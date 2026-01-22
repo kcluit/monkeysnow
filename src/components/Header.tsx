@@ -3,10 +3,16 @@ import { useEffect } from 'react';
 export function Header(): JSX.Element {
     useEffect(() => {
         // Add SF Pro Display font
-        const fontLink = document.createElement('link');
-        fontLink.rel = 'stylesheet';
-        fontLink.href = 'https://fonts.cdnfonts.com/css/sf-pro-display';
-        document.head.appendChild(fontLink);
+        const sfProLink = document.createElement('link');
+        sfProLink.rel = 'stylesheet';
+        sfProLink.href = 'https://fonts.cdnfonts.com/css/sf-pro-display';
+        document.head.appendChild(sfProLink);
+
+        // Add Lexend Deca font for logo
+        const lexendLink = document.createElement('link');
+        lexendLink.rel = 'stylesheet';
+        lexendLink.href = 'https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400&display=swap';
+        document.head.appendChild(lexendLink);
 
         // Add meta tags
         const meta = document.createElement('meta');
@@ -24,7 +30,8 @@ export function Header(): JSX.Element {
 
         // Cleanup function
         return () => {
-            document.head.removeChild(fontLink);
+            document.head.removeChild(sfProLink);
+            document.head.removeChild(lexendLink);
             document.head.removeChild(meta);
             document.head.removeChild(metaDesc);
         };
@@ -32,10 +39,10 @@ export function Header(): JSX.Element {
 
     return (
         <header className="mb-8 pt-4">
-            <div className="flex items-baseline gap-2">
-                <h1 className="text-2xl font-semibold apple-rainbow-text tracking-tight">monkeysnow</h1>
-                <span className="text-sm text-gray-500 dark:text-dark-text-secondary">monkey do</span>
-            </div>
+            <h1 className="logo-text apple-rainbow-text">
+                <div className="subtitle">monkey do</div>
+                monkeysnow
+            </h1>
         </header>
     );
 }
