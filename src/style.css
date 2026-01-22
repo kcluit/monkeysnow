@@ -10,35 +10,18 @@
     h4,
     h5,
     h6 {
-        font-family: 'SF Pro Display', system-ui, sans-serif;
+        font-family: var(--fontFamily, 'SF Pro Display', system-ui, sans-serif);
         font-weight: 600;
     }
 }
 
-/* CSS Variables for theme support */
-:root {
-    --bg-primary: #ffffff;
-    --card-bg: rgba(255, 255, 255, 0.8);
-    --card-border: rgba(255, 255, 255, 0.5);
-    --period-card-bg: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8));
-    --period-card-border: rgba(255, 255, 255, 0.3);
-    --snow-blue-bg: rgba(240, 244, 248, 0.8);
-}
-
-.dark {
-    --bg-primary: #000000;
-    --card-bg: rgba(28, 28, 30, 0.8);
-    --card-border: rgba(44, 44, 46, 0.5);
-    --period-card-bg: linear-gradient(to bottom, rgba(44, 44, 46, 0.95), rgba(28, 28, 30, 0.8));
-    --period-card-border: rgba(44, 44, 46, 0.3);
-    --snow-blue-bg: rgba(28, 28, 30, 0.8);
-}
+/* All CSS variables are set via useTheme.ts from the theme system */
 
 body {
-    background: var(--bg-primary);
+    background: var(--background);
     min-height: 100vh;
     position: relative;
-    font-family: 'SF Pro Display', system-ui, sans-serif;
+    font-family: var(--fontFamily, 'SF Pro Display', system-ui, sans-serif);
     font-weight: 400;
     letter-spacing: -0.02em;
     transition: background-color 0.3s ease;
@@ -46,7 +29,7 @@ body {
 
 h1.apple-rainbow-text,
 .apple-rainbow-text {
-    background: linear-gradient(209deg, #ea6044 39%, #dc5083 50%, #9a6df7 67%, #3f8def 81%) !important;
+    background: var(--titleColor) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
@@ -63,36 +46,28 @@ h1.apple-rainbow-text,
     width: fit-content;
 }
 
+.logo-snowflake {
+    position: absolute;
+    left: -1.2em;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 0.8em;
+    width: auto;
+}
+
 .logo-text .subtitle {
     position: absolute;
     bottom: 0.5em;
     left: 11.5em;
     font-size: 0.325em;
     line-height: 0.1;
-    color: #717977;
+    color: var(--textSecondary);
     font-weight: 400;
-    -webkit-text-fill-color: #717977;
-}
-
-/* Dark mode variant for the small text */
-.dark .logo-text .subtitle {
-    color: #a1a1a6;
-    -webkit-text-fill-color: #a1a1a6;
+    -webkit-text-fill-color: var(--textSecondary);
 }
 
 .rainbow-text {
-    background: linear-gradient(90deg,
-            #FF375F,
-            #FF453A,
-            #FF9F0A,
-            #FFD60A,
-            #30D158,
-            #66D4CF,
-            #40C8E0,
-            #0A84FF,
-            #5E5CE6,
-            #BF5AF2,
-            #FF375F);
+    background: var(--specialColor);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -109,14 +84,14 @@ h1.apple-rainbow-text,
 .resort-card {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
+    background: var(--cardBg);
+    border: 1px solid var(--border);
     transition: all 0.3s ease;
 }
 
 .period-card {
-    background: var(--period-card-bg);
-    border: 1px solid var(--period-card-border);
+    background: var(--cardBg);
+    border: 1px solid var(--border);
     transition: all 0.3s ease;
 }
 
@@ -213,8 +188,8 @@ h1.apple-rainbow-text,
     left: 20px;
     top: 80px;
     font-size: 10px;
-    color: #86868B;
-    font-family: system-ui, -apple-system, sans-serif;
+    color: var(--textSecondary);
+    font-family: var(--fontFamily, system-ui, -apple-system, sans-serif);
     opacity: 1;
     transition: opacity 0.3s ease;
     display: block;
@@ -234,4 +209,327 @@ h1.apple-rainbow-text,
         opacity: 0;
         pointer-events: none;
     }
+}
+
+/* Command Palette Styles */
+.command-palette-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 15vh;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.command-palette {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 16px;
+    background: var(--background);
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+    border-radius: 12px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+.command-input-wrapper {
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+}
+
+.command-back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    margin-left: 8px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.command-back-btn:hover {
+    background: var(--cardBg, rgba(255, 255, 255, 0.1));
+    color: var(--textPrimary, #f5f5f7);
+}
+
+.command-input {
+    flex: 1;
+    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--textPrimary, #f5f5f7);
+    font-size: 16px;
+    font-family: inherit;
+}
+
+.command-input::placeholder {
+    color: var(--textSecondary, #a1a1a6);
+}
+
+.command-list {
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.command-list-empty {
+    padding: 24px;
+    text-align: center;
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 14px;
+}
+
+.command-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: var(--textPrimary, #f5f5f7);
+    font-size: 14px;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+.command-item:hover {
+    background: var(--cardBg, rgba(255, 255, 255, 0.05));
+}
+
+.command-item.selected {
+    background: var(--accent, #0a84ff);
+    color: #ffffff;
+}
+
+.command-item.selected .command-shortcut,
+.command-item.selected .command-arrow {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.command-item-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.command-icon {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+.command-name {
+    font-weight: 600;
+}
+
+.command-item-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.command-shortcut {
+    padding: 2px 6px;
+    background: var(--cardBg, rgba(255, 255, 255, 0.1));
+    border-radius: 4px;
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 11px;
+    font-family: var(--fontFamily, monospace);
+}
+
+.command-arrow {
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.command-palette-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+    background: var(--background);
+}
+
+.command-hint {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 12px;
+}
+
+.command-hint kbd {
+    padding: 2px 6px;
+    background: var(--cardBg, rgba(255, 255, 255, 0.1));
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 11px;
+}
+
+/* FPS Counter Styles */
+.fps-counter {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 50;
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    padding: 6px 10px;
+    background: var(--cardBg, #1c1c1e);
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+    border-radius: 6px;
+    font-family: var(--fontFamily, 'SF Mono', 'Menlo', monospace);
+}
+
+.fps-value {
+    color: var(--accent, #0a84ff);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.fps-label {
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 10px;
+    text-transform: uppercase;
+}
+
+/* Rainbow Text Mode - Overrides theme text colors when enabled */
+.rainbow-mode {
+    --rainbow-gradient: linear-gradient(
+        90deg,
+        #FF375F,
+        #FF453A,
+        #FF9F0A,
+        #FFD60A,
+        #30D158,
+        #66D4CF,
+        #40C8E0,
+        #0A84FF,
+        #5E5CE6,
+        #BF5AF2,
+        #FF375F
+    );
+}
+
+/* Rainbow text for primary text elements */
+.rainbow-mode h1,
+.rainbow-mode h2,
+.rainbow-mode h3,
+.rainbow-mode h4,
+.rainbow-mode h5,
+.rainbow-mode h6 {
+    background: var(--rainbow-gradient);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: rainbow 8s linear infinite;
+}
+
+/* Rainbow text for body text */
+.rainbow-mode .rainbow-text-primary {
+    background: var(--rainbow-gradient);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: rainbow 8s linear infinite;
+}
+
+/* Rainbow accent elements - buttons, links, accents */
+.rainbow-mode .text-accent,
+.rainbow-mode [class*="text-blue-"],
+.rainbow-mode [class*="text-indigo-"],
+.rainbow-mode a:not(.no-rainbow) {
+    background: var(--rainbow-gradient);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: rainbow 8s linear infinite;
+}
+
+/* Rainbow borders and accents */
+.rainbow-mode .rainbow-border {
+    border-image: var(--rainbow-gradient) 1;
+    border-image-slice: 1;
+}
+
+/* Rainbow background accent (for cards, buttons, etc.) */
+.rainbow-mode .rainbow-bg-accent {
+    background: var(--rainbow-gradient);
+    background-size: 200% auto;
+    animation: rainbow 8s linear infinite;
+}
+
+/* Override accent color variable in rainbow mode */
+.rainbow-mode {
+    --accent: linear-gradient(90deg, #FF375F, #BF5AF2);
+}
+
+/* Resort card text in rainbow mode */
+.rainbow-mode .resort-card h2,
+.rainbow-mode .resort-card h3,
+.rainbow-mode .resort-card .text-lg,
+.rainbow-mode .resort-card .text-xl,
+.rainbow-mode .resort-card .text-2xl {
+    background: var(--rainbow-gradient);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: rainbow 8s linear infinite;
+}
+
+/* Command palette accent in rainbow mode */
+.rainbow-mode .command-item.selected {
+    background: linear-gradient(90deg, #5E5CE6, #BF5AF2, #FF375F);
+    background-size: 200% auto;
+    animation: rainbow 8s linear infinite;
+}
+
+/* FPS counter accent in rainbow mode */
+.rainbow-mode .fps-value {
+    background: var(--rainbow-gradient);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: rainbow 8s linear infinite;
+}
+
+/* Logo in rainbow mode - inherits from apple-rainbow-text already */
+.rainbow-mode .logo-text {
+    background: var(--rainbow-gradient);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: rainbow 8s linear infinite;
 }

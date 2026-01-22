@@ -1,3 +1,48 @@
+import type { Theme } from './themes';
+
+// Command Palette types
+export interface Command {
+  id: string;
+  name: string;
+  shortcut?: string;
+  icon?: string;
+  action?: () => void;
+  subCommands?: Command[];
+}
+
+export interface CommandPaletteState {
+  isOpen: boolean;
+  searchQuery: string;
+  selectedIndex: number;
+  commandStack: Command[][];
+  currentCommands: Command[];
+}
+
+export interface UseCommandPaletteReturn {
+  isOpen: boolean;
+  searchQuery: string;
+  selectedIndex: number;
+  filteredCommands: Command[];
+  openPalette: () => void;
+  closePalette: () => void;
+  setSearchQuery: (query: string) => void;
+  setSelectedIndex: (index: number) => void;
+  navigateUp: () => void;
+  navigateDown: () => void;
+  selectCurrent: () => void;
+  selectAtIndex: (index: number) => void;
+  goBack: () => void;
+  canGoBack: boolean;
+}
+
+// Extended theme return type
+export interface UseThemeReturn {
+  theme: Theme;
+  setTheme: (themeId: string) => void;
+  isDark: boolean;
+  availableThemes: Theme[];
+}
+
 // Elevation & sorting types
 export type ElevationLevel = 'bot' | 'mid' | 'top';
 export type ElevationDataKey = 'botData' | 'midData' | 'topData';
@@ -123,11 +168,7 @@ export interface ThemeToggleProps {
 }
 
 // Hook return types
-export interface UseThemeReturn {
-  theme: 'light' | 'dark';
-  toggleTheme: () => void;
-  isDark: boolean;
-}
+// UseThemeReturn is defined at the top of the file
 
 export interface UseWeatherDataReturn {
   allWeatherData: AllWeatherData | null;

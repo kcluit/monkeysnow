@@ -1,12 +1,20 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Header } from './components/Header';
 import { ControlPanel } from './components/ControlPanel';
-import { ResortCard } from './components/ResortCard';
+import { FullView } from './components/FullView';
 import { DefaultCard } from './components/DefaultCard';
-import { ThemeToggle } from './components/ThemeToggle';
+import { CommandPalette } from './components/CommandPalette';
+import { FPSCounter } from './components/FPSCounter';
 import { useWeatherData } from './hooks/useWeatherData';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useResortFiltering } from './hooks/useResortFiltering';
+import { useTheme } from './hooks/useTheme';
+import { useFont } from './hooks/useFont';
+import { useFullscreen } from './hooks/useFullscreen';
+import { useFPSCounter } from './hooks/useFPSCounter';
+import { useCommandPalette } from './hooks/useCommandPalette';
+import { useRainbowText } from './hooks/useRainbowText';
+import { useHideEmoji } from './hooks/useHideEmoji';
 import { processResortData } from './utils/weather';
 import {
   skiResorts,
@@ -21,10 +29,125 @@ import type {
   ElevationDataKey,
   SortOption,
   SortDay,
-  ProcessedResortData
+  ProcessedResortData,
+  Command
 } from './types';
 
 function App(): JSX.Element {
+  // Theme, font, fullscreen, FPS, rainbow, and hide emoji hooks
+  const { setTheme, availableThemes } = useTheme();
+  const { font, setFont, availableFonts } = useFont();
+  const { isFullscreen, enterFullscreen, exitFullscreen } = useFullscreen();
+  const { fps, isEnabled: isFPSEnabled, setEnabled: setFPSEnabled } = useFPSCounter();
+  const { isRainbowEnabled, setRainbowEnabled } = useRainbowText();
+  const { isHideEmojiEnabled, setHideEmojiEnabled } = useHideEmoji();
+
+  // Build commands for command palette
+  const commands: Command[] = useMemo(() => [
+    {
+      id: 'theme',
+      name: 'Theme',
+      icon: '🎨',
+      subCommands: availableThemes.map((t) => ({
+        id: `theme-${t.id}`,
+        name: t.name,
+        icon: t.isDark ? '🌙' : '☀️',
+        action: () => setTheme(t.id),
+      })),
+    },
+    {
+      id: 'font',
+      name: 'Font',
+      icon: '🔤',
+      subCommands: availableFonts.map((f) => ({
+        id: `font-${f.id}`,
+        name: f.name,
+        icon: f.isMonospace ? '💻' : '📝',
+        action: () => setFont(f.id),
+      })),
+    },
+    {
+      id: 'rainbow',
+      name: 'Rainbow Text',
+      icon: '🌈',
+      subCommands: [
+        {
+          id: 'rainbow-on',
+          name: 'On',
+          icon: isRainbowEnabled ? '✓' : '',
+          action: () => setRainbowEnabled(true),
+        },
+        {
+          id: 'rainbow-off',
+          name: 'Off',
+          icon: !isRainbowEnabled ? '✓' : '',
+          action: () => setRainbowEnabled(false),
+        },
+      ],
+    },
+    {
+      id: 'fullscreen',
+      name: 'Fullscreen',
+      icon: '⬛',
+      shortcut: 'F11',
+      subCommands: [
+        {
+          id: 'fullscreen-on',
+          name: 'On',
+          icon: isFullscreen ? '✓' : '',
+          action: enterFullscreen,
+        },
+        {
+          id: 'fullscreen-off',
+          name: 'Off',
+          icon: !isFullscreen ? '✓' : '',
+          action: exitFullscreen,
+        },
+      ],
+    },
+    {
+      id: 'fps',
+      name: 'FPS Counter',
+      icon: '📊',
+      subCommands: [
+        {
+          id: 'fps-on',
+          name: 'On',
+          icon: isFPSEnabled ? '✓' : '',
+          action: () => setFPSEnabled(true),
+        },
+        {
+          id: 'fps-off',
+          name: 'Off',
+          icon: !isFPSEnabled ? '✓' : '',
+          action: () => setFPSEnabled(false),
+        },
+      ],
+    },
+    {
+      id: 'hide-emoji',
+      name: 'Hide Emoji',
+      icon: '🙈',
+      subCommands: [
+        {
+          id: 'hide-emoji-on',
+          name: 'On',
+          icon: isHideEmojiEnabled ? '✓' : '',
+          action: () => setHideEmojiEnabled(true),
+        },
+        {
+          id: 'hide-emoji-off',
+          name: 'Off',
+          icon: !isHideEmojiEnabled ? '✓' : '',
+          action: () => setHideEmojiEnabled(false),
+        },
+      ],
+    },
+  ], [availableThemes, setTheme, availableFonts, setFont, isRainbowEnabled, setRainbowEnabled, isFullscreen, enterFullscreen, exitFullscreen, isFPSEnabled, setFPSEnabled, isHideEmojiEnabled, setHideEmojiEnabled]);
+
+  // Command palette hook
+  const commandPalette = useCommandPalette(commands);
+
   // Weather data hook
   const { allWeatherData, loading, error, createLoadingController, cancelLoading } = useWeatherData();
 
@@ -167,9 +290,9 @@ function App(): JSX.Element {
   // Show loading state
   if (loading) {
     return (
-      <div className="min-h-screen p-8 flex items-center justify-center bg-white dark:bg-dark-bg transition-colors duration-300">
+      <div className="min-h-screen p-8 flex items-center justify-center bg-theme-background transition-colors duration-300">
         <div className="text-center">
-          <div className="text-xl font-semibold text-gray-600 dark:text-dark-text-secondary">Loading weather data...</div>
+          <div className="text-xl font-semibold text-theme-textSecondary">Loading weather data...</div>
         </div>
       </div>
     );
@@ -178,24 +301,25 @@ function App(): JSX.Element {
   // Show error state
   if (error) {
     return (
-      <div className="min-h-screen p-8 flex items-center justify-center bg-white dark:bg-dark-bg transition-colors duration-300">
+      <div className="min-h-screen p-8 flex items-center justify-center bg-theme-background transition-colors duration-300">
         <div className="text-center">
           <div className="text-xl font-semibold text-red-600">Error loading weather data</div>
-          <div className="text-sm text-gray-600 dark:text-dark-text-secondary mt-2">Please try refreshing the page</div>
+          <div className="text-sm text-theme-textSecondary mt-2">Please try refreshing the page</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen p-8 bg-white dark:bg-dark-bg transition-colors duration-300">
-      {/* Floating Action Button - Theme Toggle */}
-      <div className="fixed bottom-6 right-6 z-50 md:bottom-8 md:right-8">
-        <ThemeToggle />
-      </div>
+    <div className="min-h-screen p-8 bg-theme-background transition-colors duration-300">
+      {/* Command Palette */}
+      <CommandPalette palette={commandPalette} hideEmoji={isHideEmojiEnabled} />
+
+      {/* FPS Counter */}
+      <FPSCounter fps={fps} isVisible={isFPSEnabled} />
 
       <div className="max-w-7xl mx-auto">
-        <Header />
+        <Header font={font} />
         <ControlPanel
           selectedResorts={selectedResorts}
           setSelectedResorts={handleResortsChange}
@@ -221,7 +345,7 @@ function App(): JSX.Element {
           {displayResorts.map((resort, index) => (
             <div key={`${resort.name}-${index}`}>
               {moreInfo ? (
-                <ResortCard resort={resort} />
+                <FullView resort={resort} />
               ) : (
                 <DefaultCard resort={resort} />
               )}
@@ -230,7 +354,7 @@ function App(): JSX.Element {
 
           {selectedResorts.length === 0 && (
             <div className="text-center py-12">
-              <div className="text-gray-500 dark:text-dark-text-secondary text-lg">Select resorts to view forecasts</div>
+              <div className="text-theme-textSecondary text-lg">Select resorts to view forecasts</div>
             </div>
           )}
         </div>

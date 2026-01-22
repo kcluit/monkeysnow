@@ -9,13 +9,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        'text-primary': '#1d1d1f',
-        'text-secondary': '#86868b',
-        'text-blue': '#007AFF',
-        'dark-text-primary': '#f5f5f7',
-        'dark-text-secondary': '#a1a1a6',
-        'dark-text-blue': '#0A84FF',
-        'dark-bg': '#000000',
+        // All colors reference CSS variables set by themes.ts via useTheme.ts
+        // These colors automatically adapt to the current theme
+        'theme': {
+          'background': 'var(--background)',
+          'cardBg': 'var(--cardBg)',
+          'textPrimary': 'var(--textPrimary)',
+          'textSecondary': 'var(--textSecondary)',
+          'accent': 'var(--accent)',
+          'secondary': 'var(--secondary)',
+          'border': 'var(--border)',
+        },
       }
     },
   },

@@ -15,8 +15,8 @@ function getWeatherEmoji(condition: string): string {
 
 function getTemperatureStyle(temp: number): string {
   if (temp <= 0) {
-    // For below zero temperatures, use the gradient
-    return 'background: linear-gradient(209deg, #ea6044 39%, #dc5083 50%, #9a6df7 67%, #3f8def 81%); -webkit-background-clip: text; background-clip: text; color: transparent;';
+    // For below zero temperatures, use the special color from theme
+    return 'background: var(--specialColor); -webkit-background-clip: text; background-clip: text; color: transparent;';
   } else {
     // For above zero temperatures, use an exponential color transition
     // Colors: Blue (#007AFF) -> Yellow (#FFD60A) -> Orange (#FF9F0A) -> Red (#FF3B30)
@@ -54,17 +54,17 @@ function lerp(start: number, end: number, t: number): number {
   return start * (1 - t) + end * t;
 }
 
-export function ResortCard({ resort }: CardProps): JSX.Element {
+export function FullView({ resort }: CardProps): JSX.Element {
   const totals = calculateSnowTotals(resort);
 
   return (
     <div className="resort-card rounded-3xl p-5 shadow-lg mb-6 transition-all duration-300">
       <div className="flex justify-between items-center mb-4">
         <div>
-          <h2 className="text-2xl font-bold text-text-primary dark:text-dark-text-primary">{resort.name}</h2>
-          <p className="text-sm font-medium text-text-blue dark:text-dark-text-blue">Base Elevation: {resort.elevation}</p>
+          <h2 className="text-2xl font-bold text-theme-textPrimary">{resort.name}</h2>
+          <p className="text-sm font-medium text-theme-accent">Base Elevation: {resort.elevation}</p>
         </div>
-        <div className="text-xs font-medium text-text-secondary dark:text-dark-text-secondary">
+        <div className="text-xs font-medium text-theme-textSecondary">
           Last updated: {new Date().toLocaleTimeString()}
         </div>
       </div>
@@ -81,12 +81,12 @@ export function ResortCard({ resort }: CardProps): JSX.Element {
                   const displayCondition = pmPeriod?.condition || nightPeriod?.condition || day.weather;
 
                   return (
-                    <th key={dayIndex} className="px-5 py-2 rounded-2xl" style={{minWidth: '280px', backgroundColor: 'var(--snow-blue-bg)'}}>
-                      <div className="text-base font-bold text-text-primary dark:text-dark-text-primary flex items-center justify-center gap-2">
+                    <th key={dayIndex} className="px-5 py-2 rounded-2xl" style={{minWidth: '280px', backgroundColor: 'var(--cardBg)'}}>
+                      <div className="text-base font-bold text-theme-textPrimary flex items-center justify-center gap-2">
                         {day.name}
                         <span className="inline-flex items-center">{getWeatherEmoji(displayCondition)}</span>
                       </div>
-                      <div className="text-xs font-semibold text-text-secondary dark:text-dark-text-secondary">{displayCondition}</div>
+                      <div className="text-xs font-semibold text-theme-textSecondary">{displayCondition}</div>
                     </th>
                   );
                 })}
@@ -95,7 +95,7 @@ export function ResortCard({ resort }: CardProps): JSX.Element {
             <tbody>
               <tr>
                 <td className="align-top pt-3">
-                  <div className="flex flex-col gap-[42px] pl-3 pt-[60px] text-sm font-semibold text-text-secondary dark:text-dark-text-secondary">
+                  <div className="flex flex-col gap-[42px] pl-3 pt-[60px] text-sm font-semibold text-theme-textSecondary">
                     <div>Snow</div>
                     <div>Rain</div>
                     <div>Wind</div>
@@ -112,13 +112,13 @@ export function ResortCard({ resort }: CardProps): JSX.Element {
                           const snowAmount = parseFloat(period.snow) || 0;
                           const snowStyle = snowAmount > 0 ? (
                             snowAmount >= 5 ?
-                              'background: linear-gradient(209deg, #ea6044 39%, #dc5083 50%, #9a6df7 67%, #3f8def 81%); -webkit-background-clip: text; background-clip: text; color: transparent;' :
-                              'color: #007AFF'
+                              'background: var(--specialColor); -webkit-background-clip: text; background-clip: text; color: transparent;' :
+                              'color: var(--accent)'
                           ) : '';
                           const windSpeed = parseFloat(period.wind) || 0;
 
                           const tempStyleObj: CSSProperties = tempStyle.includes('background') ? {
-                            background: 'linear-gradient(209deg, #ea6044 39%, #dc5083 50%, #9a6df7 67%, #3f8def 81%)',
+                            background: 'var(--specialColor)',
                             WebkitBackgroundClip: 'text',
                             backgroundClip: 'text',
                             color: 'transparent'
@@ -128,12 +128,12 @@ export function ResortCard({ resort }: CardProps): JSX.Element {
 
                           const snowStyleObj: CSSProperties = snowStyle && snowAmount > 0 ? (
                             snowAmount >= 5 ? {
-                              background: 'linear-gradient(209deg, #ea6044 39%, #dc5083 50%, #9a6df7 67%, #3f8def 81%)',
+                              background: 'var(--specialColor)',
                               WebkitBackgroundClip: 'text',
                               backgroundClip: 'text',
                               color: 'transparent'
                             } : {
-                              color: '#007AFF'
+                              color: 'var(--accent)'
                             }
                           ) : {};
 
@@ -145,7 +145,7 @@ export function ResortCard({ resort }: CardProps): JSX.Element {
                                 day.periods.length === 2 && index === 1 ? 'col-span-2' : ''
                               }`}
                             >
-                              <div className="text-sm font-bold text-text-primary dark:text-dark-text-primary mb-1">{period.time}</div>
+                              <div className="text-sm font-bold text-theme-textPrimary mb-1">{period.time}</div>
                               <div
                                 className="text-lg font-bold mb-4"
                                 style={tempStyleObj}
@@ -154,23 +154,23 @@ export function ResortCard({ resort }: CardProps): JSX.Element {
                               </div>
                               <div className="flex flex-col gap-[32px] text-sm w-full">
                                 <div
-                                  className={`font-semibold ${snowAmount === 0 ? 'text-text-secondary dark:text-dark-text-secondary' : ''}`}
+                                  className={`font-semibold ${snowAmount === 0 ? 'text-theme-textSecondary' : ''}`}
                                   style={snowStyleObj}
                                 >
                                   {period.snow}
                                 </div>
-                                <div className="text-text-secondary dark:text-dark-text-secondary font-semibold">{period.rain}</div>
-                                <div className={`font-semibold ${windSpeed >= 20 ? 'text-text-blue dark:text-dark-text-blue' : 'text-text-secondary dark:text-dark-text-secondary'}`}>{period.wind}</div>
-                                <div className="text-text-secondary dark:text-dark-text-secondary font-semibold">{period.condition}</div>
+                                <div className="text-theme-textSecondary font-semibold">{period.rain}</div>
+                                <div className={`font-semibold ${windSpeed >= 20 ? 'text-theme-accent' : 'text-theme-textSecondary'}`}>{period.wind}</div>
+                                <div className="text-theme-textSecondary font-semibold">{period.condition}</div>
                               </div>
                             </div>
                           );
                         })}
                       </div>
-                      <div className="p-2.5 rounded-2xl" style={{backgroundColor: 'var(--snow-blue-bg)'}}>
+                      <div className="p-2.5 rounded-2xl" style={{backgroundColor: 'var(--cardBg)'}}>
                         <div className="text-sm">
-                          <div className="text-text-primary dark:text-dark-text-primary font-bold">Freezing Elevation: {day.freezingLevel}</div>
-                          <div className={`${day.snowCondition.isRainbow ? 'rainbow-text' : 'text-text-blue dark:text-dark-text-blue'} font-semibold mt-0.5`}>{day.snowCondition.text}</div>
+                          <div className="text-theme-textPrimary font-bold">Freezing Elevation: {day.freezingLevel}</div>
+                          <div className={`${day.snowCondition.isRainbow ? 'rainbow-text' : 'text-theme-accent'} font-semibold mt-0.5`}>{day.snowCondition.text}</div>
                         </div>
                       </div>
                     </div>
@@ -183,10 +183,10 @@ export function ResortCard({ resort }: CardProps): JSX.Element {
       </div>
       <div className="mt-2">
         <div className="flex justify-center">
-          <div className="bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-lg">
+          <div className="bg-theme-cardBg px-3 py-1 rounded-lg">
             <span className="text-sm font-medium">
-              <span className="text-text-primary dark:text-dark-text-primary">Totals:</span>
-              <span className="text-blue-600 dark:text-blue-400"> Next 3 Days: {totals.next3Days}cm | Next 7 Days: {totals.next7Days}cm</span>
+              <span className="text-theme-textPrimary">Totals:</span>
+              <span className="text-theme-accent"> Next 3 Days: {totals.next3Days}cm | Next 7 Days: {totals.next7Days}cm</span>
             </span>
           </div>
         </div>

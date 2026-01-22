@@ -1,11 +1,12 @@
 import { useTheme } from '../hooks/useTheme';
 
 export function ThemeToggle(): JSX.Element {
-  const { theme, toggleTheme, isDark } = useTheme();
+  const { theme, setTheme, isDark } = useTheme();
 
   const handleClick = (): void => {
-    console.log('Theme toggle clicked, current theme:', theme);
-    toggleTheme();
+    console.log('Theme toggle clicked, current theme:', theme.id);
+    // Toggle between light and dark (first two themes)
+    setTheme(isDark ? 'light' : 'dark');
   };
 
   return (
@@ -13,7 +14,7 @@ export function ThemeToggle(): JSX.Element {
       onClick={handleClick}
       className="relative inline-flex h-11 w-[72px] md:h-8 md:w-14 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-lg hover:shadow-xl active:scale-95"
       style={{
-        backgroundColor: isDark ? '#1C1C1E' : '#E5E5EA'
+        backgroundColor: 'var(--cardBg)'
       }}
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} theme`}
       title={`Switch to ${isDark ? 'light' : 'dark'} theme`}
@@ -26,7 +27,7 @@ export function ThemeToggle(): JSX.Element {
             : 'translate-x-[3px] md:translate-x-[2px]'
         }`}
         style={{
-          backgroundColor: '#FFFFFF',
+          backgroundColor: 'var(--textPrimary)',
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)'
         }}
       >
@@ -42,7 +43,7 @@ export function ThemeToggle(): JSX.Element {
           >
             <path
               d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
-              fill="#6B7280"
+              fill="var(--textSecondary)"
             />
           </svg>
         ) : (
@@ -54,10 +55,10 @@ export function ThemeToggle(): JSX.Element {
             viewBox="0 0 24 24"
             fill="none"
           >
-            <circle cx="12" cy="12" r="4" fill="#F59E0B"/>
+            <circle cx="12" cy="12" r="4" fill="var(--accent)"/>
             <path
               d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M17.36 17.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M17.36 6.64l1.42-1.42"
-              stroke="#F59E0B"
+              stroke="var(--accent)"
               strokeWidth="2"
               strokeLinecap="round"
             />

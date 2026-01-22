@@ -1,53 +1,84 @@
 import { useState, useEffect, useCallback } from 'react';
+import { themes, getThemeById, getDefaultTheme } from '../types/themes';
+import type { Theme } from '../types/themes';
 import type { UseThemeReturn } from '../types';
 
-type Theme = 'light' | 'dark';
-
 export function useTheme(): UseThemeReturn {
-  const [theme, setTheme] = useState<Theme>('light');
-  const [isInitialized, setIsInitialized] = useState(false);
+    const [theme, setThemeState] = useState<Theme>(getDefaultTheme());
+    const [isInitialized, setIsInitialized] = useState(false);
 
-  // Initialize theme on mount
-  useEffect(() => {
-    try {
-      // Check localStorage for saved theme preference
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'dark' || savedTheme === 'light') {
-        setTheme(savedTheme);
-      }
-      // If no saved preference, use default 'light' theme
-    } catch (error) {
-      console.warn('Error accessing localStorage:', error);
-    }
-    setIsInitialized(true);
-  }, []);
+    // Apply theme CSS variables to document
+    const applyTheme = useCallback((themeToApply: Theme) => {
+        const root = document.documentElement;
+        const { colors, isDark } = themeToApply;
 
-  // Update DOM and localStorage when theme changes (but only after initialization)
-  useEffect(() => {
-    if (!isInitialized) return;
+        // Set CSS variables from theme (8 core variables)
+        root.style.setProperty('--background', colors.background);
+        root.style.setProperty('--cardBg', colors.cardBg);
+        root.style.setProperty('--textPrimary', colors.textPrimary);
+        root.style.setProperty('--textSecondary', colors.textSecondary);
+        root.style.setProperty('--accent', colors.accent);
+        root.style.setProperty('--secondary', colors.secondary);
+        root.style.setProperty('--titleColor', colors.titleColor);
+        root.style.setProperty('--specialColor', colors.specialColor);
 
-    const root = document.documentElement;
+        // Derived CSS variable
+        root.style.setProperty('--border', isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)');
 
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
+        // Toggle dark class for Tailwind compatibility
+        if (isDark) {
+            root.classList.add('dark');
+        } else {
+            root.classList.remove('dark');
+        }
+    }, []);
 
-    try {
-      localStorage.setItem('theme', theme);
-    } catch (error) {
-      console.warn('Error saving theme to localStorage:', error);
-    }
-  }, [theme, isInitialized]);
+    // Initialize theme on mount
+    useEffect(() => {
+        try {
+            const savedThemeId = localStorage.getItem('themeId');
+            if (savedThemeId) {
+                const savedTheme = getThemeById(savedThemeId);
+                if (savedTheme) {
+                    setThemeState(savedTheme);
+                    applyTheme(savedTheme);
+                } else {
+                    applyTheme(getDefaultTheme());
+                }
+            } else {
+                applyTheme(getDefaultTheme());
+            }
+        } catch (error) {
+            console.warn('Error accessing localStorage:', error);
+            applyTheme(getDefaultTheme());
+        }
+        setIsInitialized(true);
+    }, [applyTheme]);
 
-  const toggleTheme = useCallback(() => {
-    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
-  }, []);
+    // Update DOM and localStorage when theme changes (after initialization)
+    useEffect(() => {
+        if (!isInitialized) return;
 
-  return {
-    theme,
-    toggleTheme,
-    isDark: theme === 'dark'
-  };
+        applyTheme(theme);
+
+        try {
+            localStorage.setItem('themeId', theme.id);
+        } catch (error) {
+            console.warn('Error saving theme to localStorage:', error);
+        }
+    }, [theme, isInitialized, applyTheme]);
+
+    const setTheme = useCallback((themeId: string) => {
+        const newTheme = getThemeById(themeId);
+        if (newTheme) {
+            setThemeState(newTheme);
+        }
+    }, []);
+
+    return {
+        theme,
+        setTheme,
+        isDark: theme.isDark,
+        availableThemes: themes,
+    };
 }
