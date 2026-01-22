@@ -1,0 +1,189 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'SF Pro Display', system-ui, sans-serif;
+    font-weight: 600;
+  }
+}
+
+/* CSS Variables for theme support */
+:root {
+  --bg-primary: #ffffff;
+  --card-bg: rgba(255, 255, 255, 0.8);
+  --card-border: rgba(255, 255, 255, 0.5);
+  --period-card-bg: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8));
+  --period-card-border: rgba(255, 255, 255, 0.3);
+  --snow-blue-bg: rgba(240, 244, 248, 0.8);
+}
+
+.dark {
+  --bg-primary: #000000;
+  --card-bg: rgba(28, 28, 30, 0.8);
+  --card-border: rgba(44, 44, 46, 0.5);
+  --period-card-bg: linear-gradient(to bottom, rgba(44, 44, 46, 0.95), rgba(28, 28, 30, 0.8));
+  --period-card-border: rgba(44, 44, 46, 0.3);
+  --snow-blue-bg: rgba(28, 28, 30, 0.8);
+}
+
+body {
+  background: var(--bg-primary);
+  min-height: 100vh;
+  position: relative;
+  font-family: 'SF Pro Display', system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  transition: background-color 0.3s ease;
+}
+.apple-rainbow-text {
+  background: linear-gradient(209deg, #ea6044 39%, #dc5083 50%, #9a6df7 67%, #3f8def 81%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.rainbow-text {
+  background: linear-gradient(
+    90deg,
+    #FF375F,
+    #FF453A,
+    #FF9F0A,
+    #FFD60A,
+    #30D158,
+    #66D4CF,
+    #40C8E0,
+    #0A84FF,
+    #5E5CE6,
+    #BF5AF2,
+    #FF375F
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  background-size: 200% auto;
+  animation: rainbow 8s linear infinite;
+}
+
+@keyframes rainbow {
+  to {
+    background-position: 200% center;
+  }
+}
+
+.resort-card {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  transition: all 0.3s ease;
+}
+
+.period-card {
+  background: var(--period-card-bg);
+  border: 1px solid var(--period-card-border);
+  transition: all 0.3s ease;
+}
+
+.period-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.dark .period-card:hover {
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+}
+
+.weather-icon {
+  filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.1));
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+.weather-emoji {
+  animation: float 3s ease-in-out infinite;
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-size: 1.25rem;
+}
+
+/* Hide scrollbar but keep functionality */
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Corner image styles */
+.corner-image {
+  position: fixed;
+  top: 20px;
+  z-index: 50;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  display: block;
+}
+.corner-image img {
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+.corner-image img:hover {
+  transform: scale(1.05);
+}
+.left-image {
+  left: 20px;
+}
+.left-image img {
+  width: 150px;
+  height: auto;
+}
+.right-image {
+  right: 20px;
+}
+.right-image img {
+  width: 100px;
+  height: auto;
+}
+.attribution {
+  position: fixed;
+  left: 20px;
+  top: 80px;
+  font-size: 10px;
+  color: #86868B;
+  font-family: system-ui, -apple-system, sans-serif;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  display: block;
+}
+@media screen and (max-width: 768px) {
+  .corner-image {
+    display: none !important;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .attribution {
+    display: none !important;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+}
