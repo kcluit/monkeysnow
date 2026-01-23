@@ -107,14 +107,14 @@ function getHighestFreezingLevel(levels: number[] | undefined): number | null {
 }
 
 function getWeatherEmoji(condition: string): string {
-  if (!condition) return '⛅\uFE0E';
+  if (!condition) return '⛅';
   const lowerCondition = condition.toLowerCase();
 
-  if (lowerCondition.includes('snow')) return '❄\uFE0E';
-  if (lowerCondition.includes('rain')) return '🌧\uFE0E';
-  if (lowerCondition.includes('clear')) return '☀\uFE0E';
-  if (lowerCondition.includes('cloud')) return '☁\uFE0E';
-  return '⛅\uFE0E';
+  if (lowerCondition.includes('snow')) return '❄️';
+  if (lowerCondition.includes('rain')) return '🌧️';
+  if (lowerCondition.includes('clear')) return '☀️';
+  if (lowerCondition.includes('cloud')) return '☁️';
+  return '⛅';
 }
 
 function getSnowCondition(freezingLevel: number | null, baseElevation: number): SnowCondition {
