@@ -821,11 +821,19 @@ input[type="checkbox"] {
 
 /* Province level */
 .resort-grid-provinces {
-    padding-left: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 6px;
 }
 
 .resort-grid-province {
-    margin-bottom: 2px;
+    flex: 1 1 240px;
+    min-width: 240px;
+    max-width: 100%;
+    background: var(--cardBg, rgba(255, 255, 255, 0.03));
+    border-radius: 4px;
+    padding: 2px;
 }
 
 .resort-grid-province-header {
