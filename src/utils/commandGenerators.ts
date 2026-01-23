@@ -245,12 +245,12 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
       ),
     },
     {
-      id: 'full-view',
-      name: 'Full View',
-      icon: '📋',
-      subCommands: generateFullViewCommands(
-        params.moreInfo,
-        params.setMoreInfo
+      id: 'view-mode',
+      name: 'Choose view...',
+      icon: '👁️',
+      subCommands: generateViewModeCommands(
+        params.viewMode,
+        params.setViewMode
       ),
     },
     {
