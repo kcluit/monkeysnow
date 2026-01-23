@@ -48,6 +48,7 @@ export type ElevationLevel = 'bot' | 'mid' | 'top';
 export type ElevationDataKey = 'botData' | 'midData' | 'topData';
 export type SortOption = 'temperature' | 'snowfall' | 'wind';
 export type SortDay = number | 'next3days' | 'next7days';
+export type ViewMode = 'default' | 'full' | 'compact';
 
 // Weather data structures from API
 export interface WeatherData {
