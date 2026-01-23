@@ -144,24 +144,30 @@ export function generateOrderCommands(
 }
 
 /**
- * Generate full view toggle submenu commands with checkmarks.
+ * Generate view mode submenu commands with checkmarks.
  */
-export function generateFullViewCommands(
-  moreInfo: boolean,
-  setMoreInfo: (m: boolean) => void
+export function generateViewModeCommands(
+  viewMode: ViewMode,
+  setViewMode: (m: ViewMode) => void
 ): Command[] {
   return [
     {
-      id: 'fullview-on',
-      name: 'On',
-      icon: moreInfo ? '✓' : '',
-      action: () => setMoreInfo(true),
+      id: 'viewmode-default',
+      name: 'Default',
+      icon: viewMode === 'default' ? '✓' : '',
+      action: () => setViewMode('default'),
     },
     {
-      id: 'fullview-off',
-      name: 'Off',
-      icon: !moreInfo ? '✓' : '',
-      action: () => setMoreInfo(false),
+      id: 'viewmode-full',
+      name: 'Full',
+      icon: viewMode === 'full' ? '✓' : '',
+      action: () => setViewMode('full'),
+    },
+    {
+      id: 'viewmode-compact',
+      name: 'Compact',
+      icon: viewMode === 'compact' ? '✓' : '',
+      action: () => setViewMode('compact'),
     },
   ];
 }
