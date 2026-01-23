@@ -198,13 +198,13 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'select-resorts',
       name: 'Select Resorts',
-      icon: '⛷️',
+      icon: '⛷\uFE0E',
       action: params.openResortSelector,
     },
     {
       id: 'elevation',
       name: 'Elevation',
-      icon: '⛰️',
+      icon: '⛰\uFE0E',
       subCommands: generateElevationCommands(
         params.selectedElevation,
         params.setSelectedElevation
@@ -213,7 +213,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'sort-by',
       name: 'Sort By',
-      icon: '📊',
+      icon: '📊\uFE0E',
       subCommands: generateSortCommands(
         params.selectedSort,
         params.setSelectedSort
@@ -222,7 +222,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'sort-day',
       name: 'Sort Day',
-      icon: '📅',
+      icon: '📅\uFE0E',
       subCommands: generateSortDayCommands(
         params.selectedSortDay,
         params.setSelectedSortDay,
@@ -232,7 +232,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'sort-order',
       name: 'Sort Order',
-      icon: '↕️',
+      icon: '↕\uFE0E',
       subCommands: generateOrderCommands(
         params.isReversed,
         params.setIsReversed
@@ -241,7 +241,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'full-view',
       name: 'Full View',
-      icon: '📋',
+      icon: '📋\uFE0E',
       subCommands: generateFullViewCommands(
         params.moreInfo,
         params.setMoreInfo
@@ -250,7 +250,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'utility-bar',
       name: 'Utility Bar',
-      icon: '🎛️',
+      icon: '🎛\uFE0E',
       subCommands: generateUtilityBarCommands(
         params.showUtilityBar,
         params.setShowUtilityBar
