@@ -284,7 +284,7 @@ const updateWeatherData = async () => {
                     snowfall_total: parseFloat(getSum(hData.map((d: any) => d.snowfall)).toFixed(4)),
                     weather_code: getMode(hData.map((d: any) => d.weather_code)),
                     surface_pressure: parseFloat(getAverage(hData.map((d: any) => d.surface_pressure)).toFixed(2)),
-                    freezing_level: parseFloat(getMax(mData).toFixed(2)) // Max freezing level seen in chunk
+                    freezing_level: mData.length > 0 ? parseFloat(getMax(mData).toFixed(2)) : null
                 };
             });
         }
