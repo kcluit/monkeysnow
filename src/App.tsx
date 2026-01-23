@@ -423,7 +423,7 @@ function App(): JSX.Element {
                     />
                 )}
 
-                <div className="space-y-8">
+                <div className={viewMode === 'compact' ? "compact-grid" : "space-y-8"}>
                     {displayResorts.map((resort, index) => (
                         <div key={`${resort.name}-${index}`}>
                             {viewMode === 'full' ? (
