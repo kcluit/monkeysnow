@@ -3,7 +3,7 @@
  * Generates commands with checkmarks based on current state.
  */
 
-import type { Command, ElevationLevel, SortOption, SortDay, SortDayData } from '../types';
+import type { Command, ElevationLevel, SortOption, SortDay, SortDayData, ViewMode } from '../types';
 
 export interface ControlCommandParams {
   // Elevation
