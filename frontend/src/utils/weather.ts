@@ -129,11 +129,11 @@ function createPeriodsFromDayData(dayData: DayData): Period[] {
 function createPeriodFromData(data: PeriodData, label: string): Period {
   return {
     time: label,
-    temp: `${Math.round(data.temperature_avg)}°C`,
-    snow: `${data.snowfall_total.toFixed(1)} cm`,
-    rain: `${data.rain_total.toFixed(1)} mm`,
-    wind: `${Math.round(data.wind_speed)} km/h`,
-    condition: getWeatherDescription(data.weather_code)
+    temp: `${Math.round(data.temperature_avg ?? 0)}°C`,
+    snow: `${(data.snowfall_total ?? 0).toFixed(1)} cm`,
+    rain: `${(data.rain_total ?? 0).toFixed(1)} mm`,
+    wind: `${Math.round(data.wind_speed ?? 0)} km/h`,
+    condition: getWeatherDescription(data.weather_code ?? 0)
   };
 }
 
