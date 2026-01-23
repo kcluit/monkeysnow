@@ -35,7 +35,8 @@ import type {
     SortDay,
     ProcessedResortData,
     Command,
-    SortDayData
+    SortDayData,
+    ViewMode
 } from './types';
 
 function App(): JSX.Element {
