@@ -859,8 +859,10 @@ input[type="checkbox"] {
 
 /* Resort list */
 .resort-grid-resorts {
-    padding-left: 24px;
-    padding-bottom: 4px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 8px;
+    padding: 4px 8px 6px 24px;
 }
 
 .resort-grid-item {
