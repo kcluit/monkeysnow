@@ -90,7 +90,7 @@ export function DefaultCard({ resort }: CardProps): JSX.Element {
                                         <div className="flex items-center gap-2">
                                             <div className={`text-2xl font-bold ${getTemperatureClass(dayStats.maxTemp)}`}>{dayStats.maxTemp}°C</div>
                                             {dayStats.snow > 0 && (
-                                                <div className={`text-sm font-bold ${dayStats.snow >= 20 ? 'rainbow-text' : (dayStats.snow >= 10 ? 'apple-rainbow-text' : 'text-theme-accent')}`}>
+                                                <div className={`text-sm font-bold ${getSnowClass(dayStats.snow)}`}>
                                                     {dayStats.snow} cm snow
                                                 </div>
                                             )}
