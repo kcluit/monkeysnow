@@ -686,3 +686,283 @@ input[type="checkbox"] {
 .rainbow-mode .resort-selection-count {
     background: linear-gradient(90deg, #5E5CE6, #BF5AF2);
 }
+
+/* Resort Grid Modal Styles - Large fullscreen-like modal */
+.resort-grid-modal {
+    max-width: 90vw;
+    width: 90vw;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.resort-grid-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+}
+
+.resort-grid-header .command-input-wrapper {
+    flex: 1;
+    border-bottom: none;
+}
+
+.resort-grid-actions {
+    display: flex;
+    gap: 8px;
+    padding-right: 12px;
+}
+
+.resort-grid-action-btn {
+    padding: 6px 12px;
+    background: var(--cardBg, rgba(255, 255, 255, 0.1));
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+    border-radius: 6px;
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.resort-grid-action-btn:hover {
+    background: var(--accent, #0a84ff);
+    color: #ffffff;
+    border-color: var(--accent, #0a84ff);
+}
+
+.resort-grid-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+}
+
+.resort-grid-columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    align-items: start;
+}
+
+.resort-grid-empty {
+    padding: 48px;
+    text-align: center;
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 14px;
+}
+
+/* Continent level */
+.resort-grid-continent {
+    background: var(--cardBg, rgba(255, 255, 255, 0.05));
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.resort-grid-continent-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: var(--cardBg, rgba(255, 255, 255, 0.08));
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.resort-grid-continent-header:hover {
+    background: var(--cardBg, rgba(255, 255, 255, 0.12));
+}
+
+.resort-grid-continent-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--textPrimary, #f5f5f7);
+    flex: 1;
+}
+
+/* Country level */
+.resort-grid-countries {
+    padding: 4px;
+}
+
+.resort-grid-country {
+    margin-bottom: 4px;
+}
+
+.resort-grid-country-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.resort-grid-country-header:hover {
+    background: var(--cardBg, rgba(255, 255, 255, 0.08));
+}
+
+.resort-grid-country-name {
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--textPrimary, #f5f5f7);
+    flex: 1;
+}
+
+/* Province level */
+.resort-grid-provinces {
+    padding-left: 12px;
+}
+
+.resort-grid-province {
+    margin-bottom: 2px;
+}
+
+.resort-grid-province-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.resort-grid-province-header:hover {
+    background: var(--cardBg, rgba(255, 255, 255, 0.06));
+}
+
+.resort-grid-province-name {
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--textPrimary, #f5f5f7);
+    flex: 1;
+}
+
+/* Resort list */
+.resort-grid-resorts {
+    padding-left: 24px;
+    padding-bottom: 4px;
+}
+
+.resort-grid-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.resort-grid-item:hover {
+    background: var(--cardBg, rgba(255, 255, 255, 0.06));
+}
+
+.resort-grid-item-icon {
+    font-size: 12px;
+    width: 16px;
+    text-align: center;
+}
+
+.resort-grid-item-name {
+    font-size: 12px;
+    color: var(--textPrimary, #f5f5f7);
+}
+
+/* Shared styles */
+.resort-grid-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    background: transparent;
+    border: none;
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 8px;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+    padding: 0;
+}
+
+.resort-grid-toggle.expanded {
+    transform: rotate(90deg);
+}
+
+.resort-grid-header-icon {
+    font-size: 14px;
+    width: 18px;
+    text-align: center;
+}
+
+.resort-grid-count {
+    padding: 2px 6px;
+    background: var(--cardBg, rgba(255, 255, 255, 0.1));
+    border-radius: 8px;
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 10px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* Checkbox styles */
+.resort-grid-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--textSecondary, #a1a1a6);
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 700;
+    color: transparent;
+    background: transparent;
+    transition: all 0.15s ease;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.resort-grid-checkbox:hover {
+    border-color: var(--accent, #0a84ff);
+}
+
+.resort-grid-checkbox.checked {
+    background: var(--accent, #0a84ff);
+    border-color: var(--accent, #0a84ff);
+    color: #ffffff;
+}
+
+.resort-grid-checkbox.indeterminate {
+    background: var(--accent, #0a84ff);
+    border-color: var(--accent, #0a84ff);
+    color: #ffffff;
+}
+
+/* Rainbow mode for grid modal */
+.rainbow-mode .resort-grid-checkbox.checked,
+.rainbow-mode .resort-grid-checkbox.indeterminate {
+    background: linear-gradient(90deg, #5E5CE6, #BF5AF2);
+    border-color: transparent;
+}
+
+.rainbow-mode .resort-grid-action-btn:hover {
+    background: linear-gradient(90deg, #5E5CE6, #BF5AF2);
+    border-color: transparent;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .resort-grid-modal {
+        max-width: 95vw;
+        width: 95vw;
+        max-height: 90vh;
+    }
+
+    .resort-grid-columns {
+        grid-template-columns: 1fr;
+    }
+}
