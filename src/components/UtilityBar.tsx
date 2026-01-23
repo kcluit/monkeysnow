@@ -24,6 +24,7 @@ export function UtilityBar({
   const [showElevationMenu, setShowElevationMenu] = useState(false);
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showSortDayMenu, setShowSortDayMenu] = useState(false);
+  const [showViewModeMenu, setShowViewModeMenu] = useState(false);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
