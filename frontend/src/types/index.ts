@@ -172,7 +172,7 @@ export interface UtilityBarProps {
   processResortData: (
     allData: AllWeatherData,
     resortName: string,
-    elevation: ElevationDataKey
+    elevation: ElevationLevel
   ) => ProcessedResortData | null;
   cancelLoading: () => void;
 }
