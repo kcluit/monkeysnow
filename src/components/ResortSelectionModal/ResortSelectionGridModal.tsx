@@ -372,15 +372,18 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
   // Build hierarchy tree once
   const hierarchyTree = useMemo(() => buildHierarchyTree(), []);
 
+  // Memoize all node IDs for performance
+  const allNodeIds = useMemo(() => getAllNodeIds(hierarchyTree), [hierarchyTree]);
+
   // Initialize expanded nodes with all node IDs (default expanded)
-  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(() => getAllNodeIds(hierarchyTree));
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(() => new Set(allNodeIds));
 
   // Reset expansion state when modal opens
   useEffect(() => {
     if (isOpen) {
-      setExpandedNodes(getAllNodeIds(hierarchyTree));
+      setExpandedNodes(new Set(allNodeIds));
     }
-  }, [isOpen, hierarchyTree]);
+  }, [isOpen, allNodeIds]);
 
   // Filter hierarchy based on search
   const filteredHierarchy = useMemo(
