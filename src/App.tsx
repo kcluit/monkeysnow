@@ -387,8 +387,8 @@ function App(): JSX.Element {
       {/* Command Palette */}
       <CommandPalette palette={commandPalette} hideEmoji={isHideEmojiEnabled} />
 
-      {/* Resort Selection Modal */}
-      <ResortSelectionModal hierarchy={resortHierarchy} hideEmoji={isHideEmojiEnabled} />
+      {/* Resort Selection Grid Modal */}
+      <ResortSelectionGridModal hierarchy={resortHierarchy} hideEmoji={isHideEmojiEnabled} />
 
       {/* FPS Counter */}
       <FPSCounter fps={fps} isVisible={isFPSEnabled} />
