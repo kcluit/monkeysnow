@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Header } from './components/Header';
-import { ControlPanel } from './components/ControlPanel';
+import { UtilityBar } from './components/UtilityBar';
 import { FullView } from './components/FullView';
 import { DefaultCard } from './components/DefaultCard';
 import { CommandPalette } from './components/CommandPalette';
