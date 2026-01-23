@@ -51,7 +51,6 @@ export function CommandPalette({ palette, hideEmoji }: CommandPaletteProps): JSX
         <CommandInput
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder={canGoBack ? 'Search...' : 'Type a command...'}
           canGoBack={canGoBack}
           onBack={goBack}
         />
