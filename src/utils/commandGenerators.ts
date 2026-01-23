@@ -241,7 +241,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'full-view',
       name: 'Full View',
-      icon: '📋\uFE0E',
+      icon: '📋',
       subCommands: generateFullViewCommands(
         params.moreInfo,
         params.setMoreInfo
