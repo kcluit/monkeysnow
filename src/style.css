@@ -81,6 +81,11 @@ h1.apple-rainbow-text,
     }
 }
 
+/* Theme-aware checkbox styling */
+input[type="checkbox"] {
+    accent-color: var(--accent);
+}
+
 .resort-card {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -532,4 +537,152 @@ h1.apple-rainbow-text,
     -webkit-text-fill-color: transparent;
     color: transparent;
     animation: rainbow 8s linear infinite;
+}
+
+/* Resort Selection Modal Styles */
+.resort-selection-modal {
+    max-width: 650px;
+}
+
+.resort-breadcrumb {
+    padding: 8px 16px;
+    font-size: 12px;
+    color: var(--textSecondary, #a1a1a6);
+    border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+    background: var(--cardBg, rgba(255, 255, 255, 0.05));
+}
+
+.resort-tree-list {
+    max-height: 400px;
+}
+
+.resort-tree-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: var(--textPrimary, #f5f5f7);
+    font-size: 14px;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+.resort-tree-item:hover {
+    background: var(--cardBg, rgba(255, 255, 255, 0.05));
+}
+
+.resort-tree-item.selected {
+    background: var(--accent, #0a84ff);
+    color: #ffffff;
+}
+
+.resort-tree-item.selected .resort-tree-count,
+.resort-tree-item.selected .resort-tree-arrow {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.resort-tree-item-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.resort-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--textSecondary, #a1a1a6);
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    color: transparent;
+    background: transparent;
+    transition: all 0.15s ease;
+    cursor: pointer;
+}
+
+.resort-checkbox:hover {
+    border-color: var(--accent, #0a84ff);
+}
+
+.resort-checkbox.checked {
+    background: var(--accent, #0a84ff);
+    border-color: var(--accent, #0a84ff);
+    color: #ffffff;
+}
+
+.resort-checkbox.indeterminate {
+    background: var(--accent, #0a84ff);
+    border-color: var(--accent, #0a84ff);
+    color: #ffffff;
+}
+
+.resort-tree-item.selected .resort-checkbox {
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+.resort-tree-item.selected .resort-checkbox.checked,
+.resort-tree-item.selected .resort-checkbox.indeterminate {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+.resort-tree-icon {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+.resort-tree-name {
+    font-weight: 500;
+}
+
+.resort-tree-count {
+    padding: 2px 8px;
+    background: var(--cardBg, rgba(255, 255, 255, 0.1));
+    border-radius: 10px;
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.resort-tree-arrow {
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.resort-selection-count {
+    margin-left: auto;
+    padding: 2px 8px;
+    background: var(--accent, #0a84ff);
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* Rainbow mode for resort selection */
+.rainbow-mode .resort-checkbox.checked,
+.rainbow-mode .resort-checkbox.indeterminate {
+    background: linear-gradient(90deg, #5E5CE6, #BF5AF2);
+    border-color: transparent;
+}
+
+.rainbow-mode .resort-tree-item.selected {
+    background: linear-gradient(90deg, #5E5CE6, #BF5AF2, #FF375F);
+    background-size: 200% auto;
+    animation: rainbow 8s linear infinite;
+}
+
+.rainbow-mode .resort-selection-count {
+    background: linear-gradient(90deg, #5E5CE6, #BF5AF2);
 }

@@ -1,49 +1,8 @@
 import type { ElevationLevel, SortOption } from '../types';
+import { buildResortAliases, getDisplayNameFromHierarchy } from '../data/resortHierarchy';
 
-export const resortAliases: Record<string, string> = {
-  // British Columbia
-  "Apex Mountain": "Apex",
-  "Mt Baldy": "Mt-Baldy-Ski-Area",
-  "Big White": "Big-White",
-  "Cypress Mountain": "Cypress-Mountain",
-  "Fairmont Hot Springs": "Fairmont-Hot-Springs",
-  "Fernie Alpine": "Fernie",
-  "Grouse Mountain": "Grouse-Mountain",
-  "Harper Mountain": "Harper-Mountain",
-  "Hudson Bay Mountain": "Ski-Smithers",
-  "Kicking Horse": "Kicking-Horse",
-  "Kimberley Alpine": "Kimberley",
-  "Manning Park": "Manning-Park-Resort",
-  "Mount Cain": "MountCain",
-  "Mount Timothy": "Mount-Timothy-Ski-Area",
-  "Mount Washington": "Mount-Washington",
-  "Mount Seymour": "Mount-Seymour",
-  "Murray Ridge": "Murray-Ridge",
-  "Panorama Mountain": "Panorama",
-  "Powder King": "PowderKing",
-  "Red Mountain": "Red-Mountain",
-  "Revelstoke Mountain": "Revelstoke",
-  "Sasquatch Mountain": "HemlockResort",
-  "Shames Mountain": "ShamesMountain",
-  "SilverStar Mountain": "Silver-Star",
-  "Summit Lake Ski Area": "Summit-Lake-Ski-and-Snowboard-Area",
-  "Sun Peaks": "Sun-Peaks",
-  "Troll Resort": "Troll-Resort",
-  "Whistler Blackcomb": "Whistler-Blackcomb",
-  "Whitewater": "Whitewater",
-  // Alberta
-  "Lake Louise": "Lake-Louise",
-  "Sunshine Village": "Sunshine",
-  "Mt Norquay": "Banff-Norquay",
-  "Marmot Basin": "Marmot-Basin",
-  "Nakiska": "Nakiska",
-  "Castle Mountain": "Castle-Mountain-Resort",
-  "Pass Powderkeg": "Pass-Powderkeg",
-  // Washington State
-  "Mt Baker": "Mount-Baker",
-  "Crystal Mountain WA": "Crystal-Mountain",
-  "Stevens Pass" : "Stevens-Pass"
-};
+// Build resort aliases from the hierarchy (single source of truth)
+export const resortAliases: Record<string, string> = buildResortAliases();
 
 export const webcamUrls: Record<string, string> = {
   "Apex Mountain": "https://apexresort.com/weather/?1#live-webcams",
@@ -91,6 +50,7 @@ export const defaultSort: SortOption = "temperature";
 export const defaultSortDay: number = 0;
 
 // Helper function to get display name from API ID
+// Uses the hierarchy as the source of truth
 export function getDisplayName(apiId: string): string {
-  return Object.entries(resortAliases).find(([, id]) => id === apiId)?.[0] || apiId.replace(/-/g, ' ');
+  return getDisplayNameFromHierarchy(apiId);
 }

@@ -5,6 +5,7 @@ import { FullView } from './components/FullView';
 import { DefaultCard } from './components/DefaultCard';
 import { CommandPalette } from './components/CommandPalette';
 import { FPSCounter } from './components/FPSCounter';
+import { ResortSelectionModal } from './components/ResortSelectionModal';
 import { useWeatherData } from './hooks/useWeatherData';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useResortFiltering } from './hooks/useResortFiltering';
@@ -15,7 +16,9 @@ import { useFPSCounter } from './hooks/useFPSCounter';
 import { useCommandPalette } from './hooks/useCommandPalette';
 import { useRainbowText } from './hooks/useRainbowText';
 import { useHideEmoji } from './hooks/useHideEmoji';
+import { useResortHierarchy } from './hooks/useResortHierarchy';
 import { processResortData } from './utils/weather';
+import { generateControlCommands } from './utils/commandGenerators';
 import {
   skiResorts,
   defaultSelectedResorts,
@@ -30,7 +33,8 @@ import type {
   SortOption,
   SortDay,
   ProcessedResortData,
-  Command
+  Command,
+  SortDayData
 } from './types';
 
 function App(): JSX.Element {
@@ -42,112 +46,6 @@ function App(): JSX.Element {
   const { isRainbowEnabled, setRainbowEnabled } = useRainbowText();
   const { isHideEmojiEnabled, setHideEmojiEnabled } = useHideEmoji();
 
-  // Build commands for command palette
-  const commands: Command[] = useMemo(() => [
-    {
-      id: 'theme',
-      name: 'Theme',
-      icon: '🎨',
-      subCommands: availableThemes.map((t) => ({
-        id: `theme-${t.id}`,
-        name: t.name,
-        icon: t.isDark ? '🌙' : '☀️',
-        action: () => setTheme(t.id),
-      })),
-    },
-    {
-      id: 'font',
-      name: 'Font',
-      icon: '🔤',
-      subCommands: availableFonts.map((f) => ({
-        id: `font-${f.id}`,
-        name: f.name,
-        icon: f.isMonospace ? '💻' : '📝',
-        action: () => setFont(f.id),
-      })),
-    },
-    {
-      id: 'rainbow',
-      name: 'Rainbow Text',
-      icon: '🌈',
-      subCommands: [
-        {
-          id: 'rainbow-on',
-          name: 'On',
-          icon: isRainbowEnabled ? '✓' : '',
-          action: () => setRainbowEnabled(true),
-        },
-        {
-          id: 'rainbow-off',
-          name: 'Off',
-          icon: !isRainbowEnabled ? '✓' : '',
-          action: () => setRainbowEnabled(false),
-        },
-      ],
-    },
-    {
-      id: 'fullscreen',
-      name: 'Fullscreen',
-      icon: '⬛',
-      shortcut: 'F11',
-      subCommands: [
-        {
-          id: 'fullscreen-on',
-          name: 'On',
-          icon: isFullscreen ? '✓' : '',
-          action: enterFullscreen,
-        },
-        {
-          id: 'fullscreen-off',
-          name: 'Off',
-          icon: !isFullscreen ? '✓' : '',
-          action: exitFullscreen,
-        },
-      ],
-    },
-    {
-      id: 'fps',
-      name: 'FPS Counter',
-      icon: '📊',
-      subCommands: [
-        {
-          id: 'fps-on',
-          name: 'On',
-          icon: isFPSEnabled ? '✓' : '',
-          action: () => setFPSEnabled(true),
-        },
-        {
-          id: 'fps-off',
-          name: 'Off',
-          icon: !isFPSEnabled ? '✓' : '',
-          action: () => setFPSEnabled(false),
-        },
-      ],
-    },
-    {
-      id: 'hide-emoji',
-      name: 'Hide Emoji',
-      icon: '🙈',
-      subCommands: [
-        {
-          id: 'hide-emoji-on',
-          name: 'On',
-          icon: isHideEmojiEnabled ? '✓' : '',
-          action: () => setHideEmojiEnabled(true),
-        },
-        {
-          id: 'hide-emoji-off',
-          name: 'Off',
-          icon: !isHideEmojiEnabled ? '✓' : '',
-          action: () => setHideEmojiEnabled(false),
-        },
-      ],
-    },
-  ], [availableThemes, setTheme, availableFonts, setFont, isRainbowEnabled, setRainbowEnabled, isFullscreen, enterFullscreen, exitFullscreen, isFPSEnabled, setFPSEnabled, isHideEmojiEnabled, setHideEmojiEnabled]);
-
-  // Command palette hook
-  const commandPalette = useCommandPalette(commands);
-
   // Weather data hook
   const { allWeatherData, loading, error, createLoadingController, cancelLoading } = useWeatherData();
 
@@ -157,13 +55,187 @@ function App(): JSX.Element {
   const [selectedSort, setSelectedSort] = useLocalStorage<SortOption>('selectedSort', defaultSort);
   const [selectedSortDay, setSelectedSortDay] = useLocalStorage<SortDay>('selectedSortDay', defaultSortDay);
   const [isReversed, setIsReversed] = useLocalStorage<boolean>('reverseOrder', false);
+  const [showControlPanel, setShowControlPanel] = useLocalStorage<boolean>('showControlPanel', true);
 
   // Local component state
   const [moreInfo, setMoreInfo] = useState(false);
   const [resortData, setResortData] = useState<Map<string, ProcessedResortData>>(new Map());
 
+  // Resort hierarchy hook for modal
+  const resortHierarchy = useResortHierarchy({
+    selectedResorts,
+    onResortsChange: setSelectedResorts,
+  });
+
   // Resort filtering hook
   const { searchTerm, setSearchTerm, filteredResorts, sortResorts } = useResortFiltering(skiResorts, allWeatherData);
+
+  // Get sort day options for command palette
+  const getSortDayData = useCallback((): SortDayData => {
+    const specialOptions = [
+      { name: "Next 3 Days", value: "next3days" },
+      { name: "Next 7 Days", value: "next7days" }
+    ];
+
+    if (selectedResorts.length === 0 || !allWeatherData) {
+      return { specialOptions, regularDays: [] };
+    }
+
+    const firstResort = selectedResorts[0];
+    const elevation: ElevationDataKey = selectedElevation === 'bot' ? 'botData' : selectedElevation === 'mid' ? 'midData' : 'topData';
+    const resortDataResult = processResortData(allWeatherData, firstResort, elevation);
+
+    return {
+      specialOptions,
+      regularDays: resortDataResult?.days || []
+    };
+  }, [selectedResorts, allWeatherData, selectedElevation]);
+
+  const sortDayData = useMemo(() => getSortDayData(), [getSortDayData]);
+
+  // Build commands for command palette
+  const commands: Command[] = useMemo(() => {
+    // Base commands (Theme, Font, etc.)
+    const baseCommands: Command[] = [
+      {
+        id: 'theme',
+        name: 'Theme',
+        icon: '🎨',
+        subCommands: availableThemes.map((t) => ({
+          id: `theme-${t.id}`,
+          name: t.name,
+          icon: t.isDark ? '🌙' : '☀️',
+          action: () => setTheme(t.id),
+        })),
+      },
+      {
+        id: 'font',
+        name: 'Font',
+        icon: '🔤',
+        subCommands: availableFonts.map((f) => ({
+          id: `font-${f.id}`,
+          name: f.name,
+          icon: f.isMonospace ? '💻' : '📝',
+          action: () => setFont(f.id),
+        })),
+      },
+      {
+        id: 'rainbow',
+        name: 'Rainbow Text',
+        icon: '🌈',
+        subCommands: [
+          {
+            id: 'rainbow-on',
+            name: 'On',
+            icon: isRainbowEnabled ? '✓' : '',
+            action: () => setRainbowEnabled(true),
+          },
+          {
+            id: 'rainbow-off',
+            name: 'Off',
+            icon: !isRainbowEnabled ? '✓' : '',
+            action: () => setRainbowEnabled(false),
+          },
+        ],
+      },
+      {
+        id: 'fullscreen',
+        name: 'Fullscreen',
+        icon: '⬛',
+        shortcut: 'F11',
+        subCommands: [
+          {
+            id: 'fullscreen-on',
+            name: 'On',
+            icon: isFullscreen ? '✓' : '',
+            action: enterFullscreen,
+          },
+          {
+            id: 'fullscreen-off',
+            name: 'Off',
+            icon: !isFullscreen ? '✓' : '',
+            action: exitFullscreen,
+          },
+        ],
+      },
+      {
+        id: 'fps',
+        name: 'FPS Counter',
+        icon: '📊',
+        subCommands: [
+          {
+            id: 'fps-on',
+            name: 'On',
+            icon: isFPSEnabled ? '✓' : '',
+            action: () => setFPSEnabled(true),
+          },
+          {
+            id: 'fps-off',
+            name: 'Off',
+            icon: !isFPSEnabled ? '✓' : '',
+            action: () => setFPSEnabled(false),
+          },
+        ],
+      },
+      {
+        id: 'hide-emoji',
+        name: 'Hide Emoji',
+        icon: '🙈',
+        subCommands: [
+          {
+            id: 'hide-emoji-on',
+            name: 'On',
+            icon: isHideEmojiEnabled ? '✓' : '',
+            action: () => setHideEmojiEnabled(true),
+          },
+          {
+            id: 'hide-emoji-off',
+            name: 'Off',
+            icon: !isHideEmojiEnabled ? '✓' : '',
+            action: () => setHideEmojiEnabled(false),
+          },
+        ],
+      },
+    ];
+
+    // Control panel commands
+    const controlCommands = generateControlCommands({
+      selectedElevation,
+      setSelectedElevation,
+      selectedSort,
+      setSelectedSort,
+      selectedSortDay,
+      setSelectedSortDay,
+      sortDayData,
+      isReversed,
+      setIsReversed,
+      moreInfo,
+      setMoreInfo,
+      showControlPanel,
+      setShowControlPanel,
+      openResortSelector: resortHierarchy.openModal,
+    });
+
+    return [...baseCommands, ...controlCommands];
+  }, [
+    availableThemes, setTheme,
+    availableFonts, setFont,
+    isRainbowEnabled, setRainbowEnabled,
+    isFullscreen, enterFullscreen, exitFullscreen,
+    isFPSEnabled, setFPSEnabled,
+    isHideEmojiEnabled, setHideEmojiEnabled,
+    selectedElevation, setSelectedElevation,
+    selectedSort, setSelectedSort,
+    selectedSortDay, setSelectedSortDay,
+    sortDayData,
+    isReversed, setIsReversed,
+    moreInfo, setMoreInfo,
+    showControlPanel, setShowControlPanel,
+    resortHierarchy.openModal,
+  ]);
+
+  // Command palette hook
+  const commandPalette = useCommandPalette(commands);
 
   // Load resort data
   const loadResort = useCallback(async (resortName: string): Promise<boolean> => {
@@ -315,31 +387,38 @@ function App(): JSX.Element {
       {/* Command Palette */}
       <CommandPalette palette={commandPalette} hideEmoji={isHideEmojiEnabled} />
 
+      {/* Resort Selection Modal */}
+      <ResortSelectionModal hierarchy={resortHierarchy} hideEmoji={isHideEmojiEnabled} />
+
       {/* FPS Counter */}
       <FPSCounter fps={fps} isVisible={isFPSEnabled} />
 
       <div className="max-w-7xl mx-auto">
         <Header font={font} />
-        <ControlPanel
-          selectedResorts={selectedResorts}
-          setSelectedResorts={handleResortsChange}
-          selectedElevation={selectedElevation}
-          setSelectedElevation={handleElevationChange}
-          selectedSort={selectedSort}
-          setSelectedSort={handleSortChange}
-          selectedSortDay={selectedSortDay}
-          setSelectedSortDay={handleSortDayChange}
-          moreInfo={moreInfo}
-          setMoreInfo={setMoreInfo}
-          isReversed={isReversed}
-          setIsReversed={handleReverseChange}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          filteredResorts={filteredResorts}
-          allWeatherData={allWeatherData}
-          processResortData={processResortData}
-          cancelLoading={cancelLoading}
-        />
+
+        {/* Conditionally render Control Panel */}
+        {showControlPanel && (
+          <ControlPanel
+            selectedResorts={selectedResorts}
+            setSelectedResorts={handleResortsChange}
+            selectedElevation={selectedElevation}
+            setSelectedElevation={handleElevationChange}
+            selectedSort={selectedSort}
+            setSelectedSort={handleSortChange}
+            selectedSortDay={selectedSortDay}
+            setSelectedSortDay={handleSortDayChange}
+            moreInfo={moreInfo}
+            setMoreInfo={setMoreInfo}
+            isReversed={isReversed}
+            setIsReversed={handleReverseChange}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            filteredResorts={filteredResorts}
+            allWeatherData={allWeatherData}
+            processResortData={processResortData}
+            cancelLoading={cancelLoading}
+          />
+        )}
 
         <div className="space-y-8">
           {displayResorts.map((resort, index) => (
