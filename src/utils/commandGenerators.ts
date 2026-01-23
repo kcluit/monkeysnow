@@ -22,9 +22,9 @@ export interface ControlCommandParams {
   // Full View
   moreInfo: boolean;
   setMoreInfo: (m: boolean) => void;
-  // Control Panel visibility
-  showControlPanel: boolean;
-  setShowControlPanel: (show: boolean) => void;
+  // Utility Bar visibility
+  showUtilityBar: boolean;
+  setShowUtilityBar: (show: boolean) => void;
   // Resort selector
   openResortSelector: () => void;
 }
