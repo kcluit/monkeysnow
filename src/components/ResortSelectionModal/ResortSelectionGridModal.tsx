@@ -434,19 +434,21 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
     };
   }, [isOpen]);
 
-  // Handle keyboard events
+  // Handle keyboard events - use capture phase to intercept before hook's handler
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
+        e.stopImmediatePropagation(); // Prevent hook's handler from also firing
         closeModal();
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    // Use capture phase to handle before the hook's bubbling handler
+    window.addEventListener('keydown', handleKeyDown, true);
+    return () => window.removeEventListener('keydown', handleKeyDown, true);
   }, [isOpen, closeModal]);
 
   if (!isOpen) {
