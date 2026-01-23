@@ -417,6 +417,7 @@ function App(): JSX.Element {
             allWeatherData={allWeatherData}
             processResortData={processResortData}
             cancelLoading={cancelLoading}
+            openResortModal={resortHierarchy.openModal}
           />
         )}
 
