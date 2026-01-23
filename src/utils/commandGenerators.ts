@@ -232,7 +232,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'sort-order',
       name: 'Sort Order',
-      icon: '↕\uFE0E',
+      icon: '↕️',
       subCommands: generateOrderCommands(
         params.isReversed,
         params.setIsReversed
