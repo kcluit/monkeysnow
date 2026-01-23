@@ -167,24 +167,24 @@ export function generateFullViewCommands(
 }
 
 /**
- * Generate control panel visibility submenu commands with checkmarks.
+ * Generate utility bar visibility submenu commands with checkmarks.
  */
-export function generateControlPanelCommands(
-  showControlPanel: boolean,
-  setShowControlPanel: (show: boolean) => void
+export function generateUtilityBarCommands(
+  showUtilityBar: boolean,
+  setShowUtilityBar: (show: boolean) => void
 ): Command[] {
   return [
     {
-      id: 'controlpanel-show',
+      id: 'utilitybar-show',
       name: 'Show',
-      icon: showControlPanel ? '✓' : '',
-      action: () => setShowControlPanel(true),
+      icon: showUtilityBar ? '✓' : '',
+      action: () => setShowUtilityBar(true),
     },
     {
-      id: 'controlpanel-hide',
+      id: 'utilitybar-hide',
       name: 'Hide',
-      icon: !showControlPanel ? '✓' : '',
-      action: () => setShowControlPanel(false),
+      icon: !showUtilityBar ? '✓' : '',
+      action: () => setShowUtilityBar(false),
     },
   ];
 }
