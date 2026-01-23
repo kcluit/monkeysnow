@@ -62,8 +62,6 @@ export function ControlPanel({
     };
   };
 
-  const isAllSelected = filteredResorts.length > 0 && filteredResorts.every(resort => selectedResorts.includes(resort));
-
   const elevationText = selectedElevation === 'bot' ? 'Base Forecast' :
                        selectedElevation === 'mid' ? 'Mid Forecast' : 'Peak Forecast';
 
