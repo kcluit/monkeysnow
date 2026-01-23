@@ -426,8 +426,10 @@ function App(): JSX.Element {
                 <div className="space-y-8">
                     {displayResorts.map((resort, index) => (
                         <div key={`${resort.name}-${index}`}>
-                            {moreInfo ? (
+                            {viewMode === 'full' ? (
                                 <FullView resort={resort} />
+                            ) : viewMode === 'compact' ? (
+                                <CompactCard resort={resort} />
                             ) : (
                                 <DefaultCard resort={resort} />
                             )}
