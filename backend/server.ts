@@ -32,6 +32,9 @@ let lastSuccessfulUpdate: Date | null = null;
 
 const app = express();
 
+// Enable CORS for all origins (for local development)
+app.use(cors());
+
 // --- Helpers ---
 const loadLocations = (): LocationsMap => {
     try {
