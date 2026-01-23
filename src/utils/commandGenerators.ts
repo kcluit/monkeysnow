@@ -19,9 +19,9 @@ export interface ControlCommandParams {
   // Order
   isReversed: boolean;
   setIsReversed: (r: boolean) => void;
-  // Full View
-  moreInfo: boolean;
-  setMoreInfo: (m: boolean) => void;
+  // View Mode
+  viewMode: ViewMode;
+  setViewMode: (m: ViewMode) => void;
   // Utility Bar visibility
   showUtilityBar: boolean;
   setShowUtilityBar: (show: boolean) => void;
