@@ -109,7 +109,7 @@ const ResortItem = memo(function ResortItem({
   return (
     <label className="resort-grid-item" onClick={(e) => { e.preventDefault(); onToggle(); }}>
       <Checkbox state={isSelected ? 'all' : 'none'} onClick={(e) => { e.stopPropagation(); onToggle(); }} />
-      {!hideEmoji && <span className="resort-grid-item-icon">⛷️</span>}
+      {!hideEmoji && <span className="resort-grid-item-icon">⛷\uFE0E</span>}
       <span className="resort-grid-item-name">{node.name}</span>
     </label>
   );
