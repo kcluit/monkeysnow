@@ -109,7 +109,7 @@ const ResortItem = memo(function ResortItem({
   return (
     <label className="resort-grid-item" onClick={(e) => { e.preventDefault(); onToggle(); }}>
       <Checkbox state={isSelected ? 'all' : 'none'} onClick={(e) => { e.stopPropagation(); onToggle(); }} />
-      {!hideEmoji && <span className="resort-grid-item-icon">⛷\uFE0E</span>}
+      {!hideEmoji && <span className="resort-grid-item-icon">⛷️</span>}
       <span className="resort-grid-item-name">{node.name}</span>
     </label>
   );
@@ -167,7 +167,7 @@ const ProvinceGroup = memo(function ProvinceGroup({
           ▶
         </button>
         <Checkbox state={selectionState} onClick={(e) => { e.stopPropagation(); handleHeaderClick(); }} />
-        {!hideEmoji && <span className="resort-grid-header-icon">📍\uFE0E</span>}
+        {!hideEmoji && <span className="resort-grid-header-icon">📍</span>}
         <span className="resort-grid-province-name">{node.name}</span>
         <span className="resort-grid-count">
           {selectedCount}/{resortsUnder.length}
@@ -242,7 +242,7 @@ const CountrySection = memo(function CountrySection({
           ▶
         </button>
         <Checkbox state={selectionState} onClick={(e) => { e.stopPropagation(); handleHeaderClick(); }} />
-        {!hideEmoji && <span className="resort-grid-header-icon">🏳\uFE0E</span>}
+        {!hideEmoji && <span className="resort-grid-header-icon">🏳️</span>}
         <span className="resort-grid-country-name">{node.name}</span>
         <span className="resort-grid-count">
           {selectedCount}/{resortsUnder.length}
@@ -322,7 +322,7 @@ const ContinentColumn = memo(function ContinentColumn({
           ▶
         </button>
         <Checkbox state={selectionState} onClick={(e) => { e.stopPropagation(); handleHeaderClick(); }} />
-        {!hideEmoji && <span className="resort-grid-header-icon">🌍\uFE0E</span>}
+        {!hideEmoji && <span className="resort-grid-header-icon">🌍</span>}
         <span className="resort-grid-continent-name">{node.name}</span>
         <span className="resort-grid-count">
           {selectedCount}/{resortsUnder.length}
