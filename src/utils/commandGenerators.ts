@@ -213,7 +213,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'sort-by',
       name: 'Sort By',
-      icon: '📊\uFE0E',
+      icon: '📊',
       subCommands: generateSortCommands(
         params.selectedSort,
         params.setSelectedSort
