@@ -988,8 +988,14 @@ input[type="checkbox"] {
 /* Compact View Grid - Auto-fill columns */
 .compact-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    grid-template-columns: 1fr;
     gap: 2rem;
+}
+
+@media (min-width: 768px) {
+    .compact-grid {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    }
 }
 
 /* Responsive adjustments */
