@@ -322,7 +322,7 @@ const ContinentColumn = memo(function ContinentColumn({
           ▶
         </button>
         <Checkbox state={selectionState} onClick={(e) => { e.stopPropagation(); handleHeaderClick(); }} />
-        {!hideEmoji && <span className="resort-grid-header-icon">🌍</span>}
+        {!hideEmoji && <span className="resort-grid-header-icon">🌍\uFE0E</span>}
         <span className="resort-grid-continent-name">{node.name}</span>
         <span className="resort-grid-count">
           {selectedCount}/{resortsUnder.length}
