@@ -204,7 +204,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'elevation',
       name: 'Elevation',
-      icon: '⛰\uFE0E',
+      icon: '⛰️',
       subCommands: generateElevationCommands(
         params.selectedElevation,
         params.setSelectedElevation
