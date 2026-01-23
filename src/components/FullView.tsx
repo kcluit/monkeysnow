@@ -185,8 +185,8 @@ export function FullView({ resort }: CardProps): JSX.Element {
         <div className="flex justify-center">
           <div className="bg-theme-cardBg px-3 py-1 rounded-lg">
             <span className="text-sm font-medium">
-              <span className="text-theme-textPrimary">Totals:</span>
-              <span className="text-theme-accent"> Next 3 Days: {totals.next3Days}cm | Next 7 Days: {totals.next7Days}cm</span>
+              <span className="text-theme-accent">Totals:</span>
+              <span className="text-theme-textPrimary"> Next 3 Days: {totals.next3Days}cm | Next 7 Days: {totals.next7Days}cm</span>
             </span>
           </div>
         </div>
