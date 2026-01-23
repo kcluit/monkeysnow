@@ -7,7 +7,6 @@ interface ExtendedControlPanelProps extends ControlPanelProps {
 
 export function ControlPanel({
   selectedResorts,
-  setSelectedResorts,
   selectedElevation,
   setSelectedElevation,
   selectedSort,
@@ -18,10 +17,8 @@ export function ControlPanel({
   setMoreInfo,
   isReversed,
   setIsReversed,
-  filteredResorts,
   allWeatherData,
   processResortData,
-  cancelLoading,
   openResortModal
 }: ExtendedControlPanelProps): JSX.Element {
   const [showElevationMenu, setShowElevationMenu] = useState(false);
