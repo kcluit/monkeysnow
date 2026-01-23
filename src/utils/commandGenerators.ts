@@ -198,7 +198,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'select-resorts',
       name: 'Select Resorts',
-      icon: '⛷\uFE0E',
+      icon: '⛷️',
       action: params.openResortSelector,
     },
     {
