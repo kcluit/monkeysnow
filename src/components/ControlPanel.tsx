@@ -32,7 +32,6 @@ export function ControlPanel({
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent): void => {
       if (!(e.target as HTMLElement).closest('[data-dropdown]')) {
-        setShowDropdown(false);
         setShowElevationMenu(false);
         setShowSortMenu(false);
         setShowSortDayMenu(false);
@@ -42,36 +41,6 @@ export function ControlPanel({
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
-
-  const handleResortToggle = (resortId: string): void => {
-    setSelectedResorts((prev: string[]) =>
-      prev.includes(resortId)
-        ? prev.filter(id => id !== resortId)
-        : [...prev, resortId]
-    );
-  };
-
-  const handleSelectAll = (): void => {
-    const visibleResorts = filteredResorts;
-    const allSelected = visibleResorts.every(resort => selectedResorts.includes(resort));
-
-    if (allSelected) {
-      // Deselect all visible resorts
-      cancelLoading();
-      setSelectedResorts((prev: string[]) => prev.filter(resort => !visibleResorts.includes(resort)));
-    } else {
-      // Select all visible resorts
-      setSelectedResorts((prev: string[]) => {
-        const newSelection = [...prev];
-        visibleResorts.forEach(resort => {
-          if (!newSelection.includes(resort)) {
-            newSelection.push(resort);
-          }
-        });
-        return newSelection;
-      });
-    }
-  };
 
   const getSortDayOptions = (): SortDayData => {
     const specialOptions = [
