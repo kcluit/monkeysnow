@@ -409,8 +409,8 @@ function App(): JSX.Element {
                         setSelectedSort={handleSortChange}
                         selectedSortDay={selectedSortDay}
                         setSelectedSortDay={handleSortDayChange}
-                        moreInfo={moreInfo}
-                        setMoreInfo={setMoreInfo}
+                        viewMode={viewMode}
+                        setViewMode={setViewMode}
                         isReversed={isReversed}
                         setIsReversed={handleReverseChange}
                         searchTerm={searchTerm}
