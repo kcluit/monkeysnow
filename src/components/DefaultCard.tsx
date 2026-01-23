@@ -1,70 +1,8 @@
 import { useRef, useState, MouseEvent } from 'react';
 import { webcamUrls } from '../utils/constants';
 import { calculateSnowTotals } from '../utils/weather';
-import type { CardProps, DayForecast, Period, DayStats } from '../types';
-
-function formatWeatherText(periods: Period[]): string {
-    if (!periods || periods.length === 0) return 'No data';
-
-    const amPeriod = periods.find(p => p.time === 'AM');
-    const pmPeriod = periods.find(p => p.time === 'PM');
-
-    if (amPeriod && pmPeriod) {
-        // If AM and PM conditions are the same, show just one
-        if (amPeriod.condition === pmPeriod.condition) {
-            return amPeriod.condition;
-        }
-        return `${amPeriod.condition} / ${pmPeriod.condition}`;
-    } else if (pmPeriod) {
-        return pmPeriod.condition;
-    } else if (periods.length === 1) {
-        return periods[0].condition;
-    }
-
-    return periods[0].condition;
-}
-
-function calculateDayStats(day: DayForecast): DayStats {
-    const periods = day.periods;
-    if (!periods.length) return { maxTemp: 0, snow: 0, wind: 0 };
-
-    let maxTemp = -Infinity;
-    let totalSnow = 0;
-
-    // Get PM wind or fallback to available wind
-    let wind = 0;
-    const pmPeriod = periods.find(p => p.time === 'PM');
-    if (pmPeriod) {
-        wind = parseFloat(pmPeriod.wind.replace(' km/h', '')) || 0;
-    } else if (periods.length > 0) {
-        // If no PM period, take the first available wind value
-        wind = parseFloat(periods[0].wind.replace(' km/h', '')) || 0;
-    }
-
-    periods.forEach(period => {
-        // Temperature - find maximum
-        const temp = parseFloat(period.temp.replace('°C', '')) || 0;
-        maxTemp = Math.max(maxTemp, temp);
-
-        // Snow - accumulate
-        const snowAmount = parseFloat(period.snow.replace(' cm', '')) || 0;
-        totalSnow += snowAmount;
-    });
-
-    return {
-        maxTemp: Math.round(maxTemp * 10) / 10,
-        snow: Math.round(totalSnow * 10) / 10,
-        wind: Math.round(wind)
-    };
-}
-
-function getTemperatureClass(temp: number): string {
-    const temperature = temp;
-    if (temperature <= 0) return 'text-blue-600 font-semibold';
-    if (temperature <= 5) return 'text-green-600 font-semibold';
-    if (temperature <= 10) return 'text-orange-500 font-semibold';
-    return 'text-red-500 font-semibold';
-}
+import { calculateDayStats, formatWeatherText, getTemperatureClass, getSnowClass, getWindClass } from './cards/cardUtils';
+import type { CardProps } from '../types';
 
 export function DefaultCard({ resort }: CardProps): JSX.Element {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
