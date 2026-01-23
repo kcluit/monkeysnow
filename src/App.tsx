@@ -211,8 +211,8 @@ function App(): JSX.Element {
       setIsReversed,
       moreInfo,
       setMoreInfo,
-      showControlPanel,
-      setShowControlPanel,
+      showUtilityBar,
+      setShowUtilityBar,
       openResortSelector: resortHierarchy.openModal,
     });
 
