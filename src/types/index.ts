@@ -134,7 +134,7 @@ export interface SortDayData {
 }
 
 // Component props
-export interface ControlPanelProps {
+export interface UtilityBarProps {
   selectedResorts: string[];
   setSelectedResorts: (resorts: string[] | ((prev: string[]) => string[])) => void;
   selectedElevation: ElevationLevel;
