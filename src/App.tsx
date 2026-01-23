@@ -230,7 +230,7 @@ function App(): JSX.Element {
     sortDayData,
     isReversed, setIsReversed,
     moreInfo, setMoreInfo,
-    showControlPanel, setShowControlPanel,
+    showUtilityBar, setShowUtilityBar,
     resortHierarchy.openModal,
   ]);
 
