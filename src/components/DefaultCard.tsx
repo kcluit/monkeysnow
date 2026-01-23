@@ -96,7 +96,7 @@ export function DefaultCard({ resort }: CardProps): JSX.Element {
                                             )}
                                         </div>
                                         <div className="text-sm text-theme-textPrimary mt-1 font-medium truncate" title={weatherText}>{weatherText}</div>
-                                        <div className={`text-xs font-medium ${dayStats.wind >= 20 ? 'text-theme-accent' : 'text-theme-textSecondary'} mt-1`}>
+                                        <div className={`text-xs font-medium ${getWindClass(dayStats.wind)} mt-1`}>
                                             {dayStats.wind} km/h wind
                                         </div>
                                         <div className="mt-2 pt-2 border-t border-theme-border">
