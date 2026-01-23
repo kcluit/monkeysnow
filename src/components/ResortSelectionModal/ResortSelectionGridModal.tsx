@@ -406,8 +406,8 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
 
   // Expand all nodes
   const handleExpandAll = useCallback(() => {
-    setExpandedNodes(getAllNodeIds(hierarchyTree));
-  }, [hierarchyTree]);
+    setExpandedNodes(new Set(allNodeIds));
+  }, [allNodeIds]);
 
   // Collapse all nodes
   const handleCollapseAll = useCallback(() => {
