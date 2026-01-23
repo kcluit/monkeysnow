@@ -242,8 +242,7 @@ function App(): JSX.Element {
         if (!allWeatherData) return false;
 
         try {
-            const elevation: ElevationDataKey = selectedElevation === 'bot' ? 'botData' : selectedElevation === 'mid' ? 'midData' : 'topData';
-            const data = processResortData(allWeatherData, resortName, elevation);
+            const data = processResortData(allWeatherData, resortName, selectedElevation);
 
             if (data) {
                 data.name = getDisplayName(resortName);
