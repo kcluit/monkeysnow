@@ -63,7 +63,7 @@ export interface PeriodData {
   snowfall_total: number;
   weather_code: number;
   surface_pressure: number;
-  freezing_level: number;
+  freezing_level: number | null;
 }
 
 export interface DayData {
