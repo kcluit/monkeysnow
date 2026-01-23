@@ -35,8 +35,6 @@ export function useResortFiltering(
   ): string[] => {
     if (!allWeatherData) return resorts;
 
-    const elevation: ElevationDataKey = selectedElevation === 'bot' ? 'botData' : selectedElevation === 'mid' ? 'midData' : 'topData';
-
     // Helper functions for single day calculations
     const getMaxTemp = (day: DayForecast): number => {
       return Math.max(
