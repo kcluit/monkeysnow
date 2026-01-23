@@ -63,10 +63,10 @@ export const ResortTreeNode = memo(function ResortTreeNode({
   const getIcon = (): string => {
     if (hideEmoji) return '';
     switch (node.type) {
-      case 'continent': return '🌍\uFE0E';
-      case 'country': return '🏳\uFE0E';
-      case 'province': return '📍\uFE0E';
-      case 'resort': return '⛷\uFE0E';
+      case 'continent': return '🌍';
+      case 'country': return '🏳️';
+      case 'province': return '📍';
+      case 'resort': return '⛷️';
       default: return '';
     }
   };
