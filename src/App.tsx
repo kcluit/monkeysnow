@@ -60,7 +60,7 @@ function App(): JSX.Element {
     const [showUtilityBar, setShowUtilityBar] = useLocalStorage<boolean>('showUtilityBar', true);
 
     // Local component state
-    const [moreInfo, setMoreInfo] = useState(false);
+    const [viewMode, setViewMode] = useLocalStorage<ViewMode>('viewMode', 'default');
     const [resortData, setResortData] = useState<Map<string, ProcessedResortData>>(new Map());
 
     // Resort hierarchy hook for modal
