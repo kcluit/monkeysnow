@@ -20,7 +20,7 @@ export function UtilityBar({
   allWeatherData,
   processResortData,
   openResortModal
-}: ExtendedControlPanelProps): JSX.Element {
+}: ExtendedUtilityBarProps): JSX.Element {
   const [showElevationMenu, setShowElevationMenu] = useState(false);
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showSortDayMenu, setShowSortDayMenu] = useState(false);
