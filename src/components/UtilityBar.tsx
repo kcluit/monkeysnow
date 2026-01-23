@@ -88,6 +88,7 @@ export function UtilityBar({
             setShowElevationMenu(false);
             setShowSortMenu(false);
             setShowSortDayMenu(false);
+            setShowViewModeMenu(false);
           }}
           className="w-full md:w-64 bg-theme-background border border-theme-border rounded-lg px-4 py-2 text-left flex items-center justify-between shadow-sm hover:bg-theme-secondary transition-colors duration-200"
         >
