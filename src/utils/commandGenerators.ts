@@ -248,12 +248,12 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
       ),
     },
     {
-      id: 'control-panel',
-      name: 'Control Panel',
+      id: 'utility-bar',
+      name: 'Utility Bar',
       icon: '🎛️',
-      subCommands: generateControlPanelCommands(
-        params.showControlPanel,
-        params.setShowControlPanel
+      subCommands: generateUtilityBarCommands(
+        params.showUtilityBar,
+        params.setShowUtilityBar
       ),
     },
   ];
