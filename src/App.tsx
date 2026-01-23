@@ -231,7 +231,7 @@ function App(): JSX.Element {
         selectedSortDay, setSelectedSortDay,
         sortDayData,
         isReversed, setIsReversed,
-        moreInfo, setMoreInfo,
+        viewMode, setViewMode,
         showUtilityBar, setShowUtilityBar,
         resortHierarchy.openModal,
     ]);
