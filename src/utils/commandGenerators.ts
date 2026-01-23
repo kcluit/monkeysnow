@@ -222,7 +222,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'sort-day',
       name: 'Sort Day',
-      icon: '📅\uFE0E',
+      icon: '📅',
       subCommands: generateSortDayCommands(
         params.selectedSortDay,
         params.setSelectedSortDay,
