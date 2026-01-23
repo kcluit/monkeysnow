@@ -3,14 +3,14 @@ import type { CardProps } from '../types';
 import type { CSSProperties } from 'react';
 
 function getWeatherEmoji(condition: string): string {
-  if (!condition) return '⛅';
+  if (!condition) return '⛅\uFE0E';
   const lowerCondition = condition.toLowerCase();
 
-  if (lowerCondition.includes('snow')) return '❄️';
-  if (lowerCondition.includes('rain')) return '🌧️';
-  if (lowerCondition.includes('clear')) return '☀️';
-  if (lowerCondition.includes('cloud')) return '☁️';
-  return '⛅';
+  if (lowerCondition.includes('snow')) return '❄\uFE0E';
+  if (lowerCondition.includes('rain')) return '🌧\uFE0E';
+  if (lowerCondition.includes('clear')) return '☀\uFE0E';
+  if (lowerCondition.includes('cloud')) return '☁\uFE0E';
+  return '⛅\uFE0E';
 }
 
 function getTemperatureStyle(temp: number): string {
