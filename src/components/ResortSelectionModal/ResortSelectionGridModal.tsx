@@ -460,7 +460,7 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
   };
 
   // Check if all nodes are expanded
-  const allExpanded = expandedNodes.size === getAllNodeIds(hierarchyTree).size;
+  const allExpanded = expandedNodes.size === allNodeIds.size;
 
   return (
     <div className="command-palette-backdrop" onClick={handleBackdropClick}>
