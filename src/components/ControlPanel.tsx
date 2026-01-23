@@ -1,11 +1,11 @@
 import { useState, useEffect, ChangeEvent } from 'react';
-import type { ControlPanelProps, SortDay, SortDayData } from '../types';
+import type { UtilityBarProps, SortDay, SortDayData } from '../types';
 
-interface ExtendedControlPanelProps extends ControlPanelProps {
+interface ExtendedUtilityBarProps extends UtilityBarProps {
   openResortModal: () => void;
 }
 
-export function ControlPanel({
+export function UtilityBar({
   selectedResorts,
   selectedElevation,
   setSelectedElevation,
