@@ -1,6 +1,9 @@
-import { useState, useEffect, useRef, ChangeEvent } from 'react';
-import { getDisplayName } from '../utils/constants';
+import { useState, useEffect, ChangeEvent } from 'react';
 import type { ControlPanelProps, SortDay, SortDayData } from '../types';
+
+interface ExtendedControlPanelProps extends ControlPanelProps {
+  openResortModal: () => void;
+}
 
 export function ControlPanel({
   selectedResorts,
@@ -15,19 +18,15 @@ export function ControlPanel({
   setMoreInfo,
   isReversed,
   setIsReversed,
-  searchTerm,
-  setSearchTerm,
   filteredResorts,
   allWeatherData,
   processResortData,
-  cancelLoading
-}: ControlPanelProps): JSX.Element {
-  const [showDropdown, setShowDropdown] = useState(false);
+  cancelLoading,
+  openResortModal
+}: ExtendedControlPanelProps): JSX.Element {
   const [showElevationMenu, setShowElevationMenu] = useState(false);
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showSortDayMenu, setShowSortDayMenu] = useState(false);
-
-  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
