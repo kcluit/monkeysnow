@@ -170,7 +170,7 @@ const ProvinceGroup = memo(function ProvinceGroup({
         {!hideEmoji && <span className="resort-grid-header-icon">📍</span>}
         <span className="resort-grid-province-name">{node.name}</span>
         <span className="resort-grid-count">
-          {isExpanded ? `${selectedCount}/${resortsUnder.length}` : `${node.name} (${selectedCount}/${resortsUnder.length})`}
+          {selectedCount}/{resortsUnder.length}
         </span>
       </div>
       {isExpanded && node.children && (
