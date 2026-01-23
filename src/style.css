@@ -347,6 +347,10 @@ input[type="checkbox"] {
 /* Selected state - white emoji to match white text */
 .command-item.selected .command-icon {
     background: #ffffff;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
 }
 
 .command-name {
@@ -430,20 +434,18 @@ input[type="checkbox"] {
 
 /* Rainbow Text Mode - Overrides theme text colors when enabled */
 .rainbow-mode {
-    --rainbow-gradient: linear-gradient(
-        90deg,
-        #FF375F,
-        #FF453A,
-        #FF9F0A,
-        #FFD60A,
-        #30D158,
-        #66D4CF,
-        #40C8E0,
-        #0A84FF,
-        #5E5CE6,
-        #BF5AF2,
-        #FF375F
-    );
+    --rainbow-gradient: linear-gradient(90deg,
+            #FF375F,
+            #FF453A,
+            #FF9F0A,
+            #FFD60A,
+            #30D158,
+            #66D4CF,
+            #40C8E0,
+            #0A84FF,
+            #5E5CE6,
+            #BF5AF2,
+            #FF375F);
 }
 
 /* Rainbow text for primary text elements */
@@ -981,6 +983,13 @@ input[type="checkbox"] {
 .rainbow-mode .resort-grid-action-btn:hover {
     background: linear-gradient(90deg, #5E5CE6, #BF5AF2);
     border-color: transparent;
+}
+
+/* Compact View Grid - Auto-fill columns */
+.compact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
 }
 
 /* Responsive adjustments */
