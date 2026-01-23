@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { UtilityBarProps, SortDay, SortDayData, ViewMode } from '../types';
+import type { UtilityBarProps, SortDay, SortDayData } from '../types';
 
 interface ExtendedUtilityBarProps extends UtilityBarProps {
   openResortModal: () => void;
