@@ -11,7 +11,7 @@ interface CommandInputProps {
 export function CommandInput({
   value,
   onChange,
-  placeholder = 'Type a command...',
+  placeholder = 'Search...',
   canGoBack,
   onBack,
 }: CommandInputProps): JSX.Element {
