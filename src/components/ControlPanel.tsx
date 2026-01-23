@@ -105,7 +105,6 @@ export function ControlPanel({
           <button
             onClick={() => {
               setShowElevationMenu(!showElevationMenu);
-              setShowDropdown(false);
               setShowSortMenu(false);
               setShowSortDayMenu(false);
             }}
