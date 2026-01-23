@@ -83,8 +83,7 @@ function App(): JSX.Element {
         }
 
         const firstResort = selectedResorts[0];
-        const elevation: ElevationDataKey = selectedElevation === 'bot' ? 'botData' : selectedElevation === 'mid' ? 'midData' : 'topData';
-        const resortDataResult = processResortData(allWeatherData, firstResort, elevation);
+        const resortDataResult = processResortData(allWeatherData, firstResort, selectedElevation);
 
         return {
             specialOptions,
