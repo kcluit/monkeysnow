@@ -82,71 +82,23 @@ export function ControlPanel({
   return (
     <div className="mb-8 flex flex-wrap gap-4 items-center justify-between">
       <div className="flex items-center gap-4">
-        {/* Resort Selection Dropdown */}
-        <div className="relative" data-dropdown>
-          <button
-            onClick={() => {
-              setShowDropdown(!showDropdown);
-              setShowElevationMenu(false);
-              setShowSortMenu(false);
-              setShowSortDayMenu(false);
-              if (!showDropdown && searchInputRef.current) {
-                setTimeout(() => searchInputRef.current?.focus(), 100);
-              }
-            }}
-            className="w-full md:w-64 bg-theme-background border border-theme-border rounded-lg px-4 py-2 text-left flex items-center justify-between shadow-sm hover:bg-theme-secondary transition-colors duration-200"
-          >
-            <span className="block truncate text-theme-textPrimary">Select Resorts</span>
-            <svg className="h-5 w-5 text-theme-textSecondary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-          </button>
-          {showDropdown && (
-            <div className="absolute z-10 mt-1 w-full md:w-64 bg-theme-background rounded-lg shadow-lg max-h-96 overflow-y-auto border border-theme-border">
-              <div className="sticky top-0 bg-theme-background p-2 border-b border-theme-border">
-                <div className="relative">
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    value={searchTerm}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-                    className="w-full px-3 py-2 border border-theme-border rounded-md pl-9 focus:outline-none focus:ring-2 focus:ring-theme-accent focus:border-transparent bg-theme-background text-theme-textPrimary placeholder-theme-textSecondary"
-                    placeholder="Search resorts..."
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                  <svg className="absolute left-3 top-2.5 h-5 w-5 text-theme-textSecondary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-                  </svg>
-                </div>
-              </div>
-              <div className="p-2 space-y-1">
-                <label className="flex items-center p-2 hover:bg-theme-secondary rounded cursor-pointer transition-colors duration-200">
-                  <input
-                    type="checkbox"
-                    checked={isAllSelected}
-                    onChange={handleSelectAll}
-                    className="h-4 w-4 rounded border-theme-border"
-                  />
-                  <span className="ml-2 text-sm font-medium text-theme-textPrimary">
-                    {isAllSelected ? 'Deselect All' : 'Select All'}
-                  </span>
-                </label>
-                <div className="border-t border-theme-border my-2"></div>
-                {filteredResorts.map(resort => (
-                  <label key={resort} className="flex items-center p-2 hover:bg-theme-secondary rounded cursor-pointer transition-colors duration-200">
-                    <input
-                      type="checkbox"
-                      checked={selectedResorts.includes(resort)}
-                      onChange={() => handleResortToggle(resort)}
-                      className="h-4 w-4 rounded border-theme-border"
-                    />
-                    <span className="ml-2 text-sm text-theme-textPrimary">{getDisplayName(resort)}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+        {/* Resort Selection Button - Opens Modal */}
+        <button
+          onClick={() => {
+            openResortModal();
+            setShowElevationMenu(false);
+            setShowSortMenu(false);
+            setShowSortDayMenu(false);
+          }}
+          className="w-full md:w-64 bg-theme-background border border-theme-border rounded-lg px-4 py-2 text-left flex items-center justify-between shadow-sm hover:bg-theme-secondary transition-colors duration-200"
+        >
+          <span className="block truncate text-theme-textPrimary">
+            Select Resorts ({selectedResorts.length})
+          </span>
+          <svg className="h-5 w-5 text-theme-textSecondary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+          </svg>
+        </button>
 
         {/* Elevation Dropdown */}
         <div className="relative" data-dropdown>
