@@ -873,6 +873,7 @@ input[type="checkbox"] {
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.1s ease;
+    white-space: nowrap;
 }
 
 .resort-grid-item:hover {
