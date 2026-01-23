@@ -149,16 +149,58 @@ export function UtilityBar({
           )}
         </div>
 
-        {/* Full View Toggle */}
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={moreInfo}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setMoreInfo(e.target.checked)}
-            className="h-4 w-4 rounded border-theme-border"
-          />
-          <span className="text-sm font-bold text-theme-accent">Full View</span>
-        </label>
+        {/* View Mode Dropdown */}
+        <div className="relative" data-dropdown>
+          <button
+            onClick={() => {
+              setShowViewModeMenu(!showViewModeMenu);
+              setShowElevationMenu(false);
+              setShowSortMenu(false);
+              setShowSortDayMenu(false);
+            }}
+            className="w-full md:w-36 bg-theme-background border border-theme-border rounded-lg px-3 py-2 text-left flex items-center justify-between shadow-sm hover:bg-theme-secondary transition-colors duration-200"
+          >
+            <span className="block truncate text-sm font-medium text-theme-accent">
+              {viewMode === 'default' ? 'Default' : viewMode === 'full' ? 'Full View' : 'Compact'}
+            </span>
+            <svg className="h-4 w-4 text-theme-textSecondary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
+          {showViewModeMenu && (
+            <div className="absolute right-0 z-10 mt-1 w-36 bg-theme-background rounded-lg shadow-lg border border-theme-border">
+              <div className="p-2 space-y-1">
+                <button
+                  onClick={() => {
+                    setViewMode('default');
+                    setShowViewModeMenu(false);
+                  }}
+                  className={`w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors duration-200 ${viewMode === 'default' ? 'bg-theme-secondary text-theme-accent font-medium' : 'hover:bg-theme-secondary text-theme-textPrimary'}`}
+                >
+                  Default
+                </button>
+                <button
+                  onClick={() => {
+                    setViewMode('full');
+                    setShowViewModeMenu(false);
+                  }}
+                  className={`w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors duration-200 ${viewMode === 'full' ? 'bg-theme-secondary text-theme-accent font-medium' : 'hover:bg-theme-secondary text-theme-textPrimary'}`}
+                >
+                  Full View
+                </button>
+                <button
+                  onClick={() => {
+                    setViewMode('compact');
+                    setShowViewModeMenu(false);
+                  }}
+                  className={`w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors duration-200 ${viewMode === 'compact' ? 'bg-theme-secondary text-theme-accent font-medium' : 'hover:bg-theme-secondary text-theme-textPrimary'}`}
+                >
+                  Compact
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center gap-4">
