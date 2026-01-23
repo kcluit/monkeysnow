@@ -994,7 +994,7 @@ input[type="checkbox"] {
 
 @media (min-width: 768px) {
     .compact-grid {
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(650px, 1fr));
     }
 }
 
