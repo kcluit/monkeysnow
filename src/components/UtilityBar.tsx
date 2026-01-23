@@ -33,6 +33,7 @@ export function UtilityBar({
         setShowElevationMenu(false);
         setShowSortMenu(false);
         setShowSortDayMenu(false);
+        setShowViewModeMenu(false);
       }
     };
 
