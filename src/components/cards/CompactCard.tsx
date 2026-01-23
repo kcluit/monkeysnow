@@ -34,7 +34,7 @@ export function CompactCard({ resort }: CardProps): JSX.Element {
     };
 
     return (
-        <div className="resort-card rounded-xl p-3 shadow-md mb-4 backdrop-blur-md">
+        <div className="resort-card rounded-xl p-3 shadow-md backdrop-blur-md">
             {/* Compact Header */}
             <div className="mb-2 flex justify-between items-center">
                 <div className="flex items-center gap-2">
