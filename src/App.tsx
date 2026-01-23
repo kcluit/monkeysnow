@@ -396,9 +396,9 @@ function App(): JSX.Element {
       <div className="max-w-7xl mx-auto">
         <Header font={font} />
 
-        {/* Conditionally render Control Panel */}
-        {showControlPanel && (
-          <ControlPanel
+        {/* Conditionally render Utility Bar */}
+        {showUtilityBar && (
+          <UtilityBar
             selectedResorts={selectedResorts}
             setSelectedResorts={handleResortsChange}
             selectedElevation={selectedElevation}
