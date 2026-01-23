@@ -5,7 +5,7 @@ import { FullView } from './components/FullView';
 import { DefaultCard } from './components/DefaultCard';
 import { CommandPalette } from './components/CommandPalette';
 import { FPSCounter } from './components/FPSCounter';
-import { ResortSelectionModal } from './components/ResortSelectionModal';
+import { ResortSelectionGridModal } from './components/ResortSelectionModal';
 import { useWeatherData } from './hooks/useWeatherData';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useResortFiltering } from './hooks/useResortFiltering';
