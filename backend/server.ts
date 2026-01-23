@@ -340,10 +340,23 @@ const updateWeatherData = async () => {
 };
 
 // --- Routes/Start ---
+let isUpdating = false;
+
 const startWeatherUpdates = async () => {
     try { await updateWeatherData(); } catch (e) { console.error("Init failed", e); }
     setInterval(async () => {
-        try { await updateWeatherData(); } catch (e) { console.error("Update failed", e); }
+        if (isUpdating) {
+            console.warn('Previous update still in progress, skipping...');
+            return;
+        }
+        isUpdating = true;
+        try {
+            await updateWeatherData();
+        } catch (e) {
+            console.error("Update failed", e);
+        } finally {
+            isUpdating = false;
+        }
     }, UPDATE_INTERVAL_MS);
 };
 
