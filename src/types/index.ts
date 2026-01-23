@@ -144,8 +144,8 @@ export interface UtilityBarProps {
   setSelectedSort: (sort: SortOption) => void;
   selectedSortDay: SortDay;
   setSelectedSortDay: (day: SortDay) => void;
-  moreInfo: boolean;
-  setMoreInfo: (value: boolean) => void;
+  viewMode: ViewMode;
+  setViewMode: (mode: ViewMode) => void;
   isReversed: boolean;
   setIsReversed: (value: boolean) => void;
   searchTerm: string;
