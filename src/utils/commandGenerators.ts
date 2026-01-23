@@ -250,7 +250,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'utility-bar',
       name: 'Utility Bar',
-      icon: '🎛\uFE0E',
+      icon: '🎛️',
       subCommands: generateUtilityBarCommands(
         params.showUtilityBar,
         params.setShowUtilityBar
