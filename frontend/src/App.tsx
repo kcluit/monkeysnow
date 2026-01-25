@@ -291,6 +291,7 @@ function App(): JSX.Element {
         selectedTemperatureMetric, setSelectedTemperatureMetric,
         snowfallEstimateMode, setSnowfallEstimateMode,
         showUtilityBar, setShowUtilityBar,
+        utilityBarStyle, setUtilityBarStyle,
         resortHierarchy.openModal,
     ]);
 
