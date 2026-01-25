@@ -23,6 +23,7 @@ import { useShowDate } from './hooks/useShowDate';
 import { useResortHierarchy } from './hooks/useResortHierarchy';
 import { processResortData } from './utils/weather';
 import { generateControlCommands } from './utils/commandGenerators';
+import { getSortDayData } from './utils/sortDayHelpers';
 import {
     skiResorts,
     defaultSelectedResorts,
