@@ -50,6 +50,7 @@ function App(): JSX.Element {
     const { fps, isEnabled: isFPSEnabled, setEnabled: setFPSEnabled } = useFPSCounter();
     const { isRainbowEnabled, setRainbowEnabled } = useRainbowText();
     const { isHideEmojiEnabled, setHideEmojiEnabled } = useHideEmoji();
+    const { isHideBordersEnabled, setHideBordersEnabled } = useHideBorders();
 
     // Weather data hook
     const { allWeatherData, loading, error, createLoadingController, cancelLoading } = useWeatherData();
