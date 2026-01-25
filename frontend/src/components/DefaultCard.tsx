@@ -83,7 +83,9 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
                             return (
                                 <div key={dayIndex} className="w-[180px]">
                                     <div className="flex items-center gap-1 mb-1">
-                                        <h3 className="text-sm font-semibold text-theme-textPrimary tracking-tight">{day.name}</h3>
+                                        <h3 className="text-sm font-semibold text-theme-textPrimary tracking-tight">
+                                            {day.name}{showDate && <span className="text-theme-textSecondary font-normal"> {day.date}</span>}
+                                        </h3>
                                         <span className="text-lg">{day.weatherEmoji}</span>
                                     </div>
                                     <div className="rounded-xl p-3 backdrop-blur-sm" style={{ backgroundColor: 'var(--secondary)' }}>
