@@ -243,7 +243,7 @@ export function generateTemperatureMetricCommands(
     },
     {
       id: 'tempmetric-min',
-      name: 'Min Temperature',
+      name: 'Min temperature',
       icon: selectedMetric === 'min' ? '✓' : '',
       action: () => setSelectedMetric('min'),
     },
