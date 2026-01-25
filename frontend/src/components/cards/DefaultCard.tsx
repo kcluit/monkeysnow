@@ -122,7 +122,7 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
                     <div className="bg-theme-cardBg px-3 py-1 rounded-lg">
                         <span className="text-sm font-medium">
                             <span className="text-theme-accent">Totals:</span>
-                            <span className="text-theme-textPrimary"> Next 3 Days: {totals.next3Days}cm | Next 7 Days: {totals.next7Days}cm</span>
+                            <span className="text-theme-textPrimary"> Next 3 Days: {formatSnow(totals.next3Days, unitSystem)} | Next 7 Days: {formatSnow(totals.next7Days, unitSystem)}</span>
                         </span>
                     </div>
                 </div>
