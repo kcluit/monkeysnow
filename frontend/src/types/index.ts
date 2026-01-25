@@ -105,6 +105,10 @@ export interface SnowCondition {
 export interface Period {
   time: string;
   temp: string;
+  tempMax: number;
+  tempMin: number;
+  tempAvg: number;
+  tempMedian: number;
   snow: string;
   rain: string;
   wind: string;
