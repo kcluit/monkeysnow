@@ -128,10 +128,30 @@ function createPeriodsFromDayData(dayData: DayData, temperatureMetric: Temperatu
   return periods;
 }
 
-function createPeriodFromData(data: PeriodData, label: string): Period {
+function getTemperatureByMetric(data: PeriodData, metric: TemperatureMetric): number {
+  switch (metric) {
+    case 'max':
+      return data.temperature_max ?? 0;
+    case 'min':
+      return data.temperature_min ?? 0;
+    case 'avg':
+      return data.temperature_avg ?? 0;
+    case 'median':
+      return data.temperature_median ?? 0;
+    default:
+      return data.temperature_max ?? 0;
+  }
+}
+
+function createPeriodFromData(data: PeriodData, label: string, temperatureMetric: TemperatureMetric): Period {
+  const displayTemp = getTemperatureByMetric(data, temperatureMetric);
   return {
     time: label,
-    temp: `${Math.round(data.temperature_avg ?? 0)}°C`,
+    temp: `${Math.round(displayTemp)}°C`,
+    tempMax: data.temperature_max ?? 0,
+    tempMin: data.temperature_min ?? 0,
+    tempAvg: data.temperature_avg ?? 0,
+    tempMedian: data.temperature_median ?? 0,
     snow: `${(data.snowfall_total ?? 0).toFixed(1)} cm`,
     rain: `${(data.rain_total ?? 0).toFixed(1)} mm`,
     wind: `${Math.round(data.wind_speed ?? 0)} km/h`,
