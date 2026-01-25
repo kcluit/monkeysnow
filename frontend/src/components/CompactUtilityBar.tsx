@@ -104,7 +104,7 @@ export function CompactUtilityBar({
         {/* View Mode - Cycle button */}
         <button
           onClick={cycleViewMode}
-          className="compact-bar-text hover:text-theme-accent transition-colors"
+          className="compact-bar-text text-theme-textPrimary hover:text-theme-accent transition-colors"
         >
           {getViewModeText()}
         </button>
