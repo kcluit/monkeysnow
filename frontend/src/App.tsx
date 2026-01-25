@@ -86,13 +86,13 @@ function App(): JSX.Element {
         }
 
         const firstResort = selectedResorts[0];
-        const resortDataResult = processResortData(allWeatherData, firstResort, selectedElevation);
+        const resortDataResult = processResortData(allWeatherData, firstResort, selectedElevation, selectedTemperatureMetric);
 
         return {
             specialOptions,
             regularDays: resortDataResult?.days || []
         };
-    }, [selectedResorts, allWeatherData, selectedElevation]);
+    }, [selectedResorts, allWeatherData, selectedElevation, selectedTemperatureMetric]);
 
     const sortDayData = useMemo(() => getSortDayData(), [getSortDayData]);
 
