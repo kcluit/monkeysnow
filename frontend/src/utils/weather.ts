@@ -230,14 +230,14 @@ function getWeatherEmoji(condition: string): string {
  */
 function getSnowConditionFromQuality(quality: SnowQuality): SnowCondition {
   switch (quality) {
-    case 'dry_powder':
-      return { text: 'Dry Powder!', isRainbow: true };
     case 'powder':
-      return { text: 'Powder', isRainbow: true };
+      return { text: 'Powder!', isRainbow: true };
     case 'wet_snow':
-      return { text: 'Wet, Heavy Snow', isRainbow: false };
-    case 'sleet_mix':
-      return { text: 'Sleet/Mix', isRainbow: false };
+      return { text: 'Wet Snow', isRainbow: false };
+    case 'slush':
+      return { text: 'Slushy Mix', isRainbow: false };
+    case 'wet_mix':
+      return { text: 'Rain/Snow Mix', isRainbow: false };
     case 'rain':
       return { text: 'Rain', isRainbow: false };
     default:
