@@ -282,19 +282,19 @@ function getSnowConditionFromPeriods(periods: Period[]): SnowCondition {
     return getSnowConditionFromQuality(periods[0].snowQuality);
   }
 
-  // Find the best (highest priority) quality among periods with precipitation
-  let bestQuality: SnowQuality = 'rain';
-  let bestPriorityIndex = qualityPriority.length;
+  // Find the worst (lowest priority) quality among periods with precipitation
+  let worstQuality: SnowQuality = 'powder';
+  let worstPriorityIndex = -1;
 
   for (const period of periodsWithPrecip) {
     const priorityIndex = qualityPriority.indexOf(period.snowQuality);
-    if (priorityIndex !== -1 && priorityIndex < bestPriorityIndex) {
-      bestPriorityIndex = priorityIndex;
-      bestQuality = period.snowQuality;
+    if (priorityIndex !== -1 && priorityIndex > worstPriorityIndex) {
+      worstPriorityIndex = priorityIndex;
+      worstQuality = period.snowQuality;
     }
   }
 
-  return getSnowConditionFromQuality(bestQuality);
+  return getSnowConditionFromQuality(worstQuality);
 }
 
 export function calculateSnowTotals(resort: ProcessedResortData | null): SnowTotals {
