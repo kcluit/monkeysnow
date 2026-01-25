@@ -33,6 +33,9 @@ export function formatWeatherText(periods: Period[]): string {
  * For min: returns min of all period mins (true daily min)
  * For avg: returns average of all period averages
  * For median: returns average of all period medians
+ *
+ * Note: Returns values in the current unit system (parsed from formatted strings).
+ * Temperature is from raw metric values, but snow/wind are parsed from formatted strings.
  */
 export function calculateDayStats(day: DayForecast, temperatureMetric: TemperatureMetric = 'max'): DayStats {
     const periods = day.periods;
