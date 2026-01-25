@@ -235,6 +235,7 @@ function App(): JSX.Element {
         sortDayData,
         isReversed, setIsReversed,
         viewMode, setViewMode,
+        selectedTemperatureMetric, setSelectedTemperatureMetric,
         showUtilityBar, setShowUtilityBar,
         resortHierarchy.openModal,
     ]);
