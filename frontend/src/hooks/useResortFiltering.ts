@@ -138,7 +138,7 @@ export function useResortFiltering(
 
       switch (sortBy) {
         case 'temperature':
-          return getMaxTemp(dayA) - getMaxTemp(dayB);
+          return getTempForDay(dayA, temperatureMetric) - getTempForDay(dayB, temperatureMetric);
         case 'snowfall':
           return getTotalSnow(dayB) - getTotalSnow(dayA);
         case 'wind':
