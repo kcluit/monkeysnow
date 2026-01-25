@@ -80,7 +80,7 @@ export function CompactCard({ resort, temperatureMetric = 'max' }: CardProps): J
                 <div ref={scrollContainerRef} className="scroll-container overflow-x-auto hide-scrollbar px-1">
                     <div className="flex gap-1.5" style={{ width: 'max-content' }}>
                         {resort.days.map((day, dayIndex) => {
-                            const dayStats = calculateDayStats(day);
+                            const dayStats = calculateDayStats(day, temperatureMetric);
                             const weatherText = formatWeatherText(day.periods);
                             return (
                                 <div key={dayIndex} className="w-[130px]">
