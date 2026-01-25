@@ -381,22 +381,21 @@ const updateWeatherData = async () => {
                     if (estimate.ratio > 0) {
                         ratios.push(estimate.ratio);
                     }
-                    qualities.push(estimate.quality);
+                    // Only track quality for hours with precipitation
+                    if (hourData.precipitation > 0) {
+                        qualities.push(estimate.quality);
+                    }
                 }
 
-                // Determine dominant snow quality for the period
-                const qualityCounts: Record<SnowQuality, number> = {
-                    'rain': 0, 'sleet/mix': 0, 'wet_snow': 0, 'powder': 0, 'dry_snow': 0
+                // Determine worst snow quality for the period (from hours with precip)
+                // Ranking from worst to best: rain -> sleet/mix -> wet_snow -> dry_snow -> powder
+                const qualityRank: Record<SnowQuality, number> = {
+                    'rain': 0, 'sleet/mix': 1, 'wet_snow': 2, 'dry_snow': 3, 'powder': 4
                 };
+                let worstQuality: SnowQuality | null = null;
                 for (const q of qualities) {
-                    qualityCounts[q]++;
-                }
-                let dominantQuality: SnowQuality = 'rain';
-                let maxCount = 0;
-                for (const [q, count] of Object.entries(qualityCounts)) {
-                    if (count > maxCount) {
-                        maxCount = count;
-                        dominantQuality = q as SnowQuality;
+                    if (worstQuality === null || qualityRank[q] < qualityRank[worstQuality]) {
+                        worstQuality = q;
                     }
                 }
 
