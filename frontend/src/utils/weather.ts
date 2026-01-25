@@ -299,19 +299,27 @@ function getSnowConditionFromPeriods(periods: Period[]): SnowCondition {
   const periodsWithPrecip = periods.filter(p => parseFloat(p.snow) > 0 || parseFloat(p.rain) > 0);
 
   if (periodsWithPrecip.length === 0) {
-    // No precipitation - use first period's quality or default
-    return getSnowConditionFromQuality(periods[0].snowQuality);
+    // No precipitation - return N/A
+    return { text: 'N/A', isRainbow: false, isSecondary: true };
+  }
+
+  // Filter out periods with null quality
+  const periodsWithQuality = periodsWithPrecip.filter(p => p.snowQuality !== null);
+
+  if (periodsWithQuality.length === 0) {
+    // All periods with precipitation have null quality - return N/A
+    return { text: 'N/A', isRainbow: false, isSecondary: true };
   }
 
   // Find the worst (lowest priority) quality among periods with precipitation
   let worstQuality: SnowQuality = 'powder';
   let worstPriorityIndex = -1;
 
-  for (const period of periodsWithPrecip) {
-    const priorityIndex = qualityPriority.indexOf(period.snowQuality);
+  for (const period of periodsWithQuality) {
+    const priorityIndex = qualityPriority.indexOf(period.snowQuality!);
     if (priorityIndex !== -1 && priorityIndex > worstPriorityIndex) {
       worstPriorityIndex = priorityIndex;
-      worstQuality = period.snowQuality;
+      worstQuality = period.snowQuality!;
     }
   }
 
