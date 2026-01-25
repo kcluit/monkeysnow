@@ -9,7 +9,8 @@ import type {
   DayForecast,
   Period,
   TemperatureMetric,
-  SnowfallEstimateMode
+  SnowfallEstimateMode,
+  UnitSystem
 } from '../types';
 
 export function useResortFiltering(
