@@ -54,7 +54,7 @@ export function generateElevationCommands(
     },
     {
       id: 'elevation-mid',
-      name: 'Mid Forecast',
+      name: 'Mid forecast',
       icon: selectedElevation === 'mid' ? '✓' : '',
       action: () => setSelectedElevation('mid'),
     },
