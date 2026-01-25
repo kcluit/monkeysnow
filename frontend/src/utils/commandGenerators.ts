@@ -237,7 +237,7 @@ export function generateTemperatureMetricCommands(
   return [
     {
       id: 'tempmetric-max',
-      name: 'Max Temperature',
+      name: 'Max temperature',
       icon: selectedMetric === 'max' ? '✓' : '',
       action: () => setSelectedMetric('max'),
     },
