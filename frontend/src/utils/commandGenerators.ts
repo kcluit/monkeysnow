@@ -145,7 +145,7 @@ export function generateOrderCommands(
     },
     {
       id: 'order-reverse',
-      name: 'Reverse Order',
+      name: 'Reverse order',
       icon: isReversed ? '✓' : '',
       action: () => setIsReversed(true),
     },
