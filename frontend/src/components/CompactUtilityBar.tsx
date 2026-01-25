@@ -114,7 +114,7 @@ export function CompactUtilityBar({
         {/* Reverse Order - Toggle */}
         <button
           onClick={() => setIsReversed(!isReversed)}
-          className="compact-bar-text hover:text-theme-accent transition-colors"
+          className="compact-bar-text text-theme-textPrimary hover:text-theme-accent transition-colors"
         >
           {isReversed ? '↑ Reverse' : '↓ Normal'}
         </button>
