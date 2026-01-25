@@ -254,6 +254,8 @@ function App(): JSX.Element {
             setShowUtilityBar,
             utilityBarStyle,
             setUtilityBarStyle,
+            unitSystem,
+            setUnitSystem,
             openResortSelector: resortHierarchy.openModal,
         });
 
