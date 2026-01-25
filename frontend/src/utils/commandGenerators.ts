@@ -22,6 +22,9 @@ export interface ControlCommandParams {
   // View Mode
   viewMode: ViewMode;
   setViewMode: (m: ViewMode) => void;
+  // Temperature Metric
+  selectedTemperatureMetric: TemperatureMetric;
+  setSelectedTemperatureMetric: (m: TemperatureMetric) => void;
   // Utility Bar visibility
   showUtilityBar: boolean;
   setShowUtilityBar: (show: boolean) => void;
