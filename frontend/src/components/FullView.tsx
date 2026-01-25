@@ -69,7 +69,7 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto -mx-5 px-5">
         <div className="min-w-[1400px]">
           <table className="w-full border-separate border-spacing-4">
             <thead>
