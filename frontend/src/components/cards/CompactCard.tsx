@@ -101,7 +101,7 @@ export function CompactCard({ resort, temperatureMetric = 'max', showDate = fals
                                                 {formatTemp(dayStats.maxTemp, unitSystem)}
                                             </span>
                                             {dayStats.snow > 0 ? (
-                                                <span className={`text-xs font-bold ${getSnowClass(dayStats.snow)}`}>
+                                                <span className={`text-xs font-bold ${getSnowClass(dayStats.snow, unitSystem)}`}>
                                                     {formatSnow(dayStats.snow, unitSystem)}
                                                 </span>
                                             ) : (
@@ -114,7 +114,7 @@ export function CompactCard({ resort, temperatureMetric = 'max', showDate = fals
                                             <span className="text-xs text-theme-textPrimary truncate max-w-[70px]" title={weatherText}>
                                                 {weatherText.split('/')[0].trim()}
                                             </span>
-                                            <span className={`text-xs font-medium ${getWindClass(dayStats.wind)}`}>
+                                            <span className={`text-xs font-medium ${getWindClass(dayStats.wind, unitSystem)}`}>
                                                 {formatWind(dayStats.wind, unitSystem)}
                                             </span>
                                         </div>
