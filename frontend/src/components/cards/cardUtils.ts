@@ -103,17 +103,25 @@ export function getTemperatureClass(temp: number): string {
 }
 
 /**
- * Gets snow amount color class (rainbow for significant amounts)
+ * Gets snow amount color class (rainbow for significant amounts).
+ * Thresholds are based on cm values: 20cm+ rainbow, 10cm+ apple-rainbow.
+ * When in imperial mode, converts inches back to cm for threshold comparison.
  */
-export function getSnowClass(snow: number): string {
-    if (snow >= 20) return 'rainbow-text';
-    if (snow >= 10) return 'apple-rainbow-text';
+export function getSnowClass(snow: number, unitSystem: UnitSystem = 'metric'): string {
+    // Convert to metric for threshold comparison if needed
+    const snowCm = unitSystem === 'imperial' ? snow * INCHES_TO_CM : snow;
+    if (snowCm >= 20) return 'rainbow-text';
+    if (snowCm >= 10) return 'apple-rainbow-text';
     return 'text-theme-accent';
 }
 
 /**
- * Gets wind color class (accent for high winds)
+ * Gets wind color class (accent for high winds).
+ * Threshold is based on km/h values: 20 km/h+ gets accent.
+ * When in imperial mode, converts mph back to km/h for threshold comparison.
  */
-export function getWindClass(wind: number): string {
-    return wind >= 20 ? 'text-theme-accent' : 'text-theme-textSecondary';
+export function getWindClass(wind: number, unitSystem: UnitSystem = 'metric'): string {
+    // Convert to metric for threshold comparison if needed
+    const windKmh = unitSystem === 'imperial' ? wind * MPH_TO_KMH : wind;
+    return windKmh >= 20 ? 'text-theme-accent' : 'text-theme-textSecondary';
 }
