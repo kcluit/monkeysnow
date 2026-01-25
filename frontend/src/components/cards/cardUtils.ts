@@ -1,4 +1,4 @@
-import type { DayForecast, Period, DayStats } from '../../types';
+import type { DayForecast, Period, DayStats, TemperatureMetric } from '../../types';
 
 /**
  * Formats weather text from periods (combines AM/PM conditions intelligently)
