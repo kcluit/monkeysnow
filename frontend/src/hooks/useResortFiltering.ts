@@ -32,18 +32,37 @@ export function useResortFiltering(
     sortBy: SortOption,
     selectedElevation: ElevationLevel,
     selectedSortDay: SortDay,
-    isReversed: boolean
+    isReversed: boolean,
+    temperatureMetric: TemperatureMetric = 'max'
   ): string[] => {
     if (!allWeatherData) return resorts;
 
-    // Helper functions for single day calculations
+    // Helper function to get temperature based on metric
+    const getTempForDay = (day: DayForecast, metric: TemperatureMetric): number => {
+      const periods = day.periods;
+      if (!periods.length) return -Infinity;
+
+      switch (metric) {
+        case 'max':
+          // Max of all period maxes (true daily maximum)
+          return Math.max(...periods.map(p => p.tempMax));
+        case 'min':
+          // Min of all period mins (true daily minimum)
+          return Math.min(...periods.map(p => p.tempMin));
+        case 'avg':
+          // Average of all period averages
+          return periods.reduce((sum, p) => sum + p.tempAvg, 0) / periods.length;
+        case 'median':
+          // Average of all period medians
+          return periods.reduce((sum, p) => sum + p.tempMedian, 0) / periods.length;
+        default:
+          return Math.max(...periods.map(p => p.tempMax));
+      }
+    };
+
+    // Legacy helper for backward compatibility (not used, but keeping structure)
     const getMaxTemp = (day: DayForecast): number => {
-      return Math.max(
-        ...day.periods.map((period: Period) => {
-          const temp = parseFloat(period.temp);
-          return isNaN(temp) ? -Infinity : temp;
-        })
-      );
+      return getTempForDay(day, temperatureMetric);
     };
 
     const getTotalSnow = (day: DayForecast): number => {
