@@ -60,7 +60,7 @@ export function generateElevationCommands(
     },
     {
       id: 'elevation-top',
-      name: 'Peak Forecast',
+      name: 'Peak forecast',
       icon: selectedElevation === 'top' ? '✓' : '',
       action: () => setSelectedElevation('top'),
     },
