@@ -17,6 +17,7 @@ import { useFPSCounter } from './hooks/useFPSCounter';
 import { useCommandPalette } from './hooks/useCommandPalette';
 import { useRainbowText } from './hooks/useRainbowText';
 import { useHideEmoji } from './hooks/useHideEmoji';
+import { useHideBorders } from './hooks/useHideBorders';
 import { useResortHierarchy } from './hooks/useResortHierarchy';
 import { processResortData } from './utils/weather';
 import { generateControlCommands } from './utils/commandGenerators';
