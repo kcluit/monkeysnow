@@ -124,7 +124,7 @@ export function CompactUtilityBar({
         {/* Sort - Cycle button */}
         <button
           onClick={cycleSort}
-          className="compact-bar-text hover:text-theme-accent transition-colors"
+          className="compact-bar-text text-theme-textPrimary hover:text-theme-accent transition-colors"
         >
           {getSortText()}
         </button>
