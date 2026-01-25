@@ -81,8 +81,8 @@ const getMode = (arr: number[]) => {
     return mode;
 };
 
-// --- Snow Estimation (Coastal-Optimized with Transition Zones) ---
-type SnowQuality = 'rain' | 'wet_mix' | 'slush' | 'wet_snow' | 'powder';
+// --- Snow Estimation (Crystal Habit-Based with Kuchera Ratios) ---
+type SnowQuality = 'rain' | 'sleet/mix' | 'wet_snow' | 'powder' | 'dry_snow';
 
 interface HourlySnowEstimate {
     snowCm: number;
@@ -91,8 +91,11 @@ interface HourlySnowEstimate {
     quality: SnowQuality;
 }
 
+/**
+ * Calculates the Wet Bulb Temperature using the Stull (2011) approximation.
+ */
 function calculateWetBulb(tempC: number, rh: number): number {
-    const safeRh = Math.max(0.1, Math.min(100, rh));
+    const safeRh = Math.max(0, Math.min(100, rh));
     const term1 = tempC * Math.atan(0.151977 * Math.pow(safeRh + 8.313659, 0.5));
     const term2 = Math.atan(tempC + safeRh);
     const term3 = Math.atan(safeRh - 1.676331);
@@ -103,7 +106,9 @@ function calculateWetBulb(tempC: number, rh: number): number {
 
 /**
  * Calculates what percentage of precipitation actually contributes to accumulation.
- * Handles "Transition Zones" (Rain/Snow Mix) for maritime climates.
+ * - Warm (> 0.5C WB): 0% Snow (All rain)
+ * - Transition (-2.0C to 0.5C WB): 10% - 100% Snow (Slush/Mix)
+ * - Cold (< -2.0C WB): 100% Snow
  */
 function calculateSnowFraction(wetBulbC: number): number {
     // Warm Zone: Pure Rain
@@ -121,46 +126,55 @@ function calculateSnowFraction(wetBulbC: number): number {
 }
 
 /**
- * Determines snow density (fluffiness) using Hybrid Logic.
+ * Determines the Snow-to-Liquid Ratio (SLR) based on Wet Bulb Temperature.
+ * Uses Kuchera method with crystal habit-based ratios:
+ * - 0 to -4: Thin Plates (Wet) -> 3:1
+ * - -4 to -10: Needles/Columns (Avg) -> 7:1
+ * - -10 to -12: Transition -> 10:1
+ * - -12 to -18: Dendrites (DGZ - Fluffy) -> 15:1
+ * - < -18: Plates/Columns (Dense) -> 12:1
  */
-function getSnowRatio(wetBulbC: number): number {
-    // Surface Constraint: If warm, snow is heavy/wet
-    if (wetBulbC > -2.0) return 6;  // Concrete / Base builder
-    if (wetBulbC > -3.5) return 9;  // Standard coastal snow
-
-    // Aloft Constraint: Check for Dendritic Growth Zone (Powder)
-    const cloudTemp = wetBulbC - 10;
-    if (cloudTemp <= -12 && cloudTemp >= -18) return 15; // Powder (Dendrites)
-
-    return 11; // Default winter snow
+function getKucheraRatio(wetBulbC: number): number {
+    // Warm/Rain Zone
+    if (wetBulbC > 0) return 3;
+    // Thin Plates / Dendritic fragments (0 to -4)
+    if (wetBulbC > -4) return 3;
+    // Needles / Columns (-4 to -10)
+    if (wetBulbC > -10) return 7;
+    // Transition Zone (-10 to -12)
+    if (wetBulbC > -12) return 10;
+    // Dendritic Growth Zone / Stellar Dendrites (-12 to -18)
+    if (wetBulbC > -18) return 15;
+    // Cold / Plates & Columns (< -18)
+    return 12;
 }
 
-function getSnowQuality(snowFraction: number, ratio: number): SnowQuality {
-    if (snowFraction <= 0.05) return 'rain';
-    if (snowFraction < 0.6) return 'wet_mix';
-    if (snowFraction < 0.9) return 'slush';
-    if (ratio >= 14) return 'powder';
-    return 'wet_snow';
+/**
+ * Determines snow quality based on wet bulb temp and snow fraction.
+ */
+function getSnowQuality(wetBulbC: number, snowFraction: number): SnowQuality {
+    if (snowFraction === 0) return 'rain';
+    if (snowFraction < 0.5) return 'sleet/mix';
+    if (wetBulbC > -4) return 'wet_snow';        // 0 to -4: Thin Plates/Wet
+    if (wetBulbC <= -12 && wetBulbC >= -18) return 'powder'; // -12 to -18: DGZ/Fluffy
+    return 'dry_snow'; // -4 to -12 and < -18
 }
 
 function estimateHourlySnow(tempC: number, humidity: number, precipMm: number): HourlySnowEstimate {
     const wetBulb = calculateWetBulb(tempC, humidity);
     const snowFraction = calculateSnowFraction(wetBulb);
-    const ratio = getSnowRatio(wetBulb);
+    const ratio = getKucheraRatio(wetBulb);
 
     // Only multiply the "snow fraction" of precip by the ratio
     const effectiveSnowPrecipMm = precipMm * snowFraction;
     const snowMm = effectiveSnowPrecipMm * ratio;
     const snowCm = snowMm / 10;
 
-    // Effective ratio = Final Snow Depth / Original Total Precip
-    const effectiveRatio = precipMm > 0 ? snowMm / precipMm : 0;
-
     return {
         snowCm,
-        ratio: effectiveRatio,
+        ratio,
         snowFraction,
-        quality: getSnowQuality(snowFraction, ratio)
+        quality: getSnowQuality(wetBulb, snowFraction)
     };
 }
 
