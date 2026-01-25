@@ -39,7 +39,6 @@ import type {
     SortDay,
     ProcessedResortData,
     Command,
-    SortDayData,
     ViewMode,
     TemperatureMetric,
     SnowfallEstimateMode,
