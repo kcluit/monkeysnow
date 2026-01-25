@@ -44,7 +44,8 @@ export function processResortData(
   resortName: string,
   elevation: ElevationLevel = 'bot',
   temperatureMetric: TemperatureMetric = 'max',
-  snowfallEstimateMode: SnowfallEstimateMode = 'model'
+  snowfallEstimateMode: SnowfallEstimateMode = 'model',
+  unitSystem: UnitSystem = 'metric'
 ): ProcessedResortData | null {
   try {
     if (!allData || !allData.data) {
