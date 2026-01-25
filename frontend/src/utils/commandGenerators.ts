@@ -405,5 +405,14 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
         params.setUtilityBarStyle
       ),
     },
+    {
+      id: 'units',
+      name: 'Units',
+      icon: '📏',
+      subCommands: generateUnitSystemCommands(
+        params.unitSystem,
+        params.setUnitSystem
+      ),
+    },
   ];
 }
