@@ -386,7 +386,7 @@ const updateWeatherData = async () => {
 
                 // Determine dominant snow quality for the period
                 const qualityCounts: Record<SnowQuality, number> = {
-                    'rain': 0, 'wet_mix': 0, 'slush': 0, 'wet_snow': 0, 'powder': 0
+                    'rain': 0, 'sleet/mix': 0, 'wet_snow': 0, 'powder': 0, 'dry_snow': 0
                 };
                 for (const q of qualities) {
                     qualityCounts[q]++;
