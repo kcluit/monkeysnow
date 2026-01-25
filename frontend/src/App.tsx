@@ -52,6 +52,7 @@ function App(): JSX.Element {
     const { isRainbowEnabled, setRainbowEnabled } = useRainbowText();
     const { isHideEmojiEnabled, setHideEmojiEnabled } = useHideEmoji();
     const { isHideBordersEnabled, setHideBordersEnabled } = useHideBorders();
+    const { isShowDateEnabled, setShowDateEnabled } = useShowDate();
 
     // Weather data hook
     const { allWeatherData, loading, error, createLoadingController, cancelLoading } = useWeatherData();
