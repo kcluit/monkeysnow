@@ -214,6 +214,8 @@ function App(): JSX.Element {
             setIsReversed,
             viewMode,
             setViewMode,
+            selectedTemperatureMetric,
+            setSelectedTemperatureMetric,
             showUtilityBar,
             setShowUtilityBar,
             openResortSelector: resortHierarchy.openModal,
