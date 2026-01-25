@@ -160,12 +160,12 @@ function getTemperatureByMetric(data: PeriodData, metric: TemperatureMetric): nu
   }
 }
 
-function createPeriodFromData(data: PeriodData, label: string, temperatureMetric: TemperatureMetric, snowfallEstimateMode: SnowfallEstimateMode): Period {
+function createPeriodFromData(data: PeriodData, label: string, temperatureMetric: TemperatureMetric, snowfallEstimateMode: SnowfallEstimateMode, unitSystem: UnitSystem): Period {
   const displayTemp = getTemperatureByMetric(data, temperatureMetric);
-  // Round based on metric: ceil for max, floor for min, round for avg/median
-  const roundedTemp = temperatureMetric === 'max' ? Math.ceil(displayTemp)
-                    : temperatureMetric === 'min' ? Math.floor(displayTemp)
-                    : Math.round(displayTemp);
+  // Determine rounding mode based on metric
+  const roundingMode = temperatureMetric === 'max' ? 'ceil' as const
+                     : temperatureMetric === 'min' ? 'floor' as const
+                     : 'round' as const;
 
   const snowQuality = data.snow_quality ?? 'rain';
   let snowValue: number;
