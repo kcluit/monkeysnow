@@ -200,6 +200,7 @@ export interface CardProps {
   temperatureMetric?: TemperatureMetric;
   snowfallEstimateMode?: SnowfallEstimateMode;
   showDate?: boolean;
+  unitSystem?: UnitSystem;
 }
 
 export interface ThemeToggleProps {
