@@ -126,6 +126,7 @@ export interface Period {
 // Day forecast data
 export interface DayForecast {
   name: string;
+  date: string;
   weather: string;
   weatherEmoji: string;
   periods: Period[];
