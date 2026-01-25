@@ -106,7 +106,7 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
                                             <div className="text-xs text-theme-textPrimary font-medium">
                                                 Freezing: {day.freezingLevel}
                                             </div>
-                                            <div className={`text-xs font-medium mt-0.5 truncate ${day.snowCondition.isRainbow ? 'apple-rainbow-text' : 'text-theme-accent'}`} title={day.snowCondition.text}>
+                                            <div className={`text-xs font-medium mt-0.5 truncate ${day.snowCondition.isRainbow ? 'apple-rainbow-text' : day.snowCondition.isSecondary ? 'text-theme-textSecondary' : 'text-theme-accent'}`} title={day.snowCondition.text}>
                                                 {day.snowCondition.text}
                                             </div>
                                         </div>
