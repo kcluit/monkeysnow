@@ -224,6 +224,25 @@ function App(): JSX.Element {
                     },
                 ],
             },
+            {
+                id: 'show-date',
+                name: 'Show Date',
+                icon: '📅',
+                subCommands: [
+                    {
+                        id: 'show-date-on',
+                        name: 'On',
+                        icon: isShowDateEnabled ? '✔️' : '',
+                        action: () => setShowDateEnabled(true),
+                    },
+                    {
+                        id: 'show-date-off',
+                        name: 'Off',
+                        icon: !isShowDateEnabled ? '✔️' : '',
+                        action: () => setShowDateEnabled(false),
+                    },
+                ],
+            },
         ];
 
         // Control panel commands
