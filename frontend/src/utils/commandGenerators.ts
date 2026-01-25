@@ -31,6 +31,9 @@ export interface ControlCommandParams {
   // Utility Bar visibility
   showUtilityBar: boolean;
   setShowUtilityBar: (show: boolean) => void;
+  // Utility Bar style
+  utilityBarStyle: UtilityBarStyle;
+  setUtilityBarStyle: (style: UtilityBarStyle) => void;
   // Resort selector
   openResortSelector: () => void;
 }
