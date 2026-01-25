@@ -48,6 +48,7 @@ export type ElevationLevel = 'bot' | 'mid' | 'top';
 export type SortOption = 'temperature' | 'snowfall' | 'wind';
 export type SortDay = number | 'next3days' | 'next7days';
 export type ViewMode = 'default' | 'full' | 'compact';
+export type TemperatureMetric = 'max' | 'min' | 'avg' | 'median';
 
 // Weather data structures from new API format
 export interface PeriodData {
