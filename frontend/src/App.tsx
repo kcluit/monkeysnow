@@ -278,7 +278,8 @@ function App(): JSX.Element {
                 selectedSort,
                 selectedElevation,
                 selectedSortDay,
-                isReversed
+                isReversed,
+                selectedTemperatureMetric
             );
 
             // Clear existing data
