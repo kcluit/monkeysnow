@@ -34,6 +34,9 @@ export interface ControlCommandParams {
   // Utility Bar style
   utilityBarStyle: UtilityBarStyle;
   setUtilityBarStyle: (style: UtilityBarStyle) => void;
+  // Unit System
+  unitSystem: UnitSystem;
+  setUnitSystem: (system: UnitSystem) => void;
   // Resort selector
   openResortSelector: () => void;
 }
