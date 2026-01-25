@@ -91,7 +91,7 @@ export function WeatherChart({
   };
 
   const renderModelBars = () => {
-    return selectedModels.map((modelId, index) => {
+    return selectedModels.map((modelId) => {
       const modelConfig = getModelConfig(modelId);
       return (
         <Bar
