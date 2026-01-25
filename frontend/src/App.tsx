@@ -41,7 +41,8 @@ import type {
     SortDayData,
     ViewMode,
     TemperatureMetric,
-    SnowfallEstimateMode
+    SnowfallEstimateMode,
+    UtilityBarStyle
 } from './types';
 
 function App(): JSX.Element {
