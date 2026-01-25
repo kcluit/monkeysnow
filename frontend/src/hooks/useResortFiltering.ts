@@ -85,12 +85,12 @@ export function useResortFiltering(
       const selectedDays = days.slice(0, Math.min(numDays, days.length));
       if (selectedDays.length === 0) return 0;
 
-      let totalMaxTemp = 0;
+      let totalTemp = 0;
       selectedDays.forEach(day => {
-        const dayMaxTemp = getMaxTemp(day);
-        totalMaxTemp += (dayMaxTemp === -Infinity ? 0 : dayMaxTemp);
+        const dayTemp = getTempForDay(day, temperatureMetric);
+        totalTemp += (dayTemp === -Infinity ? 0 : dayTemp);
       });
-      return totalMaxTemp / selectedDays.length;
+      return totalTemp / selectedDays.length;
     };
 
     const getTotalSnowMultipleDays = (days: DayForecast[], numDays: number): number => {
