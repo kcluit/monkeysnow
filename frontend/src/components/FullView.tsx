@@ -54,7 +54,7 @@ function lerp(start: number, end: number, t: number): number {
   return start * (1 - t) + end * t;
 }
 
-export function FullView({ resort }: CardProps): JSX.Element {
+export function FullView({ resort, temperatureMetric = 'max' }: CardProps): JSX.Element {
   const totals = calculateSnowTotals(resort);
 
   return (
