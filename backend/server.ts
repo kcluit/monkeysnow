@@ -421,7 +421,7 @@ const updateWeatherData = async () => {
                     // Snow estimation fields
                     snowfall_estimate: parseFloat(totalSnowEstimateCm.toFixed(4)),
                     snow_to_liquid_ratio: parseFloat(avgRatio.toFixed(2)),
-                    snow_quality: dominantQuality
+                    snow_quality: worstQuality
                 };
             });
         }
