@@ -392,6 +392,25 @@ function App(): JSX.Element {
         setIsReversed(newReversed);
     }, [setIsReversed]);
 
+    // Handle resort card click to enter detail view
+    const handleResortClick = useCallback((resortId: string): void => {
+        enterDetailView(resortId);
+    }, [enterDetailView]);
+
+    // Get resort location for detail view
+    const selectedResortLocation = useMemo(() => {
+        if (!selectedResortId) return null;
+        const location = getResortLocation(selectedResortId);
+        if (!location) return null;
+        return {
+            lat: location.loc[0],
+            lon: location.loc[1],
+            baseElevation: location.bot,
+            midElevation: location.mid,
+            topElevation: location.top,
+        };
+    }, [selectedResortId]);
+
     // Get sorted resort data for display
     const displayResorts = useMemo((): ProcessedResortData[] => {
         if (!allWeatherData || selectedResorts.length === 0) return [];
