@@ -480,74 +480,87 @@ function App(): JSX.Element {
             <div className="max-w-7xl mx-auto">
                 <Header font={font} />
 
-                {/* Conditionally render Utility Bar */}
-                {showUtilityBar && (
-                    utilityBarStyle === 'compact' ? (
-                        <CompactUtilityBar
-                            selectedResorts={selectedResorts}
-                            setSelectedResorts={handleResortsChange}
-                            selectedElevation={selectedElevation}
-                            setSelectedElevation={handleElevationChange}
-                            selectedSort={selectedSort}
-                            setSelectedSort={handleSortChange}
-                            selectedSortDay={selectedSortDay}
-                            setSelectedSortDay={handleSortDayChange}
-                            viewMode={viewMode}
-                            setViewMode={setViewMode}
-                            isReversed={isReversed}
-                            setIsReversed={handleReverseChange}
-                            searchTerm={searchTerm}
-                            setSearchTerm={setSearchTerm}
-                            filteredResorts={filteredResorts}
-                            allWeatherData={allWeatherData}
-                            processResortData={processResortData}
-                            cancelLoading={cancelLoading}
-                            openResortModal={resortHierarchy.openModal}
-                        />
-                    ) : (
-                        <UtilityBar
-                            selectedResorts={selectedResorts}
-                            setSelectedResorts={handleResortsChange}
-                            selectedElevation={selectedElevation}
-                            setSelectedElevation={handleElevationChange}
-                            selectedSort={selectedSort}
-                            setSelectedSort={handleSortChange}
-                            selectedSortDay={selectedSortDay}
-                            setSelectedSortDay={handleSortDayChange}
-                            viewMode={viewMode}
-                            setViewMode={setViewMode}
-                            isReversed={isReversed}
-                            setIsReversed={handleReverseChange}
-                            searchTerm={searchTerm}
-                            setSearchTerm={setSearchTerm}
-                            filteredResorts={filteredResorts}
-                            allWeatherData={allWeatherData}
-                            processResortData={processResortData}
-                            cancelLoading={cancelLoading}
-                            openResortModal={resortHierarchy.openModal}
-                        />
-                    )
-                )}
-
-                <div className={viewMode === 'compact' ? "compact-grid" : "space-y-8"}>
-                    {displayResorts.map((resort, index) => (
-                        <div key={`${resort.name}-${index}`}>
-                            {viewMode === 'full' ? (
-                                <FullView resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} unitSystem={unitSystem} />
-                            ) : viewMode === 'compact' ? (
-                                <CompactCard resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} unitSystem={unitSystem} />
+                {/* Detail View Mode */}
+                {isDetailView && selectedResortId && selectedResortLocation ? (
+                    <DetailedResortView
+                        resortId={selectedResortId}
+                        resortName={getDisplayName(selectedResortId)}
+                        location={selectedResortLocation}
+                        onBack={exitDetailView}
+                        unitSystem={unitSystem}
+                    />
+                ) : (
+                    <>
+                        {/* Conditionally render Utility Bar */}
+                        {showUtilityBar && (
+                            utilityBarStyle === 'compact' ? (
+                                <CompactUtilityBar
+                                    selectedResorts={selectedResorts}
+                                    setSelectedResorts={handleResortsChange}
+                                    selectedElevation={selectedElevation}
+                                    setSelectedElevation={handleElevationChange}
+                                    selectedSort={selectedSort}
+                                    setSelectedSort={handleSortChange}
+                                    selectedSortDay={selectedSortDay}
+                                    setSelectedSortDay={handleSortDayChange}
+                                    viewMode={viewMode}
+                                    setViewMode={setViewMode}
+                                    isReversed={isReversed}
+                                    setIsReversed={handleReverseChange}
+                                    searchTerm={searchTerm}
+                                    setSearchTerm={setSearchTerm}
+                                    filteredResorts={filteredResorts}
+                                    allWeatherData={allWeatherData}
+                                    processResortData={processResortData}
+                                    cancelLoading={cancelLoading}
+                                    openResortModal={resortHierarchy.openModal}
+                                />
                             ) : (
-                                <DefaultCard resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} unitSystem={unitSystem} />
+                                <UtilityBar
+                                    selectedResorts={selectedResorts}
+                                    setSelectedResorts={handleResortsChange}
+                                    selectedElevation={selectedElevation}
+                                    setSelectedElevation={handleElevationChange}
+                                    selectedSort={selectedSort}
+                                    setSelectedSort={handleSortChange}
+                                    selectedSortDay={selectedSortDay}
+                                    setSelectedSortDay={handleSortDayChange}
+                                    viewMode={viewMode}
+                                    setViewMode={setViewMode}
+                                    isReversed={isReversed}
+                                    setIsReversed={handleReverseChange}
+                                    searchTerm={searchTerm}
+                                    setSearchTerm={setSearchTerm}
+                                    filteredResorts={filteredResorts}
+                                    allWeatherData={allWeatherData}
+                                    processResortData={processResortData}
+                                    cancelLoading={cancelLoading}
+                                    openResortModal={resortHierarchy.openModal}
+                                />
+                            )
+                        )}
+
+                        <div className={viewMode === 'compact' ? "compact-grid" : "space-y-8"}>
+                            {displayResorts.map((resort, index) => (
+                                <div key={`${resort.name}-${index}`}>
+                                    {viewMode === 'full' ? (
+                                        <FullView resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} unitSystem={unitSystem} onResortClick={handleResortClick} />
+                                    ) : viewMode === 'compact' ? (
+                                        <CompactCard resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} unitSystem={unitSystem} onResortClick={handleResortClick} />
+                                    ) : (
+                                        <DefaultCard resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} unitSystem={unitSystem} onResortClick={handleResortClick} />
+                                    )}
+                                </div>
+                            ))}
+
+                            {selectedResorts.length === 0 && (
+                                <div className="text-center py-12">
+                                    <div className="text-theme-textSecondary text-lg">Select resorts to view forecasts</div>
+                                </div>
                             )}
                         </div>
-                    ))}
-
-                    {selectedResorts.length === 0 && (
-                        <div className="text-center py-12">
-                            <div className="text-theme-textSecondary text-lg">Select resorts to view forecasts</div>
-                        </div>
-                    )}
-                </div>
+                    </>
+                )}
             </div>
         </div>
     );
