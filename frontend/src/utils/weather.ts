@@ -232,12 +232,12 @@ function getSnowConditionFromQuality(quality: SnowQuality): SnowCondition {
   switch (quality) {
     case 'powder':
       return { text: 'Powder!', isRainbow: true };
+    case 'dry_snow':
+      return { text: 'Dry Snow', isRainbow: true };
     case 'wet_snow':
       return { text: 'Wet Snow', isRainbow: false };
-    case 'slush':
-      return { text: 'Slushy Mix', isRainbow: false };
-    case 'wet_mix':
-      return { text: 'Rain/Snow Mix', isRainbow: false };
+    case 'sleet/mix':
+      return { text: 'Sleet/Mix', isRainbow: false };
     case 'rain':
       return { text: 'Rain', isRainbow: false };
     default:
