@@ -1,4 +1,4 @@
-import type { ElevationLevel, SortOption } from '../types';
+import type { ElevationLevel, SortOption, TemperatureMetric } from '../types';
 import { buildResortAliases, getDisplayNameFromHierarchy } from '../data/resortHierarchy';
 
 // Build resort aliases from the hierarchy (single source of truth)
