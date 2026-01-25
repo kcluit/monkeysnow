@@ -310,6 +310,7 @@ function App(): JSX.Element {
         selectedSortDay,
         isReversed,
         selectedTemperatureMetric,
+        snowfallEstimateMode,
         sortResorts,
         loadResort,
         createLoadingController
