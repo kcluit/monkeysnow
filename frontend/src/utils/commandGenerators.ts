@@ -345,7 +345,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     },
     {
       id: 'temperature-metric',
-      name: 'Temperature Display...',
+      name: 'Temperature display',
       icon: '🌡️',
       subCommands: generateTemperatureMetricCommands(
         params.selectedTemperatureMetric,
