@@ -32,6 +32,12 @@ body {
     transition: background-color 0.3s ease;
 }
 
+/* Prevent horizontal overflow on mobile */
+html, body, #root {
+    overflow-x: hidden;
+    max-width: 100vw;
+}
+
 h1.apple-rainbow-text,
 .apple-rainbow-text {
     background: var(--titleColor) !important;
