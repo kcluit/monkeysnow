@@ -75,7 +75,7 @@ export function CompactUtilityBar({
         {/* Select Resorts */}
         <button
           onClick={() => openResortModal()}
-          className="compact-bar-text hover:text-theme-accent transition-colors"
+          className="compact-bar-text text-theme-textPrimary hover:text-theme-accent transition-colors"
         >
           Select Resorts ({selectedResorts.length})
         </button>
