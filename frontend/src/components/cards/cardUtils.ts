@@ -69,7 +69,7 @@ export function calculateDayStats(day: DayForecast, temperatureMetric: Temperatu
     }
 
     periods.forEach(period => {
-        const snowAmount = parseFloat(period.snow.replace(' cm', '')) || 0;
+        const snowAmount = parseFloat(period.snow.replace(/[^\d.-]/g, '')) || 0;
         totalSnow += snowAmount;
     });
 
