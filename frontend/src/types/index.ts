@@ -184,6 +184,7 @@ export interface UtilityBarProps {
 
 export interface CardProps {
   resort: ProcessedResortData;
+  temperatureMetric?: TemperatureMetric;
 }
 
 export interface ThemeToggleProps {
