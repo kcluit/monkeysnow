@@ -487,11 +487,11 @@ function App(): JSX.Element {
                     {displayResorts.map((resort, index) => (
                         <div key={`${resort.name}-${index}`}>
                             {viewMode === 'full' ? (
-                                <FullView resort={resort} temperatureMetric={selectedTemperatureMetric} />
+                                <FullView resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} />
                             ) : viewMode === 'compact' ? (
-                                <CompactCard resort={resort} temperatureMetric={selectedTemperatureMetric} />
+                                <CompactCard resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} />
                             ) : (
-                                <DefaultCard resort={resort} temperatureMetric={selectedTemperatureMetric} />
+                                <DefaultCard resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} />
                             )}
                         </div>
                     ))}
