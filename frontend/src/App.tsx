@@ -26,7 +26,6 @@ import { processResortData } from './utils/weather';
 import { generateControlCommands } from './utils/commandGenerators';
 import { getSortDayData } from './utils/sortDayHelpers';
 import { getResortLocation } from './utils/openMeteoClient';
-import { getDisplayName as getDisplayNameFromConstants } from './utils/constants';
 import {
     skiResorts,
     defaultSelectedResorts,
