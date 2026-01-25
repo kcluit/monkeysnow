@@ -110,6 +110,7 @@ export interface AllWeatherData {
 export interface SnowCondition {
   text: string;
   isRainbow: boolean;
+  isSecondary?: boolean;  // true for N/A display
 }
 
 // Period data (AM/PM/Night)
