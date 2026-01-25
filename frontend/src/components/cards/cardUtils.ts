@@ -73,8 +73,13 @@ export function calculateDayStats(day: DayForecast, temperatureMetric: Temperatu
         totalSnow += snowAmount;
     });
 
+    // Round based on metric: ceil for max, floor for min, round for avg/median
+    const roundedTemp = temperatureMetric === 'max' ? Math.ceil(aggregatedTemp)
+                      : temperatureMetric === 'min' ? Math.floor(aggregatedTemp)
+                      : Math.round(aggregatedTemp);
+
     return {
-        maxTemp: Math.round(aggregatedTemp * 10) / 10,
+        maxTemp: roundedTemp,
         snow: Math.round(totalSnow * 10) / 10,
         wind: Math.round(wind)
     };
