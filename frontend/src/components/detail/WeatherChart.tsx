@@ -14,7 +14,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import type { WeatherChartProps } from '../../types/detailView';
-import type { WeatherModel, HourlyDataPoint } from '../../types/openMeteo';
+import type { HourlyDataPoint } from '../../types/openMeteo';
 import { getModelConfig, getVariableConfig } from '../../utils/chartConfigurations';
 
 interface ChartDataPoint {
