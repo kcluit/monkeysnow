@@ -138,7 +138,7 @@ function createPeriodsFromDayData(dayData: DayData, temperatureMetric: Temperatu
   for (const { key, label } of periodOrder) {
     const periodData = dayData[key];
     if (periodData) {
-      periods.push(createPeriodFromData(periodData, label, temperatureMetric, snowfallEstimateMode));
+      periods.push(createPeriodFromData(periodData, label, temperatureMetric, snowfallEstimateMode, unitSystem));
     }
   }
 
