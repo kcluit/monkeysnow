@@ -1,4 +1,8 @@
-import type { DayForecast, Period, DayStats, TemperatureMetric } from '../../types';
+import type { DayForecast, Period, DayStats, TemperatureMetric, UnitSystem } from '../../types';
+
+// Conversion constants for back-converting imperial to metric for threshold checks
+const INCHES_TO_CM = 2.54;
+const MPH_TO_KMH = 1.609344;
 
 /**
  * Formats weather text from periods (combines AM/PM conditions intelligently)
