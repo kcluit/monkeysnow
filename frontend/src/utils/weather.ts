@@ -105,7 +105,7 @@ export function processResortData(
         weather: mainCondition,
         weatherEmoji: getWeatherEmoji(mainCondition),
         periods,
-        freezingLevel: highestFreezingLevel ? `${Math.round(highestFreezingLevel)} m` : '- m',
+        freezingLevel: formatFreezingLevel(highestFreezingLevel, unitSystem),
         snowCondition
       });
     }
