@@ -1,6 +1,7 @@
 import { useRef, useState, MouseEvent } from 'react';
 import { webcamUrls } from '../../utils/constants';
 import { calculateDayStats, formatWeatherText, getTemperatureClass, getSnowClass, getWindClass } from './cardUtils';
+import { formatTemp, formatSnow, formatWind } from '../../utils/unitConversion';
 import type { CardProps } from '../../types';
 
 export function CompactCard({ resort, temperatureMetric = 'max', showDate = false }: CardProps): JSX.Element {
