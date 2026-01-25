@@ -91,6 +91,7 @@ export function processResortData(
 
       days.push({
         name: dayName,
+        date: dateDisplay,
         weather: mainCondition,
         weatherEmoji: getWeatherEmoji(mainCondition),
         periods,
