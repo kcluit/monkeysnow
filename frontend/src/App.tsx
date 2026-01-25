@@ -41,7 +41,8 @@ import type {
     ViewMode,
     TemperatureMetric,
     SnowfallEstimateMode,
-    UtilityBarStyle
+    UtilityBarStyle,
+    UnitSystem
 } from './types';
 
 function App(): JSX.Element {
