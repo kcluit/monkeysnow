@@ -42,41 +42,14 @@ export function UtilityBar({
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  const getSortDayOptions = (): SortDayData => {
-    const specialOptions = [
-      { name: "Next 3 Days", value: "next3days" },
-      { name: "Next 7 Days", value: "next7days" }
-    ];
-
-    if (selectedResorts.length === 0 || !allWeatherData) {
-      return { specialOptions, regularDays: [] };
-    }
-
-    const firstResort = selectedResorts[0];
-    const resortData = processResortData(allWeatherData, firstResort, selectedElevation);
-
-    return {
-      specialOptions,
-      regularDays: resortData?.days || []
-    };
-  };
-
   const elevationText = selectedElevation === 'bot' ? 'Base Forecast' :
                        selectedElevation === 'mid' ? 'Mid Forecast' : 'Peak Forecast';
 
   const sortText = selectedSort === 'temperature' ? 'Sort by Temperature' :
                    selectedSort === 'snowfall' ? 'Sort by Snowfall' : 'Sort by Wind';
 
-  const sortDayData = getSortDayOptions();
-  const getSortDayText = (): string => {
-    if (typeof selectedSortDay === 'string') {
-      const specialOption = sortDayData.specialOptions.find(opt => opt.value === selectedSortDay);
-      return specialOption?.name || 'Today';
-    } else {
-      return sortDayData.regularDays[selectedSortDay]?.name || 'Today';
-    }
-  };
-  const sortDayText = getSortDayText();
+  const sortDayData = getSortDayData(selectedResorts, allWeatherData, processResortData, selectedElevation);
+  const sortDayText = getSortDayText(selectedSortDay, sortDayData);
 
   return (
     <div className="mb-8 flex flex-wrap gap-4 items-center justify-between">
