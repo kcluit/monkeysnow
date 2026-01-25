@@ -255,7 +255,7 @@ export function generateTemperatureMetricCommands(
     },
     {
       id: 'tempmetric-median',
-      name: 'Median Temperature',
+      name: 'Median temperature',
       icon: selectedMetric === 'median' ? '✓' : '',
       action: () => setSelectedMetric('median'),
     },
