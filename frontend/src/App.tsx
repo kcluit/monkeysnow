@@ -466,27 +466,51 @@ function App(): JSX.Element {
 
                 {/* Conditionally render Utility Bar */}
                 {showUtilityBar && (
-                    <UtilityBar
-                        selectedResorts={selectedResorts}
-                        setSelectedResorts={handleResortsChange}
-                        selectedElevation={selectedElevation}
-                        setSelectedElevation={handleElevationChange}
-                        selectedSort={selectedSort}
-                        setSelectedSort={handleSortChange}
-                        selectedSortDay={selectedSortDay}
-                        setSelectedSortDay={handleSortDayChange}
-                        viewMode={viewMode}
-                        setViewMode={setViewMode}
-                        isReversed={isReversed}
-                        setIsReversed={handleReverseChange}
-                        searchTerm={searchTerm}
-                        setSearchTerm={setSearchTerm}
-                        filteredResorts={filteredResorts}
-                        allWeatherData={allWeatherData}
-                        processResortData={processResortData}
-                        cancelLoading={cancelLoading}
-                        openResortModal={resortHierarchy.openModal}
-                    />
+                    utilityBarStyle === 'compact' ? (
+                        <CompactUtilityBar
+                            selectedResorts={selectedResorts}
+                            setSelectedResorts={handleResortsChange}
+                            selectedElevation={selectedElevation}
+                            setSelectedElevation={handleElevationChange}
+                            selectedSort={selectedSort}
+                            setSelectedSort={handleSortChange}
+                            selectedSortDay={selectedSortDay}
+                            setSelectedSortDay={handleSortDayChange}
+                            viewMode={viewMode}
+                            setViewMode={setViewMode}
+                            isReversed={isReversed}
+                            setIsReversed={handleReverseChange}
+                            searchTerm={searchTerm}
+                            setSearchTerm={setSearchTerm}
+                            filteredResorts={filteredResorts}
+                            allWeatherData={allWeatherData}
+                            processResortData={processResortData}
+                            cancelLoading={cancelLoading}
+                            openResortModal={resortHierarchy.openModal}
+                        />
+                    ) : (
+                        <UtilityBar
+                            selectedResorts={selectedResorts}
+                            setSelectedResorts={handleResortsChange}
+                            selectedElevation={selectedElevation}
+                            setSelectedElevation={handleElevationChange}
+                            selectedSort={selectedSort}
+                            setSelectedSort={handleSortChange}
+                            selectedSortDay={selectedSortDay}
+                            setSelectedSortDay={handleSortDayChange}
+                            viewMode={viewMode}
+                            setViewMode={setViewMode}
+                            isReversed={isReversed}
+                            setIsReversed={handleReverseChange}
+                            searchTerm={searchTerm}
+                            setSearchTerm={setSearchTerm}
+                            filteredResorts={filteredResorts}
+                            allWeatherData={allWeatherData}
+                            processResortData={processResortData}
+                            cancelLoading={cancelLoading}
+                            openResortModal={resortHierarchy.openModal}
+                        />
+                    )
                 )}
 
                 <div className={viewMode === 'compact' ? "compact-grid" : "space-y-8"}>
