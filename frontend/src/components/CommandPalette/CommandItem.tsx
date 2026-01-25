@@ -37,7 +37,7 @@ export const CommandItem = memo(function CommandItem({
         >
             <div className="command-item-content">
                 {!hideEmoji && command.icon && <span className="command-icon">{command.icon}</span>}
-                <span className="command-name">{command.name}...</span>
+                <span className="command-name">{command.name}</span>
             </div>
             <div className="command-item-meta">
                 {command.shortcut && (
