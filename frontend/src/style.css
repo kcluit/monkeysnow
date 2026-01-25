@@ -1021,3 +1021,16 @@ input[type="checkbox"] {
         grid-template-columns: 1fr;
     }
 }
+
+/* Small mobile screens - remove min-width constraints */
+@media (max-width: 360px) {
+    .resort-grid-country {
+        min-width: 0;
+        flex-basis: 100%;
+    }
+
+    .resort-grid-province {
+        min-width: 0;
+        flex-basis: 100%;
+    }
+}
