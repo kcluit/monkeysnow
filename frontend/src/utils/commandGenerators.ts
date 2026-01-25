@@ -289,6 +289,29 @@ export function generateSnowfallEstimateCommands(
 }
 
 /**
+ * Generate unit system submenu commands with checkmarks.
+ */
+export function generateUnitSystemCommands(
+  unitSystem: UnitSystem,
+  setUnitSystem: (system: UnitSystem) => void
+): Command[] {
+  return [
+    {
+      id: 'units-metric',
+      name: 'Metric (°C, cm, km/h)',
+      icon: unitSystem === 'metric' ? '✓' : '',
+      action: () => setUnitSystem('metric'),
+    },
+    {
+      id: 'units-imperial',
+      name: 'Imperial (°F, in, mph)',
+      icon: unitSystem === 'imperial' ? '✓' : '',
+      action: () => setUnitSystem('imperial'),
+    },
+  ];
+}
+
+/**
  * Generate all control-related commands for the command palette.
  * This is the main entry point for command generation.
  */
