@@ -109,8 +109,8 @@ export function useResortFiltering(
     };
 
     let sortedResorts = [...resorts].sort((a, b) => {
-      const resortDataA = processResortData(allWeatherData, a, selectedElevation);
-      const resortDataB = processResortData(allWeatherData, b, selectedElevation);
+      const resortDataA = processResortData(allWeatherData, a, selectedElevation, temperatureMetric);
+      const resortDataB = processResortData(allWeatherData, b, selectedElevation, temperatureMetric);
 
       if (!resortDataA || !resortDataB) return 0;
 
