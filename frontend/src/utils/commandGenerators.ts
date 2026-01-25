@@ -370,5 +370,14 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
         params.setShowUtilityBar
       ),
     },
+    {
+      id: 'utility-bar-style',
+      name: 'Utility Bar Style',
+      icon: '📐',
+      subCommands: generateUtilityBarStyleCommands(
+        params.utilityBarStyle,
+        params.setUtilityBarStyle
+      ),
+    },
   ];
 }
