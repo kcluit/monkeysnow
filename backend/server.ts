@@ -329,6 +329,43 @@ const updateWeatherData = async () => {
                     return;
                 }
 
+                // Calculate snow estimates from hourly data
+                let totalSnowEstimateCm = 0;
+                const ratios: number[] = [];
+                const qualities: SnowQuality[] = [];
+
+                for (const hourData of hData) {
+                    const estimate = estimateHourlySnow(
+                        hourData.temperature,
+                        hourData.humidity,
+                        hourData.precipitation
+                    );
+                    totalSnowEstimateCm += estimate.snowCm;
+                    if (estimate.ratio > 0) {
+                        ratios.push(estimate.ratio);
+                    }
+                    qualities.push(estimate.quality);
+                }
+
+                // Determine dominant snow quality for the period
+                const qualityCounts: Record<SnowQuality, number> = {
+                    'rain': 0, 'sleet_mix': 0, 'wet_snow': 0, 'powder': 0, 'dry_powder': 0
+                };
+                for (const q of qualities) {
+                    qualityCounts[q]++;
+                }
+                let dominantQuality: SnowQuality = 'rain';
+                let maxCount = 0;
+                for (const [q, count] of Object.entries(qualityCounts)) {
+                    if (count > maxCount) {
+                        maxCount = count;
+                        dominantQuality = q as SnowQuality;
+                    }
+                }
+
+                // Average ratio (only from hours with snow)
+                const avgRatio = ratios.length > 0 ? getAverage(ratios) : 0;
+
                 // Aggregate values for the UI
                 // REMOVED Math.round() to preserve decimal precision
                 forecast[date][chunkName] = {
@@ -344,7 +381,11 @@ const updateWeatherData = async () => {
                     snowfall_total: parseFloat(getSum(hData.map((d: any) => d.snowfall)).toFixed(4)),
                     weather_code: getMode(hData.map((d: any) => d.weather_code)),
                     surface_pressure: parseFloat(getAverage(hData.map((d: any) => d.surface_pressure)).toFixed(2)),
-                    freezing_level: mData.length > 0 ? parseFloat(getMax(mData).toFixed(2)) : null
+                    freezing_level: mData.length > 0 ? parseFloat(getMax(mData).toFixed(2)) : null,
+                    // Snow estimation fields
+                    snowfall_estimate: parseFloat(totalSnowEstimateCm.toFixed(4)),
+                    snow_to_liquid_ratio: parseFloat(avgRatio.toFixed(2)),
+                    snow_quality: dominantQuality
                 };
             });
         }
