@@ -236,3 +236,24 @@ export interface UseResortFilteringReturn {
     unitSystem?: UnitSystem
   ) => string[];
 }
+
+// Re-export detail view types
+export type {
+  WeatherModel,
+  WeatherVariable,
+  OpenMeteoResponse,
+  ModelWeatherData,
+  HourlyDataPoint,
+} from './openMeteo';
+
+export type {
+  DetailViewState,
+  DetailViewConfig,
+  VariableConfig,
+  ModelConfig,
+  DetailedResortViewProps,
+  DetailViewHeaderProps,
+  DetailUtilityBarProps,
+  DetailChartGridProps,
+  WeatherChartProps,
+} from './detailView';
