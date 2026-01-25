@@ -135,7 +135,7 @@ export function CompactUtilityBar({
         <div className="relative inline-block" data-dropdown>
           <button
             onClick={() => setShowSortDayMenu(!showSortDayMenu)}
-            className="compact-bar-text hover:text-theme-accent transition-colors inline-flex items-center gap-1"
+            className="compact-bar-text text-theme-textPrimary hover:text-theme-accent transition-colors inline-flex items-center gap-1"
           >
             {getSortDayText(selectedSortDay, sortDayData)}
             <svg className="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
