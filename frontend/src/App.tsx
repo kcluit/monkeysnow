@@ -424,7 +424,7 @@ function App(): JSX.Element {
     // Show loading state
     if (loading) {
         return (
-            <div className="min-h-screen p-8 flex items-center justify-center bg-theme-background transition-colors duration-300">
+            <div className="min-h-screen p-4 sm:p-6 md:p-8 flex items-center justify-center bg-theme-background transition-colors duration-300 overflow-x-hidden">
                 <div className="text-center">
                     <div className="text-xl font-semibold text-theme-textSecondary">Loading weather data...</div>
                 </div>
