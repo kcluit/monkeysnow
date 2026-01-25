@@ -445,7 +445,7 @@ function App(): JSX.Element {
     }
 
     return (
-        <div className="min-h-screen p-8 bg-theme-background transition-colors duration-300">
+        <div className="min-h-screen p-4 sm:p-6 md:p-8 bg-theme-background transition-colors duration-300 overflow-x-hidden">
             {/* Command Palette */}
             <CommandPalette palette={commandPalette} hideEmoji={isHideEmojiEnabled} />
 
