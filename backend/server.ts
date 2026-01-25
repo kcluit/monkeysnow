@@ -81,6 +81,66 @@ const getMode = (arr: number[]) => {
     return mode;
 };
 
+// --- Snow Estimation (Stull's Wet Bulb + Hybrid Lapse-Rate) ---
+type SnowQuality = 'rain' | 'sleet_mix' | 'wet_snow' | 'powder' | 'dry_powder';
+
+interface HourlySnowEstimate {
+    snowCm: number;
+    ratio: number;
+    quality: SnowQuality;
+}
+
+function calculateWetBulb(tempC: number, rh: number): number {
+    const safeRh = Math.max(0.1, Math.min(100, rh));
+    const term1 = tempC * Math.atan(0.151977 * Math.pow(safeRh + 8.313659, 0.5));
+    const term2 = Math.atan(tempC + safeRh);
+    const term3 = Math.atan(safeRh - 1.676331);
+    const term4 = 0.00391838 * Math.pow(safeRh, 1.5) * Math.atan(0.023101 * safeRh);
+    const term5 = 4.686035;
+    return term1 + term2 - term3 + term4 - term5;
+}
+
+function getHybridRatio(surfaceTempC: number, surfaceWetBulbC: number): number {
+    // Rain barrier
+    if (surfaceWetBulbC > 1.5) return 0;
+    // Slush/Mix
+    if (surfaceWetBulbC > 0.5) return 3;
+    // Wet Snow ("Sierra Cement")
+    if (surfaceWetBulbC > -1.0) return 6;
+    // Heavy Snow
+    if (surfaceWetBulbC > -2.5) return 9;
+
+    // Crystal check - estimate cloud temp ~1500m above surface
+    const estimatedCloudTemp = surfaceTempC - 10;
+
+    // Dendritic Growth Zone (-12C to -18C) - max fluff
+    if (estimatedCloudTemp <= -12 && estimatedCloudTemp >= -18) return 18;
+    // Cold Column/Plate Zone
+    if (estimatedCloudTemp < -18) return 15;
+    // Standard Zone
+    return 12;
+}
+
+function getSnowQuality(ratio: number): SnowQuality {
+    if (ratio === 0) return 'rain';
+    if (ratio < 6) return 'sleet_mix';
+    if (ratio < 10) return 'wet_snow';
+    if (ratio < 15) return 'powder';
+    return 'dry_powder';
+}
+
+function estimateHourlySnow(tempC: number, humidity: number, precipMm: number): HourlySnowEstimate {
+    const wetBulb = calculateWetBulb(tempC, humidity);
+    const ratio = getHybridRatio(tempC, wetBulb);
+    const snowMm = precipMm * ratio;
+    const snowCm = snowMm / 10;
+    return {
+        snowCm,
+        ratio,
+        quality: getSnowQuality(ratio)
+    };
+}
+
 // --- Core Logic ---
 
 const updateWeatherData = async () => {
