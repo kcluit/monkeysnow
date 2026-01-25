@@ -354,7 +354,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     },
     {
       id: 'snowfall-estimate',
-      name: 'Snowfall Estimate...',
+      name: 'Snowfall estimate',
       icon: '❄️',
       subCommands: generateSnowfallEstimateCommands(
         params.snowfallEstimateMode,
