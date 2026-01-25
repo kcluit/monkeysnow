@@ -109,8 +109,8 @@ export function useResortFiltering(
     };
 
     let sortedResorts = [...resorts].sort((a, b) => {
-      const resortDataA = processResortData(allWeatherData, a, selectedElevation, temperatureMetric, snowfallEstimateMode);
-      const resortDataB = processResortData(allWeatherData, b, selectedElevation, temperatureMetric, snowfallEstimateMode);
+      const resortDataA = processResortData(allWeatherData, a, selectedElevation, temperatureMetric, snowfallEstimateMode, unitSystem);
+      const resortDataB = processResortData(allWeatherData, b, selectedElevation, temperatureMetric, snowfallEstimateMode, unitSystem);
 
       if (!resortDataA || !resortDataB) return 0;
 
