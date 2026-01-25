@@ -12,7 +12,7 @@ interface DetailedResortViewPropsWithUnits extends DetailedResortViewProps {
 }
 
 export function DetailedResortView({
-  resortId,
+  resortId: _resortId,
   resortName,
   location,
   onBack,
