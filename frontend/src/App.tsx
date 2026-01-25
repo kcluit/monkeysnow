@@ -291,7 +291,7 @@ function App(): JSX.Element {
         if (!allWeatherData) return false;
 
         try {
-            const data = processResortData(allWeatherData, resortName, selectedElevation, selectedTemperatureMetric, snowfallEstimateMode);
+            const data = processResortData(allWeatherData, resortName, selectedElevation, selectedTemperatureMetric, snowfallEstimateMode, unitSystem);
 
             if (data) {
                 data.name = getDisplayName(resortName);
@@ -302,7 +302,7 @@ function App(): JSX.Element {
             console.warn(`Failed to load ${resortName}:`, err);
             return false;
         }
-    }, [allWeatherData, selectedElevation, selectedTemperatureMetric, snowfallEstimateMode]);
+    }, [allWeatherData, selectedElevation, selectedTemperatureMetric, snowfallEstimateMode, unitSystem]);
 
     // Load all selected resorts
     const loadSelectedResorts = useCallback(async (): Promise<void> => {
