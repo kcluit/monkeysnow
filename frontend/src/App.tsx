@@ -192,7 +192,7 @@ function App(): JSX.Element {
             },
             {
                 id: 'hide-borders',
-                name: 'Hide Borders',
+                name: 'Hide borders',
                 icon: '🔲',
                 subCommands: [
                     {
