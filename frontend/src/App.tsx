@@ -323,7 +323,8 @@ function App(): JSX.Element {
                 selectedSortDay,
                 isReversed,
                 selectedTemperatureMetric,
-                snowfallEstimateMode
+                snowfallEstimateMode,
+                unitSystem
             );
 
             // Clear existing data
