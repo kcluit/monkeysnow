@@ -58,10 +58,10 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
                     </a>
                 )}
             </div>
-            <div className="relative">
+            <div className="relative overflow-hidden">
                 <button
                     onClick={scrollLeft}
-                    className="absolute left-0 top-1/2 -translate-y-1/2 -ml-4 z-10 bg-theme-cardBg rounded-full p-2 shadow-lg hover:bg-theme-secondary transition-all text-theme-textPrimary"
+                    className="absolute left-1 top-1/2 -translate-y-1/2 z-10 bg-theme-cardBg rounded-full p-2 shadow-lg hover:bg-theme-secondary transition-all text-theme-textPrimary"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
