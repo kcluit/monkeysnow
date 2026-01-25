@@ -36,7 +36,8 @@ export function useResortFiltering(
     selectedSortDay: SortDay,
     isReversed: boolean,
     temperatureMetric: TemperatureMetric = 'max',
-    snowfallEstimateMode: SnowfallEstimateMode = 'model'
+    snowfallEstimateMode: SnowfallEstimateMode = 'model',
+    unitSystem: UnitSystem = 'metric'
   ): string[] => {
     if (!allWeatherData) return resorts;
 
