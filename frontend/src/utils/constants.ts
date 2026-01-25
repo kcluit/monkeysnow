@@ -48,6 +48,7 @@ export const defaultSelectedResorts: string[] = ["Cypress-Mountain", "Mount-Seym
 export const defaultElevation: ElevationLevel = "bot";
 export const defaultSort: SortOption = "temperature";
 export const defaultSortDay: number = 0;
+export const defaultTemperatureMetric: TemperatureMetric = "max";
 
 // Helper function to get display name from API ID
 // Uses the hierarchy as the source of truth
