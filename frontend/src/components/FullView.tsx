@@ -83,7 +83,7 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
                   return (
                     <th key={dayIndex} className="px-5 py-2 rounded-2xl" style={{minWidth: '280px', backgroundColor: 'var(--cardBg)'}}>
                       <div className="text-base font-bold text-theme-textPrimary flex items-center justify-center gap-2">
-                        {day.name}
+                        {day.name}{showDate && <span className="font-normal text-theme-textSecondary"> {day.date}</span>}
                         <span className="inline-flex items-center">{getWeatherEmoji(displayCondition)}</span>
                       </div>
                       <div className="text-xs font-semibold text-theme-textSecondary">{displayCondition}</div>
