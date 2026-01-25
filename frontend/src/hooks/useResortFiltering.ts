@@ -60,10 +60,6 @@ export function useResortFiltering(
       }
     };
 
-    // Legacy helper for backward compatibility (not used, but keeping structure)
-    const getMaxTemp = (day: DayForecast): number => {
-      return getTempForDay(day, temperatureMetric);
-    };
 
     const getTotalSnow = (day: DayForecast): number => {
       return day.periods.reduce((sum: number, period: Period) => {
