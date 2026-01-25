@@ -203,6 +203,25 @@ function App(): JSX.Element {
                     },
                 ],
             },
+            {
+                id: 'hide-borders',
+                name: 'Hide Borders',
+                icon: '🔲',
+                subCommands: [
+                    {
+                        id: 'hide-borders-on',
+                        name: 'On',
+                        icon: isHideBordersEnabled ? '✔️' : '',
+                        action: () => setHideBordersEnabled(true),
+                    },
+                    {
+                        id: 'hide-borders-off',
+                        name: 'Off',
+                        icon: !isHideBordersEnabled ? '✔️' : '',
+                        action: () => setHideBordersEnabled(false),
+                    },
+                ],
+            },
         ];
 
         // Control panel commands
