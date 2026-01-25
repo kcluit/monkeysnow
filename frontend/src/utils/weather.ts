@@ -68,19 +68,11 @@ export function processResortData(
       const date = new Date(dateKey);
       const dayName = daysInWeek[date.getDay()];
 
-      // Get the highest freezing level from all periods
-      const freezingLevels = [
-        dayData.AM?.freezing_level,
-        dayData.PM?.freezing_level,
-        dayData.NIGHT?.freezing_level
-      ].filter((level): level is number => typeof level === 'number' && !isNaN(level));
-
-      const highestFreezingLevel = freezingLevels.length > 0 ? Math.max(...freezingLevels) : null;
-      const baseElevation = elevationData.metadata.elevation;
-      const snowCondition = getSnowCondition(highestFreezingLevel, baseElevation);
-
       // Create periods from AM/PM/NIGHT data
-      const periods = createPeriodsFromDayData(dayData, temperatureMetric);
+      const periods = createPeriodsFromDayData(dayData, temperatureMetric, snowfallEstimateMode);
+
+      // Get snow condition from periods' snow quality (use first available with precipitation)
+      const snowCondition = getSnowConditionFromPeriods(periods);
 
       // Get main weather condition from first available period
       const mainWeatherCode = dayData.AM?.weather_code ?? dayData.PM?.weather_code ?? dayData.NIGHT?.weather_code ?? 0;
