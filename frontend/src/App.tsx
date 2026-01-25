@@ -248,7 +248,7 @@ function App(): JSX.Element {
         if (!allWeatherData) return false;
 
         try {
-            const data = processResortData(allWeatherData, resortName, selectedElevation);
+            const data = processResortData(allWeatherData, resortName, selectedElevation, selectedTemperatureMetric);
 
             if (data) {
                 data.name = getDisplayName(resortName);
@@ -259,7 +259,7 @@ function App(): JSX.Element {
             console.warn(`Failed to load ${resortName}:`, err);
             return false;
         }
-    }, [allWeatherData, selectedElevation]);
+    }, [allWeatherData, selectedElevation, selectedTemperatureMetric]);
 
     // Load all selected resorts
     const loadSelectedResorts = useCallback(async (): Promise<void> => {
