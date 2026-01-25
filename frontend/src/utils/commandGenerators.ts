@@ -336,7 +336,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     },
     {
       id: 'view-mode',
-      name: 'Choose view...',
+      name: 'Choose view',
       icon: '👁️',
       subCommands: generateViewModeCommands(
         params.viewMode,
