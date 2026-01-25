@@ -91,16 +91,16 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
                                     </div>
                                     <div className="rounded-xl p-3 backdrop-blur-sm" style={{ backgroundColor: 'var(--secondary)' }}>
                                         <div className="flex items-center gap-2">
-                                            <div className={`text-2xl font-bold ${getTemperatureClass(dayStats.maxTemp)}`}>{dayStats.maxTemp}°C</div>
+                                            <div className={`text-2xl font-bold ${getTemperatureClass(dayStats.maxTemp)}`}>{formatTemp(dayStats.maxTemp, unitSystem)}</div>
                                             {dayStats.snow > 0 && (
                                                 <div className={`text-sm font-bold ${getSnowClass(dayStats.snow)}`}>
-                                                    {dayStats.snow} cm snow
+                                                    {formatSnow(dayStats.snow, unitSystem)} snow
                                                 </div>
                                             )}
                                         </div>
                                         <div className="text-sm text-theme-textPrimary mt-1 font-medium truncate" title={weatherText}>{weatherText}</div>
                                         <div className={`text-xs font-medium ${getWindClass(dayStats.wind)} mt-1`}>
-                                            {dayStats.wind} km/h wind
+                                            {formatWind(dayStats.wind, unitSystem)} wind
                                         </div>
                                         <div className="mt-2 pt-2 border-t border-theme-border">
                                             <div className="text-xs text-theme-textPrimary font-medium">
