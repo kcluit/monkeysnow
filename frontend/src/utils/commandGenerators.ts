@@ -139,7 +139,7 @@ export function generateOrderCommands(
   return [
     {
       id: 'order-normal',
-      name: 'Normal Order',
+      name: 'Normal order',
       icon: !isReversed ? '✓' : '',
       action: () => setIsReversed(false),
     },
