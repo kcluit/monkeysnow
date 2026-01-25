@@ -115,7 +115,7 @@ function App(): JSX.Element {
             },
             {
                 id: 'rainbow',
-                name: 'Rainbow Text',
+                name: 'Rainbow text',
                 icon: '💎',
                 subCommands: [
                     {
