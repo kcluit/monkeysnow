@@ -74,6 +74,14 @@ export function processResortData(
       // Get snow condition from periods' snow quality (use first available with precipitation)
       const snowCondition = getSnowConditionFromPeriods(periods);
 
+      // Get the highest freezing level from all periods
+      const freezingLevels = [
+        dayData.AM?.freezing_level,
+        dayData.PM?.freezing_level,
+        dayData.NIGHT?.freezing_level
+      ].filter((level): level is number => typeof level === 'number' && !isNaN(level));
+      const highestFreezingLevel = freezingLevels.length > 0 ? Math.max(...freezingLevels) : null;
+
       // Get main weather condition from first available period
       const mainWeatherCode = dayData.AM?.weather_code ?? dayData.PM?.weather_code ?? dayData.NIGHT?.weather_code ?? 0;
       const mainCondition = getWeatherDescription(mainWeatherCode);
