@@ -36,7 +36,8 @@ import type {
     ProcessedResortData,
     Command,
     SortDayData,
-    ViewMode
+    ViewMode,
+    TemperatureMetric
 } from './types';
 
 function App(): JSX.Element {
