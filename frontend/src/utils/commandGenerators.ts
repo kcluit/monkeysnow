@@ -308,7 +308,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     },
     {
       id: 'sort-by',
-      name: 'Sort By',
+      name: 'Sort by',
       icon: '📊',
       subCommands: generateSortCommands(
         params.selectedSort,
