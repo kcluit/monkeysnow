@@ -71,16 +71,6 @@ export function WeatherChart({
   // Get unit based on system
   const unit = unitSystem === 'imperial' ? variableConfig.unitImperial : variableConfig.unit;
 
-  // Custom tooltip formatter
-  const formatTooltipValue = (value: number): string => {
-    return variableConfig.formatValue(
-      unitSystem === 'imperial' && variableConfig.convertToImperial
-        ? value / (variableConfig.convertToImperial(1) || 1) // Reverse conversion for raw value
-        : value,
-      unitSystem
-    );
-  };
-
   // Render lines for each model
   const renderModelLines = () => {
     return selectedModels.map((modelId) => {
