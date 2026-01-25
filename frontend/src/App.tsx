@@ -3,6 +3,7 @@ import { Header } from './components/Header';
 import { UtilityBar } from './components/UtilityBar';
 import { CompactUtilityBar } from './components/CompactUtilityBar';
 import { FullView, DefaultCard, CompactCard } from './components/cards';
+import { DetailedResortView } from './components/detail';
 import { CommandPalette } from './components/CommandPalette';
 import { FPSCounter } from './components/FPSCounter';
 import { ResortSelectionGridModal } from './components/ResortSelectionModal';
@@ -20,9 +21,12 @@ import { useHideBorders } from './hooks/useHideBorders';
 import { useShowDate } from './hooks/useShowDate';
 import { useResortHierarchy } from './hooks/useResortHierarchy';
 import { useUnitSystem } from './hooks/useUnitSystem';
+import { useDetailViewState } from './hooks/useDetailViewState';
 import { processResortData } from './utils/weather';
 import { generateControlCommands } from './utils/commandGenerators';
 import { getSortDayData } from './utils/sortDayHelpers';
+import { getResortLocation } from './utils/openMeteoClient';
+import { getDisplayName as getDisplayNameFromConstants } from './utils/constants';
 import {
     skiResorts,
     defaultSelectedResorts,
