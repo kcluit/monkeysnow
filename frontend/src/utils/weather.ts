@@ -31,7 +31,8 @@ export async function fetchAllData(): Promise<AllWeatherData> {
 export function processResortData(
   allData: AllWeatherData,
   resortName: string,
-  elevation: ElevationLevel = 'bot'
+  elevation: ElevationLevel = 'bot',
+  temperatureMetric: TemperatureMetric = 'max'
 ): ProcessedResortData | null {
   try {
     if (!allData || !allData.data) {
