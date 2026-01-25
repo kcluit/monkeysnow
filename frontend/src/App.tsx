@@ -211,7 +211,7 @@ function App(): JSX.Element {
             },
             {
                 id: 'show-date',
-                name: 'Show Date',
+                name: 'Show date',
                 icon: '📅',
                 subCommands: [
                     {
