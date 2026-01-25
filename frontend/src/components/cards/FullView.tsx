@@ -1,4 +1,5 @@
 import { calculateSnowTotals } from '../../utils/weather';
+import { formatSnow } from '../../utils/unitConversion';
 import type { CardProps } from '../../types';
 import type { CSSProperties } from 'react';
 
