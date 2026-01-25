@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
+import { useLocalStorage } from './useLocalStorage';
 
 export interface UseHideBordersReturn {
   isHideBordersEnabled: boolean;
@@ -6,57 +7,26 @@ export interface UseHideBordersReturn {
   setHideBordersEnabled: (enabled: boolean) => void;
 }
 
-const STORAGE_KEY = 'hideBordersEnabled';
-
 export function useHideBorders(): UseHideBordersReturn {
-  const [isHideBordersEnabled, setIsHideBordersEnabled] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [isHideBordersEnabled, setIsHideBordersEnabled] = useLocalStorage('hideBordersEnabled', false);
 
-  // Apply no-borders class to document
-  const applyHideBorders = useCallback((enabled: boolean) => {
+  // Apply no-borders class to document when state changes
+  useEffect(() => {
     const root = document.documentElement;
-    if (enabled) {
+    if (isHideBordersEnabled) {
       root.classList.add('no-borders');
     } else {
       root.classList.remove('no-borders');
     }
-  }, []);
-
-  // Initialize from localStorage
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved !== null) {
-        const enabled = saved === 'true';
-        setIsHideBordersEnabled(enabled);
-        applyHideBorders(enabled);
-      }
-    } catch (error) {
-      console.warn('Error accessing localStorage:', error);
-    }
-    setIsInitialized(true);
-  }, [applyHideBorders]);
-
-  // Update DOM and localStorage when state changes (after init)
-  useEffect(() => {
-    if (!isInitialized) return;
-
-    applyHideBorders(isHideBordersEnabled);
-
-    try {
-      localStorage.setItem(STORAGE_KEY, String(isHideBordersEnabled));
-    } catch (error) {
-      console.warn('Error saving hide borders state to localStorage:', error);
-    }
-  }, [isHideBordersEnabled, isInitialized, applyHideBorders]);
+  }, [isHideBordersEnabled]);
 
   const toggleHideBorders = useCallback(() => {
     setIsHideBordersEnabled((prev) => !prev);
-  }, []);
+  }, [setIsHideBordersEnabled]);
 
   const setHideBordersEnabled = useCallback((enabled: boolean) => {
     setIsHideBordersEnabled(enabled);
-  }, []);
+  }, [setIsHideBordersEnabled]);
 
   return {
     isHideBordersEnabled,
