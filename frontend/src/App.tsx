@@ -240,6 +240,7 @@ function App(): JSX.Element {
         isReversed, setIsReversed,
         viewMode, setViewMode,
         selectedTemperatureMetric, setSelectedTemperatureMetric,
+        snowfallEstimateMode, setSnowfallEstimateMode,
         showUtilityBar, setShowUtilityBar,
         resortHierarchy.openModal,
     ]);
