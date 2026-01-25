@@ -370,6 +370,7 @@ function App(): JSX.Element {
         selectedSortDay,
         isReversed,
         selectedTemperatureMetric,
+        snowfallEstimateMode,
         resortData,
         sortResorts
     ]);
