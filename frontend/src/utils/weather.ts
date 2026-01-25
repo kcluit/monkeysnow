@@ -77,7 +77,7 @@ export function processResortData(
       const snowCondition = getSnowCondition(highestFreezingLevel, baseElevation);
 
       // Create periods from AM/PM/NIGHT data
-      const periods = createPeriodsFromDayData(dayData);
+      const periods = createPeriodsFromDayData(dayData, temperatureMetric);
 
       // Get main weather condition from first available period
       const mainWeatherCode = dayData.AM?.weather_code ?? dayData.PM?.weather_code ?? dayData.NIGHT?.weather_code ?? 0;
