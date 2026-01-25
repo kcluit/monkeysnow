@@ -363,7 +363,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     },
     {
       id: 'utility-bar',
-      name: 'Utility Bar',
+      name: 'Utility bar',
       icon: '🎛️',
       subCommands: generateUtilityBarCommands(
         params.showUtilityBar,
