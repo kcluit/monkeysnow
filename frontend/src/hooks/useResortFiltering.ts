@@ -7,7 +7,8 @@ import type {
   SortDay,
   UseResortFilteringReturn,
   DayForecast,
-  Period
+  Period,
+  TemperatureMetric
 } from '../types';
 
 export function useResortFiltering(
