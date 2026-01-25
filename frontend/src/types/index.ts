@@ -125,7 +125,7 @@ export interface Period {
   rain: string;
   wind: string;
   condition: string;
-  snowQuality: SnowQuality;
+  snowQuality: SnowQuality | null;
   snowToLiquidRatio: number;
 }
 
