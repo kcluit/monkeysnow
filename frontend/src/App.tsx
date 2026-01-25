@@ -85,26 +85,10 @@ function App(): JSX.Element {
     const { searchTerm, setSearchTerm, filteredResorts, sortResorts } = useResortFiltering(skiResorts, allWeatherData);
 
     // Get sort day options for command palette
-    const getSortDayData = useCallback((): SortDayData => {
-        const specialOptions = [
-            { name: "Next 3 Days", value: "next3days" },
-            { name: "Next 7 Days", value: "next7days" }
-        ];
-
-        if (selectedResorts.length === 0 || !allWeatherData) {
-            return { specialOptions, regularDays: [] };
-        }
-
-        const firstResort = selectedResorts[0];
-        const resortDataResult = processResortData(allWeatherData, firstResort, selectedElevation, selectedTemperatureMetric, snowfallEstimateMode);
-
-        return {
-            specialOptions,
-            regularDays: resortDataResult?.days || []
-        };
-    }, [selectedResorts, allWeatherData, selectedElevation, selectedTemperatureMetric, snowfallEstimateMode]);
-
-    const sortDayData = useMemo(() => getSortDayData(), [getSortDayData]);
+    const sortDayData = useMemo(
+        () => getSortDayData(selectedResorts, allWeatherData, processResortData, selectedElevation),
+        [selectedResorts, allWeatherData, selectedElevation]
+    );
 
     // Build commands for command palette
     const commands: Command[] = useMemo(() => {
