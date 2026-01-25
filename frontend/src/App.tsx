@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Header } from './components/Header';
 import { UtilityBar } from './components/UtilityBar';
+import { CompactUtilityBar } from './components/CompactUtilityBar';
 import { FullView } from './components/FullView';
 import { DefaultCard } from './components/DefaultCard';
 import { CompactCard } from './components/cards';
