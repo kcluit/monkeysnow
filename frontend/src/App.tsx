@@ -62,6 +62,7 @@ function App(): JSX.Element {
 
     // Local component state
     const [viewMode, setViewMode] = useLocalStorage<ViewMode>('viewMode', 'default');
+    const [selectedTemperatureMetric, setSelectedTemperatureMetric] = useLocalStorage<TemperatureMetric>('temperatureMetric', defaultTemperatureMetric);
     const [resortData, setResortData] = useState<Map<string, ProcessedResortData>>(new Map());
 
     // Resort hierarchy hook for modal
