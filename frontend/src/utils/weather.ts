@@ -117,7 +117,7 @@ export function processResortData(
 
     return {
       name: resortName.replace(/-/g, ' '),
-      elevation: `${Math.round(elevationData.metadata.elevation)}m`,
+      elevation: formatElevation(elevationData.metadata.elevation, unitSystem),
       days
     };
   } catch (err) {
