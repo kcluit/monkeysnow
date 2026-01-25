@@ -55,13 +55,16 @@ function lerp(start: number, end: number, t: number): number {
   return start * (1 - t) + end * t;
 }
 
-export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max', showDate = false, unitSystem = 'metric' }: CardProps): JSX.Element {
+export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max', showDate = false, unitSystem = 'metric', onResortClick }: CardProps): JSX.Element {
   const totals = calculateSnowTotals(resort);
 
   return (
     <div className="resort-card rounded-3xl p-5 shadow-lg mb-6 transition-all duration-300">
       <div className="flex justify-between items-center mb-4">
-        <div>
+        <div
+          className={onResortClick ? "cursor-pointer hover:opacity-80 transition-opacity" : ""}
+          onClick={() => onResortClick?.(resort.name)}
+        >
           <h2 className="text-2xl font-bold text-theme-textPrimary">{resort.name}</h2>
           <p className="text-sm font-medium text-theme-accent">Base Elevation: {resort.elevation}</p>
         </div>
