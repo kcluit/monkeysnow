@@ -1,5 +1,8 @@
 import type { Theme } from './themes';
 
+// Unit system
+export type { UnitSystem } from '../utils/unitConversion';
+
 // Command Palette types
 export interface Command {
   id: string;
