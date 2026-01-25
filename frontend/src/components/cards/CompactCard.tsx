@@ -38,7 +38,10 @@ export function CompactCard({ resort, temperatureMetric = 'max', showDate = fals
         <div className="resort-card rounded-xl p-3 shadow-md backdrop-blur-md">
             {/* Compact Header */}
             <div className="mb-2 flex justify-between items-center">
-                <div className="flex items-center gap-2">
+                <div
+                    className={`flex items-center gap-2 ${onResortClick ? "cursor-pointer hover:opacity-80 transition-opacity" : ""}`}
+                    onClick={() => onResortClick?.(resort.name)}
+                >
                     <h2 className="text-base font-semibold text-theme-textPrimary tracking-tight">{resort.name}</h2>
                     <span className="text-xs text-theme-accent">{resort.elevation}</span>
                 </div>
