@@ -205,6 +205,29 @@ export function generateUtilityBarCommands(
 }
 
 /**
+ * Generate utility bar style submenu commands with checkmarks.
+ */
+export function generateUtilityBarStyleCommands(
+  utilityBarStyle: UtilityBarStyle,
+  setUtilityBarStyle: (style: UtilityBarStyle) => void
+): Command[] {
+  return [
+    {
+      id: 'utilitybar-style-compact',
+      name: 'Compact',
+      icon: utilityBarStyle === 'compact' ? '✓' : '',
+      action: () => setUtilityBarStyle('compact'),
+    },
+    {
+      id: 'utilitybar-style-large',
+      name: 'Large',
+      icon: utilityBarStyle === 'large' ? '✓' : '',
+      action: () => setUtilityBarStyle('large'),
+    },
+  ];
+}
+
+/**
  * Generate temperature metric submenu commands with checkmarks.
  */
 export function generateTemperatureMetricCommands(
