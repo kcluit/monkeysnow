@@ -66,7 +66,10 @@ export function processResortData(
       if (!dayData) continue;
 
       const date = new Date(dateKey);
-      const dayName = daysInWeek[date.getDay()];
+      // Use getUTCDay() to match the date string from backend (which is in UTC)
+      const dayName = daysInWeek[date.getUTCDay()];
+      // Format date as "Jan 25" for optional display
+      const dateDisplay = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
 
       // Create periods from AM/PM/NIGHT data
       const periods = createPeriodsFromDayData(dayData, temperatureMetric, snowfallEstimateMode);
