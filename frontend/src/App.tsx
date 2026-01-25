@@ -351,6 +351,7 @@ function App(): JSX.Element {
         isReversed,
         selectedTemperatureMetric,
         snowfallEstimateMode,
+        unitSystem,
         sortResorts,
         loadResort,
         createLoadingController
