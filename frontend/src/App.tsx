@@ -173,7 +173,7 @@ function App(): JSX.Element {
             },
             {
                 id: 'hide-emoji',
-                name: 'Hide Emoji',
+                name: 'Hide emoji',
                 icon: '👻',
                 subCommands: [
                     {
