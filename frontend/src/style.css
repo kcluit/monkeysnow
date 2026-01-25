@@ -103,6 +103,7 @@ input[type="checkbox"] {
     background: var(--cardBg);
     border: 1px solid var(--border);
     transition: all 0.3s ease;
+    overflow: hidden;
 }
 
 .period-card {
