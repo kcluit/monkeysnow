@@ -228,6 +228,7 @@ export interface UseResortFilteringReturn {
     selectedSortDay: SortDay,
     isReversed: boolean,
     temperatureMetric?: TemperatureMetric,
-    snowfallEstimateMode?: SnowfallEstimateMode
+    snowfallEstimateMode?: SnowfallEstimateMode,
+    unitSystem?: UnitSystem
   ) => string[];
 }
