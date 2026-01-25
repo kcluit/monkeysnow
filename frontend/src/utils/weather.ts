@@ -253,8 +253,8 @@ function getSnowConditionFromPeriods(periods: Period[]): SnowCondition {
     return { text: 'Mixed conditions', isRainbow: false };
   }
 
-  // Find periods with snow and get the best quality
-  const qualityPriority: SnowQuality[] = ['dry_powder', 'powder', 'wet_snow', 'sleet_mix', 'rain'];
+  // Find periods with snow and get the best quality (powder is best, rain is worst)
+  const qualityPriority: SnowQuality[] = ['powder', 'wet_snow', 'slush', 'wet_mix', 'rain'];
 
   // Get all qualities from periods with precipitation
   const periodsWithPrecip = periods.filter(p => parseFloat(p.snow) > 0 || parseFloat(p.rain) > 0);
