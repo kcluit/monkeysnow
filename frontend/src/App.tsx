@@ -267,6 +267,8 @@ function App(): JSX.Element {
             setSnowfallEstimateMode,
             showUtilityBar,
             setShowUtilityBar,
+            utilityBarStyle,
+            setUtilityBarStyle,
             openResortSelector: resortHierarchy.openModal,
         });
 
