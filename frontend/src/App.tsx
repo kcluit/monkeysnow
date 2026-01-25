@@ -357,7 +357,8 @@ function App(): JSX.Element {
             selectedElevation,
             selectedSortDay,
             isReversed,
-            selectedTemperatureMetric
+            selectedTemperatureMetric,
+            snowfallEstimateMode
         );
 
         return sortedResorts
