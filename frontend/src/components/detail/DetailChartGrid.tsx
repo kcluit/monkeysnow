@@ -1,6 +1,5 @@
 import { WeatherChart } from './WeatherChart';
 import type { DetailChartGridProps } from '../../types/detailView';
-import { getVariableConfig } from '../../utils/chartConfigurations';
 
 export function DetailChartGrid({
   data,
@@ -19,7 +18,6 @@ export function DetailChartGrid({
   return (
     <div className="space-y-6">
       {selectedVariables.map((variable) => {
-        const config = getVariableConfig(variable);
         return (
           <div
             key={variable}
