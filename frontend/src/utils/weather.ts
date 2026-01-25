@@ -195,14 +195,14 @@ function createPeriodFromData(data: PeriodData, label: string, temperatureMetric
 
   return {
     time: label,
-    temp: `${roundedTemp}°C`,
+    temp: formatTempWithRounding(displayTemp, unitSystem, roundingMode),
     tempMax: data.temperature_max ?? 0,
     tempMin: data.temperature_min ?? 0,
     tempAvg: data.temperature_avg ?? 0,
     tempMedian: data.temperature_median ?? 0,
-    snow: `${snowValue.toFixed(1)} cm`,
-    rain: `${rainValue.toFixed(1)} mm`,
-    wind: `${Math.round(data.wind_speed ?? 0)} km/h`,
+    snow: formatSnow(snowValue, unitSystem),
+    rain: formatRain(rainValue, unitSystem),
+    wind: formatWind(data.wind_speed ?? 0, unitSystem),
     condition: getWeatherDescription(data.weather_code ?? 0),
     snowQuality,
     snowToLiquidRatio: data.snow_to_liquid_ratio ?? 0
