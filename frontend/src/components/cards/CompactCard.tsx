@@ -98,11 +98,11 @@ export function CompactCard({ resort, temperatureMetric = 'max', showDate = fals
                                         {/* Temperature + Snow in row */}
                                         <div className="flex items-baseline justify-between">
                                             <span className={`text-lg font-bold ${getTemperatureClass(dayStats.maxTemp)}`}>
-                                                {dayStats.maxTemp}°
+                                                {formatTemp(dayStats.maxTemp, unitSystem)}
                                             </span>
                                             {dayStats.snow > 0 ? (
                                                 <span className={`text-xs font-bold ${getSnowClass(dayStats.snow)}`}>
-                                                    {dayStats.snow}cm
+                                                    {formatSnow(dayStats.snow, unitSystem)}
                                                 </span>
                                             ) : (
                                                 <span className="text-xs text-theme-textSecondary">--</span>
@@ -115,7 +115,7 @@ export function CompactCard({ resort, temperatureMetric = 'max', showDate = fals
                                                 {weatherText.split('/')[0].trim()}
                                             </span>
                                             <span className={`text-xs font-medium ${getWindClass(dayStats.wind)}`}>
-                                                {dayStats.wind}kph
+                                                {formatWind(dayStats.wind, unitSystem)}
                                             </span>
                                         </div>
                                     </div>
