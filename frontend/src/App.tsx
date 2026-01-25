@@ -349,7 +349,8 @@ function App(): JSX.Element {
             selectedSort,
             selectedElevation,
             selectedSortDay,
-            isReversed
+            isReversed,
+            selectedTemperatureMetric
         );
 
         return sortedResorts
@@ -362,6 +363,7 @@ function App(): JSX.Element {
         selectedElevation,
         selectedSortDay,
         isReversed,
+        selectedTemperatureMetric,
         resortData,
         sortResorts
     ]);
