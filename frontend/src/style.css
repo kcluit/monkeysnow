@@ -17,6 +17,11 @@
 
 /* All CSS variables are set via useTheme.ts from the theme system */
 
+/* Hide Borders Mode - Removes all UI borders when enabled */
+.no-borders {
+    --border: transparent !important;
+}
+
 body {
     background: var(--background);
     min-height: 100vh;
