@@ -225,18 +225,58 @@ function getWeatherEmoji(condition: string): string {
   return '⛅';
 }
 
-function getSnowCondition(freezingLevel: number | null, baseElevation: number): SnowCondition {
-  if (!freezingLevel || !baseElevation) return { text: 'Mixed conditions', isRainbow: false };
-
-  const difference = freezingLevel - baseElevation;
-
-  if (freezingLevel < baseElevation) {
-    return { text: 'Dry, Powder Snow!', isRainbow: true };
-  } else if (difference <= 200) {
-    return { text: 'Icy or Sticky Snow', isRainbow: false };
-  } else {
-    return { text: 'Wet, Slushy Snow', isRainbow: false };
+/**
+ * Maps snow quality from API to display text and rainbow status
+ */
+function getSnowConditionFromQuality(quality: SnowQuality): SnowCondition {
+  switch (quality) {
+    case 'dry_powder':
+      return { text: 'Dry Powder!', isRainbow: true };
+    case 'powder':
+      return { text: 'Powder', isRainbow: true };
+    case 'wet_snow':
+      return { text: 'Wet, Heavy Snow', isRainbow: false };
+    case 'sleet_mix':
+      return { text: 'Sleet/Mix', isRainbow: false };
+    case 'rain':
+      return { text: 'Rain', isRainbow: false };
+    default:
+      return { text: 'Mixed conditions', isRainbow: false };
   }
+}
+
+/**
+ * Gets the dominant snow condition from periods (prefers periods with precipitation)
+ */
+function getSnowConditionFromPeriods(periods: Period[]): SnowCondition {
+  if (periods.length === 0) {
+    return { text: 'Mixed conditions', isRainbow: false };
+  }
+
+  // Find periods with snow and get the best quality
+  const qualityPriority: SnowQuality[] = ['dry_powder', 'powder', 'wet_snow', 'sleet_mix', 'rain'];
+
+  // Get all qualities from periods with precipitation
+  const periodsWithPrecip = periods.filter(p => parseFloat(p.snow) > 0 || parseFloat(p.rain) > 0);
+
+  if (periodsWithPrecip.length === 0) {
+    // No precipitation - use first period's quality or default
+    return getSnowConditionFromQuality(periods[0].snowQuality);
+  }
+
+  // Find the best (highest priority) quality among periods with precipitation
+  let bestQuality: SnowQuality = 'rain';
+  let bestPriorityIndex = qualityPriority.length;
+
+  for (const period of periodsWithPrecip) {
+    const priorityIndex = qualityPriority.indexOf(period.snowQuality);
+    if (priorityIndex !== -1 && priorityIndex < bestPriorityIndex) {
+      bestPriorityIndex = priorityIndex;
+      bestQuality = period.snowQuality;
+    }
+  }
+
+  return getSnowConditionFromQuality(bestQuality);
 }
 
 export function calculateSnowTotals(resort: ProcessedResortData | null): SnowTotals {
