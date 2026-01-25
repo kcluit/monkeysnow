@@ -82,7 +82,7 @@ export function processResortData(
       const dateDisplay = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
 
       // Create periods from AM/PM/NIGHT data
-      const periods = createPeriodsFromDayData(dayData, temperatureMetric, snowfallEstimateMode);
+      const periods = createPeriodsFromDayData(dayData, temperatureMetric, snowfallEstimateMode, unitSystem);
 
       // Get snow condition from periods' snow quality (use first available with precipitation)
       const snowCondition = getSnowConditionFromPeriods(periods);
