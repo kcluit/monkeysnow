@@ -193,6 +193,7 @@ export interface UtilityBarProps {
 export interface CardProps {
   resort: ProcessedResortData;
   temperatureMetric?: TemperatureMetric;
+  snowfallEstimateMode?: SnowfallEstimateMode;
 }
 
 export interface ThemeToggleProps {
