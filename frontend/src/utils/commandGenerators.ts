@@ -292,6 +292,15 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
       ),
     },
     {
+      id: 'temperature-metric',
+      name: 'Temperature Display...',
+      icon: '🌡️',
+      subCommands: generateTemperatureMetricCommands(
+        params.selectedTemperatureMetric,
+        params.setSelectedTemperatureMetric
+      ),
+    },
+    {
       id: 'utility-bar',
       name: 'Utility Bar',
       icon: '🎛️',
