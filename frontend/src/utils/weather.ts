@@ -109,7 +109,7 @@ export function processResortData(
   }
 }
 
-function createPeriodsFromDayData(dayData: DayData): Period[] {
+function createPeriodsFromDayData(dayData: DayData, temperatureMetric: TemperatureMetric): Period[] {
   const periods: Period[] = [];
 
   const periodOrder: Array<{ key: keyof DayData; label: string }> = [
@@ -121,7 +121,7 @@ function createPeriodsFromDayData(dayData: DayData): Period[] {
   for (const { key, label } of periodOrder) {
     const periodData = dayData[key];
     if (periodData) {
-      periods.push(createPeriodFromData(periodData, label));
+      periods.push(createPeriodFromData(periodData, label, temperatureMetric));
     }
   }
 
