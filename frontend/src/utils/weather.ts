@@ -157,23 +157,26 @@ function createPeriodFromData(data: PeriodData, label: string, temperatureMetric
   let snowValue: number;
   let rainValue: number;
 
-  if (snowfallEstimateMode === 'totalPrecip') {
-    // In totalPrecip mode, snow and rain don't coexist
-    // If quality is 'rain', show estimate as rain (convert cm to mm), otherwise as snow
-    const estimateCm = data.snowfall_estimate ?? 0;
-    if (snowQuality === 'rain') {
-      // It's rain - show in rain field (convert cm back to mm: cm * 10)
-      snowValue = 0;
-      rainValue = estimateCm * 10;
+  // Snow and rain don't coexist - use snow_quality to decide which to show
+  if (snowQuality === 'rain') {
+    // It's rain - show rain, zero snow
+    snowValue = 0;
+    if (snowfallEstimateMode === 'totalPrecip') {
+      // In totalPrecip mode, convert estimate cm back to mm
+      rainValue = (data.snowfall_estimate ?? 0) * 10;
     } else {
-      // It's snow - show in snow field
-      snowValue = estimateCm;
-      rainValue = 0;
+      // Model mode - use backend's rain_total
+      rainValue = data.rain_total ?? 0;
     }
   } else {
-    // Model mode - use backend's snowfall_total and rain_total
-    snowValue = data.snowfall_total ?? 0;
-    rainValue = data.rain_total ?? 0;
+    // It's snow - show snow, zero rain
+    rainValue = 0;
+    if (snowfallEstimateMode === 'totalPrecip') {
+      snowValue = data.snowfall_estimate ?? 0;
+    } else {
+      // Model mode - use backend's snowfall_total
+      snowValue = data.snowfall_total ?? 0;
+    }
   }
 
   return {
