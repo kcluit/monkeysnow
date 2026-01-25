@@ -58,6 +58,9 @@ function App(): JSX.Element {
     const { isHideBordersEnabled, setHideBordersEnabled } = useHideBorders();
     const { isShowDateEnabled, setShowDateEnabled } = useShowDate();
 
+    // Detail view state hook
+    const { isDetailView, selectedResortId, enterDetailView, exitDetailView } = useDetailViewState();
+
     // Weather data hook
     const { allWeatherData, loading, error, createLoadingController, cancelLoading } = useWeatherData();
 
