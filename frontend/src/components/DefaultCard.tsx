@@ -78,7 +78,7 @@ export function DefaultCard({ resort, temperatureMetric = 'max' }: CardProps): J
                 <div ref={scrollContainerRef} className="scroll-container overflow-x-auto hide-scrollbar">
                     <div className="flex gap-3 pb-2" style={{ width: 'max-content' }}>
                         {resort.days.map((day, dayIndex) => {
-                            const dayStats = calculateDayStats(day);
+                            const dayStats = calculateDayStats(day, temperatureMetric);
                             const weatherText = formatWeatherText(day.periods);
                             return (
                                 <div key={dayIndex} className="w-[180px]">
