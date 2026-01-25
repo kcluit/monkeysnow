@@ -317,7 +317,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     },
     {
       id: 'sort-day',
-      name: 'Sort Day',
+      name: 'Sort day',
       icon: '📅',
       subCommands: generateSortDayCommands(
         params.selectedSortDay,
