@@ -264,7 +264,10 @@ function getWeatherEmoji(condition: string): string {
 /**
  * Maps snow quality from API to display text and rainbow status
  */
-function getSnowConditionFromQuality(quality: SnowQuality): SnowCondition {
+function getSnowConditionFromQuality(quality: SnowQuality | null): SnowCondition {
+  if (quality === null) {
+    return { text: 'N/A', isRainbow: false, isSecondary: true };
+  }
   switch (quality) {
     case 'powder':
       return { text: 'Powder!', isRainbow: true };
