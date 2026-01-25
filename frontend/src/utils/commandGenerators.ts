@@ -249,7 +249,7 @@ export function generateTemperatureMetricCommands(
     },
     {
       id: 'tempmetric-avg',
-      name: 'Average Temperature',
+      name: 'Average temperature',
       icon: selectedMetric === 'avg' ? '✓' : '',
       action: () => setSelectedMetric('avg'),
     },
