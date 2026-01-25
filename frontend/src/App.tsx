@@ -19,6 +19,7 @@ import { useHideEmoji } from './hooks/useHideEmoji';
 import { useHideBorders } from './hooks/useHideBorders';
 import { useShowDate } from './hooks/useShowDate';
 import { useResortHierarchy } from './hooks/useResortHierarchy';
+import { useUnitSystem } from './hooks/useUnitSystem';
 import { processResortData } from './utils/weather';
 import { generateControlCommands } from './utils/commandGenerators';
 import { getSortDayData } from './utils/sortDayHelpers';
