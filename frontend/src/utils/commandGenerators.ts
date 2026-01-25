@@ -199,6 +199,41 @@ export function generateUtilityBarCommands(
 }
 
 /**
+ * Generate temperature metric submenu commands with checkmarks.
+ */
+export function generateTemperatureMetricCommands(
+  selectedMetric: TemperatureMetric,
+  setSelectedMetric: (m: TemperatureMetric) => void
+): Command[] {
+  return [
+    {
+      id: 'tempmetric-max',
+      name: 'Max Temperature',
+      icon: selectedMetric === 'max' ? '✓' : '',
+      action: () => setSelectedMetric('max'),
+    },
+    {
+      id: 'tempmetric-min',
+      name: 'Min Temperature',
+      icon: selectedMetric === 'min' ? '✓' : '',
+      action: () => setSelectedMetric('min'),
+    },
+    {
+      id: 'tempmetric-avg',
+      name: 'Average Temperature',
+      icon: selectedMetric === 'avg' ? '✓' : '',
+      action: () => setSelectedMetric('avg'),
+    },
+    {
+      id: 'tempmetric-median',
+      name: 'Median Temperature',
+      icon: selectedMetric === 'median' ? '✓' : '',
+      action: () => setSelectedMetric('median'),
+    },
+  ];
+}
+
+/**
  * Generate all control-related commands for the command palette.
  * This is the main entry point for command generation.
  */
