@@ -372,7 +372,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     },
     {
       id: 'utility-bar-style',
-      name: 'Utility Bar Style',
+      name: 'Utility bar style',
       icon: '📐',
       subCommands: generateUtilityBarStyleCommands(
         params.utilityBarStyle,
