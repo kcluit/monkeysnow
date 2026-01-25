@@ -81,12 +81,13 @@ const getMode = (arr: number[]) => {
     return mode;
 };
 
-// --- Snow Estimation (Stull's Wet Bulb + Hybrid Lapse-Rate) ---
-type SnowQuality = 'rain' | 'sleet_mix' | 'wet_snow' | 'powder' | 'dry_powder';
+// --- Snow Estimation (Coastal-Optimized with Transition Zones) ---
+type SnowQuality = 'rain' | 'wet_mix' | 'slush' | 'wet_snow' | 'powder';
 
 interface HourlySnowEstimate {
     snowCm: number;
     ratio: number;
+    snowFraction: number;
     quality: SnowQuality;
 }
 
@@ -100,44 +101,66 @@ function calculateWetBulb(tempC: number, rh: number): number {
     return term1 + term2 - term3 + term4 - term5;
 }
 
-function getHybridRatio(surfaceTempC: number, surfaceWetBulbC: number): number {
-    // Rain barrier
-    if (surfaceWetBulbC > 1.5) return 0;
-    // Slush/Mix
-    if (surfaceWetBulbC > 0.5) return 3;
-    // Wet Snow ("Sierra Cement")
-    if (surfaceWetBulbC > -1.0) return 6;
-    // Heavy Snow
-    if (surfaceWetBulbC > -2.5) return 9;
-
-    // Crystal check - estimate cloud temp ~1500m above surface
-    const estimatedCloudTemp = surfaceTempC - 10;
-
-    // Dendritic Growth Zone (-12C to -18C) - max fluff
-    if (estimatedCloudTemp <= -12 && estimatedCloudTemp >= -18) return 18;
-    // Cold Column/Plate Zone
-    if (estimatedCloudTemp < -18) return 15;
-    // Standard Zone
-    return 12;
+/**
+ * Calculates what percentage of precipitation actually contributes to accumulation.
+ * Handles "Transition Zones" (Rain/Snow Mix) for maritime climates.
+ */
+function calculateSnowFraction(wetBulbC: number): number {
+    // Warm Zone: Pure Rain
+    if (wetBulbC >= 0.5) return 0.0;
+    // Slush Zone: Mostly rain, very little sticking
+    if (wetBulbC >= -0.5) return 0.1;
+    // Transition Zone (-2.0C to -0.5C): Linear interpolation 20% to 100%
+    if (wetBulbC > -2.0) {
+        const slope = (1.0 - 0.2) / (-2.0 - (-0.5));
+        const fraction = 0.2 + slope * (wetBulbC - (-0.5));
+        return Math.min(1.0, Math.max(0.0, fraction));
+    }
+    // Cold Zone: All Snow
+    return 1.0;
 }
 
-function getSnowQuality(ratio: number): SnowQuality {
-    if (ratio === 0) return 'rain';
-    if (ratio < 6) return 'sleet_mix';
-    if (ratio < 10) return 'wet_snow';
-    if (ratio < 15) return 'powder';
-    return 'dry_powder';
+/**
+ * Determines snow density (fluffiness) using Hybrid Logic.
+ */
+function getSnowRatio(wetBulbC: number): number {
+    // Surface Constraint: If warm, snow is heavy/wet
+    if (wetBulbC > -2.0) return 6;  // Concrete / Base builder
+    if (wetBulbC > -3.5) return 9;  // Standard coastal snow
+
+    // Aloft Constraint: Check for Dendritic Growth Zone (Powder)
+    const cloudTemp = wetBulbC - 10;
+    if (cloudTemp <= -12 && cloudTemp >= -18) return 15; // Powder (Dendrites)
+
+    return 11; // Default winter snow
+}
+
+function getSnowQuality(snowFraction: number, ratio: number): SnowQuality {
+    if (snowFraction <= 0.05) return 'rain';
+    if (snowFraction < 0.6) return 'wet_mix';
+    if (snowFraction < 0.9) return 'slush';
+    if (ratio >= 14) return 'powder';
+    return 'wet_snow';
 }
 
 function estimateHourlySnow(tempC: number, humidity: number, precipMm: number): HourlySnowEstimate {
     const wetBulb = calculateWetBulb(tempC, humidity);
-    const ratio = getHybridRatio(tempC, wetBulb);
-    const snowMm = precipMm * ratio;
+    const snowFraction = calculateSnowFraction(wetBulb);
+    const ratio = getSnowRatio(wetBulb);
+
+    // Only multiply the "snow fraction" of precip by the ratio
+    const effectiveSnowPrecipMm = precipMm * snowFraction;
+    const snowMm = effectiveSnowPrecipMm * ratio;
     const snowCm = snowMm / 10;
+
+    // Effective ratio = Final Snow Depth / Original Total Precip
+    const effectiveRatio = precipMm > 0 ? snowMm / precipMm : 0;
+
     return {
         snowCm,
-        ratio,
-        quality: getSnowQuality(ratio)
+        ratio: effectiveRatio,
+        snowFraction,
+        quality: getSnowQuality(snowFraction, ratio)
     };
 }
 
