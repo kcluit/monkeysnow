@@ -153,13 +153,28 @@ function createPeriodFromData(data: PeriodData, label: string, temperatureMetric
                     : temperatureMetric === 'min' ? Math.floor(displayTemp)
                     : Math.round(displayTemp);
 
-  // Use snowfall_estimate when mode is 'totalPrecip', otherwise use model's snowfall_total
-  const snowValue = snowfallEstimateMode === 'totalPrecip'
-    ? (data.snowfall_estimate ?? 0)
-    : (data.snowfall_total ?? 0);
+  const snowQuality = data.snow_quality ?? 'rain';
+  let snowValue: number;
+  let rainValue: number;
 
-  // When using totalPrecip mode, ignore rain_total (it's already accounted for in the estimate)
-  const rainValue = snowfallEstimateMode === 'totalPrecip' ? 0 : (data.rain_total ?? 0);
+  if (snowfallEstimateMode === 'totalPrecip') {
+    // In totalPrecip mode, snow and rain don't coexist
+    // If quality is 'rain', show estimate as rain (convert cm to mm), otherwise as snow
+    const estimateCm = data.snowfall_estimate ?? 0;
+    if (snowQuality === 'rain') {
+      // It's rain - show in rain field (convert cm back to mm: cm * 10)
+      snowValue = 0;
+      rainValue = estimateCm * 10;
+    } else {
+      // It's snow - show in snow field
+      snowValue = estimateCm;
+      rainValue = 0;
+    }
+  } else {
+    // Model mode - use backend's snowfall_total and rain_total
+    snowValue = data.snowfall_total ?? 0;
+    rainValue = data.rain_total ?? 0;
+  }
 
   return {
     time: label,
@@ -172,7 +187,7 @@ function createPeriodFromData(data: PeriodData, label: string, temperatureMetric
     rain: `${rainValue.toFixed(1)} mm`,
     wind: `${Math.round(data.wind_speed ?? 0)} km/h`,
     condition: getWeatherDescription(data.weather_code ?? 0),
-    snowQuality: data.snow_quality ?? 'rain',
+    snowQuality,
     snowToLiquidRatio: data.snow_to_liquid_ratio ?? 0
   };
 }
