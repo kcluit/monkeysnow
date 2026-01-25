@@ -237,6 +237,29 @@ export function generateTemperatureMetricCommands(
 }
 
 /**
+ * Generate snowfall estimate mode submenu commands with checkmarks.
+ */
+export function generateSnowfallEstimateCommands(
+  selectedMode: SnowfallEstimateMode,
+  setSelectedMode: (m: SnowfallEstimateMode) => void
+): Command[] {
+  return [
+    {
+      id: 'snowfall-model',
+      name: 'Use Model Estimate',
+      icon: selectedMode === 'model' ? '✓' : '',
+      action: () => setSelectedMode('model'),
+    },
+    {
+      id: 'snowfall-totalprecip',
+      name: 'Estimate Using Total Precip',
+      icon: selectedMode === 'totalPrecip' ? '✓' : '',
+      action: () => setSelectedMode('totalPrecip'),
+    },
+  ];
+}
+
+/**
  * Generate all control-related commands for the command palette.
  * This is the main entry point for command generation.
  */
