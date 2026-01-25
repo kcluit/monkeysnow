@@ -8,7 +8,9 @@ import type {
   SnowTotals,
   PeriodData,
   DayData,
-  TemperatureMetric
+  TemperatureMetric,
+  SnowfallEstimateMode,
+  SnowQuality
 } from '../types';
 
 const API_URL = 'http://localhost:1234';
