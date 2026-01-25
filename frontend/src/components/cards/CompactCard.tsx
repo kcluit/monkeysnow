@@ -4,7 +4,7 @@ import { calculateDayStats, formatWeatherText, getTemperatureClass, getSnowClass
 import { formatTemp, formatSnow, formatWind } from '../../utils/unitConversion';
 import type { CardProps } from '../../types';
 
-export function CompactCard({ resort, temperatureMetric = 'max', showDate = false, unitSystem = 'metric' }: CardProps): JSX.Element {
+export function CompactCard({ resort, temperatureMetric = 'max', showDate = false, unitSystem = 'metric', onResortClick }: CardProps): JSX.Element {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [seymourClicks, setSeymourClicks] = useState(0);
 
