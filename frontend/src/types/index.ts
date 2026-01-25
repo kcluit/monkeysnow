@@ -50,7 +50,7 @@ export type SortDay = number | 'next3days' | 'next7days';
 export type ViewMode = 'default' | 'full' | 'compact';
 export type TemperatureMetric = 'max' | 'min' | 'avg' | 'median';
 export type SnowfallEstimateMode = 'model' | 'totalPrecip';
-export type SnowQuality = 'rain' | 'sleet_mix' | 'wet_snow' | 'powder' | 'dry_powder';
+export type SnowQuality = 'rain' | 'wet_mix' | 'slush' | 'wet_snow' | 'powder';
 
 // Weather data structures from new API format
 export interface PeriodData {
