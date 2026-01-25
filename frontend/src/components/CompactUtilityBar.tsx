@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import type { UtilityBarProps, SortDay, SortDayData, ElevationLevel, SortOption, ViewMode } from '../types';
+import type { UtilityBarProps, SortDay, ElevationLevel, SortOption, ViewMode } from '../types';
+import { getSortDayData, getSortDayText } from '../utils/sortDayHelpers';
 
 interface ExtendedCompactUtilityBarProps extends UtilityBarProps {
   openResortModal: () => void;
@@ -35,35 +36,7 @@ export function CompactUtilityBar({
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  const getSortDayOptions = (): SortDayData => {
-    const specialOptions = [
-      { name: "Next 3 Days", value: "next3days" },
-      { name: "Next 7 Days", value: "next7days" }
-    ];
-
-    if (selectedResorts.length === 0 || !allWeatherData) {
-      return { specialOptions, regularDays: [] };
-    }
-
-    const firstResort = selectedResorts[0];
-    const resortData = processResortData(allWeatherData, firstResort, selectedElevation);
-
-    return {
-      specialOptions,
-      regularDays: resortData?.days || []
-    };
-  };
-
-  const sortDayData = getSortDayOptions();
-
-  const getSortDayText = (): string => {
-    if (typeof selectedSortDay === 'string') {
-      const specialOption = sortDayData.specialOptions.find(opt => opt.value === selectedSortDay);
-      return specialOption?.name || 'Today';
-    } else {
-      return sortDayData.regularDays[selectedSortDay]?.name || 'Today';
-    }
-  };
+  const sortDayData = getSortDayData(selectedResorts, allWeatherData, processResortData, selectedElevation);
 
   // Cycle functions
   const cycleViewMode = (): void => {
