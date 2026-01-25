@@ -119,6 +119,8 @@ export interface Period {
   rain: string;
   wind: string;
   condition: string;
+  snowQuality: SnowQuality;
+  snowToLiquidRatio: number;
 }
 
 // Day forecast data
