@@ -91,7 +91,7 @@ export function CompactUtilityBar({
               className={`compact-bar-text transition-colors ${
                 selectedElevation === level
                   ? 'text-theme-accent'
-                  : 'hover:text-theme-accent'
+                  : 'text-theme-textPrimary hover:text-theme-accent'
               }`}
             >
               {level === 'bot' ? 'Base' : level === 'mid' ? 'Mid' : 'Peak'}
