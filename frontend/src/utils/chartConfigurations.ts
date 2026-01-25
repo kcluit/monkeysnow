@@ -1,6 +1,5 @@
 import type { WeatherModel, WeatherVariable } from '../types/openMeteo';
 import type { VariableConfig, ModelConfig } from '../types/detailView';
-import type { UnitSystem } from './unitConversion';
 
 // Weather model configurations
 export const MODEL_CONFIGS: Map<WeatherModel, ModelConfig> = new Map([
