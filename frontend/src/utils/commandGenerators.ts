@@ -48,7 +48,7 @@ export function generateElevationCommands(
   return [
     {
       id: 'elevation-bot',
-      name: 'Base Forecast',
+      name: 'Base forecast',
       icon: selectedElevation === 'bot' ? '✓' : '',
       action: () => setSelectedElevation('bot'),
     },
