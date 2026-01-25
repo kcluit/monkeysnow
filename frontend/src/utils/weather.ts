@@ -167,12 +167,16 @@ function createPeriodFromData(data: PeriodData, label: string, temperatureMetric
                      : temperatureMetric === 'min' ? 'floor' as const
                      : 'round' as const;
 
-  const snowQuality = data.snow_quality ?? 'rain';
+  const snowQuality = data.snow_quality ?? null;
   let snowValue: number;
   let rainValue: number;
 
   // Snow and rain don't coexist - use snow_quality to decide which to show
-  if (snowQuality === 'rain') {
+  if (snowQuality === null) {
+    // No precipitation - show zeros for both
+    snowValue = 0;
+    rainValue = 0;
+  } else if (snowQuality === 'rain') {
     // It's rain - show rain, zero snow
     snowValue = 0;
     if (snowfallEstimateMode === 'totalPrecip') {
