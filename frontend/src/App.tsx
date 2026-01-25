@@ -398,7 +398,8 @@ function App(): JSX.Element {
             selectedSortDay,
             isReversed,
             selectedTemperatureMetric,
-            snowfallEstimateMode
+            snowfallEstimateMode,
+            unitSystem
         );
 
         return sortedResorts
@@ -413,6 +414,7 @@ function App(): JSX.Element {
         isReversed,
         selectedTemperatureMetric,
         snowfallEstimateMode,
+        unitSystem,
         resortData,
         sortResorts
     ]);
