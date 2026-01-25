@@ -195,6 +195,7 @@ export interface CardProps {
   resort: ProcessedResortData;
   temperatureMetric?: TemperatureMetric;
   snowfallEstimateMode?: SnowfallEstimateMode;
+  showDate?: boolean;
 }
 
 export interface ThemeToggleProps {
