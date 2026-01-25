@@ -4,7 +4,7 @@ import { calculateSnowTotals } from '../utils/weather';
 import { calculateDayStats, formatWeatherText, getTemperatureClass, getSnowClass, getWindClass } from './cards/cardUtils';
 import type { CardProps } from '../types';
 
-export function DefaultCard({ resort, temperatureMetric = 'max' }: CardProps): JSX.Element {
+export function DefaultCard({ resort, temperatureMetric = 'max', showDate = false }: CardProps): JSX.Element {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [seymourClicks, setSeymourClicks] = useState(0);
 
