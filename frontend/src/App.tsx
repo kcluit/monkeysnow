@@ -254,6 +254,7 @@ function App(): JSX.Element {
         isFullscreen, enterFullscreen, exitFullscreen,
         isFPSEnabled, setFPSEnabled,
         isHideEmojiEnabled, setHideEmojiEnabled,
+        isHideBordersEnabled, setHideBordersEnabled,
         selectedElevation, setSelectedElevation,
         selectedSort, setSelectedSort,
         selectedSortDay, setSelectedSortDay,
