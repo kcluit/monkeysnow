@@ -154,7 +154,7 @@ function App(): JSX.Element {
             },
             {
                 id: 'fps',
-                name: 'FPS Counter',
+                name: 'FPS counter',
                 icon: '⚡',
                 subCommands: [
                     {
