@@ -58,7 +58,7 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
                     </a>
                 )}
             </div>
-            <div className="relative overflow-hidden">
+            <div className="relative">
                 <button
                     onClick={scrollLeft}
                     className="absolute left-1 top-1/2 -translate-y-1/2 z-10 bg-theme-cardBg rounded-full p-2 shadow-lg hover:bg-theme-secondary transition-all text-theme-textPrimary"
