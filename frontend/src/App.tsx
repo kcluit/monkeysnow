@@ -26,6 +26,7 @@ import {
     defaultElevation,
     defaultSort,
     defaultSortDay,
+    defaultTemperatureMetric,
     getDisplayName
 } from './utils/constants';
 import type {
