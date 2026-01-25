@@ -25,6 +25,9 @@ export interface ControlCommandParams {
   // Temperature Metric
   selectedTemperatureMetric: TemperatureMetric;
   setSelectedTemperatureMetric: (m: TemperatureMetric) => void;
+  // Snowfall Estimate Mode
+  snowfallEstimateMode: SnowfallEstimateMode;
+  setSnowfallEstimateMode: (m: SnowfallEstimateMode) => void;
   // Utility Bar visibility
   showUtilityBar: boolean;
   setShowUtilityBar: (show: boolean) => void;
