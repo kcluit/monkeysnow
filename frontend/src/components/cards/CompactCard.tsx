@@ -86,7 +86,9 @@ export function CompactCard({ resort, temperatureMetric = 'max', showDate = fals
                                 <div key={dayIndex} className="w-[130px]">
                                     {/* Day Header - More compact */}
                                     <div className="flex items-center justify-between mb-0.5 px-0.5">
-                                        <span className="text-xs font-medium text-theme-textSecondary">{day.name}</span>
+                                        <span className="text-xs font-medium text-theme-textSecondary">
+                                            {day.name}{showDate && ` ${day.date}`}
+                                        </span>
                                         <span className="text-sm">{day.weatherEmoji}</span>
                                     </div>
 
