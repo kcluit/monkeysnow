@@ -145,9 +145,13 @@ function getTemperatureByMetric(data: PeriodData, metric: TemperatureMetric): nu
 
 function createPeriodFromData(data: PeriodData, label: string, temperatureMetric: TemperatureMetric): Period {
   const displayTemp = getTemperatureByMetric(data, temperatureMetric);
+  // Round based on metric: ceil for max, floor for min, round for avg/median
+  const roundedTemp = temperatureMetric === 'max' ? Math.ceil(displayTemp)
+                    : temperatureMetric === 'min' ? Math.floor(displayTemp)
+                    : Math.round(displayTemp);
   return {
     time: label,
-    temp: `${Math.round(displayTemp)}°C`,
+    temp: `${roundedTemp}°C`,
     tempMax: data.temperature_max ?? 0,
     tempMin: data.temperature_min ?? 0,
     tempAvg: data.temperature_avg ?? 0,
