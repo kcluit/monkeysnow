@@ -203,6 +203,7 @@ export interface CardProps {
   snowfallEstimateMode?: SnowfallEstimateMode;
   showDate?: boolean;
   unitSystem?: UnitSystem;
+  onResortClick?: (resortId: string) => void;
 }
 
 export interface ThemeToggleProps {
