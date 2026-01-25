@@ -41,9 +41,9 @@ export function calculateDayStats(day: DayForecast, temperatureMetric: Temperatu
     let wind = 0;
     const pmPeriod = periods.find(p => p.time === 'PM');
     if (pmPeriod) {
-        wind = parseFloat(pmPeriod.wind.replace(' km/h', '')) || 0;
+        wind = parseFloat(pmPeriod.wind.replace(/[^\d.-]/g, '')) || 0;
     } else if (periods.length > 0) {
-        wind = parseFloat(periods[0].wind.replace(' km/h', '')) || 0;
+        wind = parseFloat(periods[0].wind.replace(/[^\d.-]/g, '')) || 0;
     }
 
     // Calculate temperature based on metric
