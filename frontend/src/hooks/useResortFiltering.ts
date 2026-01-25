@@ -8,7 +8,8 @@ import type {
   UseResortFilteringReturn,
   DayForecast,
   Period,
-  TemperatureMetric
+  TemperatureMetric,
+  SnowfallEstimateMode
 } from '../types';
 
 export function useResortFiltering(
