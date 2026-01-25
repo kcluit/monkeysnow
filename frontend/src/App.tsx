@@ -37,7 +37,8 @@ import type {
     Command,
     SortDayData,
     ViewMode,
-    TemperatureMetric
+    TemperatureMetric,
+    SnowfallEstimateMode
 } from './types';
 
 function App(): JSX.Element {
