@@ -3,7 +3,7 @@ import { webcamUrls } from '../../utils/constants';
 import { calculateDayStats, formatWeatherText, getTemperatureClass, getSnowClass, getWindClass } from './cardUtils';
 import type { CardProps } from '../../types';
 
-export function CompactCard({ resort }: CardProps): JSX.Element {
+export function CompactCard({ resort, temperatureMetric = 'max' }: CardProps): JSX.Element {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [seymourClicks, setSeymourClicks] = useState(0);
 
