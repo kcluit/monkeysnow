@@ -66,6 +66,7 @@ function App(): JSX.Element {
     const [selectedSortDay, setSelectedSortDay] = useLocalStorage<SortDay>('selectedSortDay', defaultSortDay);
     const [isReversed, setIsReversed] = useLocalStorage<boolean>('reverseOrder', false);
     const [showUtilityBar, setShowUtilityBar] = useLocalStorage<boolean>('showUtilityBar', true);
+    const [utilityBarStyle, setUtilityBarStyle] = useLocalStorage<UtilityBarStyle>('utilityBarStyle', 'large');
 
     // Local component state
     const [viewMode, setViewMode] = useLocalStorage<ViewMode>('viewMode', 'default');
