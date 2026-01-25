@@ -276,6 +276,7 @@ function App(): JSX.Element {
         isFPSEnabled, setFPSEnabled,
         isHideEmojiEnabled, setHideEmojiEnabled,
         isHideBordersEnabled, setHideBordersEnabled,
+        isShowDateEnabled, setShowDateEnabled,
         selectedElevation, setSelectedElevation,
         selectedSort, setSelectedSort,
         selectedSortDay, setSelectedSortDay,
