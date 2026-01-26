@@ -1,9 +1,7 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext, ReactNode } from 'react';
 import {
   useHierarchyData,
   UseHierarchyDataReturn,
-  ContinentData,
-  HierarchyNode,
 } from '../hooks/useHierarchyData';
 
 // Re-export types for convenience
