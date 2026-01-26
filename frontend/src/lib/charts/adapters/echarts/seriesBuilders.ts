@@ -104,11 +104,13 @@ export function buildBarSeries(config: SeriesConfig): SeriesOption {
 /**
  * Build an area series option for ECharts.
  * Area charts are line charts with areaStyle.
+ * Includes performance optimizations for large datasets.
  */
 export function buildAreaSeries(config: SeriesConfig): SeriesOption {
   const lineWidth = config.lineWidth ?? 2;
   const opacity = config.opacity ?? 1;
   const fillOpacity = config.fillOpacity ?? 0.3;
+  const dataLength = Array.isArray(config.data) ? config.data.length : 0;
 
   const series: SeriesOption = {
     type: 'line',
@@ -129,11 +131,18 @@ export function buildAreaSeries(config: SeriesConfig): SeriesOption {
       opacity: fillOpacity * opacity,
     },
     symbol: 'none',
+    // Performance: Enable large mode for datasets with many points
+    large: dataLength > 500,
+    largeThreshold: 500,
+    // Performance: Use sampling to reduce points when zoomed out
+    sampling: 'lttb',
+    // Performance: Disable hover state changes
     emphasis: {
-      focus: 'series',
-      areaStyle: {
-        opacity: Math.min(fillOpacity + 0.2, 1) * opacity,
-      },
+      disabled: true,
+    },
+    // Performance: Disable selection
+    select: {
+      disabled: true,
     },
   };
 
