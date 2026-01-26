@@ -15,13 +15,22 @@ import { getEChartsTheme } from '../lib/charts';
 
 /**
  * Format a date for display on the X-axis.
+ * @param date - The date to format
+ * @param timezone - Optional IANA timezone string (e.g., "America/Vancouver")
  */
-function formatTimeLabel(date: Date): string {
-  return date.toLocaleString('en-US', {
+function formatTimeLabel(date: Date, timezone?: string): string {
+  const options: Intl.DateTimeFormatOptions = {
     month: 'short',
     day: 'numeric',
     hour: 'numeric',
-  });
+  };
+
+  // Add timezone if provided
+  if (timezone) {
+    options.timeZone = timezone;
+  }
+
+  return date.toLocaleString('en-US', options);
 }
 
 /**
