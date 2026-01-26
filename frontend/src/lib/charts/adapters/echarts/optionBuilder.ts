@@ -391,7 +391,6 @@ export function buildEChartsOption(config: ChartConfig): ChartOption {
 
     // Performance thresholds
     const isLargeDataset = totalDataPoints > 2000;
-    const hasManySeriesCount = series.length > 10;
 
     return {
         backgroundColor: theme.background,
