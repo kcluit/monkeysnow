@@ -88,14 +88,7 @@ function EChartsAdapterInner({
             (zr as unknown as { animation?: { clear?: () => void } }).animation?.clear?.();
         }
 
-        // Performance: Disable tooltip trigger animation
-        const tooltipModel = chart.getModel()?.getComponent('tooltip');
-        if (tooltipModel) {
-            (tooltipModel as unknown as { option?: { transitionDuration?: number } }).option = {
-                ...(tooltipModel as unknown as { option?: object }).option,
-                transitionDuration: 0,
-            };
-        }
+        // Note: Additional tooltip configuration is done in optionBuilder.ts
     }, []);
 
     // Cleanup on unmount
