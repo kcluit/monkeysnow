@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback, memo } from 'react';
 import {
     LineChart,
     Line,
@@ -86,7 +86,7 @@ export function WeatherChart({
                     stroke={modelConfig.color}
                     strokeWidth={2}
                     dot={false}
-                    activeDot={{ r: 6, strokeWidth: 2, fill: 'var(--color-cardBg)' }}
+                    activeDot={{ r: 6, strokeWidth: 2, fill: 'var(--cardBg)' }}
                     isAnimationActive={false}
                 />
             );
@@ -121,7 +121,7 @@ export function WeatherChart({
                     fill={modelConfig.color}
                     fillOpacity={0.3}
                     dot={false}
-                    activeDot={{ r: 6, strokeWidth: 2, fill: 'var(--color-cardBg)' }}
+                    activeDot={{ r: 6, strokeWidth: 2, fill: 'var(--cardBg)' }}
                     isAnimationActive={false}
                 />
             );
@@ -144,16 +144,16 @@ export function WeatherChart({
 
     const xAxisProps = {
         dataKey: 'time',
-        tick: { fontSize: 11, fill: 'var(--color-textSecondary)' },
-        tickLine: { stroke: 'var(--color-border)' },
-        axisLine: { stroke: 'var(--color-border)' },
+        tick: { fontSize: 11, fill: 'var(--textSecondary)' },
+        tickLine: { stroke: 'var(--border)' },
+        axisLine: { stroke: 'var(--border)' },
         interval: Math.floor(chartData.length / 14), // Show ~14 ticks
     };
 
     const yAxisProps = {
-        tick: { fontSize: 11, fill: 'var(--color-textSecondary)' },
-        tickLine: { stroke: 'var(--color-border)' },
-        axisLine: { stroke: 'var(--color-border)' },
+        tick: { fontSize: 11, fill: 'var(--textSecondary)' },
+        tickLine: { stroke: 'var(--border)' },
+        axisLine: { stroke: 'var(--border)' },
         domain: variableConfig.yAxisDomain || ['auto', 'auto'],
         tickFormatter: (value: number) => `${Math.round(value)}`,
     };
@@ -178,7 +178,7 @@ export function WeatherChart({
 
     const gridProps = {
         strokeDasharray: '3 3',
-        stroke: 'var(--color-border)',
+        stroke: 'var(--border)',
         opacity: 0.3,
         horizontal: true,
         vertical: true,
@@ -191,8 +191,8 @@ export function WeatherChart({
     const brushProps = {
         dataKey: 'time',
         height: 40,
-        stroke: 'var(--color-accent)',
-        fill: 'var(--color-cardBg)',
+        stroke: 'var(--accent)',
+        fill: 'var(--cardBg)',
         travellerWidth: 10,
         onChange: handleBrushChange,
         startIndex: brushRange.startIndex,
