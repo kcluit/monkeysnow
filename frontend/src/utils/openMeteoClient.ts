@@ -8,10 +8,22 @@ const OPEN_METEO_URL = 'https://api.open-meteo.com/v1/forecast';
 
 // DEV MODE: Enable mock data for performance testing
 // Set window.__USE_MOCK_DATA = true in browser console to enable
+// Or set sessionStorage.__USE_MOCK_DATA = 'true' for persistence across reloads
 declare global {
   interface Window {
     __USE_MOCK_DATA?: boolean;
   }
+}
+
+// Check if mock mode is enabled (from window or sessionStorage)
+function isMockModeEnabled(): boolean {
+  if (typeof window === 'undefined') return false;
+  if (window.__USE_MOCK_DATA) return true;
+  if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('__USE_MOCK_DATA') === 'true') {
+    window.__USE_MOCK_DATA = true; // Sync to window for consistency
+    return true;
+  }
+  return false;
 }
 
 /**
