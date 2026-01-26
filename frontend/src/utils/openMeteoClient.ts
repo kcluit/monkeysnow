@@ -171,6 +171,14 @@ export async function fetchOpenMeteoData(
   forecastDays: number = 14,
   timezone: string = 'auto'
 ): Promise<FetchOpenMeteoDataResult> {
+  // DEV MODE: Return mock data for performance testing
+  if (typeof window !== 'undefined' && window.__USE_MOCK_DATA) {
+    console.log('[MOCK MODE] Generating mock data for', models.length, 'models');
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 100));
+    return generateMockData(models, variables, forecastDays);
+  }
+
   const params = {
     latitude,
     longitude,
