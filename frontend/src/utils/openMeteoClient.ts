@@ -114,7 +114,6 @@ export async function fetchOpenMeteoData(
       const hourly = response.hourly();
       if (!hourly) continue;
 
-      const utcOffsetSeconds = response.utcOffsetSeconds();
       const timeStart = Number(hourly.time());
       const timeEnd = Number(hourly.timeEnd());
       const interval = hourly.interval();
