@@ -94,7 +94,7 @@ export function buildAreaSeries(config: SeriesConfig): SeriesOption {
   const opacity = config.opacity ?? 1;
   const fillOpacity = config.fillOpacity ?? 0.3;
 
-  return {
+  const series: SeriesOption = {
     type: 'line',
     name: config.name,
     data: config.data,
@@ -120,6 +120,13 @@ export function buildAreaSeries(config: SeriesConfig): SeriesOption {
       },
     },
   };
+
+  // Add yAxisIndex if specified (for secondary Y-axis)
+  if (config.yAxisIndex !== undefined) {
+    series.yAxisIndex = config.yAxisIndex;
+  }
+
+  return series;
 }
 
 /**
