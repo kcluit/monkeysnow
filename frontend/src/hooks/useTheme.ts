@@ -22,8 +22,10 @@ export function useTheme(): UseThemeReturn {
         root.style.setProperty('--titleColor', colors.titleColor);
         root.style.setProperty('--specialColor', colors.specialColor);
 
-        // Derived CSS variable
+        // Derived CSS variables
         root.style.setProperty('--border', isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)');
+        // Grid line color for charts - not affected by 'hide borders' setting
+        root.style.setProperty('--gridLine', isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)');
 
         // Toggle dark class for Tailwind compatibility
         if (isDark) {
