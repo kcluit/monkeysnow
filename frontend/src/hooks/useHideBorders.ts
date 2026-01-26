@@ -8,9 +8,10 @@ export interface UseHideBordersReturn {
 }
 
 export function useHideBorders(): UseHideBordersReturn {
-  const [isHideBordersEnabled, setIsHideBordersEnabled] = useLocalStorage('hideBordersEnabled', false);
+  const [isHideBordersEnabled, setIsHideBordersEnabled] = useLocalStorage('hideBordersEnabled', true);
 
   // Apply no-borders class to document when state changes
+  // Note: isHideBordersEnabled=true means borders are hidden (no-borders class applied)
   useEffect(() => {
     const root = document.documentElement;
     if (isHideBordersEnabled) {
