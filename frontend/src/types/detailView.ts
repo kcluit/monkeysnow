@@ -61,6 +61,10 @@ export interface DetailUtilityBarProps {
     setSelectedModels: (models: WeatherModel[]) => void;
     selectedVariables: WeatherVariable[];
     setSelectedVariables: (variables: WeatherVariable[]) => void;
+    selectedAggregations: AggregationType[];
+    setSelectedAggregations: (aggregations: AggregationType[]) => void;
+    aggregationColors: Record<AggregationType, string>;
+    setAggregationColors: (colors: Record<AggregationType, string>) => void;
     elevation: number;
     setElevation: (elevation: number) => void;
     forecastDays: number;
