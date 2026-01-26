@@ -129,6 +129,8 @@ export function buildAreaSeries(config: SeriesConfig): SeriesOption {
     name: config.name,
     data: config.data,
     z: config.zIndex ?? 2,
+    // Performance: Don't trigger mouse events on individual data points
+    triggerLineEvent: false,
     itemStyle: {
       color: config.color,
       opacity,
@@ -143,17 +145,22 @@ export function buildAreaSeries(config: SeriesConfig): SeriesOption {
       opacity: fillOpacity * opacity,
     },
     symbol: 'none',
+    showSymbol: false,
     // Performance: Enable large mode for datasets with many points
-    large: dataLength > 500,
-    largeThreshold: 500,
+    large: dataLength > 300,
+    largeThreshold: 300,
     // Performance: Use sampling to reduce points when zoomed out
     sampling: 'lttb',
-    // Performance: Disable hover state changes
+    // Performance: Disable hover state changes completely
     emphasis: {
       disabled: true,
     },
     // Performance: Disable selection
     select: {
+      disabled: true,
+    },
+    // Performance: Disable blur effect
+    blur: {
       disabled: true,
     },
   };
