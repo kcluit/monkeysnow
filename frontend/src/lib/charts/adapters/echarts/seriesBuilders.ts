@@ -152,8 +152,6 @@ export function buildAreaSeries(config: SeriesConfig): SeriesOption {
   const lineWidth = config.lineWidth ?? 2;
   const opacity = config.opacity ?? 1;
   const fillOpacity = config.fillOpacity ?? 0.3;
-  const dataLength = Array.isArray(config.data) ? config.data.length : 0;
-  const isLarge = dataLength > 50;
 
   const series: SeriesOption = {
     type: 'line',
