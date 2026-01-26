@@ -96,7 +96,7 @@ function buildTooltip(config: ChartConfig, _theme: ChartTheme): ChartOption {
         // Performance: position tooltip efficiently using fixed position calculation
         position: (point: number[]) => [point[0] + 10, point[1] - 10],
         axisPointer: {
-            type: 'line',
+            type: 'shadow', // Performance: shadow is simpler than line
             // Performance: disable ALL axis pointer animations
             animation: false,
             // Performance: snap to data points to reduce calculations
@@ -104,10 +104,8 @@ function buildTooltip(config: ChartConfig, _theme: ChartTheme): ChartOption {
             // Performance: DON'T trigger emphasis effects on hover
             triggerEmphasis: false,
             triggerTooltip: true,
-            lineStyle: {
-                color: '#999',
-                type: 'dashed',
-                width: 1,
+            shadowStyle: {
+                color: 'rgba(150, 150, 150, 0.1)',
             },
             // Performance: simple label, no fancy styling
             label: {
