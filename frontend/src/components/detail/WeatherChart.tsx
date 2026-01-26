@@ -179,8 +179,10 @@ function WeatherChartInner({
         </div>
       </div>
 
-      {/* Chart */}
-      <ChartRenderer config={chartConfig} />
+      {/* Chart - wrapped in hover coordinator container for performance */}
+      <div ref={containerRef}>
+        <ChartRenderer config={chartConfig} />
+      </div>
 
       {/* Settings Modal */}
       <ChartSettingsModal
