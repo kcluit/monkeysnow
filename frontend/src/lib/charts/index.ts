@@ -21,6 +21,7 @@ export type {
   GridConfig,
   DataZoomConfig,
   ChartTheme,
+  MarkLineData,
 } from './types';
 
 // Theme utilities
