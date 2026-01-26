@@ -1294,3 +1294,117 @@ input[type="checkbox"] {
     background-size: 200% auto;
     animation: rainbow 8s linear infinite;
 }
+
+/* Model Selection Grid Modal Styles */
+.model-grid-modal {
+    max-width: 90vw;
+    width: 90vw;
+    max-height: 85vh;
+}
+
+.model-grid-columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 12px;
+    align-items: start;
+}
+
+.model-grid-items {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px 8px 8px 8px;
+}
+
+.model-grid-items .resort-grid-item {
+    padding: 6px 8px;
+}
+
+.model-grid-items .model-color-dot {
+    width: 10px;
+    height: 10px;
+}
+
+.model-color-clickable {
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.model-color-clickable:hover {
+    transform: scale(1.2);
+}
+
+/* Aggregation item with color picker */
+.model-aggregation-item {
+    position: relative;
+}
+
+.model-aggregation-item .resort-grid-item {
+    padding-right: 12px;
+}
+
+.model-aggregation-item .model-tree-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.model-aggregation-item .model-tree-description {
+    font-size: 10px;
+}
+
+/* Color picker dropdown for grid modal */
+.model-color-picker-dropdown {
+    position: absolute;
+    left: 32px;
+    top: 100%;
+    margin-top: 4px;
+    padding: 8px;
+    background: var(--background, #1c1c1e);
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    z-index: 30;
+}
+
+.model-color-picker-dropdown .model-color-picker-grid {
+    position: static;
+    margin-top: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+/* Aggregations section styling */
+.model-aggregations-section {
+    border: 1px solid var(--accent, #0a84ff);
+    background: rgba(10, 132, 255, 0.05);
+}
+
+.model-aggregations-section .resort-grid-continent-header {
+    background: rgba(10, 132, 255, 0.1);
+}
+
+/* Responsive adjustments for model grid */
+@media (max-width: 768px) {
+    .model-grid-modal {
+        max-width: 95vw;
+        width: 95vw;
+        max-height: 90vh;
+    }
+
+    .model-grid-columns {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .model-grid-columns {
+        grid-template-columns: 1fr;
+    }
+
+    .model-grid-items .resort-grid-item {
+        padding: 8px 6px;
+    }
+}
