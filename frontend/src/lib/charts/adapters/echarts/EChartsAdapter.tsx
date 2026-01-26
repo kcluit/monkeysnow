@@ -63,6 +63,8 @@ function EChartsAdapterInner({
             useDirtyRect: true, // Only re-render changed areas
             width: 'auto' as const,
             height: 'auto' as const,
+            // Performance: use webgl2 if available (currently experimental)
+            // useCoarsePointer: true, // Reduce pointer precision for performance
         }),
         []
     );
