@@ -1,24 +1,81 @@
 import type { WeatherModel, WeatherVariable } from '../types/openMeteo';
 import type { VariableConfig, ModelConfig } from '../types/detailView';
 
-// Weather model configurations
+// Weather model configurations (all 46 models)
 export const MODEL_CONFIGS: Map<WeatherModel, ModelConfig> = new Map([
+  // Auto-select
   ['best_match', { id: 'best_match', name: 'Best Match', color: '#6366f1', description: 'Auto-selected best model for location' }],
+
+  // ECMWF
   ['ecmwf_ifs', { id: 'ecmwf_ifs', name: 'ECMWF IFS', color: '#3b82f6', description: 'European Centre for Medium-Range Weather Forecasts' }],
   ['ecmwf_ifs025', { id: 'ecmwf_ifs025', name: 'ECMWF IFS 0.25', color: '#0ea5e9', description: 'ECMWF high resolution' }],
+  ['ecmwf_aifs025_single', { id: 'ecmwf_aifs025_single', name: 'ECMWF AIFS', color: '#2563eb', description: 'ECMWF AI-based forecast' }],
+
+  // ICON (DWD Germany)
   ['icon_seamless', { id: 'icon_seamless', name: 'ICON Seamless', color: '#10b981', description: 'DWD ICON combined' }],
-  ['icon_eu', { id: 'icon_eu', name: 'ICON EU', color: '#14b8a6', description: 'DWD ICON Europe' }],
+  ['icon_global', { id: 'icon_global', name: 'ICON Global', color: '#059669', description: 'DWD ICON 13km global' }],
+  ['icon_eu', { id: 'icon_eu', name: 'ICON EU', color: '#14b8a6', description: 'DWD ICON 7km Europe' }],
+  ['icon_d2', { id: 'icon_d2', name: 'ICON D2', color: '#0d9488', description: 'DWD ICON 2km Germany' }],
+
+  // GFS (NOAA USA)
   ['gfs_seamless', { id: 'gfs_seamless', name: 'GFS Seamless', color: '#f59e0b', description: 'NOAA GFS combined' }],
+  ['gfs_global', { id: 'gfs_global', name: 'GFS Global', color: '#d97706', description: 'NOAA GFS 25km global' }],
+  ['gfs_hrrr', { id: 'gfs_hrrr', name: 'GFS HRRR', color: '#ea580c', description: 'NOAA HRRR 3km continental US' }],
+  ['gfs_graphcast025', { id: 'gfs_graphcast025', name: 'GFS GraphCast', color: '#c2410c', description: 'NOAA GraphCast AI-based' }],
+
+  // GEM (Canada)
   ['gem_seamless', { id: 'gem_seamless', name: 'GEM Seamless', color: '#ef4444', description: 'Canadian GEM combined' }],
-  ['gem_hrdps_continental', { id: 'gem_hrdps_continental', name: 'GEM HRDPS', color: '#dc2626', description: 'Canadian high-res regional' }],
+  ['gem_global', { id: 'gem_global', name: 'GEM Global', color: '#dc2626', description: 'Canadian GEM 15km global' }],
+  ['gem_regional', { id: 'gem_regional', name: 'GEM Regional', color: '#b91c1c', description: 'Canadian GEM 10km regional' }],
+  ['gem_hrdps_continental', { id: 'gem_hrdps_continental', name: 'GEM HRDPS', color: '#991b1b', description: 'Canadian HRDPS 2.5km' }],
+  ['gem_hrdps_west', { id: 'gem_hrdps_west', name: 'GEM HRDPS West', color: '#7f1d1d', description: 'Canadian HRDPS West 2.5km' }],
+
+  // Meteo-France
   ['meteofrance_seamless', { id: 'meteofrance_seamless', name: 'MF Seamless', color: '#8b5cf6', description: 'Meteo-France combined' }],
-  ['meteofrance_arpege_europe', { id: 'meteofrance_arpege_europe', name: 'MF ARPEGE', color: '#a855f7', description: 'Meteo-France ARPEGE Europe' }],
+  ['meteofrance_arpege_world', { id: 'meteofrance_arpege_world', name: 'MF ARPEGE World', color: '#7c3aed', description: 'Meteo-France ARPEGE 25km global' }],
+  ['meteofrance_arpege_europe', { id: 'meteofrance_arpege_europe', name: 'MF ARPEGE Europe', color: '#6d28d9', description: 'Meteo-France ARPEGE 10km Europe' }],
+  ['meteofrance_arome_france', { id: 'meteofrance_arome_france', name: 'MF AROME France', color: '#5b21b6', description: 'Meteo-France AROME 2.5km France' }],
+  ['meteofrance_arome_france_hd', { id: 'meteofrance_arome_france_hd', name: 'MF AROME HD', color: '#4c1d95', description: 'Meteo-France AROME 1.5km France' }],
+
+  // MetNo (Norway)
   ['metno_seamless', { id: 'metno_seamless', name: 'MetNo Seamless', color: '#ec4899', description: 'Norwegian MET combined' }],
-  ['metno_nordic', { id: 'metno_nordic', name: 'MetNo Nordic', color: '#f472b6', description: 'Norwegian MET Nordic' }],
+  ['metno_nordic', { id: 'metno_nordic', name: 'MetNo Nordic', color: '#db2777', description: 'Norwegian MET 1km Nordic' }],
+
+  // KNMI (Netherlands)
   ['knmi_seamless', { id: 'knmi_seamless', name: 'KNMI Seamless', color: '#84cc16', description: 'Dutch KNMI combined' }],
-  ['ncep_nbm_conus', { id: 'ncep_nbm_conus', name: 'NBM CONUS', color: '#22c55e', description: 'NOAA National Blend of Models' }],
-  ['meteoswiss_icon_ch2', { id: 'meteoswiss_icon_ch2', name: 'ICON CH2', color: '#06b6d4', description: 'MeteoSwiss ICON 2km' }],
-  ['kma_gdps', { id: 'kma_gdps', name: 'KMA GDPS', color: '#78716c', description: 'Korea Meteorological Administration' }],
+  ['knmi_harmonie_arome_europe', { id: 'knmi_harmonie_arome_europe', name: 'KNMI HARMONIE EU', color: '#65a30d', description: 'Dutch KNMI 5.5km Europe' }],
+  ['knmi_harmonie_arome_netherlands', { id: 'knmi_harmonie_arome_netherlands', name: 'KNMI HARMONIE NL', color: '#4d7c0f', description: 'Dutch KNMI 2km Netherlands' }],
+
+  // JMA (Japan)
+  ['jma_seamless', { id: 'jma_seamless', name: 'JMA Seamless', color: '#f472b6', description: 'Japan Meteorological Agency combined' }],
+  ['jma_msm', { id: 'jma_msm', name: 'JMA MSM', color: '#e879f9', description: 'JMA 5km Japan' }],
+  ['jma_gsm', { id: 'jma_gsm', name: 'JMA GSM', color: '#d946ef', description: 'JMA 20km global' }],
+
+  // UKMO (UK Met Office)
+  ['ukmo_seamless', { id: 'ukmo_seamless', name: 'UKMO Seamless', color: '#22d3ee', description: 'UK Met Office combined' }],
+  ['ukmo_global_deterministic_10km', { id: 'ukmo_global_deterministic_10km', name: 'UKMO Global', color: '#06b6d4', description: 'UK Met Office 10km global' }],
+  ['ukmo_uk_deterministic_2km', { id: 'ukmo_uk_deterministic_2km', name: 'UKMO UK', color: '#0891b2', description: 'UK Met Office 2km UK' }],
+
+  // DMI (Denmark)
+  ['dmi_seamless', { id: 'dmi_seamless', name: 'DMI Seamless', color: '#a3e635', description: 'Danish Meteorological Institute combined' }],
+  ['dmi_harmonie_arome_europe', { id: 'dmi_harmonie_arome_europe', name: 'DMI HARMONIE', color: '#84cc16', description: 'DMI 2km Europe' }],
+
+  // MeteoSwiss
+  ['meteoswiss_icon_seamless', { id: 'meteoswiss_icon_seamless', name: 'MeteoSwiss Seamless', color: '#2dd4bf', description: 'MeteoSwiss combined' }],
+  ['meteoswiss_icon_ch1', { id: 'meteoswiss_icon_ch1', name: 'MeteoSwiss ICON-CH1', color: '#14b8a6', description: 'MeteoSwiss 1km Switzerland' }],
+  ['meteoswiss_icon_ch2', { id: 'meteoswiss_icon_ch2', name: 'MeteoSwiss ICON-CH2', color: '#0d9488', description: 'MeteoSwiss 2km Switzerland' }],
+
+  // KMA (Korea)
+  ['kma_seamless', { id: 'kma_seamless', name: 'KMA Seamless', color: '#fb923c', description: 'Korea Meteorological Administration combined' }],
+  ['kma_gdps', { id: 'kma_gdps', name: 'KMA GDPS', color: '#f97316', description: 'KMA 10km global' }],
+  ['kma_ldps', { id: 'kma_ldps', name: 'KMA LDPS', color: '#ea580c', description: 'KMA 1.5km Korea' }],
+
+  // Other
+  ['cma_grapes_global', { id: 'cma_grapes_global', name: 'CMA GRAPES', color: '#fbbf24', description: 'China Meteorological 15km' }],
+  ['bom_access_global', { id: 'bom_access_global', name: 'BOM ACCESS', color: '#a78bfa', description: 'Australia BoM 12km global' }],
+  ['ncep_nbm_conus', { id: 'ncep_nbm_conus', name: 'NCEP NBM', color: '#22c55e', description: 'NOAA National Blend of Models' }],
+  ['ncep_nam_conus', { id: 'ncep_nam_conus', name: 'NCEP NAM', color: '#16a34a', description: 'NOAA North American Mesoscale' }],
+  ['italia_meteo_arpae_icon_2i', { id: 'italia_meteo_arpae_icon_2i', name: 'Italia Meteo ICON', color: '#f87171', description: 'Italia Meteo 2km Italy' }],
 ]);
 
 // Helper to convert temperature from Celsius
@@ -268,21 +325,64 @@ export const ALL_VARIABLES: WeatherVariable[] = [
 // All available models (in display order)
 export const ALL_MODELS: WeatherModel[] = [
   'best_match',
+  // ECMWF
   'ecmwf_ifs',
   'ecmwf_ifs025',
+  'ecmwf_aifs025_single',
+  // ICON
   'icon_seamless',
+  'icon_global',
   'icon_eu',
+  'icon_d2',
+  // GFS
   'gfs_seamless',
+  'gfs_global',
+  'gfs_hrrr',
+  'gfs_graphcast025',
+  // GEM
   'gem_seamless',
+  'gem_global',
+  'gem_regional',
   'gem_hrdps_continental',
+  'gem_hrdps_west',
+  // Meteo-France
   'meteofrance_seamless',
+  'meteofrance_arpege_world',
   'meteofrance_arpege_europe',
+  'meteofrance_arome_france',
+  'meteofrance_arome_france_hd',
+  // MetNo
   'metno_seamless',
   'metno_nordic',
+  // KNMI
   'knmi_seamless',
-  'ncep_nbm_conus',
+  'knmi_harmonie_arome_europe',
+  'knmi_harmonie_arome_netherlands',
+  // JMA
+  'jma_seamless',
+  'jma_msm',
+  'jma_gsm',
+  // UKMO
+  'ukmo_seamless',
+  'ukmo_global_deterministic_10km',
+  'ukmo_uk_deterministic_2km',
+  // DMI
+  'dmi_seamless',
+  'dmi_harmonie_arome_europe',
+  // MeteoSwiss
+  'meteoswiss_icon_seamless',
+  'meteoswiss_icon_ch1',
   'meteoswiss_icon_ch2',
+  // KMA
+  'kma_seamless',
   'kma_gdps',
+  'kma_ldps',
+  // Other
+  'cma_grapes_global',
+  'bom_access_global',
+  'ncep_nbm_conus',
+  'ncep_nam_conus',
+  'italia_meteo_arpae_icon_2i',
 ];
 
 // Get model config with fallback
