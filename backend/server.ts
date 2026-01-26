@@ -594,6 +594,11 @@ const startWeatherUpdates = async () => {
     }, UPDATE_INTERVAL_MS);
 };
 
+app.get('/hierarchy', (req, res) => {
+    const hierarchy = buildHierarchyFromLocations();
+    res.json({ continents: hierarchy });
+});
+
 app.get('/all', (req, res) => {
     if (!weatherCache) return res.status(503).json({ error: "Initializing..." });
     res.json({ updatedAt: lastSuccessfulUpdate, data: weatherCache });
