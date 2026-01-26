@@ -144,15 +144,17 @@ function buildLegend(config: ChartConfig, theme: ChartTheme): ChartOption {
             color: theme.textSecondary,
             fontSize: 12,
         },
+        // Performance: disable legend hover interactions entirely
+        silent: true,
         // Performance: disable legend selection emphasis (hover effects)
         emphasis: {
             selectorLabel: {
                 show: false,
             },
         },
-        // Performance: don't trigger series emphasis on legend hover
-        selectedMode: true, // Keep selection but...
-        inactiveColor: theme.gridLine, // Inactive series color
+        // Performance: disable series selection via legend
+        selectedMode: false,
+        inactiveColor: theme.gridLine,
     };
 }
 
