@@ -29,6 +29,9 @@ export function buildLineSeries(config: SeriesConfig): SeriesOption {
     name: config.name,
     data: config.data,
     z: config.zIndex ?? 2,
+    // Performance: Don't trigger mouse events on individual data points
+    silent: false, // Keep false to allow tooltip, but disable other events
+    triggerLineEvent: false,
     itemStyle: {
       color: config.color,
       opacity,
@@ -40,17 +43,22 @@ export function buildLineSeries(config: SeriesConfig): SeriesOption {
       type: lineType,
     },
     symbol: 'none', // No data point markers for performance
+    showSymbol: false,
     // Performance: Enable large mode for datasets with many points
-    large: dataLength > 500,
-    largeThreshold: 500,
+    large: dataLength > 300,
+    largeThreshold: 300,
     // Performance: Use sampling to reduce points when zoomed out
     sampling: 'lttb', // Largest-Triangle-Three-Buckets algorithm preserves visual shape
-    // Performance: Disable hover state changes
+    // Performance: Disable hover state changes completely
     emphasis: {
       disabled: true,
     },
     // Performance: Disable selection
     select: {
+      disabled: true,
+    },
+    // Performance: Disable blur effect
+    blur: {
       disabled: true,
     },
   };
