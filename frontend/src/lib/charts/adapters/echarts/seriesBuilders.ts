@@ -9,12 +9,18 @@ import type { SeriesConfig } from '../../types';
 /** Generic series option type to avoid complex ECharts type conflicts */
 type SeriesOption = Record<string, unknown>;
 
+/** Map our line style to ECharts line type */
+function mapLineStyle(style?: 'solid' | 'dashed' | 'dotted'): 'solid' | 'dashed' | 'dotted' {
+  return style ?? 'solid';
+}
+
 /**
  * Build a line series option for ECharts.
  */
 export function buildLineSeries(config: SeriesConfig): SeriesOption {
   const lineWidth = config.lineWidth ?? 2;
   const opacity = config.opacity ?? 1;
+  const lineType = mapLineStyle(config.lineStyle);
 
   return {
     type: 'line',
@@ -29,6 +35,7 @@ export function buildLineSeries(config: SeriesConfig): SeriesOption {
       color: config.color,
       width: lineWidth,
       opacity,
+      type: lineType,
     },
     symbol: 'none', // No data point markers for performance
     emphasis: {
