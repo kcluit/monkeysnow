@@ -101,7 +101,6 @@ export function useDetailedWeatherData({
 
     return () => {
       cancelled = true;
-      controller.abort();
     };
   }, [paramsKey, enabled, refetchTrigger]);
 
