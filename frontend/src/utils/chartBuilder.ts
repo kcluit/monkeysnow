@@ -30,7 +30,13 @@ function formatTimeLabel(date: Date, timezone?: string): string {
     options.timeZone = timezone;
   }
 
-  return date.toLocaleString('en-US', options);
+  try {
+    return date.toLocaleString('en-US', options);
+  } catch {
+    // Fallback to browser timezone if provided timezone is invalid
+    delete options.timeZone;
+    return date.toLocaleString('en-US', options);
+  }
 }
 
 /**
