@@ -272,8 +272,11 @@ function WeatherChartInner({
                 </span>
             </div>
             <ResponsiveContainer width="100%" height={380}>
-                {renderChart()}
+                {chart}
             </ResponsiveContainer>
         </div>
     );
 }
+
+// Export memoized component to prevent unnecessary re-renders
+export const WeatherChart = memo(WeatherChartInner);
