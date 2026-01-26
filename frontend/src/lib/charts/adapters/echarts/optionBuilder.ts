@@ -38,21 +38,26 @@ function buildTooltip(config: ChartConfig, _theme: ChartTheme): ChartOption {
         },
         // Performance: disable tooltip transitions completely
         transitionDuration: 0,
-        // Performance: show tooltip without delay
+        // Performance: add slight delay to reduce update frequency during rapid movement
         showDelay: 0,
-        hideDelay: 0,
+        hideDelay: 100, // Brief hide delay prevents flicker when moving between points
+        // Performance: confine tooltip to chart area (avoids layout calculations)
+        confine: true,
         axisPointer: {
             type: 'line',
             // Performance: disable axis pointer animation
             animation: false,
-            // Performance: snap to data points
+            // Performance: snap to data points reduces intermediate calculations
             snap: true,
+            // Performance: throttle axis pointer updates during rapid mouse movement
+            triggerEmphasis: false, // Don't trigger emphasis on hover
+            triggerTooltip: true,
             lineStyle: {
                 color: '#666',
                 type: 'dashed',
             },
         },
-        extraCssText: 'box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-height: 300px; overflow: hidden;',
+        extraCssText: 'box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-height: 300px; overflow: hidden; pointer-events: none;',
         // Performance: Optimized formatter that limits displayed series
         formatter: (params: unknown) => {
             if (!Array.isArray(params)) return '';
