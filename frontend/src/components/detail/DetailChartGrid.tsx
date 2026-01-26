@@ -25,6 +25,7 @@ function DetailChartGridInner({
           selectedModels={selectedModels}
           variable={variable}
           unitSystem={unitSystem}
+          timezoneInfo={timezoneInfo}
         />
       </div>
     ));
