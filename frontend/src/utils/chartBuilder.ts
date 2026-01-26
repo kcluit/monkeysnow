@@ -119,7 +119,7 @@ export function buildWeatherChartConfig(
   props: WeatherChartProps,
   theme?: ChartTheme
 ): ChartConfig | null {
-  const { data, selectedModels, variable, unitSystem } = props;
+  const { data, selectedModels, variable, unitSystem, timezoneInfo } = props;
 
   // Handle empty data
   if (!data || data.size === 0) {
