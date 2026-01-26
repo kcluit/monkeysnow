@@ -56,6 +56,78 @@ const app = express();
 app.use(cors());
 
 // --- Helpers ---
+
+/**
+ * Converts a name to a URL-friendly slug ID.
+ * E.g., "British Columbia" -> "british-columbia"
+ */
+const toSlugId = (name: string): string => {
+    return name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+};
+
+/**
+ * Builds the resort hierarchy from locations.json for the /hierarchy endpoint.
+ * Transforms the nested structure into the frontend-expected format.
+ */
+const buildHierarchyFromLocations = (): ContinentData[] => {
+    try {
+        const rawData = fs.readFileSync(LOCATIONS_FILE, 'utf-8');
+        const json = JSON.parse(rawData);
+        const hierarchy: ContinentData[] = [];
+
+        for (const [continentName, continentData] of Object.entries(json)) {
+            const continent: ContinentData = {
+                id: toSlugId(continentName),
+                name: continentName,
+                countries: []
+            };
+
+            for (const [countryName, countryData] of Object.entries(continentData as Record<string, any>)) {
+                const country: CountryData = {
+                    id: toSlugId(countryName),
+                    name: countryName,
+                    provinces: []
+                };
+
+                for (const [provinceName, provinceData] of Object.entries(countryData as Record<string, any>)) {
+                    const province: ProvinceData = {
+                        id: toSlugId(provinceName),
+                        name: provinceName,
+                        resorts: []
+                    };
+
+                    for (const [resortId, resortData] of Object.entries(provinceData as Record<string, any>)) {
+                        // Check if this is actually a resort (has elevation data)
+                        if (resortData && typeof resortData === 'object' && resortData.bot !== undefined) {
+                            province.resorts.push({
+                                id: resortId,
+                                displayName: resortData.displayName || resortId.replace(/-/g, ' ')
+                            });
+                        }
+                    }
+
+                    if (province.resorts.length > 0) {
+                        country.provinces.push(province);
+                    }
+                }
+
+                if (country.provinces.length > 0) {
+                    continent.countries.push(country);
+                }
+            }
+
+            if (continent.countries.length > 0) {
+                hierarchy.push(continent);
+            }
+        }
+
+        return hierarchy;
+    } catch (error) {
+        console.error("Error building hierarchy from locations.json:", error);
+        return [];
+    }
+};
+
 const loadLocations = (): LocationsMap => {
     try {
         const rawData = fs.readFileSync(LOCATIONS_FILE, 'utf-8');
