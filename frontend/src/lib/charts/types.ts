@@ -28,6 +28,8 @@ export interface SeriesConfig {
   zIndex?: number;
   /** Optional line style for line charts */
   lineStyle?: 'solid' | 'dashed' | 'dotted';
+  /** Optional Y-axis index (0 = left/primary, 1 = right/secondary) */
+  yAxisIndex?: number;
 }
 
 /** Configuration for horizontal reference lines (mark lines) */
