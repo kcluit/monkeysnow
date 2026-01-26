@@ -1,6 +1,6 @@
 # Contributing Translations
 
-Thank you for helping translate MonkeySnow! This guide explains how to add a new language to the application.
+Thank you for helping translate monkeysnow! This guide explains how to add a new language to the application.
 
 ## Quick Start
 
