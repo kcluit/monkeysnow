@@ -4,7 +4,7 @@
  */
 
 import { memo, useCallback } from 'react';
-import type { HierarchyNode } from '../../data/resortHierarchy';
+import type { HierarchyNode } from '../../contexts/HierarchyContext';
 import { getResortsUnderNode } from '../../data/resortHierarchy';
 
 interface ResortTreeNodeProps {
