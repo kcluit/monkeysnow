@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import type { DetailUtilityBarProps } from '../../types/detailView';
-import type { WeatherVariable } from '../../types/openMeteo';
-import { VARIABLE_CONFIGS, ALL_VARIABLES } from '../../utils/chartConfigurations';
 import { useModelHierarchy } from '../../hooks/useModelHierarchy';
+import { useVariableSelection } from '../../hooks/useVariableSelection';
 import { ModelSelectionGridModal } from '../ModelSelectionModal';
+import { VariableSelectionModal } from '../VariableSelectionModal';
 
 export function DetailUtilityBar({
     selectedModels,
@@ -23,7 +23,6 @@ export function DetailUtilityBar({
     isChartLocked,
     setIsChartLocked,
 }: DetailUtilityBarProps): JSX.Element {
-    const [showVariableDropdown, setShowVariableDropdown] = useState(false);
     const [showElevationDropdown, setShowElevationDropdown] = useState(false);
     const [showForecastDropdown, setShowForecastDropdown] = useState(false);
     const [showCustomElevationInput, setShowCustomElevationInput] = useState(false);
@@ -39,11 +38,16 @@ export function DetailUtilityBar({
         onAggregationColorsChange: setAggregationColors,
     });
 
+    // Variable selection hook for modal
+    const variableSelection = useVariableSelection({
+        selectedVariables,
+        setSelectedVariables,
+    });
+
     // Close dropdowns when clicking outside
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent): void => {
             if (!(e.target as HTMLElement).closest('[data-dropdown]')) {
-                setShowVariableDropdown(false);
                 setShowElevationDropdown(false);
                 setShowForecastDropdown(false);
                 setShowCustomElevationInput(false);
@@ -71,26 +75,6 @@ export function DetailUtilityBar({
             setShowCustomElevationInput(false);
             setCustomElevationValue('');
         }
-    };
-
-    const toggleVariable = (variableId: WeatherVariable) => {
-        if (selectedVariables.includes(variableId)) {
-            // Don't allow removing the last variable
-            if (selectedVariables.length > 1) {
-                setSelectedVariables(selectedVariables.filter(v => v !== variableId));
-            }
-        } else {
-            setSelectedVariables([...selectedVariables, variableId]);
-        }
-    };
-
-    const selectAllVariables = () => {
-        setSelectedVariables([...ALL_VARIABLES]);
-    };
-
-    const deselectAllVariables = () => {
-        // Keep at least one variable
-        setSelectedVariables([ALL_VARIABLES[0]]);
     };
 
     // Get model button text
@@ -134,7 +118,6 @@ export function DetailUtilityBar({
                 <button
                     onClick={() => {
                         setShowElevationDropdown(!showElevationDropdown);
-                        setShowVariableDropdown(false);
                         setShowForecastDropdown(false);
                     }}
                     className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-background border border-theme-border hover:bg-theme-secondary transition-colors"
@@ -231,7 +214,6 @@ export function DetailUtilityBar({
                 <button
                     onClick={() => {
                         setShowForecastDropdown(!showForecastDropdown);
-                        setShowVariableDropdown(false);
                         setShowElevationDropdown(false);
                     }}
                     className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-background border border-theme-border hover:bg-theme-secondary transition-colors"
@@ -267,73 +249,18 @@ export function DetailUtilityBar({
 
             <div className="h-6 w-px bg-theme-border" />
 
-            {/* Variable Selection Dropdown */}
-            <div className="relative" data-dropdown>
-                <button
-                    onClick={() => {
-                        setShowVariableDropdown(!showVariableDropdown);
-                        setShowElevationDropdown(false);
-                        setShowForecastDropdown(false);
-                    }}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-background border border-theme-border hover:bg-theme-secondary transition-colors"
-                >
-                    <span className="text-sm text-theme-textPrimary">
-                        Variables ({selectedVariables.length})
-                    </span>
-                    <svg className="w-4 h-4 text-theme-textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                </button>
-                {showVariableDropdown && (
-                    <div className="absolute left-0 z-20 mt-1 w-64 max-h-80 overflow-y-auto bg-theme-background rounded-lg shadow-lg border border-theme-border">
-                        <div className="p-2 border-b border-theme-border flex gap-2">
-                            <button
-                                onClick={selectAllVariables}
-                                className="text-xs px-2 py-1 rounded bg-theme-secondary hover:bg-theme-cardBg text-theme-textPrimary"
-                            >
-                                Select All
-                            </button>
-                            <button
-                                onClick={deselectAllVariables}
-                                className="text-xs px-2 py-1 rounded bg-theme-secondary hover:bg-theme-cardBg text-theme-textPrimary"
-                            >
-                                Deselect All
-                            </button>
-                        </div>
-                        <div className="p-2">
-                            {ALL_VARIABLES.map(varId => {
-                                const config = VARIABLE_CONFIGS.get(varId);
-                                const isSelected = selectedVariables.includes(varId);
-                                return (
-                                    <label
-                                        key={varId}
-                                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-theme-secondary cursor-pointer"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            checked={isSelected}
-                                            onChange={() => toggleVariable(varId)}
-                                            className="w-4 h-4 rounded border-theme-border"
-                                        />
-                                        <span
-                                            className="w-3 h-3 rounded-full flex-shrink-0"
-                                            style={{ backgroundColor: config?.color }}
-                                        />
-                                        <div className="flex-1 min-w-0">
-                                            <div className="text-sm text-theme-textPrimary truncate">
-                                                {config?.label || varId}
-                                            </div>
-                                            <div className="text-xs text-theme-textSecondary">
-                                                {config?.unit || ''}
-                                            </div>
-                                        </div>
-                                    </label>
-                                );
-                            })}
-                        </div>
-                    </div>
-                )}
-            </div>
+            {/* Variable Selection Button - Opens Modal */}
+            <button
+                onClick={variableSelection.openModal}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-background border border-theme-border hover:bg-theme-secondary transition-colors"
+            >
+                <span className="text-sm text-theme-textPrimary">
+                    Variables ({selectedVariables.length})
+                </span>
+                <svg className="w-4 h-4 text-theme-textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
 
             <div className="h-6 w-px bg-theme-border" />
 
@@ -348,6 +275,9 @@ export function DetailUtilityBar({
 
             {/* Model Selection Modal */}
             <ModelSelectionGridModal hierarchy={modelHierarchy} />
+
+            {/* Variable Selection Modal */}
+            <VariableSelectionModal selection={variableSelection} />
         </div>
     );
 }
