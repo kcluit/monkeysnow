@@ -81,6 +81,7 @@ export interface DetailChartGridProps {
     selectedVariables: WeatherVariable[];
     unitSystem: UnitSystem;
     timezoneInfo?: TimezoneInfo;
+    isChartLocked?: boolean;
 }
 
 export interface WeatherChartProps {
