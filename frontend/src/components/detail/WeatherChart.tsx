@@ -12,6 +12,7 @@ import type { WeatherChartProps } from '../../types/detailView';
 import type { ChartDisplayType } from '../../types/chartSettings';
 import { useChartTheme } from '../../hooks/useChartTheme';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { useChartHoverCoordinator } from '../../hooks/useChartHoverCoordinator';
 import { buildWeatherChartConfig, getVariableDisplayInfo } from '../../utils/chartBuilder';
 import { getVariableConfig } from '../../utils/chartConfigurations';
 import { ChartSettingsModal } from './ChartSettingsModal';
