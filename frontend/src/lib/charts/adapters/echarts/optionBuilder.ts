@@ -401,8 +401,8 @@ export function buildEChartsOption(config: ChartConfig): ChartOption {
         animationDuration: 0,
         animationDurationUpdate: 0,
         // Performance: use progressive rendering for large datasets
-        progressive: 50,
-        progressiveThreshold: 500,
+        progressive: isLargeDataset ? 20 : 50,
+        progressiveThreshold: 200,
         // Performance: CRITICAL - disable hover layer entirely (no separate layer for hover effects)
         hoverLayerThreshold: Infinity,
         // Performance: use UTC to avoid timezone calculations
@@ -423,7 +423,7 @@ export function buildEChartsOption(config: ChartConfig): ChartOption {
         xAxis: buildXAxis(config, theme),
         yAxis: buildYAxis(config, theme),
         series,
-        tooltip: buildTooltip(config, theme),
+        tooltip: buildTooltip(config, theme, totalDataPoints),
         legend: buildLegend(config, theme),
         dataZoom: buildDataZoom(config, theme),
     };
