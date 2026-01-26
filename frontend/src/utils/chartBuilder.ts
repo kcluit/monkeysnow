@@ -27,6 +27,7 @@ function formatTimeLabel(date: Date): string {
 /**
  * Transform weather data into chart series format.
  * Returns time labels and series data for each selected model.
+ * Uses null for missing values to create gaps in charts.
  */
 function transformToChartData(
   data: Map<WeatherModel, HourlyDataPoint[]>,
@@ -34,7 +35,7 @@ function transformToChartData(
   variable: string,
   unitSystem: UnitSystem,
   convertToImperial?: (value: number) => number
-): { timeLabels: string[]; seriesData: Map<WeatherModel, number[]> } {
+): { timeLabels: string[]; seriesData: Map<WeatherModel, (number | null)[]> } {
   // Get time points from first available model
   const firstModelData = data.values().next().value as HourlyDataPoint[] | undefined;
   if (!firstModelData || firstModelData.length === 0) {
@@ -45,19 +46,20 @@ function transformToChartData(
   const timeLabels = firstModelData.map((point) => formatTimeLabel(point.time));
 
   // Extract series data for each model
-  const seriesData = new Map<WeatherModel, number[]>();
+  const seriesData = new Map<WeatherModel, (number | null)[]>();
 
   for (const model of selectedModels) {
     const modelData = data.get(model);
     if (!modelData) continue;
 
     const values = modelData.map((point) => {
-      let value = point[variable];
-      if (typeof value !== 'number') return 0;
+      const value = point[variable];
+      // Return null for missing data (creates gaps in charts)
+      if (typeof value !== 'number') return null;
 
       // Convert to imperial if needed
       if (unitSystem === 'imperial' && convertToImperial) {
-        value = convertToImperial(value);
+        return convertToImperial(value);
       }
 
       return value;
