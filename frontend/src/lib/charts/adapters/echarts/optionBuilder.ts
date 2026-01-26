@@ -10,6 +10,9 @@ import { buildSeries } from './seriesBuilders';
 /** Generic option type to avoid complex ECharts type conflicts */
 type ChartOption = Record<string, unknown>;
 
+/** Maximum number of series to show in tooltip for performance */
+const MAX_TOOLTIP_SERIES = 8;
+
 /**
  * Build tooltip configuration for ECharts.
  * Optimized for performance during rapid mouse movements.
@@ -24,40 +27,56 @@ function buildTooltip(config: ChartConfig, _theme: ChartTheme): ChartOption {
         trigger: config.tooltip?.trigger ?? 'axis',
         // Keep tooltip in chart container for better performance (avoid appendToBody)
         appendToBody: false,
+        // Performance: render tooltip directly without shadow DOM manipulation
+        renderMode: 'html',
         backgroundColor: 'rgba(255, 255, 255, 0.95)',
         borderColor: '#ccc',
         borderWidth: 1,
         textStyle: {
             color: '#000',
-            fontSize: 13,
+            fontSize: 12,
         },
-        // Performance: disable tooltip transitions
+        // Performance: disable tooltip transitions completely
         transitionDuration: 0,
+        // Performance: show tooltip without delay
+        showDelay: 0,
+        hideDelay: 0,
         axisPointer: {
             type: 'line',
             // Performance: disable axis pointer animation
             animation: false,
+            // Performance: snap to data points
+            snap: true,
             lineStyle: {
                 color: '#666',
                 type: 'dashed',
             },
         },
-        extraCssText: 'box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);',
-        // Performance: Use simpler string template instead of function formatter
-        // This avoids function call overhead on every mouse move
+        extraCssText: 'box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-height: 300px; overflow: hidden;',
+        // Performance: Optimized formatter that limits displayed series
         formatter: (params: unknown) => {
             if (!Array.isArray(params)) return '';
             const header = (params[0] as { axisValueLabel?: string })?.axisValueLabel || '';
-            // Pre-allocate array size for better performance
-            const lines = new Array(params.length);
-            for (let i = 0; i < params.length; i++) {
+
+            // Performance: Limit number of series shown in tooltip
+            const displayCount = Math.min(params.length, MAX_TOOLTIP_SERIES);
+            const hasMore = params.length > MAX_TOOLTIP_SERIES;
+
+            // Build lines using simple string concatenation (faster than array join for small sets)
+            let result = header;
+            for (let i = 0; i < displayCount; i++) {
                 const p = params[i] as { marker?: string; seriesName?: string; value?: unknown };
                 const value = typeof p.value === 'number'
-                    ? (p.value % 1 === 0 ? p.value : (p.value as number).toFixed(2))
+                    ? (p.value % 1 === 0 ? p.value : (p.value as number).toFixed(1))
                     : p.value;
-                lines[i] = `${p.marker || ''} ${p.seriesName || ''}: ${value}`;
+                result += `<br/>${p.marker || ''} ${p.seriesName || ''}: ${value}`;
             }
-            return `${header}<br/>${lines.join('<br/>')}`;
+
+            if (hasMore) {
+                result += `<br/><span style="color:#999">+${params.length - MAX_TOOLTIP_SERIES} more...</span>`;
+            }
+
+            return result;
         },
     };
 }
