@@ -70,3 +70,9 @@ export interface HourlyDataPoint {
   timestamp: number;
   [key: string]: number | Date; // Dynamic keys for each variable
 }
+
+// Timezone information from API response
+export interface TimezoneInfo {
+  timezone: string;           // IANA timezone (e.g., "America/Vancouver")
+  timezoneAbbreviation: string; // Short form (e.g., "PST")
+}
