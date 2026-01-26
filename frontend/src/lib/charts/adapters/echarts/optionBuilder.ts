@@ -235,6 +235,9 @@ function buildSingleYAxis(
         position,
         min: domain[0] === 'auto' ? undefined : domain[0],
         max: domain[1] === 'auto' ? undefined : domain[1],
+        // Performance: disable axis interactions
+        silent: true,
+        triggerEvent: false,
         axisLine: {
             lineStyle: {
                 color: theme.gridLine,
