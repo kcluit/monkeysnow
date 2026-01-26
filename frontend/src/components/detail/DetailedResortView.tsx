@@ -64,7 +64,7 @@ export function DetailedResortView({
     // State for chart lock - prevents scroll zoom and hides range slider
     const [isChartLocked, setIsChartLocked] = useLocalStorage<boolean>(
         'detailChartLocked',
-        false
+        true
     );
 
     // Fetch weather data
