@@ -189,8 +189,8 @@ export function buildWeatherChartConfig(
       containLabel: true,
     },
     dataZoom: {
-      enabled: true,
-      type: 'both',
+      enabled: !isChartLocked,
+      type: isChartLocked ? 'inside' : 'both',
       range: [0, 100],
     },
     theme: chartTheme,
