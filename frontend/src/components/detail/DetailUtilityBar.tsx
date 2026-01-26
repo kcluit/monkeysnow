@@ -159,7 +159,8 @@ export function DetailUtilityBar({
                         <div className="border-t border-theme-border mt-1 pt-1">
                             {!showCustomElevationInput ? (
                                 <button
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                        e.stopPropagation();
                                         setShowCustomElevationInput(true);
                                         setCustomElevationValue(elevation.toString());
                                     }}
