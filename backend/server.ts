@@ -6,10 +6,35 @@ import path from 'path';
 
 // --- Types ---
 interface LocationData {
+    displayName: string;
     bot: number;
     mid: number;
     top: number;
     loc?: [number, number];
+}
+
+// Hierarchy types for /hierarchy endpoint
+interface ResortInfo {
+    id: string;
+    displayName: string;
+}
+
+interface ProvinceData {
+    id: string;
+    name: string;
+    resorts: ResortInfo[];
+}
+
+interface CountryData {
+    id: string;
+    name: string;
+    provinces: ProvinceData[];
+}
+
+interface ContinentData {
+    id: string;
+    name: string;
+    countries: CountryData[];
 }
 
 interface LocationsMap {
