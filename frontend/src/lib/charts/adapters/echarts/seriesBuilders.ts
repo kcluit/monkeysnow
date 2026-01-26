@@ -35,6 +35,8 @@ export function buildLineSeries(config: SeriesConfig): SeriesOption {
     // Tooltip still works because it uses axisPointer, not series events
     silent: true,
     triggerLineEvent: false,
+    // Performance: Disable hover layer for this series
+    hoverLayerThreshold: Infinity,
     itemStyle: {
       color: config.color,
       opacity,
@@ -50,10 +52,10 @@ export function buildLineSeries(config: SeriesConfig): SeriesOption {
     showSymbol: false,
     symbolSize: 0,
     // Performance: Enable large mode with very low threshold
-    large: isLarge,
-    largeThreshold: 50,
-    // Performance: Use LTTB sampling algorithm
-    sampling: 'lttb',
+    large: true,
+    largeThreshold: 20,
+    // Performance: Use average sampling (faster than lttb)
+    sampling: 'average',
     // Performance: Clip data to visible area
     clip: true,
     // Performance: Completely disable all state effects
@@ -76,6 +78,9 @@ export function buildLineSeries(config: SeriesConfig): SeriesOption {
     universalTransition: {
       enabled: false,
     },
+    // Performance: Progressive rendering
+    progressive: 100,
+    progressiveThreshold: 500,
   };
 
   // Add yAxisIndex if specified (for secondary Y-axis)
