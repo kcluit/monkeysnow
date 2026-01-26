@@ -216,6 +216,7 @@ export function buildEChartsOption(config: ChartConfig): ChartOption {
 
   return {
     backgroundColor: theme.background,
+    animation: config.animation ?? false, // Disable animation for performance by default
     grid: buildGrid(config),
     xAxis: buildXAxis(config, theme),
     yAxis: buildYAxis(config, theme),
