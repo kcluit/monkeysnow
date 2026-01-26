@@ -1,4 +1,4 @@
-import type { WeatherModel, WeatherVariable } from './openMeteo';
+import type { WeatherModel, WeatherVariable, TimezoneInfo } from './openMeteo';
 import type { UnitSystem } from '../utils/unitConversion';
 
 // Detail view navigation state
