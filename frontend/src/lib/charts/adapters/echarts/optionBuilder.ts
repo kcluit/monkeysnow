@@ -22,7 +22,6 @@ const POINTER_THROTTLE_MS = 100;
  */
 let lastTooltipDataIndex: number | undefined;
 let pendingTooltipResult = '';
-let isTooltipUpdateScheduled = false;
 
 function formatTooltip(params: unknown): string {
     if (!Array.isArray(params) || params.length === 0) return '';
