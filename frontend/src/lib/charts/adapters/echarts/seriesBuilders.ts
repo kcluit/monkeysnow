@@ -93,37 +93,42 @@ export function buildLineSeries(config: SeriesConfig): SeriesOption {
 export function buildBarSeries(config: SeriesConfig): SeriesOption {
   const opacity = config.opacity ?? 0.8;
   const dataLength = Array.isArray(config.data) ? config.data.length : 0;
-  // Lower threshold for large mode to improve performance during hover
-  const isLarge = dataLength > 100;
+  const isLarge = dataLength > 50;
 
   const series: SeriesOption = {
     type: 'bar',
     name: config.name,
     data: config.data,
     z: config.zIndex ?? 2,
+    // Performance: CRITICAL - silent mode disables event processing
+    silent: true,
     itemStyle: {
       color: config.color,
       opacity,
     },
-    // Performance: Enable large mode for datasets (lowered threshold)
+    // Performance: Enable large mode with low threshold
     large: isLarge,
-    largeThreshold: 100,
-    // Performance: Clip data to visible area only
+    largeThreshold: 50,
+    // Performance: Clip data to visible area
     clip: true,
-    // Performance: Disable hover state changes completely
+    // Performance: Disable all state effects
     emphasis: {
       disabled: true,
+      scale: false,
     },
-    // Performance: Disable selection
     select: {
       disabled: true,
     },
-    // Performance: Disable blur effect
     blur: {
       disabled: true,
     },
-    // Performance: Disable cursor change on hover
     cursor: 'default',
+    // Performance: Disable animation
+    animation: false,
+    animationDuration: 0,
+    universalTransition: {
+      enabled: false,
+    },
   };
 
   // Add yAxisIndex if specified (for secondary Y-axis)
