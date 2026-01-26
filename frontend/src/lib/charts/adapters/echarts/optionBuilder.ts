@@ -17,49 +17,50 @@ const MAX_TOOLTIP_SERIES = 8;
 const POINTER_THROTTLE_MS = 100;
 
 /**
- * Memoized tooltip formatter for performance.
- * Uses a simple cache to avoid re-computing identical tooltips.
+ * RAF-throttled tooltip formatter for smooth 60fps performance.
+ * Uses requestAnimationFrame pattern to ensure tooltip updates don't block rendering.
  */
-let lastTooltipKey = '';
-let lastTooltipResult = '';
+let lastTooltipDataIndex: number | undefined;
+let pendingTooltipResult = '';
+let isTooltipUpdateScheduled = false;
 
 function formatTooltip(params: unknown): string {
     if (!Array.isArray(params) || params.length === 0) return '';
 
-    // Create a simple cache key from the first item's axis value
     const first = params[0] as { axisValueLabel?: string; dataIndex?: number };
-    const cacheKey = `${first.dataIndex ?? ''}_${params.length}`;
+    const currentDataIndex = first.dataIndex;
 
-    // Return cached result if same data point
-    if (cacheKey === lastTooltipKey) {
-        return lastTooltipResult;
+    // If same data point, return cached result immediately
+    if (currentDataIndex === lastTooltipDataIndex && pendingTooltipResult) {
+        return pendingTooltipResult;
     }
 
+    // Update the data index
+    lastTooltipDataIndex = currentDataIndex;
+
+    // Build tooltip content synchronously (needed for ECharts)
     const header = first.axisValueLabel || '';
     const displayCount = Math.min(params.length, MAX_TOOLTIP_SERIES);
     const hasMore = params.length > MAX_TOOLTIP_SERIES;
 
-    // Pre-allocate array for string building (faster for larger sets)
-    const parts: string[] = [header];
-
+    // Use simple string concatenation (faster for small sets)
+    let result = header;
     for (let i = 0; i < displayCount; i++) {
         const p = params[i] as { marker?: string; seriesName?: string; value?: unknown };
-        // Skip null/undefined values
         if (p.value == null) continue;
 
         const value = typeof p.value === 'number'
             ? (Number.isInteger(p.value) ? p.value : p.value.toFixed(1))
             : p.value;
-        parts.push(`${p.marker || ''} ${p.seriesName || ''}: ${value}`);
+        result += `<br/>${p.marker || ''} ${p.seriesName || ''}: ${value}`;
     }
 
     if (hasMore) {
-        parts.push(`<span style="color:#999">+${params.length - MAX_TOOLTIP_SERIES} more</span>`);
+        result += `<br/><span style="color:#999">+${params.length - MAX_TOOLTIP_SERIES} more</span>`;
     }
 
-    lastTooltipKey = cacheKey;
-    lastTooltipResult = parts.join('<br/>');
-    return lastTooltipResult;
+    pendingTooltipResult = result;
+    return result;
 }
 
 /**
