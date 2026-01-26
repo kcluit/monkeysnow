@@ -90,7 +90,9 @@ export function useVariableSelection({
 
   const deselectAll = useCallback(() => {
     // Keep only the first selected variable
-    setSelectedVariables([selectedVariables[0]]);
+    if (selectedVariables.length > 0) {
+      setSelectedVariables([selectedVariables[0]]);
+    }
   }, [selectedVariables, setSelectedVariables]);
 
   const reorderVariables = useCallback(
