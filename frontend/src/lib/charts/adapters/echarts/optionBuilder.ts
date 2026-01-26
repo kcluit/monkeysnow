@@ -327,9 +327,10 @@ function buildDataZoom(config: ChartConfig, theme: ChartTheme): ChartOption[] | 
             start: range[0],
             end: range[1],
             zoomOnMouseWheel: true,
-            moveOnMouseMove: true,
+            // Performance: DISABLE moveOnMouseMove - major perf improvement
+            moveOnMouseMove: false,
             // Performance: Throttle inside zoom updates
-            throttle: 50,
+            throttle: 100,
         });
     }
 
