@@ -354,6 +354,7 @@ export function buildEChartsOption(config: ChartConfig): ChartOption {
 
     // Performance thresholds
     const isLargeDataset = totalDataPoints > 2000;
+    const hasManySeriesCount = series.length > 10;
 
     return {
         backgroundColor: theme.background,
@@ -361,10 +362,17 @@ export function buildEChartsOption(config: ChartConfig): ChartOption {
         // Performance: use progressive rendering for large datasets
         progressive: isLargeDataset ? 200 : 0,
         progressiveThreshold: 1000,
-        // Performance: separate hover layer when many series
-        hoverLayerThreshold: series.length > 10 ? 3000 : Infinity,
+        // Performance: separate hover layer when many series (reduces canvas operations)
+        hoverLayerThreshold: hasManySeriesCount ? 3000 : Infinity,
         // Performance: throttle updates during interactions
         useUTC: true,
+        // Performance: Throttle pointer event handling globally
+        // This is critical for smooth hover interactions
+        throttle: 50, // ms - reduces event processing frequency
+        // Performance: disable state animation (hover effects)
+        stateAnimation: {
+            duration: 0,
+        },
         grid: buildGrid(config),
         xAxis: buildXAxis(config, theme),
         yAxis: buildYAxis(config, theme),
