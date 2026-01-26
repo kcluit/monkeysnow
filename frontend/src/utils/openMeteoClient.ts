@@ -95,6 +95,17 @@ export async function fetchOpenMeteoData(
     const responses = await fetchWeatherApi(OPEN_METEO_URL, params);
     const result = new Map<WeatherModel, HourlyDataPoint[]>();
 
+    // Extract timezone info from first response
+    let timezoneInfo: TimezoneInfo | null = null;
+    if (responses.length > 0) {
+      const firstResponse = responses[0];
+      const tz = firstResponse.timezone();
+      const tzAbbr = firstResponse.timezoneAbbreviation();
+      if (tz && tzAbbr) {
+        timezoneInfo = { timezone: tz, timezoneAbbreviation: tzAbbr };
+      }
+    }
+
     for (let i = 0; i < responses.length; i++) {
       const response = responses[i];
       const modelIndex = i; // Responses come back in same order as models array
