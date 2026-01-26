@@ -264,6 +264,9 @@ function App(): JSX.Element {
             unitSystem,
             setUnitSystem,
             openResortSelector: resortHierarchy.openModal,
+            languageId: language.id,
+            setLanguage,
+            availableLanguages,
         });
 
         return [...baseCommands, ...controlCommands];
