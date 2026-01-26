@@ -4,7 +4,7 @@
  * Converts library-agnostic ChartConfig to ECharts-specific option object.
  */
 
-import type { ChartConfig, ChartTheme } from '../../types';
+import type { ChartConfig, ChartTheme, MarkLineData } from '../../types';
 import { buildSeries } from './seriesBuilders';
 
 /** Generic option type to avoid complex ECharts type conflicts */
