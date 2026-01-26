@@ -149,15 +149,15 @@ export function buildAreaSeries(config: SeriesConfig): SeriesOption {
   const opacity = config.opacity ?? 1;
   const fillOpacity = config.fillOpacity ?? 0.3;
   const dataLength = Array.isArray(config.data) ? config.data.length : 0;
-  // Lower threshold for large mode to improve performance during hover
-  const isLarge = dataLength > 100;
+  const isLarge = dataLength > 50;
 
   const series: SeriesOption = {
     type: 'line',
     name: config.name,
     data: config.data,
     z: config.zIndex ?? 2,
-    // Performance: Don't trigger mouse events on individual data points
+    // Performance: CRITICAL - silent mode disables event processing
+    silent: true,
     triggerLineEvent: false,
     itemStyle: {
       color: config.color,
@@ -172,29 +172,35 @@ export function buildAreaSeries(config: SeriesConfig): SeriesOption {
       color: config.color,
       opacity: fillOpacity * opacity,
     },
+    // Performance: No symbols
     symbol: 'none',
     showSymbol: false,
-    // Performance: Enable large mode for datasets (lowered threshold)
+    symbolSize: 0,
+    // Performance: Enable large mode with low threshold
     large: isLarge,
-    largeThreshold: 100,
-    // Performance: Use sampling to reduce points when zoomed out
+    largeThreshold: 50,
+    // Performance: Use LTTB sampling
     sampling: 'lttb',
-    // Performance: Clip data to visible area only
+    // Performance: Clip data
     clip: true,
-    // Performance: Disable hover state changes completely
+    // Performance: Disable all state effects
     emphasis: {
       disabled: true,
+      scale: false,
     },
-    // Performance: Disable selection
     select: {
       disabled: true,
     },
-    // Performance: Disable blur effect
     blur: {
       disabled: true,
     },
-    // Performance: Disable cursor change on hover
     cursor: 'default',
+    // Performance: Disable animation
+    animation: false,
+    animationDuration: 0,
+    universalTransition: {
+      enabled: false,
+    },
   };
 
   // Add yAxisIndex if specified (for secondary Y-axis)
