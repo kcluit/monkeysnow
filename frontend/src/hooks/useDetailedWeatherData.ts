@@ -76,7 +76,7 @@ export function useDetailedWeatherData({
         setLoading(true);
         setError(null);
 
-        async function fetchModel(model: WeatherModel) {
+        async function fetchModel(model: WeatherModel, isFirst: boolean) {
             try {
                 const result = await fetchOpenMeteoData(
                     latitude,
@@ -88,9 +88,14 @@ export function useDetailedWeatherData({
                 );
 
                 if (!cancelled) {
+                    // Store timezone from first successful response
+                    if (isFirst && result.timezoneInfo) {
+                        setTimezoneInfo(result.timezoneInfo);
+                    }
+
                     setData(prevData => {
                         const newData = new Map(prevData || []);
-                        const modelData = result.get(model);
+                        const modelData = result.data.get(model);
                         if (modelData) {
                             newData.set(model, modelData);
                         }
