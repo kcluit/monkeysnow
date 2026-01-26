@@ -10,7 +10,6 @@ import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import { DetailChartGrid } from '../components/detail/DetailChartGrid';
 import type { WeatherModel, WeatherVariable, HourlyDataPoint, AggregationType } from '../types/openMeteo';
 import type { UnitSystem } from '../types';
-import { DEFAULT_MODELS } from '../utils/chartConfigurations';
 
 // All available weather variables for maximum stress testing
 const ALL_VARIABLES: WeatherVariable[] = [
