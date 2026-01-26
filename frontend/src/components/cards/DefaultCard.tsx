@@ -41,7 +41,7 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
             <div className="mb-3 flex justify-between items-center">
                 <div
                     className={onResortClick ? "cursor-pointer hover:opacity-80 transition-opacity" : ""}
-                    onClick={() => onResortClick?.(resort.name)}
+                    onClick={() => onResortClick?.(resort.id)}
                 >
                     <h2 className="text-xl font-semibold text-theme-textPrimary tracking-tight">{resort.name}</h2>
                     <p className="text-xs text-theme-accent">{resort.elevation}</p>
