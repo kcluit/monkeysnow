@@ -23,18 +23,17 @@ import { useResortHierarchy } from './hooks/useResortHierarchy';
 import { useUnitSystem } from './hooks/useUnitSystem';
 import { useDetailViewState } from './hooks/useDetailViewState';
 import { useLanguage } from './hooks/useLanguage';
+import { useHierarchy } from './contexts/HierarchyContext';
 import { processResortData } from './utils/weather';
 import { generateControlCommands } from './utils/commandGenerators';
 import { getSortDayData } from './utils/sortDayHelpers';
 import { getResortLocation } from './utils/openMeteoClient';
 import {
-    skiResorts,
     defaultSelectedResorts,
     defaultElevation,
     defaultSort,
     defaultSortDay,
     defaultTemperatureMetric,
-    getDisplayName,
 } from './utils/constants';
 import type {
     ElevationLevel,
