@@ -14,6 +14,7 @@ export interface UseDetailedWeatherDataProps {
 
 export interface UseDetailedWeatherDataReturn {
     data: Map<WeatherModel, HourlyDataPoint[]> | null;
+    timezoneInfo: TimezoneInfo | null;
     loading: boolean;
     error: Error | null;
     refetch: () => void;
