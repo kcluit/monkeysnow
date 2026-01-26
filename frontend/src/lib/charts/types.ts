@@ -80,6 +80,8 @@ export interface ChartTheme {
   textSecondary: string;
   accent: string;
   border: string;
+  /** Grid line color - not affected by 'hide borders' setting */
+  gridLine: string;
 }
 
 /** Complete chart configuration */
