@@ -273,6 +273,9 @@ export function buildWeatherChartConfig(
   // Use provided theme or get from CSS
   const chartTheme = theme ?? getEChartsTheme();
 
+  // When chart is locked, reduce bottom margin since there's no dataZoom slider
+  const gridBottom = isChartLocked ? 50 : 80;
+
   return {
     type: chartType,
     xAxis: {
@@ -297,7 +300,7 @@ export function buildWeatherChartConfig(
     grid: {
       top: 10,
       right: 30,
-      bottom: 80,
+      bottom: gridBottom,
       left: 10,
       containLabel: true,
     },
