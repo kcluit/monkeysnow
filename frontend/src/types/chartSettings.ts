@@ -39,12 +39,3 @@ export interface ElevationLocation {
   midElevation: number;
   topElevation: number;
 }
-
-/** Mark line configuration for horizontal reference lines on charts */
-export interface MarkLineData {
-  yValue: number;
-  label: string;
-  color: string;
-  lineWidth: number;
-  lineStyle: 'solid' | 'dashed';
-}
