@@ -167,7 +167,7 @@ function calculateAggregationSeries(
 function calculateModelOpacity(modelCount: number): number {
   // Scale opacity: fewer models = more visible, more models = more faded
   // Uses sqrt scaling for a smooth curve
-  return Math.max(0.15, 0.5 / Math.sqrt(modelCount));
+  return Math.max(0.05, 0.5 / Math.sqrt(modelCount));
 }
 
 /**
