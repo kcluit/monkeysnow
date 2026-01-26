@@ -65,5 +65,3 @@ npm run build
 - `PeriodData` - Raw API data for AM/PM/NIGHT periods with snow estimation fields
 - `DayData` - Contains AM/PM/NIGHT `PeriodData`
 - `ProcessedResortData` - Transformed for UI display with `DayForecast[]`
-
-Task: Feature.md
