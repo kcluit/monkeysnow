@@ -11,7 +11,7 @@ import { buildSeries } from './seriesBuilders';
 type ChartOption = Record<string, unknown>;
 
 /** Maximum number of series to show in tooltip for performance */
-const MAX_TOOLTIP_SERIES = 6;
+const MAX_TOOLTIP_SERIES = 4;
 
 /** Global throttle value for pointer events (ms) */
 const POINTER_THROTTLE_MS = 150;
