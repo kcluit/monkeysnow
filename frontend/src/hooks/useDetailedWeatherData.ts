@@ -20,6 +20,10 @@ export interface UseDetailedWeatherDataReturn {
     refetch: () => void;
 }
 
+// Retry configuration
+const INITIAL_RETRY_DELAY_MS = 1000;
+const MAX_RETRY_DELAY_MS = 30000;
+
 export function useDetailedWeatherData({
     latitude,
     longitude,
@@ -71,50 +75,59 @@ export function useDetailedWeatherData({
         let cancelled = false;
         let timezoneSet = false; // Track if timezone has been captured
 
-        // Initialize with empty map or keep existing if only adding models?
-        // For simplicity, we restart fetching.
+        // Initialize with empty map
         setData(new Map());
         setTimezoneInfo(null); // Reset timezone on new fetch
         setLoading(true);
         setError(null);
 
-        async function fetchModel(model: WeatherModel) {
-            try {
-                const result = await fetchOpenMeteoData(
-                    latitude,
-                    longitude,
-                    elevation,
-                    [model], // Fetch just this model
-                    variables,
-                    forecastDays
-                );
+        async function fetchModelWithRetry(model: WeatherModel) {
+            let retryDelay = INITIAL_RETRY_DELAY_MS;
 
-                if (!cancelled) {
-                    // Store timezone from first successful response (any model)
-                    if (!timezoneSet && result.timezoneInfo) {
-                        timezoneSet = true;
-                        setTimezoneInfo(result.timezoneInfo);
-                    }
+            while (!cancelled) {
+                try {
+                    const result = await fetchOpenMeteoData(
+                        latitude,
+                        longitude,
+                        elevation,
+                        [model], // Fetch just this model
+                        variables,
+                        forecastDays
+                    );
 
-                    setData(prevData => {
-                        const newData = new Map(prevData || []);
-                        const modelData = result.data.get(model);
-                        if (modelData) {
-                            newData.set(model, modelData);
+                    if (!cancelled) {
+                        // Store timezone from first successful response (any model)
+                        if (!timezoneSet && result.timezoneInfo) {
+                            timezoneSet = true;
+                            setTimezoneInfo(result.timezoneInfo);
                         }
-                        return newData;
-                    });
+
+                        setData(prevData => {
+                            const newData = new Map(prevData || []);
+                            const modelData = result.data.get(model);
+                            if (modelData) {
+                                newData.set(model, modelData);
+                            }
+                            return newData;
+                        });
+                    }
+                    // Success - exit the retry loop
+                    return;
+                } catch (err) {
+                    if (cancelled) return;
+
+                    console.error(`Failed to fetch model ${model}, retrying in ${retryDelay}ms...`, err);
+
+                    // Wait before retrying with exponential backoff
+                    await new Promise(resolve => setTimeout(resolve, retryDelay));
+                    retryDelay = Math.min(retryDelay * 2, MAX_RETRY_DELAY_MS);
                 }
-            } catch (err) {
-                console.error(`Failed to fetch model ${model}`, err);
-                // We don't set global error here to allow other models to succeed
-                // Optionally could track per-model errors
             }
         }
 
         async function fetchAll() {
-            // Create an array of promises for parallel fetching
-            const promises = models.map((model) => fetchModel(model));
+            // Create an array of promises for parallel fetching with retry
+            const promises = models.map((model) => fetchModelWithRetry(model));
 
             // Wait for all to settle (finish)
             await Promise.allSettled(promises);
@@ -128,6 +141,8 @@ export function useDetailedWeatherData({
 
         return () => {
             cancelled = true;
+            // Reset prevParamsRef so re-mount triggers fresh fetch (fixes React StrictMode double-invoke)
+            prevParamsRef.current = '';
         };
     }, [paramsKey, enabled, latitude, longitude, elevation, models, variables, forecastDays]);
 
