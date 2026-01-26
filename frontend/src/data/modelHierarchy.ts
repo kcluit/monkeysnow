@@ -66,6 +66,23 @@ export const modelProviders: ProviderData[] = [
     ],
   },
   {
+    id: 'seamless',
+    name: 'Seamless',
+    models: [
+      { id: 'icon_seamless', name: 'ICON Seamless', description: 'DWD combined global + EU' },
+      { id: 'gfs_seamless', name: 'GFS Seamless', description: 'NOAA combined GFS + HRRR' },
+      { id: 'gem_seamless', name: 'GEM Seamless', description: 'Canadian combined models' },
+      { id: 'meteofrance_seamless', name: 'Météo-France Seamless', description: 'Combined models' },
+      { id: 'metno_seamless', name: 'MET Norway Seamless', description: 'Combined models' },
+      { id: 'knmi_seamless', name: 'KNMI Seamless', description: 'Dutch combined models' },
+      { id: 'jma_seamless', name: 'JMA Seamless', description: 'Japan combined models' },
+      { id: 'ukmo_seamless', name: 'UKMO Seamless', description: 'UK Met Office combined models' },
+      { id: 'dmi_seamless', name: 'DMI Seamless', description: 'Danish combined models' },
+      { id: 'meteoswiss_icon_seamless', name: 'MeteoSwiss Seamless', description: 'Swiss combined models' },
+      { id: 'kma_seamless', name: 'KMA Seamless', description: 'Korean combined models' },
+    ],
+  },
+  {
     id: 'ecmwf',
     name: 'ECMWF (European)',
     models: [
@@ -78,27 +95,26 @@ export const modelProviders: ProviderData[] = [
     id: 'icon',
     name: 'ICON (DWD Germany)',
     models: [
-      { id: 'icon_seamless', name: 'Seamless', description: 'Combined global + EU' },
       { id: 'icon_global', name: 'Global', description: '13km global' },
       { id: 'icon_eu', name: 'EU', description: '7km Europe' },
       { id: 'icon_d2', name: 'D2', description: '2km Germany' },
     ],
   },
   {
-    id: 'gfs',
-    name: 'GFS (NOAA USA)',
+    id: 'usa',
+    name: 'USA (NOAA)',
     models: [
-      { id: 'gfs_seamless', name: 'Seamless', description: 'Combined GFS + HRRR' },
-      { id: 'gfs_global', name: 'Global', description: '25km global' },
+      { id: 'gfs_global', name: 'GFS Global', description: '25km global' },
       { id: 'gfs_hrrr', name: 'HRRR', description: '3km continental US' },
       { id: 'gfs_graphcast025', name: 'GraphCast', description: 'AI-based, 25km' },
+      { id: 'ncep_nbm_conus', name: 'NCEP NBM', description: 'National Blend of Models' },
+      { id: 'ncep_nam_conus', name: 'NCEP NAM', description: 'North American Mesoscale' },
     ],
   },
   {
     id: 'gem',
     name: 'GEM (Canada)',
     models: [
-      { id: 'gem_seamless', name: 'Seamless', description: 'Combined models' },
       { id: 'gem_global', name: 'Global', description: '15km global' },
       { id: 'gem_regional', name: 'Regional', description: '10km North America' },
       { id: 'gem_hrdps_continental', name: 'HRDPS Continental', description: '2.5km Canada' },
@@ -109,7 +125,6 @@ export const modelProviders: ProviderData[] = [
     id: 'meteofrance',
     name: 'Météo-France',
     models: [
-      { id: 'meteofrance_seamless', name: 'Seamless', description: 'Combined models' },
       { id: 'meteofrance_arpege_world', name: 'ARPEGE World', description: '25km global' },
       { id: 'meteofrance_arpege_europe', name: 'ARPEGE Europe', description: '10km Europe' },
       { id: 'meteofrance_arome_france', name: 'AROME France', description: '2.5km France' },
@@ -120,7 +135,6 @@ export const modelProviders: ProviderData[] = [
     id: 'metno',
     name: 'MET Norway',
     models: [
-      { id: 'metno_seamless', name: 'Seamless', description: 'Combined models' },
       { id: 'metno_nordic', name: 'Nordic', description: '1km Scandinavia' },
     ],
   },
@@ -128,7 +142,6 @@ export const modelProviders: ProviderData[] = [
     id: 'knmi',
     name: 'KNMI (Netherlands)',
     models: [
-      { id: 'knmi_seamless', name: 'Seamless', description: 'Combined models' },
       { id: 'knmi_harmonie_arome_europe', name: 'HARMONIE Europe', description: '5.5km Europe' },
       { id: 'knmi_harmonie_arome_netherlands', name: 'HARMONIE Netherlands', description: '2km Netherlands' },
     ],
@@ -137,7 +150,6 @@ export const modelProviders: ProviderData[] = [
     id: 'jma',
     name: 'JMA (Japan)',
     models: [
-      { id: 'jma_seamless', name: 'Seamless', description: 'Combined models' },
       { id: 'jma_msm', name: 'MSM', description: '5km Japan' },
       { id: 'jma_gsm', name: 'GSM', description: '20km global' },
     ],
@@ -146,7 +158,6 @@ export const modelProviders: ProviderData[] = [
     id: 'ukmo',
     name: 'UK Met Office',
     models: [
-      { id: 'ukmo_seamless', name: 'Seamless', description: 'Combined models' },
       { id: 'ukmo_global_deterministic_10km', name: 'Global 10km', description: '10km global' },
       { id: 'ukmo_uk_deterministic_2km', name: 'UK 2km', description: '2km UK' },
     ],
@@ -155,7 +166,6 @@ export const modelProviders: ProviderData[] = [
     id: 'dmi',
     name: 'DMI (Denmark)',
     models: [
-      { id: 'dmi_seamless', name: 'Seamless', description: 'Combined models' },
       { id: 'dmi_harmonie_arome_europe', name: 'HARMONIE Europe', description: '2km Europe' },
     ],
   },
@@ -163,7 +173,6 @@ export const modelProviders: ProviderData[] = [
     id: 'meteoswiss',
     name: 'MeteoSwiss',
     models: [
-      { id: 'meteoswiss_icon_seamless', name: 'Seamless', description: 'Combined models' },
       { id: 'meteoswiss_icon_ch1', name: 'ICON-CH1', description: '1km Switzerland' },
       { id: 'meteoswiss_icon_ch2', name: 'ICON-CH2', description: '2km Switzerland' },
     ],
@@ -172,7 +181,6 @@ export const modelProviders: ProviderData[] = [
     id: 'kma',
     name: 'KMA (Korea)',
     models: [
-      { id: 'kma_seamless', name: 'Seamless', description: 'Combined models' },
       { id: 'kma_gdps', name: 'GDPS', description: '10km global' },
       { id: 'kma_ldps', name: 'LDPS', description: '1.5km Korea' },
     ],
@@ -183,8 +191,6 @@ export const modelProviders: ProviderData[] = [
     models: [
       { id: 'cma_grapes_global', name: 'CMA GRAPES', description: 'China Meteorological, 15km' },
       { id: 'bom_access_global', name: 'BOM ACCESS', description: 'Australia, 12km global' },
-      { id: 'ncep_nbm_conus', name: 'NCEP NBM', description: 'US National Blend of Models' },
-      { id: 'ncep_nam_conus', name: 'NCEP NAM', description: 'US North American Mesoscale' },
       { id: 'italia_meteo_arpae_icon_2i', name: 'Italia Meteo ICON', description: '2km Italy' },
     ],
   },
