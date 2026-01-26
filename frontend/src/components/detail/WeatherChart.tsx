@@ -120,6 +120,9 @@ export function WeatherChart({
                     stroke={modelConfig.color}
                     fill={modelConfig.color}
                     fillOpacity={0.3}
+                    dot={false}
+                    activeDot={{ r: 6, strokeWidth: 2, fill: 'var(--color-cardBg)' }}
+                    isAnimationActive={false}
                 />
             );
         });
