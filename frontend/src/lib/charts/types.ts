@@ -5,6 +5,8 @@
  * implemented by any charting library (ECharts, Recharts, D3, etc.)
  */
 
+import type { CSSProperties } from 'react';
+
 /** Supported chart types */
 export type ChartType = 'line' | 'bar' | 'area';
 
