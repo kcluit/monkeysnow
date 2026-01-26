@@ -42,6 +42,12 @@ export function DetailedResortView({
         14
     );
 
+    // State for chart lock - prevents scroll zoom and hides range slider
+    const [isChartLocked, setIsChartLocked] = useLocalStorage<boolean>(
+        'detailChartLocked',
+        false
+    );
+
     // Fetch weather data
     const { data, timezoneInfo, loading, error, refetch } = useDetailedWeatherData({
         latitude: location.lat,
