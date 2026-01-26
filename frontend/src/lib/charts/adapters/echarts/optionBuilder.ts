@@ -190,6 +190,9 @@ function buildXAxis(config: ChartConfig, theme: ChartTheme): ChartOption {
     return {
         type: config.xAxis.type,
         data: config.xAxis.data,
+        // Performance: disable axis interactions
+        silent: true,
+        triggerEvent: false,
         axisLine: {
             lineStyle: {
                 color: theme.gridLine,
