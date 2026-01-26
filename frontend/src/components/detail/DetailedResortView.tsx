@@ -122,6 +122,7 @@ export function DetailedResortView({
                         selectedModels={selectedModels}
                         selectedVariables={selectedVariables}
                         unitSystem={unitSystem}
+                        timezoneInfo={timezoneInfo}
                     />
                     {loading && (
                         <div className="text-center py-2 text-sm text-theme-textSecondary animate-pulse">
