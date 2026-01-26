@@ -58,6 +58,9 @@ function WeatherChartInner({
   // Get reactive theme
   const theme = useChartTheme();
 
+  // Performance: Use hover coordinator to only process events on hovered chart
+  const { containerRef } = useChartHoverCoordinator(`chart-${variable}`);
+
   // Modal state
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
