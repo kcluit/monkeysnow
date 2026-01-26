@@ -162,6 +162,7 @@ export function DetailUtilityBar({
                                 onClick={() => {
                                     setElevation(option.value);
                                     setShowElevationDropdown(false);
+                                    setShowCustomElevationInput(false);
                                 }}
                                 className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm ${elevation === option.value
                                         ? 'bg-theme-secondary text-theme-textPrimary'
@@ -172,6 +173,53 @@ export function DetailUtilityBar({
                                 <span className="text-xs text-theme-textSecondary opacity-70">{option.value}m</span>
                             </button>
                         ))}
+                        <div className="border-t border-theme-border mt-1 pt-1">
+                            {!showCustomElevationInput ? (
+                                <button
+                                    onClick={() => {
+                                        setShowCustomElevationInput(true);
+                                        setCustomElevationValue(elevation.toString());
+                                    }}
+                                    className="w-full flex items-center justify-between px-3 py-2 rounded-md text-sm text-theme-textSecondary hover:bg-theme-secondary hover:text-theme-textPrimary"
+                                >
+                                    <span>Custom...</span>
+                                </button>
+                            ) : (
+                                <div className="px-2 py-2">
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="number"
+                                            value={customElevationValue}
+                                            onChange={(e) => setCustomElevationValue(e.target.value)}
+                                            onKeyDown={handleCustomElevationKeyDown}
+                                            placeholder="Elevation"
+                                            min="0"
+                                            max="9000"
+                                            autoFocus
+                                            className="w-full px-2 py-1 text-sm rounded border border-theme-border bg-theme-cardBg text-theme-textPrimary placeholder-theme-textSecondary focus:outline-none focus:border-theme-accent"
+                                        />
+                                        <span className="text-sm text-theme-textSecondary">m</span>
+                                    </div>
+                                    <div className="flex gap-1 mt-2">
+                                        <button
+                                            onClick={handleCustomElevationSubmit}
+                                            className="flex-1 px-2 py-1 text-xs rounded bg-theme-accent text-white hover:opacity-90"
+                                        >
+                                            Apply
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setShowCustomElevationInput(false);
+                                                setCustomElevationValue('');
+                                            }}
+                                            className="flex-1 px-2 py-1 text-xs rounded bg-theme-secondary text-theme-textSecondary hover:bg-theme-cardBg"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
             </div>
