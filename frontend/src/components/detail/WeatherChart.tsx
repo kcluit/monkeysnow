@@ -5,35 +5,11 @@
  * Uses the chart abstraction layer with ECharts for rendering.
  */
 
-import { useMemo, memo, useState, useEffect } from 'react';
-import { ChartRenderer, getEChartsTheme } from '../../lib/charts';
-import type { ChartTheme } from '../../lib/charts';
+import { useMemo, memo } from 'react';
+import { ChartRenderer } from '../../lib/charts';
 import type { WeatherChartProps } from '../../types/detailView';
+import { useChartTheme } from '../../hooks/useChartTheme';
 import { buildWeatherChartConfig, getVariableDisplayInfo } from '../../utils/chartBuilder';
-
-/**
- * Hook to get theme and respond to theme changes.
- * Observes CSS variable changes on document root.
- */
-function useChartTheme(): ChartTheme {
-  const [theme, setTheme] = useState(() => getEChartsTheme());
-
-  useEffect(() => {
-    // Update theme when CSS variables change
-    const observer = new MutationObserver(() => {
-      setTheme(getEChartsTheme());
-    });
-
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['style', 'class'],
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
-  return theme;
-}
 
 /**
  * Weather chart component.
