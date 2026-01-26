@@ -88,7 +88,7 @@ function buildGrid(config: ChartConfig): ChartOption {
 /**
  * Build X-axis configuration for ECharts.
  */
-function buildXAxis(config: ChartConfig, theme: ChartTheme): EChartsOption['xAxis'] {
+function buildXAxis(config: ChartConfig, theme: ChartTheme): ChartOption {
   const interval = config.xAxis.data
     ? Math.floor(config.xAxis.data.length / 14)
     : 'auto';
