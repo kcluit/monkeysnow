@@ -177,9 +177,26 @@ export function WeatherChart({
     };
 
     const gridProps = {
-        strokeDasharray: '0',
+        strokeDasharray: '3 3',
         stroke: 'var(--color-border)',
-        opacity: 0.8,
+        opacity: 0.3,
+        horizontal: true,
+        vertical: true,
+    };
+
+    const handleBrushChange = (range: { startIndex?: number; endIndex?: number }) => {
+        setBrushRange(range);
+    };
+
+    const brushProps = {
+        dataKey: 'time',
+        height: 40,
+        stroke: 'var(--color-accent)',
+        fill: 'var(--color-cardBg)',
+        travellerWidth: 10,
+        onChange: handleBrushChange,
+        startIndex: brushRange.startIndex,
+        endIndex: brushRange.endIndex,
     };
 
     // Render appropriate chart type
