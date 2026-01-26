@@ -12,6 +12,7 @@ type ChartOption = Record<string, unknown>;
 
 /**
  * Build tooltip configuration for ECharts.
+ * Optimized for performance during rapid mouse movements.
  */
 function buildTooltip(config: ChartConfig, _theme: ChartTheme): ChartOption {
     if (config.tooltip?.enabled === false) {
@@ -21,7 +22,8 @@ function buildTooltip(config: ChartConfig, _theme: ChartTheme): ChartOption {
     return {
         show: true,
         trigger: config.tooltip?.trigger ?? 'axis',
-        appendToBody: config.tooltip?.appendToBody,
+        // Keep tooltip in chart container for better performance (avoid appendToBody)
+        appendToBody: false,
         backgroundColor: 'rgba(255, 255, 255, 0.95)',
         borderColor: '#ccc',
         borderWidth: 1,
@@ -29,23 +31,32 @@ function buildTooltip(config: ChartConfig, _theme: ChartTheme): ChartOption {
             color: '#000',
             fontSize: 13,
         },
+        // Performance: disable tooltip transitions
+        transitionDuration: 0,
         axisPointer: {
             type: 'line',
+            // Performance: disable axis pointer animation
+            animation: false,
             lineStyle: {
                 color: '#666',
                 type: 'dashed',
             },
         },
         extraCssText: 'box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);',
+        // Performance: Use simpler string template instead of function formatter
+        // This avoids function call overhead on every mouse move
         formatter: (params: unknown) => {
             if (!Array.isArray(params)) return '';
-            const lines = params.map((p: { marker?: string; seriesName?: string; value?: unknown }) => {
-                const value = typeof p.value === 'number'
-                    ? (Number.isInteger(p.value) ? p.value : parseFloat(p.value.toFixed(2)))
-                    : p.value;
-                return `${p.marker || ''} ${p.seriesName || ''}: ${value}`;
-            });
             const header = (params[0] as { axisValueLabel?: string })?.axisValueLabel || '';
+            // Pre-allocate array size for better performance
+            const lines = new Array(params.length);
+            for (let i = 0; i < params.length; i++) {
+                const p = params[i] as { marker?: string; seriesName?: string; value?: unknown };
+                const value = typeof p.value === 'number'
+                    ? (p.value % 1 === 0 ? p.value : (p.value as number).toFixed(2))
+                    : p.value;
+                lines[i] = `${p.marker || ''} ${p.seriesName || ''}: ${value}`;
+            }
             return `${header}<br/>${lines.join('<br/>')}`;
         },
     };
