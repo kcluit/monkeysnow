@@ -66,10 +66,13 @@ function formatTooltip(params: unknown): string {
  * Build tooltip configuration for ECharts.
  * Optimized for performance during rapid mouse movements.
  */
-function buildTooltip(config: ChartConfig, _theme: ChartTheme): ChartOption {
+function buildTooltip(config: ChartConfig, _theme: ChartTheme, totalDataPoints: number): ChartOption {
     if (config.tooltip?.enabled === false) {
         return { show: false };
     }
+
+    // For very large datasets, use a simpler tooltip or disable
+    const isHeavyLoad = totalDataPoints > TOOLTIP_DISABLE_THRESHOLD;
 
     return {
         show: true,
@@ -88,15 +91,15 @@ function buildTooltip(config: ChartConfig, _theme: ChartTheme): ChartOption {
         },
         // Performance: disable tooltip transitions completely
         transitionDuration: 0,
-        // Performance: add delay to avoid rapid tooltip updates during fast mouse movement
-        showDelay: 150,
-        hideDelay: 150,
+        // Performance: increase delay for heavy loads
+        showDelay: isHeavyLoad ? 250 : 150,
+        hideDelay: isHeavyLoad ? 250 : 150,
         // Performance: confine tooltip to chart area (avoids expensive layout recalculations)
         confine: true,
         // Performance: position tooltip efficiently using fixed position calculation
         position: (point: number[]) => [point[0] + 10, point[1] - 10],
         axisPointer: {
-            type: 'shadow', // Performance: shadow is simpler than line
+            type: 'none', // Performance: disable axis pointer entirely for best perf
             // Performance: disable ALL axis pointer animations
             animation: false,
             // Performance: snap to data points to reduce calculations
@@ -104,13 +107,6 @@ function buildTooltip(config: ChartConfig, _theme: ChartTheme): ChartOption {
             // Performance: DON'T trigger emphasis effects on hover
             triggerEmphasis: false,
             triggerTooltip: true,
-            shadowStyle: {
-                color: 'rgba(150, 150, 150, 0.1)',
-            },
-            // Performance: simple label, no fancy styling
-            label: {
-                show: false, // Hide axis pointer label for performance
-            },
         },
         // Performance: minimal CSS, no shadows which cause repaints
         extraCssText: 'max-height: 200px; overflow: hidden; pointer-events: none;',
