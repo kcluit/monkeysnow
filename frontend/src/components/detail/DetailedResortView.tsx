@@ -3,13 +3,20 @@ import { useDetailedWeatherData } from '../../hooks/useDetailedWeatherData';
 import { DetailUtilityBar } from './DetailUtilityBar';
 import { DetailChartGrid } from './DetailChartGrid';
 import { DEFAULT_VARIABLES, DEFAULT_MODELS } from '../../utils/chartConfigurations';
+import { aggregationOptions } from '../../data/modelHierarchy';
 import type { DetailedResortViewProps } from '../../types/detailView';
-import type { WeatherModel, WeatherVariable } from '../../types/openMeteo';
+import type { WeatherModel, WeatherVariable, AggregationType } from '../../types/openMeteo';
 import type { UnitSystem } from '../../types';
 
 interface DetailedResortViewPropsWithUnits extends DetailedResortViewProps {
     unitSystem: UnitSystem;
 }
+
+// Default aggregation colors
+const DEFAULT_AGGREGATION_COLORS: Record<AggregationType, string> = {
+    median: aggregationOptions.find(a => a.id === 'median')?.defaultColor ?? '#a855f7',
+    mean: aggregationOptions.find(a => a.id === 'mean')?.defaultColor ?? '#ec4899',
+};
 
 export function DetailedResortView({
     resortId: _resortId,
@@ -28,6 +35,18 @@ export function DetailedResortView({
     const [selectedVariables, setSelectedVariables] = useLocalStorage<WeatherVariable[]>(
         'detailSelectedVariables',
         DEFAULT_VARIABLES
+    );
+
+    // State for selected aggregations (median, mean)
+    const [selectedAggregations, setSelectedAggregations] = useLocalStorage<AggregationType[]>(
+        'detailSelectedAggregations',
+        []
+    );
+
+    // State for aggregation colors (user configurable)
+    const [aggregationColors, setAggregationColors] = useLocalStorage<Record<AggregationType, string>>(
+        'detailAggregationColors',
+        DEFAULT_AGGREGATION_COLORS
     );
 
     // State for elevation - default to mid elevation
@@ -82,6 +101,10 @@ export function DetailedResortView({
                 setSelectedModels={setSelectedModels}
                 selectedVariables={selectedVariables}
                 setSelectedVariables={setSelectedVariables}
+                selectedAggregations={selectedAggregations}
+                setSelectedAggregations={setSelectedAggregations}
+                aggregationColors={aggregationColors}
+                setAggregationColors={setAggregationColors}
                 elevation={elevation}
                 setElevation={setElevation}
                 forecastDays={forecastDays}
@@ -129,6 +152,8 @@ export function DetailedResortView({
                         data={data}
                         selectedModels={selectedModels}
                         selectedVariables={selectedVariables}
+                        selectedAggregations={selectedAggregations}
+                        aggregationColors={aggregationColors}
                         unitSystem={unitSystem}
                         timezoneInfo={timezoneInfo ?? undefined}
                         isChartLocked={isChartLocked}
