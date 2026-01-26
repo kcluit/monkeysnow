@@ -1,5 +1,6 @@
 import type { WeatherModel, WeatherVariable, TimezoneInfo, AggregationType } from './openMeteo';
 import type { UnitSystem } from '../utils/unitConversion';
+import type { ElevationLocation } from './chartSettings';
 
 // Detail view navigation state
 export interface DetailViewState {
