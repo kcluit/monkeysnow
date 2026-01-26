@@ -184,7 +184,7 @@ export function buildWeatherChartConfig(
     grid: {
       top: 10,
       right: 30,
-      bottom: isChartLocked ? 40 : 80, // Less space when slider is hidden
+      bottom: 80,
       left: 10,
       containLabel: true,
     },
