@@ -1,5 +1,5 @@
 import { fetchWeatherApi } from 'openmeteo';
-import type { WeatherModel, WeatherVariable, HourlyDataPoint } from '../types/openMeteo';
+import type { WeatherModel, WeatherVariable, HourlyDataPoint, TimezoneInfo } from '../types/openMeteo';
 
 // Import locations from backend
 import locationsData from '../../../backend/locations.json';
