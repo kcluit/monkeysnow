@@ -151,7 +151,7 @@ function calculateAggregationSeries(
       color,
       type: chartType,
       data: aggregatedData,
-      lineWidth: 4, // Thicker line for aggregations
+      lineWidth: 2, // Same width as models, distinguished by opacity
       opacity: 1,
       zIndex: 100, // Render on top
     });
