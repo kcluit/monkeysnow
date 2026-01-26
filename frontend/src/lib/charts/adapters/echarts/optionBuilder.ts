@@ -117,7 +117,7 @@ function buildXAxis(config: ChartConfig, theme: ChartTheme): ChartOption {
 /**
  * Build Y-axis configuration for ECharts.
  */
-function buildYAxis(config: ChartConfig, theme: ChartTheme): EChartsOption['yAxis'] {
+function buildYAxis(config: ChartConfig, theme: ChartTheme): ChartOption {
   const domain = config.yAxis.domain ?? ['auto', 'auto'];
 
   return {
