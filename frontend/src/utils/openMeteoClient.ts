@@ -123,7 +123,7 @@ export async function fetchOpenMeteoData(
       const dataPoints: HourlyDataPoint[] = [];
 
       for (let j = 0; j < numPoints; j++) {
-        const timestamp = (timeStart + j * interval + utcOffsetSeconds) * 1000;
+        const timestamp = (timeStart + j * interval) * 1000;
         const time = new Date(timestamp);
 
         const point: HourlyDataPoint = {
