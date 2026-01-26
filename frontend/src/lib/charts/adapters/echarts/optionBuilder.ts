@@ -154,14 +154,14 @@ function buildYAxis(config: ChartConfig, theme: ChartTheme): ChartOption {
 /**
  * Build dataZoom (brush/zoom) configuration for ECharts.
  */
-function buildDataZoom(config: ChartConfig, theme: ChartTheme): EChartsOption['dataZoom'] {
+function buildDataZoom(config: ChartConfig, theme: ChartTheme): ChartOption[] | undefined {
   if (config.dataZoom?.enabled === false) {
     return undefined;
   }
 
   const zoomType = config.dataZoom?.type ?? 'both';
   const range = config.dataZoom?.range ?? [0, 100];
-  const components: EChartsOption['dataZoom'] = [];
+  const components: ChartOption[] = [];
 
   // Slider (visible zoom bar)
   if (zoomType === 'slider' || zoomType === 'both') {
