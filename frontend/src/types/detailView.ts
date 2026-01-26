@@ -78,6 +78,7 @@ export interface DetailChartGridProps {
     selectedModels: WeatherModel[];
     selectedVariables: WeatherVariable[];
     unitSystem: UnitSystem;
+    timezoneInfo?: TimezoneInfo;
 }
 
 export interface WeatherChartProps {
