@@ -199,21 +199,21 @@ function App(): JSX.Element {
                 ],
             },
             {
-                id: 'hide-borders',
-                name: 'Hide borders',
+                id: 'show-borders',
+                name: 'Show borders',
                 icon: '🔲',
                 subCommands: [
                     {
-                        id: 'hide-borders-on',
+                        id: 'show-borders-on',
                         name: 'On',
-                        icon: isHideBordersEnabled ? '✔️' : '',
-                        action: () => setHideBordersEnabled(true),
-                    },
-                    {
-                        id: 'hide-borders-off',
-                        name: 'Off',
                         icon: !isHideBordersEnabled ? '✔️' : '',
                         action: () => setHideBordersEnabled(false),
+                    },
+                    {
+                        id: 'show-borders-off',
+                        name: 'Off',
+                        icon: isHideBordersEnabled ? '✔️' : '',
+                        action: () => setHideBordersEnabled(true),
                     },
                 ],
             },
