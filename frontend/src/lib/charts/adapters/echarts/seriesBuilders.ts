@@ -31,7 +31,6 @@ export function buildLineSeries(config: SeriesConfig): SeriesOption {
         width: 3,
       },
     },
-    animation: false, // Disable for performance
   };
 }
 
