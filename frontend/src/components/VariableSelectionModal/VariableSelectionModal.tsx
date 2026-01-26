@@ -105,8 +105,11 @@ export function VariableSelectionModal({
     }
   };
 
-  // Only allow dragging selected variables
-  const draggableIds = selectedVariables;
+  // SortableContext needs all filtered items, but individual items handle their disabled state
+  const draggableIds = filteredVariables;
+
+  // Calculate how many selected items are shown in filtered list
+  const selectedInFilteredCount = filteredVariables.filter(v => isSelected(v)).length;
 
   return (
     <div className="command-palette-backdrop" onClick={handleBackdropClick}>
