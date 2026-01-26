@@ -14,7 +14,8 @@ export interface SeriesConfig {
   name: string;
   color: string;
   type: ChartType;
-  data: number[];
+  /** Data values. Use null to create gaps in the chart. */
+  data: (number | null)[];
   /** Optional opacity for area fills */
   fillOpacity?: number;
 }
