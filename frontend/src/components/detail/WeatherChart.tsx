@@ -255,7 +255,7 @@ export function WeatherChart({
                     ({unit})
                 </span>
             </div>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={380}>
                 {renderChart()}
             </ResponsiveContainer>
         </div>
