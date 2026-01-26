@@ -184,7 +184,7 @@ export async function fetchOpenMeteoData(
   timezone: string = 'auto'
 ): Promise<FetchOpenMeteoDataResult> {
   // DEV MODE: Return mock data for performance testing
-  if (typeof window !== 'undefined' && window.__USE_MOCK_DATA) {
+  if (isMockModeEnabled()) {
     console.log('[MOCK MODE] Generating mock data for', models.length, 'models');
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 100));
