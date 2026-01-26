@@ -76,8 +76,8 @@ function buildTooltip(config: ChartConfig, _theme: ChartTheme): ChartOption {
         trigger: config.tooltip?.trigger ?? 'axis',
         // Performance: keep tooltip in chart container
         appendToBody: false,
-        // Performance: use richText render mode (simpler than html DOM manipulation)
-        renderMode: 'html',
+        // Performance: use richText render mode (faster than HTML DOM manipulation)
+        renderMode: 'richText',
         backgroundColor: 'rgba(255, 255, 255, 0.95)',
         borderColor: '#ccc',
         borderWidth: 1,
@@ -89,8 +89,8 @@ function buildTooltip(config: ChartConfig, _theme: ChartTheme): ChartOption {
         // Performance: disable tooltip transitions completely
         transitionDuration: 0,
         // Performance: add delay to avoid rapid tooltip updates during fast mouse movement
-        showDelay: 50,
-        hideDelay: 50,
+        showDelay: 80,
+        hideDelay: 80,
         // Performance: confine tooltip to chart area (avoids expensive layout recalculations)
         confine: true,
         // Performance: position tooltip efficiently using fixed position calculation
@@ -104,8 +104,6 @@ function buildTooltip(config: ChartConfig, _theme: ChartTheme): ChartOption {
             // Performance: DON'T trigger emphasis effects on hover
             triggerEmphasis: false,
             triggerTooltip: true,
-            // Performance: disable cross lines (we only need vertical line)
-            // cross: false - not a valid option, but we set type to 'line' not 'cross'
             lineStyle: {
                 color: '#999',
                 type: 'dashed',
