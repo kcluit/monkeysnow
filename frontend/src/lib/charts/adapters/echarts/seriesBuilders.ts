@@ -23,6 +23,8 @@ export function buildLineSeries(config: SeriesConfig): SeriesOption {
   const opacity = config.opacity ?? 1;
   const lineType = mapLineStyle(config.lineStyle);
   const dataLength = Array.isArray(config.data) ? config.data.length : 0;
+  // Lower threshold for large mode to improve performance during hover
+  const isLarge = dataLength > 100;
 
   const series: SeriesOption = {
     type: 'line',
@@ -44,11 +46,13 @@ export function buildLineSeries(config: SeriesConfig): SeriesOption {
     },
     symbol: 'none', // No data point markers for performance
     showSymbol: false,
-    // Performance: Enable large mode for datasets with many points
-    large: dataLength > 300,
-    largeThreshold: 300,
+    // Performance: Enable large mode for datasets (lowered threshold)
+    large: isLarge,
+    largeThreshold: 100,
     // Performance: Use sampling to reduce points when zoomed out
     sampling: 'lttb', // Largest-Triangle-Three-Buckets algorithm preserves visual shape
+    // Performance: Clip data to visible area only
+    clip: true,
     // Performance: Disable hover state changes completely
     emphasis: {
       disabled: true,
@@ -61,6 +65,8 @@ export function buildLineSeries(config: SeriesConfig): SeriesOption {
     blur: {
       disabled: true,
     },
+    // Performance: Disable cursor change on hover
+    cursor: 'default',
   };
 
   // Add yAxisIndex if specified (for secondary Y-axis)
