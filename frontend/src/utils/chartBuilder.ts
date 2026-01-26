@@ -6,12 +6,22 @@
  * chart abstraction layer.
  */
 
-import type { ChartConfig, ChartType, SeriesConfig, ChartTheme } from '../lib/charts';
+import type { ChartConfig, ChartType, SeriesConfig, ChartTheme, MarkLineData } from '../lib/charts';
 import type { WeatherChartProps } from '../types/detailView';
 import type { WeatherModel, HourlyDataPoint, AggregationType } from '../types/openMeteo';
 import type { UnitSystem } from '../types';
+import type { ChartDisplayType, ElevationLocation } from '../types/chartSettings';
 import { getModelConfig, getVariableConfig } from './chartConfigurations';
 import { getEChartsTheme } from '../lib/charts';
+
+/** Additional chart settings passed from WeatherChart component */
+export interface ChartBuildSettings {
+  chartTypeOverride?: ChartDisplayType;
+  showAccumulation?: boolean;
+  showElevationLines?: boolean;
+  location?: ElevationLocation;
+  currentElevation?: number;
+}
 
 /**
  * Format a date for display on the X-axis.
@@ -208,11 +218,131 @@ function buildSeriesConfigs(
 }
 
 /**
+ * Calculate cumulative accumulation from series data.
+ * Used for precipitation/snowfall accumulation overlay.
+ */
+function calculateAccumulation(values: (number | null)[]): (number | null)[] {
+  let sum = 0;
+  return values.map((v) => {
+    if (v === null) return null;
+    sum += v;
+    return sum;
+  });
+}
+
+/**
+ * Build accumulation series from model data.
+ * Calculates mean of all models first, then cumulative sum.
+ */
+function buildAccumulationSeries(
+  seriesData: Map<WeatherModel, (number | null)[]>,
+  timePoints: number,
+  color: string
+): SeriesConfig | null {
+  if (seriesData.size === 0) return null;
+
+  const allDataArrays = Array.from(seriesData.values());
+
+  // Calculate mean at each time point across all models
+  const meanValues: (number | null)[] = [];
+  for (let i = 0; i < timePoints; i++) {
+    const valuesAtTime = allDataArrays
+      .map((arr) => arr[i])
+      .filter((v): v is number => v !== null && !isNaN(v));
+
+    if (valuesAtTime.length === 0) {
+      meanValues.push(null);
+    } else {
+      meanValues.push(calculateMean(valuesAtTime));
+    }
+  }
+
+  // Calculate cumulative accumulation
+  const accumulationData = calculateAccumulation(meanValues);
+
+  // Use a lighter/different shade for the accumulation line
+  // Darken the color slightly for contrast
+  const accumulationColor = adjustColorBrightness(color, -20);
+
+  return {
+    id: 'accumulation',
+    name: 'Accumulation',
+    color: accumulationColor,
+    type: 'line',
+    data: accumulationData,
+    lineWidth: 2,
+    opacity: 0.8,
+    zIndex: 50, // Above model series but below aggregations
+    lineStyle: 'dashed',
+  };
+}
+
+/**
+ * Adjust color brightness by a percentage.
+ * Positive values lighten, negative values darken.
+ */
+function adjustColorBrightness(hex: string, percent: number): string {
+  // Remove # if present
+  const cleanHex = hex.replace('#', '');
+
+  // Parse RGB
+  const r = parseInt(cleanHex.substring(0, 2), 16);
+  const g = parseInt(cleanHex.substring(2, 4), 16);
+  const b = parseInt(cleanHex.substring(4, 6), 16);
+
+  // Adjust brightness
+  const adjust = (value: number) => {
+    const adjusted = value + (value * percent / 100);
+    return Math.max(0, Math.min(255, Math.round(adjusted)));
+  };
+
+  const newR = adjust(r).toString(16).padStart(2, '0');
+  const newG = adjust(g).toString(16).padStart(2, '0');
+  const newB = adjust(b).toString(16).padStart(2, '0');
+
+  return `#${newR}${newG}${newB}`;
+}
+
+/**
+ * Build elevation mark lines for freezing level chart.
+ */
+function buildElevationMarkLines(
+  location: ElevationLocation,
+  currentElevation: number | undefined,
+  unitSystem: UnitSystem,
+  theme: ChartTheme
+): MarkLineData[] {
+  const convert = unitSystem === 'imperial'
+    ? (m: number) => Math.round(m * 3.28084) // meters to feet
+    : (m: number) => m;
+
+  const unitLabel = unitSystem === 'imperial' ? 'ft' : 'm';
+
+  const elevations = [
+    { name: 'Base', value: location.baseElevation },
+    { name: 'Mid', value: location.midElevation },
+    { name: 'Peak', value: location.topElevation },
+  ];
+
+  return elevations.map(({ name, value }) => {
+    const isCurrent = value === currentElevation;
+    return {
+      yValue: convert(value),
+      label: `${name}: ${convert(value)}${unitLabel}`,
+      color: isCurrent ? theme.accent : theme.textSecondary,
+      lineWidth: isCurrent ? 2 : 1,
+      lineStyle: 'dashed' as const,
+    };
+  });
+}
+
+/**
  * Build a complete ChartConfig from weather data and props.
  */
 export function buildWeatherChartConfig(
   props: WeatherChartProps,
-  theme?: ChartTheme
+  theme?: ChartTheme,
+  settings?: ChartBuildSettings
 ): ChartConfig | null {
   const {
     data,
@@ -232,7 +362,9 @@ export function buildWeatherChartConfig(
 
   // Get variable configuration
   const variableConfig = getVariableConfig(variable);
-  const chartType = variableConfig.chartType as ChartType;
+
+  // Use chart type override if provided, otherwise use default from config
+  const chartType = (settings?.chartTypeOverride ?? variableConfig.chartType) as ChartType;
 
   // Transform data with timezone
   const { timeLabels, seriesData } = transformToChartData(
@@ -267,11 +399,34 @@ export function buildWeatherChartConfig(
   // Combine all series (aggregations rendered on top)
   const allSeries = [...modelSeries, ...aggregationSeries];
 
+  // Add accumulation series if enabled
+  if (settings?.showAccumulation) {
+    const accumulationSeries = buildAccumulationSeries(
+      seriesData,
+      timeLabels.length,
+      variableConfig.color
+    );
+    if (accumulationSeries) {
+      allSeries.push(accumulationSeries);
+    }
+  }
+
   // Get unit string
   const unit = unitSystem === 'imperial' ? variableConfig.unitImperial : variableConfig.unit;
 
   // Use provided theme or get from CSS
   const chartTheme = theme ?? getEChartsTheme();
+
+  // Build elevation mark lines if enabled
+  let markLines: MarkLineData[] | undefined;
+  if (settings?.showElevationLines && settings.location) {
+    markLines = buildElevationMarkLines(
+      settings.location,
+      settings.currentElevation,
+      unitSystem,
+      chartTheme
+    );
+  }
 
   // When chart is locked, reduce bottom margin since there's no dataZoom slider
   // Keep enough space (60px) for legend labels that may wrap to multiple lines
@@ -290,6 +445,7 @@ export function buildWeatherChartConfig(
       formatter: (value: number) => `${Math.round(value)}`,
     },
     series: allSeries,
+    markLines,
     tooltip: {
       enabled: true,
       trigger: 'axis',
