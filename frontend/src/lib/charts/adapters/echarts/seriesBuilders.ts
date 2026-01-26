@@ -94,8 +94,6 @@ export function buildLineSeries(config: SeriesConfig): SeriesOption {
  */
 export function buildBarSeries(config: SeriesConfig): SeriesOption {
   const opacity = config.opacity ?? 0.8;
-  const dataLength = Array.isArray(config.data) ? config.data.length : 0;
-  const isLarge = dataLength > 50;
 
   const series: SeriesOption = {
     type: 'bar',
