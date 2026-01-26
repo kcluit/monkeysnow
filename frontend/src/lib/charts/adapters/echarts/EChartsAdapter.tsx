@@ -22,7 +22,7 @@ const DEFAULT_HEIGHT = 320;
  * Throttle interval for pointer events at the zrender level (ms).
  * Higher values = better FPS during rapid mouse movement, but less responsive tooltip.
  */
-const ZRENDER_THROTTLE_MS = 200;
+const ZRENDER_THROTTLE_MS = 50;
 
 /**
  * ECharts adapter component.
