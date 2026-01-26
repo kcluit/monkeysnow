@@ -1565,3 +1565,245 @@ input[type="checkbox"] {
         padding: 8px 6px;
     }
 }
+
+/* Chart Settings Modal Styles */
+.chart-settings-modal {
+    max-width: 400px;
+}
+
+.chart-settings-header {
+    padding: 16px 16px 12px 16px;
+    border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+}
+
+.chart-settings-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chart-settings-title {
+    margin: 0;
+    color: var(--textPrimary, #f5f5f7);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.chart-settings-content {
+    padding: 12px 16px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.chart-settings-section {
+    margin-bottom: 16px;
+}
+
+.chart-settings-section:last-child {
+    margin-bottom: 0;
+}
+
+.chart-settings-section-title {
+    margin: 0 0 10px 0;
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Chart Type Options */
+.chart-type-options {
+    display: flex;
+    gap: 8px;
+}
+
+.chart-type-option {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 8px;
+    background: var(--cardBg, rgba(255, 255, 255, 0.05));
+    border: 2px solid transparent;
+    border-radius: 8px;
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.chart-type-option:hover {
+    background: var(--cardBg, rgba(255, 255, 255, 0.1));
+    color: var(--textPrimary, #f5f5f7);
+}
+
+.chart-type-option.selected {
+    background: rgba(10, 132, 255, 0.15);
+    border-color: var(--accent, #0a84ff);
+    color: var(--accent, #0a84ff);
+}
+
+.chart-type-icon {
+    font-size: 20px;
+}
+
+.chart-type-label {
+    font-weight: 500;
+}
+
+/* Settings Toggle */
+.chart-settings-toggle {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 12px;
+    background: var(--cardBg, rgba(255, 255, 255, 0.05));
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.chart-settings-toggle:hover {
+    background: var(--cardBg, rgba(255, 255, 255, 0.08));
+}
+
+.chart-settings-toggle input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.chart-settings-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--textPrimary, #f5f5f7);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.chart-settings-toggle-label::before {
+    content: '';
+    display: block;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--textSecondary, #a1a1a6);
+    border-radius: 4px;
+    transition: all 0.15s ease;
+}
+
+.chart-settings-toggle input:checked + .chart-settings-toggle-label::before {
+    background: var(--accent, #0a84ff);
+    border-color: var(--accent, #0a84ff);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/%3E%3C/svg%3E");
+    background-size: 14px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.chart-settings-toggle-desc {
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 12px;
+    padding-left: 28px;
+}
+
+/* Elevation Preview */
+.elevation-preview {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: var(--cardBg, rgba(255, 255, 255, 0.03));
+    border-radius: 6px;
+}
+
+.elevation-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 12px;
+    border-left: 2px solid var(--textSecondary, #a1a1a6);
+    padding-left: 8px;
+    margin-left: 4px;
+}
+
+.elevation-line.current {
+    color: var(--textPrimary, #f5f5f7);
+    font-weight: 600;
+    border-left-color: var(--accent, #0a84ff);
+    border-left-width: 3px;
+}
+
+/* Footer Buttons */
+.chart-settings-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+}
+
+.chart-settings-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.chart-settings-btn.cancel {
+    background: var(--cardBg, rgba(255, 255, 255, 0.1));
+    color: var(--textSecondary, #a1a1a6);
+}
+
+.chart-settings-btn.cancel:hover {
+    background: var(--cardBg, rgba(255, 255, 255, 0.15));
+    color: var(--textPrimary, #f5f5f7);
+}
+
+.chart-settings-btn.apply {
+    background: var(--accent, #0a84ff);
+    color: #ffffff;
+}
+
+.chart-settings-btn.apply:hover {
+    opacity: 0.9;
+}
+
+/* Chart Control Buttons (visibility toggle & settings) */
+.chart-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.chart-control-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: var(--textSecondary, #a1a1a6);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.chart-control-btn:hover {
+    background: var(--cardBg, rgba(255, 255, 255, 0.1));
+    color: var(--textPrimary, #f5f5f7);
+}
+
+.chart-control-btn svg {
+    width: 16px;
+    height: 16px;
+}
