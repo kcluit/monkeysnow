@@ -73,7 +73,8 @@ export async function fetchOpenMeteoData(
   models: WeatherModel[],
   variables: WeatherVariable[],
   forecastDays: number = 14,
-  timezone: string = 'auto'
+  timezone: string = 'auto',
+  signal?: AbortSignal
 ): Promise<Map<WeatherModel, HourlyDataPoint[]>> {
   const params = {
     latitude,
@@ -86,7 +87,7 @@ export async function fetchOpenMeteoData(
   };
 
   try {
-    const responses = await fetchWeatherApi(OPEN_METEO_URL, params);
+    const responses = await fetchWeatherApi(OPEN_METEO_URL, params, signal);
     const result = new Map<WeatherModel, HourlyDataPoint[]>();
 
     for (let i = 0; i < responses.length; i++) {
