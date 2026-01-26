@@ -82,7 +82,6 @@ export function buildAreaSeries(config: SeriesConfig): SeriesOption {
         opacity: 0.5,
       },
     },
-    animation: false,
   };
 }
 
