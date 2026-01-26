@@ -24,13 +24,13 @@ interface ChartDataPoint {
     [key: string]: number | string;
 }
 
-export function WeatherChart({
+function WeatherChartInner({
     data,
     selectedModels,
     variable,
     unitSystem,
 }: WeatherChartProps): JSX.Element {
-    const variableConfig = getVariableConfig(variable);
+    const variableConfig = useMemo(() => getVariableConfig(variable), [variable]);
     const [brushRange, setBrushRange] = useState<{ startIndex?: number; endIndex?: number }>({});
 
     // Transform data for recharts format
