@@ -134,6 +134,7 @@ export function useDetailedWeatherData({
 
     return {
         data,
+        timezoneInfo,
         loading,
         error,
         refetch,
