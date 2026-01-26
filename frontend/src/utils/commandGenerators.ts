@@ -317,6 +317,25 @@ export function generateUnitSystemCommands(
 }
 
 /**
+ * Generate language submenu commands with checkmarks.
+ * Shows both English name and native name for each language.
+ */
+export function generateLanguageCommands(
+  currentLanguageId: string,
+  setLanguage: (id: string) => void,
+  availableLanguages: Language[]
+): Command[] {
+  return availableLanguages.map((lang) => ({
+    id: `language-${lang.id}`,
+    name: lang.name === lang.nativeName
+      ? lang.name
+      : `${lang.name} (${lang.nativeName})`,
+    icon: currentLanguageId === lang.id ? '✓' : '',
+    action: () => setLanguage(lang.id),
+  }));
+}
+
+/**
  * Generate all control-related commands for the command palette.
  * This is the main entry point for command generation.
  */
