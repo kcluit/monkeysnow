@@ -11,10 +11,10 @@ import { buildSeries } from './seriesBuilders';
 type ChartOption = Record<string, unknown>;
 
 /** Maximum number of series to show in tooltip for performance */
-const MAX_TOOLTIP_SERIES = 8;
+const MAX_TOOLTIP_SERIES = 6;
 
 /** Global throttle value for pointer events (ms) */
-const POINTER_THROTTLE_MS = 100;
+const POINTER_THROTTLE_MS = 150;
 
 /**
  * RAF-throttled tooltip formatter for smooth 60fps performance.
