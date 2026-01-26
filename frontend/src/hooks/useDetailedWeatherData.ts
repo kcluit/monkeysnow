@@ -30,6 +30,7 @@ export function useDetailedWeatherData({
     enabled = true,
 }: UseDetailedWeatherDataProps): UseDetailedWeatherDataReturn {
     const [data, setData] = useState<Map<WeatherModel, HourlyDataPoint[]> | null>(null);
+    const [timezoneInfo, setTimezoneInfo] = useState<TimezoneInfo | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
     const [refetchTrigger, setRefetchTrigger] = useState(0);
