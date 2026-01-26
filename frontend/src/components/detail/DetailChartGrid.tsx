@@ -11,6 +11,9 @@ function DetailChartGridInner({
   unitSystem,
   timezoneInfo,
   isChartLocked,
+  onToggleVariable,
+  location,
+  currentElevation,
 }: DetailChartGridProps): JSX.Element {
   // Memoize the chart cards to prevent unnecessary re-renders
   const chartCards = useMemo(() => {
@@ -32,10 +35,25 @@ function DetailChartGridInner({
           unitSystem={unitSystem}
           timezoneInfo={timezoneInfo}
           isChartLocked={isChartLocked}
+          onToggleVisibility={onToggleVariable ? () => onToggleVariable(variable) : undefined}
+          location={location}
+          currentElevation={currentElevation}
         />
       </div>
     ));
-  }, [data, selectedModels, selectedVariables, selectedAggregations, aggregationColors, unitSystem, timezoneInfo, isChartLocked]);
+  }, [
+    data,
+    selectedModels,
+    selectedVariables,
+    selectedAggregations,
+    aggregationColors,
+    unitSystem,
+    timezoneInfo,
+    isChartLocked,
+    onToggleVariable,
+    location,
+    currentElevation,
+  ]);
 
   if (!data || data.size === 0) {
     return (
