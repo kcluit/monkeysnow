@@ -16,13 +16,13 @@ import { buildEChartsOption } from './optionBuilder';
  * Default chart height if not specified in config.
  * Lower height = smaller canvas = better performance
  */
-const DEFAULT_HEIGHT = 320;
+const DEFAULT_HEIGHT = 280;
 
 /**
  * Throttle interval for pointer events at the zrender level (ms).
  * Higher values = better FPS during rapid mouse movement, but less responsive tooltip.
  */
-const ZRENDER_THROTTLE_MS = 50;
+const ZRENDER_THROTTLE_MS = 100;
 
 /**
  * ECharts adapter component.
