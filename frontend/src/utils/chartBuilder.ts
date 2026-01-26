@@ -274,7 +274,8 @@ export function buildWeatherChartConfig(
   const chartTheme = theme ?? getEChartsTheme();
 
   // When chart is locked, reduce bottom margin since there's no dataZoom slider
-  const gridBottom = isChartLocked ? 50 : 80;
+  // Keep enough space (60px) for legend labels that may wrap to multiple lines
+  const gridBottom = isChartLocked ? 60 : 80;
 
   return {
     type: chartType,
