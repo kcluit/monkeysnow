@@ -65,6 +65,12 @@ export function getAllResortNames(): string[] {
   return Array.from(LOCATION_MAP.keys());
 }
 
+// Return type for fetchOpenMeteoData including timezone info
+export interface FetchOpenMeteoDataResult {
+  data: Map<WeatherModel, HourlyDataPoint[]>;
+  timezoneInfo: TimezoneInfo | null;
+}
+
 // Fetch weather data from Open-Meteo for multiple models
 export async function fetchOpenMeteoData(
   latitude: number,
@@ -74,7 +80,7 @@ export async function fetchOpenMeteoData(
   variables: WeatherVariable[],
   forecastDays: number = 14,
   timezone: string = 'auto'
-): Promise<Map<WeatherModel, HourlyDataPoint[]>> {
+): Promise<FetchOpenMeteoDataResult> {
   const params = {
     latitude,
     longitude,
