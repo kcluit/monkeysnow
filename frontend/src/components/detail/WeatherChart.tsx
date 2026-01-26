@@ -21,6 +21,7 @@ function WeatherChartInner({
   variable,
   unitSystem,
   timezoneInfo,
+  isChartLocked,
 }: WeatherChartProps): JSX.Element {
   // Get reactive theme
   const theme = useChartTheme();
