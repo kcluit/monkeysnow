@@ -59,11 +59,17 @@ function App(): JSX.Element {
     const { isShowDateEnabled, setShowDateEnabled } = useShowDate();
     const { t, language, setLanguage, availableLanguages } = useLanguage();
 
+    // Hierarchy data from backend (resort list, display names)
+    const { skiResorts, getDisplayName, loading: hierarchyLoading } = useHierarchy();
+
     // Detail view state hook
     const { isDetailView, selectedResortId, enterDetailView, exitDetailView } = useDetailViewState();
 
     // Weather data hook
-    const { allWeatherData, loading, error, createLoadingController, cancelLoading } = useWeatherData();
+    const { allWeatherData, loading: weatherLoading, error, createLoadingController, cancelLoading } = useWeatherData();
+
+    // Combined loading state
+    const loading = weatherLoading || hierarchyLoading;
 
     // Local storage state
     const [selectedResorts, setSelectedResorts] = useLocalStorage<string[]>('selectedResorts', defaultSelectedResorts);
