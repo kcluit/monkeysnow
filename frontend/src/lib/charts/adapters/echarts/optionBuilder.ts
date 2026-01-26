@@ -395,21 +395,27 @@ export function buildEChartsOption(config: ChartConfig): ChartOption {
 
     return {
         backgroundColor: theme.background,
-        animation: config.animation ?? false, // Disable animation for performance by default
+        // Performance: disable all animations
+        animation: false,
+        animationDuration: 0,
+        animationDurationUpdate: 0,
         // Performance: use progressive rendering for large datasets
         progressive: isLargeDataset ? 200 : 0,
         progressiveThreshold: 1000,
-        // Performance: separate hover layer when many series (reduces canvas operations)
-        hoverLayerThreshold: hasManySeriesCount ? 3000 : Infinity,
-        // Performance: throttle updates during interactions
+        // Performance: separate hover layer threshold - lower = more efficient for hover
+        hoverLayerThreshold: 1000,
+        // Performance: use UTC to avoid timezone calculations
         useUTC: true,
-        // Performance: Throttle pointer event handling globally
-        // This is critical for smooth hover interactions
-        throttle: 50, // ms - reduces event processing frequency
-        // Performance: disable state animation (hover effects)
+        // Performance: CRITICAL - increase global throttle for pointer events
+        // Higher value = fewer updates = smoother FPS during rapid mouse movement
+        throttle: POINTER_THROTTLE_MS,
+        // Performance: completely disable state animation (hover/emphasis effects)
         stateAnimation: {
             duration: 0,
+            easing: 'linear',
         },
+        // Performance: disable blend mode (avoids expensive compositing)
+        blendMode: undefined,
         grid: buildGrid(config),
         xAxis: buildXAxis(config, theme),
         yAxis: buildYAxis(config, theme),
