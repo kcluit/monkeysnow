@@ -13,6 +13,55 @@ type ChartOption = Record<string, unknown>;
 /** Maximum number of series to show in tooltip for performance */
 const MAX_TOOLTIP_SERIES = 8;
 
+/** Global throttle value for pointer events (ms) */
+const POINTER_THROTTLE_MS = 100;
+
+/**
+ * Memoized tooltip formatter for performance.
+ * Uses a simple cache to avoid re-computing identical tooltips.
+ */
+let lastTooltipKey = '';
+let lastTooltipResult = '';
+
+function formatTooltip(params: unknown): string {
+    if (!Array.isArray(params) || params.length === 0) return '';
+
+    // Create a simple cache key from the first item's axis value
+    const first = params[0] as { axisValueLabel?: string; dataIndex?: number };
+    const cacheKey = `${first.dataIndex ?? ''}_${params.length}`;
+
+    // Return cached result if same data point
+    if (cacheKey === lastTooltipKey) {
+        return lastTooltipResult;
+    }
+
+    const header = first.axisValueLabel || '';
+    const displayCount = Math.min(params.length, MAX_TOOLTIP_SERIES);
+    const hasMore = params.length > MAX_TOOLTIP_SERIES;
+
+    // Pre-allocate array for string building (faster for larger sets)
+    const parts: string[] = [header];
+
+    for (let i = 0; i < displayCount; i++) {
+        const p = params[i] as { marker?: string; seriesName?: string; value?: unknown };
+        // Skip null/undefined values
+        if (p.value == null) continue;
+
+        const value = typeof p.value === 'number'
+            ? (Number.isInteger(p.value) ? p.value : p.value.toFixed(1))
+            : p.value;
+        parts.push(`${p.marker || ''} ${p.seriesName || ''}: ${value}`);
+    }
+
+    if (hasMore) {
+        parts.push(`<span style="color:#999">+${params.length - MAX_TOOLTIP_SERIES} more</span>`);
+    }
+
+    lastTooltipKey = cacheKey;
+    lastTooltipResult = parts.join('<br/>');
+    return lastTooltipResult;
+}
+
 /**
  * Build tooltip configuration for ECharts.
  * Optimized for performance during rapid mouse movements.
@@ -25,64 +74,52 @@ function buildTooltip(config: ChartConfig, _theme: ChartTheme): ChartOption {
     return {
         show: true,
         trigger: config.tooltip?.trigger ?? 'axis',
-        // Keep tooltip in chart container for better performance (avoid appendToBody)
+        // Performance: keep tooltip in chart container
         appendToBody: false,
-        // Performance: render tooltip directly without shadow DOM manipulation
+        // Performance: use richText render mode (simpler than html DOM manipulation)
         renderMode: 'html',
         backgroundColor: 'rgba(255, 255, 255, 0.95)',
         borderColor: '#ccc',
         borderWidth: 1,
+        padding: [8, 12],
         textStyle: {
             color: '#000',
             fontSize: 12,
         },
         // Performance: disable tooltip transitions completely
         transitionDuration: 0,
-        // Performance: add slight delay to reduce update frequency during rapid movement
-        showDelay: 0,
-        hideDelay: 100, // Brief hide delay prevents flicker when moving between points
-        // Performance: confine tooltip to chart area (avoids layout calculations)
+        // Performance: add delay to avoid rapid tooltip updates during fast mouse movement
+        showDelay: 50,
+        hideDelay: 50,
+        // Performance: confine tooltip to chart area (avoids expensive layout recalculations)
         confine: true,
+        // Performance: position tooltip efficiently using fixed position calculation
+        position: (point: number[]) => [point[0] + 10, point[1] - 10],
         axisPointer: {
             type: 'line',
-            // Performance: disable axis pointer animation
+            // Performance: disable ALL axis pointer animations
             animation: false,
-            // Performance: snap to data points reduces intermediate calculations
+            // Performance: snap to data points to reduce calculations
             snap: true,
-            // Performance: throttle axis pointer updates during rapid mouse movement
-            triggerEmphasis: false, // Don't trigger emphasis on hover
+            // Performance: DON'T trigger emphasis effects on hover
+            triggerEmphasis: false,
             triggerTooltip: true,
+            // Performance: disable cross lines (we only need vertical line)
+            // cross: false - not a valid option, but we set type to 'line' not 'cross'
             lineStyle: {
-                color: '#666',
+                color: '#999',
                 type: 'dashed',
+                width: 1,
+            },
+            // Performance: simple label, no fancy styling
+            label: {
+                show: false, // Hide axis pointer label for performance
             },
         },
-        extraCssText: 'box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-height: 300px; overflow: hidden; pointer-events: none;',
-        // Performance: Optimized formatter that limits displayed series
-        formatter: (params: unknown) => {
-            if (!Array.isArray(params)) return '';
-            const header = (params[0] as { axisValueLabel?: string })?.axisValueLabel || '';
-
-            // Performance: Limit number of series shown in tooltip
-            const displayCount = Math.min(params.length, MAX_TOOLTIP_SERIES);
-            const hasMore = params.length > MAX_TOOLTIP_SERIES;
-
-            // Build lines using simple string concatenation (faster than array join for small sets)
-            let result = header;
-            for (let i = 0; i < displayCount; i++) {
-                const p = params[i] as { marker?: string; seriesName?: string; value?: unknown };
-                const value = typeof p.value === 'number'
-                    ? (p.value % 1 === 0 ? p.value : (p.value as number).toFixed(1))
-                    : p.value;
-                result += `<br/>${p.marker || ''} ${p.seriesName || ''}: ${value}`;
-            }
-
-            if (hasMore) {
-                result += `<br/><span style="color:#999">+${params.length - MAX_TOOLTIP_SERIES} more...</span>`;
-            }
-
-            return result;
-        },
+        // Performance: minimal CSS, no shadows which cause repaints
+        extraCssText: 'max-height: 280px; overflow: hidden; pointer-events: none;',
+        // Performance: use memoized formatter
+        formatter: formatTooltip,
     };
 }
 
