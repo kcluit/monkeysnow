@@ -43,7 +43,7 @@ export function DetailedResortView({
     );
 
     // Fetch weather data
-    const { data, loading, error, refetch } = useDetailedWeatherData({
+    const { data, timezoneInfo, loading, error, refetch } = useDetailedWeatherData({
         latitude: location.lat,
         longitude: location.lon,
         elevation,
