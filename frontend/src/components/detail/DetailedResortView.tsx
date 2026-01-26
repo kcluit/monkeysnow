@@ -58,12 +58,15 @@ export function DetailedResortView({
             {/* Header */}
             <div className="mb-6">
                 <h1 className="text-2xl font-bold text-theme-textPrimary">{resortName}</h1>
-                <div className="flex items-center gap-4 text-sm text-theme-textSecondary">
+                <div className="flex items-center gap-4 text-sm text-theme-textSecondary flex-wrap">
                     <span>Lat: {location.lat.toFixed(4)}</span>
                     <span>Lon: {location.lon.toFixed(4)}</span>
                     <span>Base: {location.baseElevation}m</span>
                     <span>Mid: {location.midElevation}m</span>
                     <span>Top: {location.topElevation}m</span>
+                    {timezoneInfo && (
+                        <span>Timezone: {timezoneInfo.timezoneAbbreviation} ({timezoneInfo.timezone})</span>
+                    )}
                 </div>
             </div>
 
