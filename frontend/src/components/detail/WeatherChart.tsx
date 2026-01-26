@@ -211,6 +211,7 @@ export function WeatherChart({
                         <Tooltip {...tooltipProps} />
                         <Legend {...legendProps} />
                         {renderModelBars()}
+                        <Brush {...brushProps} />
                     </BarChart>
                 );
             case 'area':
@@ -222,6 +223,7 @@ export function WeatherChart({
                         <Tooltip {...tooltipProps} />
                         <Legend {...legendProps} />
                         {renderModelAreas()}
+                        <Brush {...brushProps} />
                     </AreaChart>
                 );
             default:
@@ -233,6 +235,7 @@ export function WeatherChart({
                         <Tooltip {...tooltipProps} />
                         <Legend {...legendProps} />
                         {renderModelLines()}
+                        <Brush {...brushProps} />
                     </LineChart>
                 );
         }
