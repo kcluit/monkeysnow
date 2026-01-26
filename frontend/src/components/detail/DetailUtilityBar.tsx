@@ -1,13 +1,19 @@
 import { useState, useEffect } from 'react';
 import type { DetailUtilityBarProps } from '../../types/detailView';
-import type { WeatherModel, WeatherVariable } from '../../types/openMeteo';
-import { MODEL_CONFIGS, VARIABLE_CONFIGS, ALL_MODELS, ALL_VARIABLES } from '../../utils/chartConfigurations';
+import type { WeatherVariable } from '../../types/openMeteo';
+import { VARIABLE_CONFIGS, ALL_VARIABLES } from '../../utils/chartConfigurations';
+import { useModelHierarchy } from '../../hooks/useModelHierarchy';
+import { ModelSelectionModal } from '../ModelSelectionModal';
 
 export function DetailUtilityBar({
     selectedModels,
     setSelectedModels,
     selectedVariables,
     setSelectedVariables,
+    selectedAggregations,
+    setSelectedAggregations,
+    aggregationColors,
+    setAggregationColors,
     elevation,
     setElevation,
     forecastDays,
@@ -17,16 +23,24 @@ export function DetailUtilityBar({
     isChartLocked,
     setIsChartLocked,
 }: DetailUtilityBarProps): JSX.Element {
-    const [showModelDropdown, setShowModelDropdown] = useState(false);
     const [showVariableDropdown, setShowVariableDropdown] = useState(false);
     const [showElevationDropdown, setShowElevationDropdown] = useState(false);
     const [showForecastDropdown, setShowForecastDropdown] = useState(false);
+
+    // Model hierarchy hook for modal
+    const modelHierarchy = useModelHierarchy({
+        selectedModels,
+        onModelsChange: setSelectedModels,
+        selectedAggregations,
+        onAggregationsChange: setSelectedAggregations,
+        aggregationColors,
+        onAggregationColorsChange: setAggregationColors,
+    });
 
     // Close dropdowns when clicking outside
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent): void => {
             if (!(e.target as HTMLElement).closest('[data-dropdown]')) {
-                setShowModelDropdown(false);
                 setShowVariableDropdown(false);
                 setShowElevationDropdown(false);
                 setShowForecastDropdown(false);
@@ -36,17 +50,6 @@ export function DetailUtilityBar({
         document.addEventListener('click', handleClickOutside);
         return () => document.removeEventListener('click', handleClickOutside);
     }, []);
-
-    const toggleModel = (modelId: WeatherModel) => {
-        if (selectedModels.includes(modelId)) {
-            // Don't allow removing the last model
-            if (selectedModels.length > 1) {
-                setSelectedModels(selectedModels.filter(m => m !== modelId));
-            }
-        } else {
-            setSelectedModels([...selectedModels, modelId]);
-        }
-    };
 
     const toggleVariable = (variableId: WeatherVariable) => {
         if (selectedVariables.includes(variableId)) {
@@ -68,6 +71,16 @@ export function DetailUtilityBar({
         setSelectedVariables([ALL_VARIABLES[0]]);
     };
 
+    // Get model button text
+    const getModelButtonText = (): string => {
+        const modelCount = selectedModels.length;
+        const aggCount = selectedAggregations.length;
+        if (aggCount > 0) {
+            return `Models (${modelCount} + ${aggCount})`;
+        }
+        return `Models (${modelCount})`;
+    };
+
     return (
         <div className="mb-6 flex flex-wrap gap-4 items-center">
             {/* Back button */}
@@ -81,64 +94,24 @@ export function DetailUtilityBar({
 
             <div className="h-6 w-px bg-theme-border" />
 
-            {/* Model Selection Dropdown */}
-            <div className="relative" data-dropdown>
-                <button
-                    onClick={() => {
-                        setShowModelDropdown(!showModelDropdown);
-                        setShowVariableDropdown(false);
-                        setShowElevationDropdown(false);
-                        setShowForecastDropdown(false);
-                    }}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-background border border-theme-border hover:bg-theme-secondary transition-colors"
-                >
-                    <span className="text-sm text-theme-textPrimary">
-                        Models ({selectedModels.length})
-                    </span>
-                    <svg className="w-4 h-4 text-theme-textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                </button>
-                {showModelDropdown && (
-                    <div className="absolute left-0 z-20 mt-1 w-64 max-h-80 overflow-y-auto bg-theme-background rounded-lg shadow-lg border border-theme-border">
-                        <div className="p-2">
-                            {ALL_MODELS.map(modelId => {
-                                const config = MODEL_CONFIGS.get(modelId);
-                                const isSelected = selectedModels.includes(modelId);
-                                return (
-                                    <label
-                                        key={modelId}
-                                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-theme-secondary cursor-pointer"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            checked={isSelected}
-                                            onChange={() => toggleModel(modelId)}
-                                            className="w-4 h-4 rounded border-theme-border"
-                                        />
-                                        <span
-                                            className="w-3 h-3 rounded-full flex-shrink-0"
-                                            style={{ backgroundColor: config?.color }}
-                                        />
-                                        <div className="flex-1 min-w-0">
-                                            <div className="text-sm text-theme-textPrimary truncate">
-                                                {config?.name || modelId}
-                                            </div>
-                                        </div>
-                                    </label>
-                                );
-                            })}
-                        </div>
-                    </div>
-                )}
-            </div>
+            {/* Model Selection Button - Opens Modal */}
+            <button
+                onClick={modelHierarchy.openModal}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-background border border-theme-border hover:bg-theme-secondary transition-colors"
+            >
+                <span className="text-sm text-theme-textPrimary">
+                    {getModelButtonText()}
+                </span>
+                <svg className="w-4 h-4 text-theme-textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
 
             {/* Elevation Dropdown */}
             <div className="relative" data-dropdown>
                 <button
                     onClick={() => {
                         setShowElevationDropdown(!showElevationDropdown);
-                        setShowModelDropdown(false);
                         setShowVariableDropdown(false);
                         setShowForecastDropdown(false);
                     }}
@@ -188,7 +161,6 @@ export function DetailUtilityBar({
                 <button
                     onClick={() => {
                         setShowForecastDropdown(!showForecastDropdown);
-                        setShowModelDropdown(false);
                         setShowVariableDropdown(false);
                         setShowElevationDropdown(false);
                     }}
@@ -230,7 +202,6 @@ export function DetailUtilityBar({
                 <button
                     onClick={() => {
                         setShowVariableDropdown(!showVariableDropdown);
-                        setShowModelDropdown(false);
                         setShowElevationDropdown(false);
                         setShowForecastDropdown(false);
                     }}
@@ -308,6 +279,9 @@ export function DetailUtilityBar({
             >
                 <span className="text-lg">{isChartLocked ? '🔒' : '🔓'}</span>
             </button>
+
+            {/* Model Selection Modal */}
+            <ModelSelectionModal hierarchy={modelHierarchy} />
         </div>
     );
 }
