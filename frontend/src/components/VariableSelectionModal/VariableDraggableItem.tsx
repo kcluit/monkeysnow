@@ -74,6 +74,7 @@ function VariableDraggableItemInner({
           checked={isSelected}
           onChange={onToggle}
           className="variable-checkbox"
+          aria-label={`Select ${config?.label || variable}`}
         />
       </label>
 
