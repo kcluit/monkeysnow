@@ -454,7 +454,7 @@ function App(): JSX.Element {
         return (
             <div className="min-h-screen p-4 sm:p-6 md:p-8 flex items-center justify-center bg-theme-background transition-colors duration-300 overflow-x-hidden">
                 <div className="text-center">
-                    <div className="text-xl font-semibold text-theme-textSecondary">Loading weather data...</div>
+                    <div className="text-xl font-semibold text-theme-textSecondary">{t('loading.weatherData')}</div>
                 </div>
             </div>
         );
@@ -465,8 +465,8 @@ function App(): JSX.Element {
         return (
             <div className="min-h-screen p-4 sm:p-6 md:p-8 flex items-center justify-center bg-theme-background transition-colors duration-300 overflow-x-hidden">
                 <div className="text-center">
-                    <div className="text-xl font-semibold text-red-600">Error loading weather data</div>
-                    <div className="text-sm text-theme-textSecondary mt-2">Please try refreshing the page</div>
+                    <div className="text-xl font-semibold text-red-600">{t('error.loadingWeatherData')}</div>
+                    <div className="text-sm text-theme-textSecondary mt-2">{t('error.tryRefreshing')}</div>
                 </div>
             </div>
         );
