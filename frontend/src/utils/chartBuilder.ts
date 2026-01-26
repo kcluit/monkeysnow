@@ -220,6 +220,10 @@ function buildSeriesConfigs(
 /**
  * Calculate cumulative accumulation from series data.
  * Used for precipitation/snowfall accumulation overlay.
+ *
+ * Note: Null values are preserved as gaps but the running sum continues.
+ * This is intentional for weather data where gaps represent missing data,
+ * not periods with zero precipitation.
  */
 function calculateAccumulation(values: (number | null)[]): (number | null)[] {
   let sum = 0;
