@@ -3,6 +3,7 @@
         "Canada": {
             "British Columbia": {
                 "Apex": {
+                    "displayName": "Apex Mountain",
                     "bot": 1570,
                     "mid": 1875,
                     "top": 2180,
@@ -12,6 +13,7 @@
                     ]
                 },
                 "Mt-Baldy-Ski-Area": {
+                    "displayName": "Mt Baldy",
                     "bot": 1663,
                     "mid": 1893,
                     "top": 2123,
@@ -21,6 +23,7 @@
                     ]
                 },
                 "Big-White": {
+                    "displayName": "Big White",
                     "bot": 1524,
                     "mid": 1905,
                     "top": 2286,
@@ -30,6 +33,7 @@
                     ]
                 },
                 "Cypress-Mountain": {
+                    "displayName": "Cypress Mountain",
                     "bot": 826,
                     "mid": 1132,
                     "top": 1439,
@@ -39,6 +43,7 @@
                     ]
                 },
                 "Fairmont-Hot-Springs": {
+                    "displayName": "Fairmont Hot Springs",
                     "bot": 1219,
                     "mid": 1372,
                     "top": 1524,
@@ -48,6 +53,7 @@
                     ]
                 },
                 "Fernie": {
+                    "displayName": "Fernie Alpine",
                     "bot": 1195,
                     "mid": 1560,
                     "top": 1925,
@@ -57,6 +63,7 @@
                     ]
                 },
                 "Grouse-Mountain": {
+                    "displayName": "Grouse Mountain",
                     "bot": 881,
                     "mid": 1053,
                     "top": 1225,
@@ -66,6 +73,7 @@
                     ]
                 },
                 "Harper-Mountain": {
+                    "displayName": "Harper Mountain",
                     "bot": 1097,
                     "mid": 1310,
                     "top": 1524,
@@ -75,6 +83,7 @@
                     ]
                 },
                 "Hudson Bay Mountain": {
+                    "displayName": "Hudson Bay Mountain",
                     "bot": 1146,
                     "mid": 1411,
                     "top": 1676,
@@ -84,6 +93,7 @@
                     ]
                 },
                 "Kicking-Horse": {
+                    "displayName": "Kicking Horse",
                     "bot": 1190,
                     "mid": 1848,
                     "top": 2505,
@@ -93,6 +103,7 @@
                     ]
                 },
                 "Kimberley": {
+                    "displayName": "Kimberley Alpine",
                     "bot": 1231,
                     "mid": 1606,
                     "top": 1982,
@@ -102,6 +113,7 @@
                     ]
                 },
                 "Manning-Park-Resort": {
+                    "displayName": "Manning Park",
                     "bot": 1357,
                     "mid": 1572,
                     "top": 1788,
@@ -111,6 +123,7 @@
                     ]
                 },
                 "MountCain": {
+                    "displayName": "Mount Cain",
                     "bot": 1311,
                     "mid": 1540,
                     "top": 1768,
@@ -120,6 +133,7 @@
                     ]
                 },
                 "Mount-Timothy-Ski-Area": {
+                    "displayName": "Mount Timothy",
                     "bot": 1378,
                     "mid": 1500,
                     "top": 1621,
@@ -129,6 +143,7 @@
                     ]
                 },
                 "Mount-Washington": {
+                    "displayName": "Mount Washington",
                     "bot": 1084,
                     "mid": 1336,
                     "top": 1589,
@@ -138,6 +153,7 @@
                     ]
                 },
                 "Mount-Seymour": {
+                    "displayName": "Mount Seymour",
                     "bot": 936,
                     "mid": 1100,
                     "top": 1265,
@@ -147,6 +163,7 @@
                     ]
                 },
                 "Murray-Ridge": {
+                    "displayName": "Murray Ridge",
                     "bot": 611,
                     "mid": 876,
                     "top": 1141,
@@ -156,6 +173,7 @@
                     ]
                 },
                 "Panorama": {
+                    "displayName": "Panorama Mountain",
                     "bot": 1181,
                     "mid": 1790,
                     "top": 2400,
@@ -165,6 +183,7 @@
                     ]
                 },
                 "PowderKing": {
+                    "displayName": "Powder King",
                     "bot": 935,
                     "mid": 1255,
                     "top": 1575,
@@ -174,6 +193,7 @@
                     ]
                 },
                 "Red-Mountain": {
+                    "displayName": "Red Mountain",
                     "bot": 1183,
                     "mid": 1628,
                     "top": 2073,
@@ -183,6 +203,7 @@
                     ]
                 },
                 "Revelstoke": {
+                    "displayName": "Revelstoke Mountain",
                     "bot": 512,
                     "mid": 1368,
                     "top": 2225,
@@ -192,6 +213,7 @@
                     ]
                 },
                 "Sasquatch Mountain Resort": {
+                    "displayName": "Sasquatch Mountain",
                     "bot": 975,
                     "mid": 1174,
                     "top": 1372,
@@ -201,6 +223,7 @@
                     ]
                 },
                 "ShamesMountain": {
+                    "displayName": "Shames Mountain",
                     "bot": 671,
                     "mid": 930,
                     "top": 1189,
@@ -210,6 +233,7 @@
                     ]
                 },
                 "Silver-Star": {
+                    "displayName": "SilverStar Mountain",
                     "bot": 1155,
                     "mid": 1536,
                     "top": 1916,
@@ -219,6 +243,7 @@
                     ]
                 },
                 "Summit-Lake-Ski-and-Snowboard-Area": {
+                    "displayName": "Summit Lake Ski Area",
                     "bot": 780,
                     "mid": 850,
                     "top": 920,
@@ -228,6 +253,7 @@
                     ]
                 },
                 "Sun-Peaks": {
+                    "displayName": "Sun Peaks",
                     "bot": 1186,
                     "mid": 1634,
                     "top": 2081,
@@ -237,6 +263,7 @@
                     ]
                 },
                 "Troll-Resort": {
+                    "displayName": "Troll Resort",
                     "bot": 1118,
                     "mid": 1382,
                     "top": 1645,
@@ -246,6 +273,7 @@
                     ]
                 },
                 "Whistler-Whistler": {
+                    "displayName": "Whistler Mountain",
                     "bot": 675,
                     "mid": 1480,
                     "top": 2284,
@@ -255,6 +283,7 @@
                     ]
                 },
                 "Whistler-Blackcomb": {
+                    "displayName": "Whistler Blackcomb",
                     "bot": 675,
                     "mid": 1580,
                     "top": 2284,
@@ -264,6 +293,7 @@
                     ]
                 },
                 "Whitewater": {
+                    "displayName": "Whitewater",
                     "bot": 1388,
                     "mid": 1695,
                     "top": 2002,
@@ -275,6 +305,7 @@
             },
             "Alberta": {
                 "Lake-Louise": {
+                    "displayName": "Lake Louise",
                     "bot": 1646,
                     "mid": 2141,
                     "top": 2636,
@@ -284,6 +315,7 @@
                     ]
                 },
                 "Sunshine": {
+                    "displayName": "Sunshine Village",
                     "bot": 1658,
                     "mid": 2194,
                     "top": 2729,
@@ -293,6 +325,7 @@
                     ]
                 },
                 "Banff-Norquay": {
+                    "displayName": "Mt Norquay",
                     "bot": 1539,
                     "mid": 1790,
                     "top": 2042,
@@ -302,6 +335,7 @@
                     ]
                 },
                 "Marmot-Basin": {
+                    "displayName": "Marmot Basin",
                     "bot": 1698,
                     "mid": 2155,
                     "top": 2612,
@@ -311,6 +345,7 @@
                     ]
                 },
                 "Nakiska": {
+                    "displayName": "Nakiska",
                     "bot": 1525,
                     "mid": 1892,
                     "top": 2260,
@@ -320,6 +355,7 @@
                     ]
                 },
                 "Castle-Mountain-Resort": {
+                    "displayName": "Castle Mountain",
                     "bot": 1410,
                     "mid": 1842,
                     "top": 2273,
@@ -329,6 +365,7 @@
                     ]
                 },
                 "Pass-Powderkeg": {
+                    "displayName": "Pass Powderkeg",
                     "bot": 1274,
                     "mid": 1457,
                     "top": 1640,
@@ -342,6 +379,7 @@
         "USA": {
             "Washington": {
                 "Mount-Baker": {
+                    "displayName": "Mt Baker",
                     "bot": 1067,
                     "mid": 1309,
                     "top": 1551,
@@ -351,6 +389,7 @@
                     ]
                 },
                 "Crystal-Mountain": {
+                    "displayName": "Crystal Mountain WA",
                     "bot": 1345,
                     "mid": 1741,
                     "top": 2137,
@@ -360,6 +399,7 @@
                     ]
                 },
                 "Stevens-Pass": {
+                    "displayName": "Stevens Pass",
                     "bot": 1232,
                     "mid": 1506,
                     "top": 1781,
