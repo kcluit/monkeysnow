@@ -43,7 +43,8 @@ function transformToChartData(
   selectedModels: WeatherModel[],
   variable: string,
   unitSystem: UnitSystem,
-  convertToImperial?: (value: number) => number
+  convertToImperial?: (value: number) => number,
+  timezone?: string
 ): { timeLabels: string[]; seriesData: Map<WeatherModel, (number | null)[]> } {
   // Get time points from first available model
   const firstModelData = data.values().next().value as HourlyDataPoint[] | undefined;
@@ -51,8 +52,8 @@ function transformToChartData(
     return { timeLabels: [], seriesData: new Map() };
   }
 
-  // Extract time labels
-  const timeLabels = firstModelData.map((point) => formatTimeLabel(point.time));
+  // Extract time labels with timezone formatting
+  const timeLabels = firstModelData.map((point) => formatTimeLabel(point.time, timezone));
 
   // Extract series data for each model
   const seriesData = new Map<WeatherModel, (number | null)[]>();
