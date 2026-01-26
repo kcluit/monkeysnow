@@ -366,8 +366,8 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Build hierarchy tree once
-  const hierarchyTree = useMemo(() => buildHierarchyTree(), []);
+  // Get hierarchy tree from context (fetched from backend)
+  const { hierarchyTree } = useHierarchy();
 
   // Memoize all node IDs for performance
   const allNodeIds = useMemo(() => getAllNodeIds(hierarchyTree), [hierarchyTree]);
