@@ -118,6 +118,8 @@ export interface ChartConfig {
   yAxis: AxisConfig;
   /** Data series to render */
   series: SeriesConfig[];
+  /** Horizontal reference lines */
+  markLines?: MarkLineData[];
   /** Tooltip settings */
   tooltip?: TooltipConfig;
   /** Legend settings */
