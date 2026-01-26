@@ -1,0 +1,50 @@
+/**
+ * Chart Settings Types
+ *
+ * Type definitions for per-variable chart customization settings.
+ * Settings are stored in localStorage with keys like `chartType_${variable}`.
+ */
+
+import type { WeatherVariable } from './openMeteo';
+
+/** Available chart types for display */
+export type ChartDisplayType = 'line' | 'bar' | 'area';
+
+/** Variables that support accumulation overlay */
+export const ACCUMULATION_VARIABLES: WeatherVariable[] = [
+  'precipitation',
+  'rain',
+  'snowfall',
+  'snow_depth',
+];
+
+/** Variables that support elevation lines */
+export const ELEVATION_LINE_VARIABLES: WeatherVariable[] = [
+  'freezing_level_height',
+];
+
+/** Check if a variable supports accumulation overlay */
+export function supportsAccumulation(variable: WeatherVariable): boolean {
+  return ACCUMULATION_VARIABLES.includes(variable);
+}
+
+/** Check if a variable supports elevation lines */
+export function supportsElevationLines(variable: WeatherVariable): boolean {
+  return ELEVATION_LINE_VARIABLES.includes(variable);
+}
+
+/** Location elevation data */
+export interface ElevationLocation {
+  baseElevation: number;
+  midElevation: number;
+  topElevation: number;
+}
+
+/** Mark line configuration for horizontal reference lines on charts */
+export interface MarkLineData {
+  yValue: number;
+  label: string;
+  color: string;
+  lineWidth: number;
+  lineStyle: 'solid' | 'dashed';
+}
