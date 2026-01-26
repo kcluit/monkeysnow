@@ -37,29 +37,26 @@ function formatTooltip(params: unknown): string {
     // Update the data index
     lastTooltipDataIndex = currentDataIndex;
 
-    // Build tooltip content synchronously (needed for ECharts)
+    // Build tooltip - minimal content for performance
     const header = first.axisValueLabel || '';
     const displayCount = Math.min(params.length, MAX_TOOLTIP_SERIES);
     const hasMore = params.length > MAX_TOOLTIP_SERIES;
 
-    // Use simple string concatenation (faster for small sets)
-    let result = header;
+    // Pre-allocate array for faster join
+    const lines: string[] = [header];
     for (let i = 0; i < displayCount; i++) {
         const p = params[i] as { marker?: string; seriesName?: string; value?: unknown };
         if (p.value == null) continue;
-
-        const value = typeof p.value === 'number'
-            ? (Number.isInteger(p.value) ? p.value : p.value.toFixed(1))
-            : p.value;
-        result += `<br/>${p.marker || ''} ${p.seriesName || ''}: ${value}`;
+        const val = typeof p.value === 'number' ? Math.round(p.value * 10) / 10 : p.value;
+        lines.push(`${p.marker || ''}${p.seriesName || ''}: ${val}`);
     }
 
     if (hasMore) {
-        result += `<br/><span style="color:#999">+${params.length - MAX_TOOLTIP_SERIES} more</span>`;
+        lines.push(`<span style="color:#999">+${params.length - MAX_TOOLTIP_SERIES} more</span>`);
     }
 
-    pendingTooltipResult = result;
-    return result;
+    pendingTooltipResult = lines.join('<br/>');
+    return pendingTooltipResult;
 }
 
 /**
