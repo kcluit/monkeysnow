@@ -8,6 +8,7 @@ function DetailChartGridInner({
   selectedVariables,
   unitSystem,
   timezoneInfo,
+  isChartLocked,
 }: DetailChartGridProps): JSX.Element {
   // Memoize the chart cards to prevent unnecessary re-renders
   const chartCards = useMemo(() => {
