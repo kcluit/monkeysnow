@@ -110,8 +110,8 @@ export function useDetailedWeatherData({
         }
 
         async function fetchAll() {
-            // Create an array of promises
-            const promises = models.map(model => fetchModel(model));
+            // Create an array of promises, marking first model for timezone extraction
+            const promises = models.map((model, index) => fetchModel(model, index === 0));
 
             // Wait for all to settle (finish)
             await Promise.allSettled(promises);
