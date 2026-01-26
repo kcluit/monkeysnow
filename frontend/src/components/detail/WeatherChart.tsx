@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
     LineChart,
     Line,
@@ -12,6 +12,7 @@ import {
     Tooltip,
     Legend,
     ResponsiveContainer,
+    Brush,
 } from 'recharts';
 import type { WeatherChartProps } from '../../types/detailView';
 import type { HourlyDataPoint } from '../../types/openMeteo';
