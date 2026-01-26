@@ -113,7 +113,9 @@ function buildTooltip(config: ChartConfig, _theme: ChartTheme): ChartOption {
             },
         },
         // Performance: minimal CSS, no shadows which cause repaints
-        extraCssText: 'max-height: 280px; overflow: hidden; pointer-events: none;',
+        extraCssText: 'max-height: 200px; overflow: hidden; pointer-events: none;',
+        // Performance: prevent mouse from entering tooltip
+        enterable: false,
         // Performance: use memoized formatter
         formatter: formatTooltip,
     };
