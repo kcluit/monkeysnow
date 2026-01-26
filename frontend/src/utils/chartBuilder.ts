@@ -161,6 +161,16 @@ function calculateAggregationSeries(
 }
 
 /**
+ * Calculate model line opacity based on number of selected models.
+ * More models = lower opacity so aggregation lines stand out.
+ */
+function calculateModelOpacity(modelCount: number): number {
+  // Scale opacity: fewer models = more visible, more models = more faded
+  // Uses sqrt scaling for a smooth curve
+  return Math.max(0.15, 0.5 / Math.sqrt(modelCount));
+}
+
+/**
  * Build series configurations from weather model data.
  * Skips models with no data or empty data arrays.
  */
@@ -171,6 +181,7 @@ function buildSeriesConfigs(
   hasAggregations: boolean
 ): SeriesConfig[] {
   const configs: SeriesConfig[] = [];
+  const modelOpacity = hasAggregations ? calculateModelOpacity(selectedModels.length) : 1;
 
   for (const model of selectedModels) {
     const data = seriesData.get(model);
@@ -186,8 +197,8 @@ function buildSeriesConfigs(
       type: chartType,
       data,
       fillOpacity: chartType === 'area' ? 0.3 : undefined,
-      // Reduce opacity when aggregations are enabled
-      opacity: hasAggregations ? 0.25 : 1,
+      // Reduce opacity when aggregations are enabled, scaled by model count
+      opacity: modelOpacity,
       lineWidth: 2,
       zIndex: 2,
     });
