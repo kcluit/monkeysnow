@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useDetailedWeatherData } from '../../hooks/useDetailedWeatherData';
 import { DetailUtilityBar } from './DetailUtilityBar';
