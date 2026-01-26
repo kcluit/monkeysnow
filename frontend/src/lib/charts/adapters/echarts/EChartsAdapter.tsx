@@ -91,16 +91,6 @@ function EChartsAdapterInner({
         // Note: Additional tooltip configuration is done in optionBuilder.ts
     }, []);
 
-    // Cleanup on unmount
-    useEffect(() => {
-        return () => {
-            if (chartRef.current) {
-                chartRef.current.dispose();
-                chartRef.current = null;
-            }
-        };
-    }, []);
-
     return (
         <ReactECharts
             option={option}
