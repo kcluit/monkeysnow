@@ -3,7 +3,7 @@ import type { DetailUtilityBarProps } from '../../types/detailView';
 import type { WeatherVariable } from '../../types/openMeteo';
 import { VARIABLE_CONFIGS, ALL_VARIABLES } from '../../utils/chartConfigurations';
 import { useModelHierarchy } from '../../hooks/useModelHierarchy';
-import { ModelSelectionModal } from '../ModelSelectionModal';
+import { ModelSelectionGridModal } from '../ModelSelectionModal';
 
 export function DetailUtilityBar({
     selectedModels,
