@@ -137,68 +137,22 @@ function WeatherChartInner({
         );
     }
 
-    // Common chart props
-    const commonProps = {
-        data: chartData,
-        margin: { top: 10, right: 30, left: 10, bottom: 0 },
-    };
+    // Memoize chart margin to prevent object recreation
+    const chartMargin = useMemo(() => ({ top: 10, right: 30, left: 10, bottom: 0 }), []);
 
-    const xAxisProps = {
-        dataKey: 'time',
-        tick: { fontSize: 11, fill: 'var(--textSecondary)' },
-        tickLine: { stroke: 'var(--border)' },
-        axisLine: { stroke: 'var(--border)' },
-        interval: Math.floor(chartData.length / 14), // Show ~14 ticks
-    };
+    // Memoize axis tick interval
+    const xAxisInterval = useMemo(() => Math.floor(chartData.length / 14), [chartData.length]);
 
-    const yAxisProps = {
-        tick: { fontSize: 11, fill: 'var(--textSecondary)' },
-        tickLine: { stroke: 'var(--border)' },
-        axisLine: { stroke: 'var(--border)' },
-        domain: variableConfig.yAxisDomain || ['auto', 'auto'],
-        tickFormatter: (value: number) => `${Math.round(value)}`,
-    };
+    // Memoize Y-axis domain
+    const yAxisDomain = useMemo(() => variableConfig.yAxisDomain || ['auto', 'auto'], [variableConfig.yAxisDomain]);
 
-    const tooltipProps = {
-        contentStyle: {
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            border: '1px solid #ccc',
-            borderRadius: '6px',
-            fontSize: '13px',
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-            color: '#000',
-        },
-        itemStyle: { padding: 0 },
-        labelStyle: { color: '#000', fontWeight: 600, marginBottom: '4px' },
-        cursor: { stroke: '#666', strokeWidth: 1, strokeDasharray: '3 3' },
-    };
+    // Memoize tick formatter
+    const tickFormatter = useCallback((value: number) => `${Math.round(value)}`, []);
 
-    const legendProps = {
-        wrapperStyle: { fontSize: '12px' },
-    };
-
-    const gridProps = {
-        strokeDasharray: '3 3',
-        stroke: 'var(--border)',
-        opacity: 0.3,
-        horizontal: true,
-        vertical: true,
-    };
-
-    const handleBrushChange = (range: { startIndex?: number; endIndex?: number }) => {
+    // Memoize brush change handler
+    const handleBrushChange = useCallback((range: { startIndex?: number; endIndex?: number }) => {
         setBrushRange(range);
-    };
-
-    const brushProps = {
-        dataKey: 'time',
-        height: 40,
-        stroke: 'var(--accent)',
-        fill: 'var(--cardBg)',
-        travellerWidth: 10,
-        onChange: handleBrushChange,
-        startIndex: brushRange.startIndex,
-        endIndex: brushRange.endIndex,
-    };
+    }, []);
 
     // Render appropriate chart type
     const renderChart = () => {
