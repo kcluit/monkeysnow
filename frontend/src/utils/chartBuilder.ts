@@ -272,38 +272,6 @@ function buildAccumulationSeries(
 
   return accumulationSeries;
 }
-
-/**
- * Adjust color brightness by a percentage.
- * Positive values lighten, negative values darken.
- */
-function adjustColorBrightness(hex: string, percent: number): string {
-  // Remove # if present
-  const cleanHex = hex.replace('#', '');
-
-  // Validate hex format (must be 6 hex characters)
-  if (!/^[0-9A-Fa-f]{6}$/.test(cleanHex)) {
-    return hex; // Return original if invalid
-  }
-
-  // Parse RGB
-  const r = parseInt(cleanHex.substring(0, 2), 16);
-  const g = parseInt(cleanHex.substring(2, 4), 16);
-  const b = parseInt(cleanHex.substring(4, 6), 16);
-
-  // Adjust brightness
-  const adjust = (value: number) => {
-    const adjusted = value + (value * percent / 100);
-    return Math.max(0, Math.min(255, Math.round(adjusted)));
-  };
-
-  const newR = adjust(r).toString(16).padStart(2, '0');
-  const newG = adjust(g).toString(16).padStart(2, '0');
-  const newB = adjust(b).toString(16).padStart(2, '0');
-
-  return `#${newR}${newG}${newB}`;
-}
-
 /**
  * Build elevation mark lines for freezing level chart.
  */
