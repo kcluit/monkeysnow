@@ -134,12 +134,12 @@ function buildYAxis(config: ChartConfig, theme: ChartTheme): ChartOption {
     max: domain[1] === 'auto' ? undefined : domain[1],
     axisLine: {
       lineStyle: {
-        color: theme.border,
+        color: theme.gridLine,
       },
     },
     axisTick: {
       lineStyle: {
-        color: theme.border,
+        color: theme.gridLine,
       },
     },
     axisLabel: {
@@ -151,7 +151,7 @@ function buildYAxis(config: ChartConfig, theme: ChartTheme): ChartOption {
     },
     splitLine: {
       lineStyle: {
-        color: theme.border,
+        color: theme.gridLine,
         opacity: 0.3,
         type: 'dashed',
       },
