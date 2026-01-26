@@ -293,6 +293,21 @@ export function DetailUtilityBar({
                     </div>
                 )}
             </div>
+
+            <div className="h-6 w-px bg-theme-border" />
+
+            {/* Lock Button - toggles scroll zoom and range slider */}
+            <button
+                onClick={() => setIsChartLocked(!isChartLocked)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                    isChartLocked
+                        ? 'bg-theme-accent text-white'
+                        : 'bg-theme-background border border-theme-border hover:bg-theme-secondary text-theme-textPrimary'
+                }`}
+                title={isChartLocked ? 'Unlock charts (enable zoom and slider)' : 'Lock charts (disable zoom and hide slider)'}
+            >
+                <span className="text-lg">{isChartLocked ? '🔒' : '🔓'}</span>
+            </button>
         </div>
     );
 }
