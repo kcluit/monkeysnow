@@ -29,7 +29,7 @@ function DetailChartGridInner({
         />
       </div>
     ));
-  }, [data, selectedModels, selectedVariables, unitSystem]);
+  }, [data, selectedModels, selectedVariables, unitSystem, timezoneInfo]);
 
   if (!data || data.size === 0) {
     return (
