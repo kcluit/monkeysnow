@@ -114,5 +114,5 @@ export interface ChartConfig {
 export interface ChartRendererProps {
   config: ChartConfig;
   className?: string;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 }
