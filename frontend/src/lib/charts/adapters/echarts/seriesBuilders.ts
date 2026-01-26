@@ -164,6 +164,7 @@ export function buildAreaSeries(config: SeriesConfig): SeriesOption {
     // Performance: CRITICAL - silent mode disables event processing
     silent: true,
     triggerLineEvent: false,
+    hoverLayerThreshold: Infinity,
     itemStyle: {
       color: config.color,
       opacity,
@@ -182,10 +183,10 @@ export function buildAreaSeries(config: SeriesConfig): SeriesOption {
     showSymbol: false,
     symbolSize: 0,
     // Performance: Enable large mode with low threshold
-    large: isLarge,
-    largeThreshold: 50,
-    // Performance: Use LTTB sampling
-    sampling: 'lttb',
+    large: true,
+    largeThreshold: 20,
+    // Performance: Use average sampling (faster than lttb)
+    sampling: 'average',
     // Performance: Clip data
     clip: true,
     // Performance: Disable all state effects
@@ -206,6 +207,9 @@ export function buildAreaSeries(config: SeriesConfig): SeriesOption {
     universalTransition: {
       enabled: false,
     },
+    // Performance: Progressive rendering
+    progressive: 100,
+    progressiveThreshold: 500,
   };
 
   // Add yAxisIndex if specified (for secondary Y-axis)
