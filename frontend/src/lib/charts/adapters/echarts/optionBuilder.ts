@@ -14,7 +14,7 @@ type ChartOption = Record<string, unknown>;
 const MAX_TOOLTIP_SERIES = 4;
 
 /** Global throttle value for pointer events (ms) */
-const POINTER_THROTTLE_MS = 150;
+const POINTER_THROTTLE_MS = 200;
 
 /**
  * RAF-throttled tooltip formatter for smooth 60fps performance.
