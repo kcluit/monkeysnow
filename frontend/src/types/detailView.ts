@@ -71,6 +71,8 @@ export interface DetailUtilityBarProps {
         topElevation: number;
     };
     onBack: () => void;
+    isChartLocked: boolean;
+    setIsChartLocked: (locked: boolean) => void;
 }
 
 export interface DetailChartGridProps {
