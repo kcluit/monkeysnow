@@ -36,6 +36,17 @@ function buildTooltip(config: ChartConfig, _theme: ChartTheme): ChartOption {
       },
     },
     extraCssText: 'box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);',
+    formatter: (params: unknown) => {
+      if (!Array.isArray(params)) return '';
+      const lines = params.map((p: { marker?: string; seriesName?: string; value?: unknown }) => {
+        const value = typeof p.value === 'number'
+          ? (Number.isInteger(p.value) ? p.value : parseFloat(p.value.toFixed(2)))
+          : p.value;
+        return `${p.marker || ''} ${p.seriesName || ''}: ${value}`;
+      });
+      const header = (params[0] as { axisValueLabel?: string })?.axisValueLabel || '';
+      return `${header}<br/>${lines.join('<br/>')}`;
+    },
   };
 }
 
