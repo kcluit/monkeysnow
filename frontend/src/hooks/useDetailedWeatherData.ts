@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { fetchOpenMeteoData } from '../utils/openMeteoClient';
-import type { WeatherModel, WeatherVariable, HourlyDataPoint } from '../types/openMeteo';
+import type { WeatherModel, WeatherVariable, HourlyDataPoint, TimezoneInfo } from '../types/openMeteo';
 
 export interface UseDetailedWeatherDataProps {
     latitude: number;
