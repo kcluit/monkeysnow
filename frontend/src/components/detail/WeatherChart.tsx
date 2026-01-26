@@ -73,8 +73,8 @@ function WeatherChartInner({
     // Get unit based on system
     const unit = unitSystem === 'imperial' ? variableConfig.unitImperial : variableConfig.unit;
 
-    // Render lines for each model
-    const renderModelLines = () => {
+    // Memoize model line/bar/area elements
+    const modelLines = useMemo(() => {
         return selectedModels.map((modelId) => {
             const modelConfig = getModelConfig(modelId);
             return (
@@ -91,9 +91,9 @@ function WeatherChartInner({
                 />
             );
         });
-    };
+    }, [selectedModels]);
 
-    const renderModelBars = () => {
+    const modelBars = useMemo(() => {
         return selectedModels.map((modelId) => {
             const modelConfig = getModelConfig(modelId);
             return (
@@ -103,12 +103,13 @@ function WeatherChartInner({
                     name={modelConfig.name}
                     fill={modelConfig.color}
                     opacity={0.8}
+                    isAnimationActive={false}
                 />
             );
         });
-    };
+    }, [selectedModels]);
 
-    const renderModelAreas = () => {
+    const modelAreas = useMemo(() => {
         return selectedModels.map((modelId) => {
             const modelConfig = getModelConfig(modelId);
             return (
@@ -126,7 +127,7 @@ function WeatherChartInner({
                 />
             );
         });
-    };
+    }, [selectedModels]);
 
     if (chartData.length === 0) {
         return (
