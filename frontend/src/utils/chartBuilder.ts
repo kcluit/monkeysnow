@@ -433,6 +433,18 @@ export function buildWeatherChartConfig(
   // Keep enough space (60px) for legend labels that may wrap to multiple lines
   const gridBottom = isChartLocked ? 60 : 80;
 
+  // Need more space on right when accumulation has secondary Y-axis
+  const gridRight = hasAccumulation ? 50 : 30;
+
+  // Build secondary Y-axis config if accumulation is enabled
+  const yAxisSecondary = hasAccumulation
+    ? {
+        type: 'value' as const,
+        label: `Accumulation (${unit})`,
+        formatter: (value: number) => `${Math.round(value)}`,
+      }
+    : undefined;
+
   return {
     type: chartType,
     xAxis: {
@@ -445,6 +457,7 @@ export function buildWeatherChartConfig(
       domain: variableConfig.yAxisDomain,
       formatter: (value: number) => `${Math.round(value)}`,
     },
+    yAxisSecondary,
     series: allSeries,
     markLines,
     tooltip: {
@@ -457,7 +470,7 @@ export function buildWeatherChartConfig(
     },
     grid: {
       top: 10,
-      right: 30,
+      right: gridRight,
       bottom: gridBottom,
       left: 10,
       containLabel: true,
