@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
 import type { WeatherVariable } from '../types/openMeteo';
-import { ALL_VARIABLES } from '../utils/chartConfigurations';
+import { ALL_VARIABLES, VARIABLE_CONFIGS } from '../utils/chartConfigurations';
 
 export interface UseVariableSelectionProps {
   selectedVariables: WeatherVariable[];
