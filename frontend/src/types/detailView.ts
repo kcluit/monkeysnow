@@ -86,4 +86,5 @@ export interface WeatherChartProps {
     selectedModels: WeatherModel[];
     variable: WeatherVariable;
     unitSystem: UnitSystem;
+    timezoneInfo?: TimezoneInfo;
 }
