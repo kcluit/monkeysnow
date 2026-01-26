@@ -10,7 +10,6 @@ import {
   getModelsUnderNode,
   getAggregationsUnderNode,
   flattenModels,
-  aggregationOptions,
   type ModelHierarchyNode,
 } from '../data/modelHierarchy';
 
