@@ -73,9 +73,10 @@ function transformToChartData(
 
 /**
  * Build series configurations from weather model data.
+ * Skips models with no data or empty data arrays.
  */
 function buildSeriesConfigs(
-  seriesData: Map<WeatherModel, number[]>,
+  seriesData: Map<WeatherModel, (number | null)[]>,
   selectedModels: WeatherModel[],
   chartType: ChartType
 ): SeriesConfig[] {
@@ -83,7 +84,8 @@ function buildSeriesConfigs(
 
   for (const model of selectedModels) {
     const data = seriesData.get(model);
-    if (!data) continue;
+    // Skip if no data or empty array
+    if (!data || data.length === 0) continue;
 
     const modelConfig = getModelConfig(model);
 
