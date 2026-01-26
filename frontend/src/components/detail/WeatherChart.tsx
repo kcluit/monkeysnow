@@ -180,7 +180,13 @@ function WeatherChartInner({
       </div>
 
       {/* Chart - wrapped in hover coordinator container for performance */}
-      <div ref={containerRef}>
+      <div
+        ref={containerRef}
+        style={{
+          // Performance: CSS containment to isolate repaints
+          contain: 'layout style paint',
+        }}
+      >
         <ChartRenderer config={chartConfig} />
       </div>
 
