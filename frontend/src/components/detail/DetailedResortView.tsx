@@ -68,6 +68,14 @@ export function DetailedResortView({
         true
     );
 
+    // Toggle variable visibility (for the eye icon on each chart)
+    const toggleVariable = useCallback((variable: WeatherVariable) => {
+        // Don't allow removing the last variable
+        if (selectedVariables.length > 1) {
+            setSelectedVariables(selectedVariables.filter((v) => v !== variable));
+        }
+    }, [selectedVariables, setSelectedVariables]);
+
     // Fetch weather data
     const { data, timezoneInfo, loading, error, refetch } = useDetailedWeatherData({
         latitude: location.lat,
