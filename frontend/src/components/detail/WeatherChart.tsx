@@ -31,6 +31,7 @@ export function WeatherChart({
     unitSystem,
 }: WeatherChartProps): JSX.Element {
     const variableConfig = getVariableConfig(variable);
+    const [brushRange, setBrushRange] = useState<{ startIndex?: number; endIndex?: number }>({});
 
     // Transform data for recharts format
     const chartData = useMemo((): ChartDataPoint[] => {
