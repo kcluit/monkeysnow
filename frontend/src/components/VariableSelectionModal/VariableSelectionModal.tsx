@@ -151,7 +151,7 @@ export function VariableSelectionModal({
             Deselect All
           </button>
           <span className="variable-selection-count">
-            {selectedVariables.length} of {filteredVariables.length} selected
+            {selectedInFilteredCount} of {filteredVariables.length} shown
           </span>
         </div>
 
