@@ -58,8 +58,9 @@ export function useDetailedWeatherData({
       return;
     }
 
-    // Skip if params haven't changed (unless refetch was triggered)
-    if (paramsKey === prevParamsRef.current && refetchTrigger === 0) {
+    // Skip if params haven't changed and this isn't a refetch
+    const isRefetch = refetchTrigger > 0;
+    if (paramsKey === prevParamsRef.current && !isRefetch) {
       return;
     }
     prevParamsRef.current = paramsKey;
@@ -78,7 +79,9 @@ export function useDetailedWeatherData({
           elevation,
           models,
           variables,
-          forecastDays
+          forecastDays,
+          'auto',
+          controller.signal
         );
 
         if (!cancelled) {
