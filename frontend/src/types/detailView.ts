@@ -58,11 +58,11 @@ export interface DetailViewHeaderProps {
 
 export interface DetailUtilityBarProps {
     selectedModels: WeatherModel[];
-    setSelectedModels: (models: WeatherModel[]) => void;
+    setSelectedModels: (models: WeatherModel[] | ((prev: WeatherModel[]) => WeatherModel[])) => void;
     selectedVariables: WeatherVariable[];
     setSelectedVariables: (variables: WeatherVariable[]) => void;
     selectedAggregations: AggregationType[];
-    setSelectedAggregations: (aggregations: AggregationType[]) => void;
+    setSelectedAggregations: (aggregations: AggregationType[] | ((prev: AggregationType[]) => AggregationType[])) => void;
     aggregationColors: Record<AggregationType, string>;
     setAggregationColors: (colors: Record<AggregationType, string>) => void;
     elevation: number;
