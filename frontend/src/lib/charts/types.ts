@@ -20,6 +20,12 @@ export interface SeriesConfig {
   data: (number | null)[];
   /** Optional opacity for area fills */
   fillOpacity?: number;
+  /** Optional line width (default: 2) */
+  lineWidth?: number;
+  /** Optional series opacity (0-1, default: 1) */
+  opacity?: number;
+  /** Optional z-index for rendering order */
+  zIndex?: number;
 }
 
 /** Axis configuration */
