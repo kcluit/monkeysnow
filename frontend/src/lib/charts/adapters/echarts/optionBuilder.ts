@@ -212,6 +212,7 @@ function buildYAxis(config: ChartConfig, theme: ChartTheme): ChartOption | Chart
 
 /**
  * Build dataZoom (brush/zoom) configuration for ECharts.
+ * Optimized for smooth interactions.
  */
 function buildDataZoom(config: ChartConfig, theme: ChartTheme): ChartOption[] | undefined {
     if (config.dataZoom?.enabled === false) {
@@ -246,6 +247,10 @@ function buildDataZoom(config: ChartConfig, theme: ChartTheme): ChartOption[] | 
                     color: `${theme.gridLine}40`,
                 },
             },
+            // Performance: Throttle slider updates
+            throttle: 50,
+            // Performance: Don't redraw during drag
+            realtime: true,
         });
     }
 
@@ -258,6 +263,8 @@ function buildDataZoom(config: ChartConfig, theme: ChartTheme): ChartOption[] | 
             end: range[1],
             zoomOnMouseWheel: true,
             moveOnMouseMove: true,
+            // Performance: Throttle inside zoom updates
+            throttle: 50,
         });
     }
 
