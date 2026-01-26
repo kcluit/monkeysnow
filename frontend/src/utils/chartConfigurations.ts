@@ -403,6 +403,6 @@ export function getVariableConfig(variableId: WeatherVariable): VariableConfig {
     unitImperial: '',
     color: '#6b7280',
     chartType: 'line',
-    formatValue: (v) => `${v}`,
+    formatValue: (v) => `${Number.isInteger(v) ? v : parseFloat(v.toFixed(2))}`,
   };
 }
