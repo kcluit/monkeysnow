@@ -154,47 +154,108 @@ function WeatherChartInner({
         setBrushRange(range);
     }, []);
 
-    // Render appropriate chart type
-    const renderChart = () => {
+    // Memoize common chart elements to prevent recreation
+    const chartElements = useMemo(() => ({
+        grid: (
+            <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="var(--border)"
+                opacity={0.3}
+                horizontal={true}
+                vertical={true}
+            />
+        ),
+        xAxis: (
+            <XAxis
+                dataKey="time"
+                tick={{ fontSize: 11, fill: 'var(--textSecondary)' }}
+                tickLine={{ stroke: 'var(--border)' }}
+                axisLine={{ stroke: 'var(--border)' }}
+                interval={xAxisInterval}
+            />
+        ),
+        yAxis: (
+            <YAxis
+                tick={{ fontSize: 11, fill: 'var(--textSecondary)' }}
+                tickLine={{ stroke: 'var(--border)' }}
+                axisLine={{ stroke: 'var(--border)' }}
+                domain={yAxisDomain}
+                tickFormatter={tickFormatter}
+            />
+        ),
+        tooltip: (
+            <Tooltip
+                contentStyle={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    border: '1px solid #ccc',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                    color: '#000',
+                }}
+                itemStyle={{ padding: 0 }}
+                labelStyle={{ color: '#000', fontWeight: 600, marginBottom: '4px' }}
+                cursor={{ stroke: '#666', strokeWidth: 1, strokeDasharray: '3 3' }}
+            />
+        ),
+        legend: <Legend wrapperStyle={{ fontSize: '12px' }} />,
+    }), [xAxisInterval, yAxisDomain, tickFormatter]);
+
+    // Memoize brush element separately since it has changing props
+    const brushElement = useMemo(() => (
+        <Brush
+            dataKey="time"
+            height={40}
+            stroke="var(--accent)"
+            fill="var(--cardBg)"
+            travellerWidth={10}
+            onChange={handleBrushChange}
+            startIndex={brushRange.startIndex}
+            endIndex={brushRange.endIndex}
+        />
+    ), [handleBrushChange, brushRange.startIndex, brushRange.endIndex]);
+
+    // Memoize the chart render based on chart type
+    const chart = useMemo(() => {
         switch (variableConfig.chartType) {
             case 'bar':
                 return (
-                    <BarChart {...commonProps}>
-                        <CartesianGrid {...gridProps} />
-                        <XAxis {...xAxisProps} />
-                        <YAxis {...yAxisProps} />
-                        <Tooltip {...tooltipProps} />
-                        <Legend {...legendProps} />
-                        {renderModelBars()}
-                        <Brush {...brushProps} />
+                    <BarChart data={chartData} margin={chartMargin}>
+                        {chartElements.grid}
+                        {chartElements.xAxis}
+                        {chartElements.yAxis}
+                        {chartElements.tooltip}
+                        {chartElements.legend}
+                        {modelBars}
+                        {brushElement}
                     </BarChart>
                 );
             case 'area':
                 return (
-                    <AreaChart {...commonProps}>
-                        <CartesianGrid {...gridProps} />
-                        <XAxis {...xAxisProps} />
-                        <YAxis {...yAxisProps} />
-                        <Tooltip {...tooltipProps} />
-                        <Legend {...legendProps} />
-                        {renderModelAreas()}
-                        <Brush {...brushProps} />
+                    <AreaChart data={chartData} margin={chartMargin}>
+                        {chartElements.grid}
+                        {chartElements.xAxis}
+                        {chartElements.yAxis}
+                        {chartElements.tooltip}
+                        {chartElements.legend}
+                        {modelAreas}
+                        {brushElement}
                     </AreaChart>
                 );
             default:
                 return (
-                    <LineChart {...commonProps}>
-                        <CartesianGrid {...gridProps} />
-                        <XAxis {...xAxisProps} />
-                        <YAxis {...yAxisProps} />
-                        <Tooltip {...tooltipProps} />
-                        <Legend {...legendProps} />
-                        {renderModelLines()}
-                        <Brush {...brushProps} />
+                    <LineChart data={chartData} margin={chartMargin}>
+                        {chartElements.grid}
+                        {chartElements.xAxis}
+                        {chartElements.yAxis}
+                        {chartElements.tooltip}
+                        {chartElements.legend}
+                        {modelLines}
+                        {brushElement}
                     </LineChart>
                 );
         }
-    };
+    }, [variableConfig.chartType, chartData, chartMargin, chartElements, modelBars, modelAreas, modelLines, brushElement]);
 
     return (
         <div className="w-full">
