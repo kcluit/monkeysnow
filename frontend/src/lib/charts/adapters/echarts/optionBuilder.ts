@@ -138,13 +138,19 @@ function buildXAxis(config: ChartConfig, theme: ChartTheme): ChartOption {
 }
 
 /**
- * Build Y-axis configuration for ECharts.
+ * Build a single Y-axis configuration for ECharts.
  */
-function buildYAxis(config: ChartConfig, theme: ChartTheme): ChartOption {
-  const domain = config.yAxis.domain ?? ['auto', 'auto'];
+function buildSingleYAxis(
+  axisConfig: ChartConfig['yAxis'],
+  theme: ChartTheme,
+  position: 'left' | 'right',
+  showSplitLine: boolean
+): ChartOption {
+  const domain = axisConfig.domain ?? ['auto', 'auto'];
 
   return {
     type: 'value',
+    position,
     min: domain[0] === 'auto' ? undefined : domain[0],
     max: domain[1] === 'auto' ? undefined : domain[1],
     axisLine: {
@@ -160,11 +166,12 @@ function buildYAxis(config: ChartConfig, theme: ChartTheme): ChartOption {
     axisLabel: {
       color: theme.textSecondary,
       fontSize: 11,
-      formatter: config.yAxis.formatter
-        ? (value: number) => config.yAxis.formatter!(value)
+      formatter: axisConfig.formatter
+        ? (value: number) => axisConfig.formatter!(value)
         : (value: number) => `${Math.round(value)}`,
     },
     splitLine: {
+      show: showSplitLine,
       lineStyle: {
         color: theme.gridLine,
         opacity: 0.3,
@@ -172,6 +179,23 @@ function buildYAxis(config: ChartConfig, theme: ChartTheme): ChartOption {
       },
     },
   };
+}
+
+/**
+ * Build Y-axis configuration for ECharts.
+ * Returns an array if secondary axis is defined.
+ */
+function buildYAxis(config: ChartConfig, theme: ChartTheme): ChartOption | ChartOption[] {
+  if (config.yAxisSecondary) {
+    // Dual Y-axis: primary on left, secondary on right
+    return [
+      buildSingleYAxis(config.yAxis, theme, 'left', true),
+      buildSingleYAxis(config.yAxisSecondary, theme, 'right', false),
+    ];
+  }
+
+  // Single Y-axis
+  return buildSingleYAxis(config.yAxis, theme, 'left', true);
 }
 
 /**
