@@ -208,7 +208,7 @@ function buildDataZoom(config: ChartConfig, theme: ChartTheme): ChartOption[] | 
 /**
  * Convert ChartConfig to complete ECharts option object.
  */
-export function buildEChartsOption(config: ChartConfig): EChartsOption {
+export function buildEChartsOption(config: ChartConfig): ChartOption {
   const theme = config.theme;
 
   // Build series from config
