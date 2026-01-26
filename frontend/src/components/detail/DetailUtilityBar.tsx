@@ -281,7 +281,7 @@ export function DetailUtilityBar({
             </button>
 
             {/* Model Selection Modal */}
-            <ModelSelectionModal hierarchy={modelHierarchy} />
+            <ModelSelectionGridModal hierarchy={modelHierarchy} />
         </div>
     );
 }
