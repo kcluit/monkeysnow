@@ -103,4 +103,7 @@ export interface WeatherChartProps {
     unitSystem: UnitSystem;
     timezoneInfo?: TimezoneInfo;
     isChartLocked?: boolean;
+    onToggleVisibility?: () => void;
+    location?: ElevationLocation;
+    currentElevation?: number;
 }
