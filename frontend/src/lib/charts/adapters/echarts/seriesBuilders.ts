@@ -65,9 +65,11 @@ export function buildLineSeries(config: SeriesConfig): SeriesOption {
 
 /**
  * Build a bar series option for ECharts.
+ * Includes performance optimizations for large datasets.
  */
 export function buildBarSeries(config: SeriesConfig): SeriesOption {
   const opacity = config.opacity ?? 0.8;
+  const dataLength = Array.isArray(config.data) ? config.data.length : 0;
 
   const series: SeriesOption = {
     type: 'bar',
@@ -78,11 +80,16 @@ export function buildBarSeries(config: SeriesConfig): SeriesOption {
       color: config.color,
       opacity,
     },
+    // Performance: Enable large mode for datasets with many bars
+    large: dataLength > 500,
+    largeThreshold: 500,
+    // Performance: Disable hover state changes
     emphasis: {
-      focus: 'series',
-      itemStyle: {
-        opacity: Math.min(opacity + 0.2, 1),
-      },
+      disabled: true,
+    },
+    // Performance: Disable selection
+    select: {
+      disabled: true,
     },
   };
 
