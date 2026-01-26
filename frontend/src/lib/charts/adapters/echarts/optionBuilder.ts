@@ -66,20 +66,18 @@ function formatTooltip(params: unknown): string {
  * Build tooltip configuration for ECharts.
  * Optimized for performance during rapid mouse movements.
  */
-function buildTooltip(config: ChartConfig, _theme: ChartTheme, totalDataPoints: number): ChartOption {
+function buildTooltip(config: ChartConfig, _theme: ChartTheme, _totalDataPoints: number): ChartOption {
     if (config.tooltip?.enabled === false) {
         return { show: false };
     }
 
-    // For very large datasets, use a simpler tooltip or disable
-    const isHeavyLoad = totalDataPoints > TOOLTIP_DISABLE_THRESHOLD;
-
+    // Performance mode: minimize tooltip overhead
     return {
         show: true,
         trigger: config.tooltip?.trigger ?? 'axis',
         // Performance: keep tooltip in chart container
         appendToBody: false,
-        // Performance: use html render mode (richText requires different format)
+        // Performance: use html render mode
         renderMode: 'html',
         backgroundColor: 'rgba(255, 255, 255, 0.95)',
         borderColor: '#ccc',
@@ -91,26 +89,21 @@ function buildTooltip(config: ChartConfig, _theme: ChartTheme, totalDataPoints: 
         },
         // Performance: disable tooltip transitions completely
         transitionDuration: 0,
-        // Performance: increase delay for heavy loads
-        showDelay: isHeavyLoad ? 250 : 150,
-        hideDelay: isHeavyLoad ? 250 : 150,
-        // Performance: confine tooltip to chart area (avoids expensive layout recalculations)
+        // Performance: significant delay to avoid rapid updates
+        showDelay: 200,
+        hideDelay: 200,
+        // Performance: confine tooltip to chart area
         confine: true,
-        // Performance: position tooltip efficiently using fixed position calculation
+        // Performance: fixed position calculation
         position: (point: number[]) => [point[0] + 10, point[1] - 10],
         axisPointer: {
-            type: 'none', // Performance: disable axis pointer entirely for best perf
-            // Performance: disable ALL axis pointer animations
+            type: 'none', // Disable axis pointer completely
             animation: false,
-            // Performance: snap to data points to reduce calculations
-            snap: true,
-            // Performance: DON'T trigger emphasis effects on hover
             triggerEmphasis: false,
             triggerTooltip: true,
         },
-        // Performance: minimal CSS, no shadows which cause repaints
+        // Performance: minimal CSS
         extraCssText: 'max-height: 200px; overflow: hidden; pointer-events: none;',
-        // Performance: prevent mouse from entering tooltip
         enterable: false,
         // Performance: use memoized formatter
         formatter: formatTooltip,
