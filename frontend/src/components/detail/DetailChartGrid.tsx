@@ -6,6 +6,8 @@ function DetailChartGridInner({
   data,
   selectedModels,
   selectedVariables,
+  selectedAggregations,
+  aggregationColors,
   unitSystem,
   timezoneInfo,
   isChartLocked,
@@ -24,6 +26,8 @@ function DetailChartGridInner({
         <WeatherChart
           data={data}
           selectedModels={selectedModels}
+          selectedAggregations={selectedAggregations}
+          aggregationColors={aggregationColors}
           variable={variable}
           unitSystem={unitSystem}
           timezoneInfo={timezoneInfo}
@@ -31,7 +35,7 @@ function DetailChartGridInner({
         />
       </div>
     ));
-  }, [data, selectedModels, selectedVariables, unitSystem, timezoneInfo, isChartLocked]);
+  }, [data, selectedModels, selectedVariables, selectedAggregations, aggregationColors, unitSystem, timezoneInfo, isChartLocked]);
 
   if (!data || data.size === 0) {
     return (
