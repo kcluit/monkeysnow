@@ -14,6 +14,7 @@ const DEFAULT_THEME: ChartTheme = {
   textSecondary: '#6b7280',
   accent: '#3b82f6',
   border: '#e5e7eb',
+  gridLine: 'rgba(107, 114, 128, 0.3)',
 };
 
 /**
