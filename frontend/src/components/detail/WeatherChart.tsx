@@ -35,10 +35,10 @@ function WeatherChartInner({
   const chartConfig = useMemo(
     () =>
       buildWeatherChartConfig(
-        { data, selectedModels, variable, unitSystem },
+        { data, selectedModels, variable, unitSystem, timezoneInfo },
         theme
       ),
-    [data, selectedModels, variable, unitSystem, theme]
+    [data, selectedModels, variable, unitSystem, timezoneInfo, theme]
   );
 
   // Handle no data
