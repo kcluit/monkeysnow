@@ -18,6 +18,8 @@ import { buildWeatherChartConfig, getVariableDisplayInfo } from '../../utils/cha
 function WeatherChartInner({
   data,
   selectedModels,
+  selectedAggregations,
+  aggregationColors,
   variable,
   unitSystem,
   timezoneInfo,
@@ -36,10 +38,19 @@ function WeatherChartInner({
   const chartConfig = useMemo(
     () =>
       buildWeatherChartConfig(
-        { data, selectedModels, variable, unitSystem, timezoneInfo, isChartLocked },
+        {
+          data,
+          selectedModels,
+          selectedAggregations,
+          aggregationColors,
+          variable,
+          unitSystem,
+          timezoneInfo,
+          isChartLocked,
+        },
         theme
       ),
-    [data, selectedModels, variable, unitSystem, timezoneInfo, theme, isChartLocked]
+    [data, selectedModels, selectedAggregations, aggregationColors, variable, unitSystem, timezoneInfo, theme, isChartLocked]
   );
 
   // Handle no data
