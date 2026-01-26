@@ -57,7 +57,7 @@ const DEFAULT_AGGREGATION_COLORS: Record<AggregationType, string> = {
  */
 function generateMockData(
     models: WeatherModel[],
-    variables: WeatherVariable[],
+    _variables: WeatherVariable[],
     hourCount: number = 336
 ): Map<WeatherModel, HourlyDataPoint[]> {
     const data = new Map<WeatherModel, HourlyDataPoint[]>();
