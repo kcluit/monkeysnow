@@ -43,5 +43,6 @@ export function getEChartsTheme(): ChartTheme {
     textSecondary: getCSSVariable('--textSecondary', DEFAULT_THEME.textSecondary),
     accent: getCSSVariable('--accent', DEFAULT_THEME.accent),
     border: getCSSVariable('--border', DEFAULT_THEME.border),
+    gridLine: getCSSVariable('--gridLine', DEFAULT_THEME.gridLine),
   };
 }
