@@ -42,7 +42,7 @@ function buildTooltip(config: ChartConfig, _theme: ChartTheme): ChartOption {
 /**
  * Build legend configuration for ECharts.
  */
-function buildLegend(config: ChartConfig, theme: ChartTheme): EChartsOption['legend'] {
+function buildLegend(config: ChartConfig, theme: ChartTheme): ChartOption {
   if (config.legend?.enabled === false) {
     return { show: false };
   }
