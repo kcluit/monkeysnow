@@ -1,14 +1,13 @@
 /**
  * Hook for managing resort hierarchy state and navigation.
  * Provides tree navigation, selection tracking, and search filtering.
+ *
+ * This hook now gets hierarchy data from the HierarchyContext (fetched from backend).
  */
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import {
-  buildHierarchyTree,
-  getResortsUnderNode,
-  type HierarchyNode,
-} from '../data/resortHierarchy';
+import { useHierarchy, type HierarchyNode } from '../contexts/HierarchyContext';
+import { getResortsUnderNode } from '../data/resortHierarchy';
 
 export interface UseResortHierarchyProps {
   selectedResorts: string[];
@@ -47,6 +46,9 @@ export interface UseResortHierarchyReturn {
   setSearchTerm: (term: string) => void;
   filteredNodes: HierarchyNode[];
   isSearchMode: boolean;
+
+  // Loading state
+  isLoading: boolean;
 }
 
 /**
@@ -77,8 +79,8 @@ export function useResortHierarchy({
   selectedResorts,
   onResortsChange,
 }: UseResortHierarchyProps): UseResortHierarchyReturn {
-  // Build hierarchy tree once
-  const hierarchyTree = useMemo(() => buildHierarchyTree(), []);
+  // Get hierarchy from context (fetched from backend)
+  const { hierarchyTree, loading: isLoading } = useHierarchy();
 
   // Modal state
   const [isOpen, setIsOpen] = useState(false);
@@ -297,5 +299,8 @@ export function useResortHierarchy({
     setSearchTerm,
     filteredNodes,
     isSearchMode,
+
+    // Loading state
+    isLoading,
   };
 }
