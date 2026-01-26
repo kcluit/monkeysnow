@@ -52,7 +52,6 @@ export function buildBarSeries(config: SeriesConfig): SeriesOption {
         opacity: 1,
       },
     },
-    animation: false,
   };
 }
 
