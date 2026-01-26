@@ -13,22 +13,28 @@ type SeriesOption = Record<string, unknown>;
  * Build a line series option for ECharts.
  */
 export function buildLineSeries(config: SeriesConfig): SeriesOption {
+  const lineWidth = config.lineWidth ?? 2;
+  const opacity = config.opacity ?? 1;
+
   return {
     type: 'line',
     name: config.name,
     data: config.data,
+    z: config.zIndex ?? 2,
     itemStyle: {
       color: config.color,
+      opacity,
     },
     lineStyle: {
       color: config.color,
-      width: 2,
+      width: lineWidth,
+      opacity,
     },
     symbol: 'none', // No data point markers for performance
     emphasis: {
       focus: 'series',
       lineStyle: {
-        width: 3,
+        width: lineWidth + 1,
       },
     },
   };
@@ -38,18 +44,21 @@ export function buildLineSeries(config: SeriesConfig): SeriesOption {
  * Build a bar series option for ECharts.
  */
 export function buildBarSeries(config: SeriesConfig): SeriesOption {
+  const opacity = config.opacity ?? 0.8;
+
   return {
     type: 'bar',
     name: config.name,
     data: config.data,
+    z: config.zIndex ?? 2,
     itemStyle: {
       color: config.color,
-      opacity: 0.8,
+      opacity,
     },
     emphasis: {
       focus: 'series',
       itemStyle: {
-        opacity: 1,
+        opacity: Math.min(opacity + 0.2, 1),
       },
     },
   };
@@ -60,26 +69,33 @@ export function buildBarSeries(config: SeriesConfig): SeriesOption {
  * Area charts are line charts with areaStyle.
  */
 export function buildAreaSeries(config: SeriesConfig): SeriesOption {
+  const lineWidth = config.lineWidth ?? 2;
+  const opacity = config.opacity ?? 1;
+  const fillOpacity = config.fillOpacity ?? 0.3;
+
   return {
     type: 'line',
     name: config.name,
     data: config.data,
+    z: config.zIndex ?? 2,
     itemStyle: {
       color: config.color,
+      opacity,
     },
     lineStyle: {
       color: config.color,
-      width: 2,
+      width: lineWidth,
+      opacity,
     },
     areaStyle: {
       color: config.color,
-      opacity: config.fillOpacity ?? 0.3,
+      opacity: fillOpacity * opacity,
     },
     symbol: 'none',
     emphasis: {
       focus: 'series',
       areaStyle: {
-        opacity: 0.5,
+        opacity: Math.min(fillOpacity + 0.2, 1) * opacity,
       },
     },
   };
