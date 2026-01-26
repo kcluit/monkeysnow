@@ -26,6 +26,22 @@ export interface SeriesConfig {
   opacity?: number;
   /** Optional z-index for rendering order */
   zIndex?: number;
+  /** Optional line style for line charts */
+  lineStyle?: 'solid' | 'dashed' | 'dotted';
+}
+
+/** Configuration for horizontal reference lines (mark lines) */
+export interface MarkLineData {
+  /** Y-axis value where the line should be drawn */
+  yValue: number;
+  /** Label to display on the line */
+  label: string;
+  /** Line color */
+  color: string;
+  /** Line width (default: 1) */
+  lineWidth: number;
+  /** Line style */
+  lineStyle: 'solid' | 'dashed' | 'dotted';
 }
 
 /** Axis configuration */
