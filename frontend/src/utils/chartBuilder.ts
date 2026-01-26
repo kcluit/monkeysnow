@@ -236,49 +236,41 @@ function calculateAccumulation(values: (number | null)[]): (number | null)[] {
 
 /**
  * Build accumulation series from model data.
- * Calculates mean of all models first, then cumulative sum.
+ * Creates a cumulative sum line for each model, plotted on the secondary Y-axis.
+ * Returns multiple series (one per model) with solid lines.
  */
 function buildAccumulationSeries(
   seriesData: Map<WeatherModel, (number | null)[]>,
-  timePoints: number,
-  color: string
-): SeriesConfig | null {
-  if (seriesData.size === 0) return null;
+  selectedModels: WeatherModel[]
+): SeriesConfig[] {
+  if (seriesData.size === 0) return [];
 
-  const allDataArrays = Array.from(seriesData.values());
+  const accumulationSeries: SeriesConfig[] = [];
 
-  // Calculate mean at each time point across all models
-  const meanValues: (number | null)[] = [];
-  for (let i = 0; i < timePoints; i++) {
-    const valuesAtTime = allDataArrays
-      .map((arr) => arr[i])
-      .filter((v): v is number => v !== null && !isNaN(v));
+  for (const model of selectedModels) {
+    const modelData = seriesData.get(model);
+    if (!modelData || modelData.length === 0) continue;
 
-    if (valuesAtTime.length === 0) {
-      meanValues.push(null);
-    } else {
-      meanValues.push(calculateMean(valuesAtTime));
-    }
+    const modelConfig = getModelConfig(model);
+
+    // Calculate cumulative accumulation for this model
+    const accumulationData = calculateAccumulation(modelData);
+
+    accumulationSeries.push({
+      id: `accumulation_${model}`,
+      name: `${modelConfig.name} (Accum)`,
+      color: modelConfig.color,
+      type: 'line',
+      data: accumulationData,
+      lineWidth: 2,
+      opacity: 0.9,
+      zIndex: 50, // Above model series but below aggregations
+      lineStyle: 'solid',
+      yAxisIndex: 1, // Use secondary Y-axis (right side)
+    });
   }
 
-  // Calculate cumulative accumulation
-  const accumulationData = calculateAccumulation(meanValues);
-
-  // Use a lighter/different shade for the accumulation line
-  // Darken the color slightly for contrast
-  const accumulationColor = adjustColorBrightness(color, -20);
-
-  return {
-    id: 'accumulation',
-    name: 'Accumulation',
-    color: accumulationColor,
-    type: 'line',
-    data: accumulationData,
-    lineWidth: 2,
-    opacity: 0.8,
-    zIndex: 50, // Above model series but below aggregations
-    lineStyle: 'dashed',
-  };
+  return accumulationSeries;
 }
 
 /**
