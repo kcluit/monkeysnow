@@ -88,6 +88,8 @@ export function DetailedResortView({
                 setForecastDays={setForecastDays}
                 location={location}
                 onBack={onBack}
+                isChartLocked={isChartLocked}
+                setIsChartLocked={setIsChartLocked}
             />
 
             {/* Loading State - Only show when no data at all */}
