@@ -22,7 +22,7 @@ export function buildLineSeries(config: SeriesConfig): SeriesOption {
   const opacity = config.opacity ?? 1;
   const lineType = mapLineStyle(config.lineStyle);
 
-  return {
+  const series: SeriesOption = {
     type: 'line',
     name: config.name,
     data: config.data,
@@ -45,6 +45,13 @@ export function buildLineSeries(config: SeriesConfig): SeriesOption {
       },
     },
   };
+
+  // Add yAxisIndex if specified (for secondary Y-axis)
+  if (config.yAxisIndex !== undefined) {
+    series.yAxisIndex = config.yAxisIndex;
+  }
+
+  return series;
 }
 
 /**
