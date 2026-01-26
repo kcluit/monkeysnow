@@ -14,6 +14,8 @@ export function DetailUtilityBar({
     setForecastDays,
     location,
     onBack,
+    isChartLocked,
+    setIsChartLocked,
 }: DetailUtilityBarProps): JSX.Element {
     const [showModelDropdown, setShowModelDropdown] = useState(false);
     const [showVariableDropdown, setShowVariableDropdown] = useState(false);
