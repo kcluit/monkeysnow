@@ -23,16 +23,17 @@ export function buildLineSeries(config: SeriesConfig): SeriesOption {
   const opacity = config.opacity ?? 1;
   const lineType = mapLineStyle(config.lineStyle);
   const dataLength = Array.isArray(config.data) ? config.data.length : 0;
-  // Lower threshold for large mode to improve performance during hover
-  const isLarge = dataLength > 100;
+  // Enable large mode more aggressively for better hover performance
+  const isLarge = dataLength > 50;
 
   const series: SeriesOption = {
     type: 'line',
     name: config.name,
     data: config.data,
     z: config.zIndex ?? 2,
-    // Performance: Don't trigger mouse events on individual data points
-    silent: false, // Keep false to allow tooltip, but disable other events
+    // Performance: CRITICAL - silent mode disables most event processing on this series
+    // Tooltip still works because it uses axisPointer, not series events
+    silent: true,
     triggerLineEvent: false,
     itemStyle: {
       color: config.color,
@@ -44,29 +45,37 @@ export function buildLineSeries(config: SeriesConfig): SeriesOption {
       opacity,
       type: lineType,
     },
-    symbol: 'none', // No data point markers for performance
+    // Performance: No symbols at all
+    symbol: 'none',
     showSymbol: false,
-    // Performance: Enable large mode for datasets (lowered threshold)
+    symbolSize: 0,
+    // Performance: Enable large mode with very low threshold
     large: isLarge,
-    largeThreshold: 100,
-    // Performance: Use sampling to reduce points when zoomed out
-    sampling: 'lttb', // Largest-Triangle-Three-Buckets algorithm preserves visual shape
-    // Performance: Clip data to visible area only
+    largeThreshold: 50,
+    // Performance: Use LTTB sampling algorithm
+    sampling: 'lttb',
+    // Performance: Clip data to visible area
     clip: true,
-    // Performance: Disable hover state changes completely
+    // Performance: Completely disable all state effects
     emphasis: {
       disabled: true,
+      scale: false,
     },
-    // Performance: Disable selection
     select: {
       disabled: true,
     },
-    // Performance: Disable blur effect
     blur: {
       disabled: true,
     },
-    // Performance: Disable cursor change on hover
+    // Performance: No cursor change
     cursor: 'default',
+    // Performance: Disable animation on this series
+    animation: false,
+    animationDuration: 0,
+    // Performance: No universal transition
+    universalTransition: {
+      enabled: false,
+    },
   };
 
   // Add yAxisIndex if specified (for secondary Y-axis)
