@@ -60,7 +60,7 @@ export function buildLineSeries(config: SeriesConfig): SeriesOption {
 export function buildBarSeries(config: SeriesConfig): SeriesOption {
   const opacity = config.opacity ?? 0.8;
 
-  return {
+  const series: SeriesOption = {
     type: 'bar',
     name: config.name,
     data: config.data,
@@ -76,6 +76,13 @@ export function buildBarSeries(config: SeriesConfig): SeriesOption {
       },
     },
   };
+
+  // Add yAxisIndex if specified (for secondary Y-axis)
+  if (config.yAxisIndex !== undefined) {
+    series.yAxisIndex = config.yAxisIndex;
+  }
+
+  return series;
 }
 
 /**
