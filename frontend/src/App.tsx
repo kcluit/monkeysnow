@@ -291,7 +291,7 @@ function App(): JSX.Element {
         utilityBarStyle, setUtilityBarStyle,
         unitSystem, setUnitSystem,
         resortHierarchy.openModal,
-        language.id, setLanguage, availableLanguages,
+        language.id, setLanguage, availableLanguages, t,
     ]);
 
     // Command palette hook
