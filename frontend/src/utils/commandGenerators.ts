@@ -4,6 +4,7 @@
  */
 
 import type { Command, ElevationLevel, SortOption, SortDay, SortDayData, ViewMode, TemperatureMetric, SnowfallEstimateMode, UtilityBarStyle, UnitSystem } from '../types';
+import type { Language } from '../types/i18n';
 
 export interface ControlCommandParams {
   // Elevation
@@ -39,6 +40,10 @@ export interface ControlCommandParams {
   setUnitSystem: (system: UnitSystem) => void;
   // Resort selector
   openResortSelector: () => void;
+  // Language
+  languageId: string;
+  setLanguage: (id: string) => void;
+  availableLanguages: Language[];
 }
 
 /**
