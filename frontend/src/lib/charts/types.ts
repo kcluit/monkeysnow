@@ -116,8 +116,10 @@ export interface ChartConfig {
   type: ChartType;
   /** X-axis configuration */
   xAxis: AxisConfig;
-  /** Y-axis configuration */
+  /** Y-axis configuration (primary/left axis) */
   yAxis: AxisConfig;
+  /** Secondary Y-axis configuration (right axis, optional) */
+  yAxisSecondary?: AxisConfig;
   /** Data series to render */
   series: SeriesConfig[];
   /** Horizontal reference lines */
