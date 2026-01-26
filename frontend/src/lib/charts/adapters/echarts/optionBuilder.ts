@@ -67,18 +67,45 @@ function formatTooltip(params: unknown): string {
  * Optimized for performance during rapid mouse movements.
  */
 function buildTooltip(config: ChartConfig, _theme: ChartTheme, _totalDataPoints: number): ChartOption {
-    // Performance: Disable tooltip entirely for maximum performance
-    // The axis pointer alone provides sufficient visual feedback
     if (config.tooltip?.enabled === false) {
         return { show: false };
     }
 
     return {
-        show: false, // PERFORMANCE: Disable tooltip content entirely
-        trigger: 'none',
-        axisPointer: {
-            type: 'none',
+        show: true,
+        trigger: config.tooltip?.trigger ?? 'axis',
+        appendToBody: false,
+        renderMode: 'html',
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        borderColor: '#ccc',
+        borderWidth: 1,
+        padding: [8, 12],
+        textStyle: {
+            color: '#000',
+            fontSize: 12,
         },
+        transitionDuration: 0,
+        showDelay: 100,
+        hideDelay: 100,
+        confine: true,
+        position: (point: number[]) => [point[0] + 10, point[1] - 10],
+        axisPointer: {
+            type: 'line',
+            animation: false,
+            snap: true,
+            triggerEmphasis: false,
+            triggerTooltip: true,
+            lineStyle: {
+                color: 'rgba(150, 150, 150, 0.5)',
+                width: 1,
+            },
+            label: {
+                show: false,
+            },
+        },
+        extraCssText: 'max-height: 200px; overflow: hidden; pointer-events: none;',
+        enterable: false,
+        formatter: formatTooltip,
     };
 }
 
