@@ -190,7 +190,7 @@ export function buildWeatherChartConfig(
     },
     dataZoom: {
       enabled: !isChartLocked,
-      type: isChartLocked ? 'inside' : 'both',
+      type: 'both',
       range: [0, 100],
     },
     theme: chartTheme,
