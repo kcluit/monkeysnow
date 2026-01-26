@@ -90,4 +90,5 @@ export interface WeatherChartProps {
     variable: WeatherVariable;
     unitSystem: UnitSystem;
     timezoneInfo?: TimezoneInfo;
+    isChartLocked?: boolean;
 }
