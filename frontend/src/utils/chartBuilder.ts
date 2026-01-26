@@ -16,11 +16,11 @@ import { getEChartsTheme } from '../lib/charts';
 
 /** Additional chart settings passed from WeatherChart component */
 export interface ChartBuildSettings {
-  chartTypeOverride?: ChartDisplayType;
-  showAccumulation?: boolean;
-  showElevationLines?: boolean;
-  location?: ElevationLocation;
-  currentElevation?: number;
+    chartTypeOverride?: ChartDisplayType;
+    showAccumulation?: boolean;
+    showElevationLines?: boolean;
+    location?: ElevationLocation;
+    currentElevation?: number;
 }
 
 /**
@@ -29,24 +29,24 @@ export interface ChartBuildSettings {
  * @param timezone - Optional IANA timezone string (e.g., "America/Vancouver")
  */
 function formatTimeLabel(date: Date, timezone?: string): string {
-  const options: Intl.DateTimeFormatOptions = {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-  };
+    const options: Intl.DateTimeFormatOptions = {
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+    };
 
-  // Add timezone if provided
-  if (timezone) {
-    options.timeZone = timezone;
-  }
+    // Add timezone if provided
+    if (timezone) {
+        options.timeZone = timezone;
+    }
 
-  try {
-    return date.toLocaleString('en-US', options);
-  } catch {
-    // Fallback to browser timezone if provided timezone is invalid
-    delete options.timeZone;
-    return date.toLocaleString('en-US', options);
-  }
+    try {
+        return date.toLocaleString('en-US', options);
+    } catch {
+        // Fallback to browser timezone if provided timezone is invalid
+        delete options.timeZone;
+        return date.toLocaleString('en-US', options);
+    }
 }
 
 /**
@@ -55,119 +55,119 @@ function formatTimeLabel(date: Date, timezone?: string): string {
  * Uses null for missing values to create gaps in charts.
  */
 function transformToChartData(
-  data: Map<WeatherModel, HourlyDataPoint[]>,
-  selectedModels: WeatherModel[],
-  variable: string,
-  unitSystem: UnitSystem,
-  convertToImperial?: (value: number) => number,
-  timezone?: string
+    data: Map<WeatherModel, HourlyDataPoint[]>,
+    selectedModels: WeatherModel[],
+    variable: string,
+    unitSystem: UnitSystem,
+    convertToImperial?: (value: number) => number,
+    timezone?: string
 ): { timeLabels: string[]; seriesData: Map<WeatherModel, (number | null)[]> } {
-  // Get time points from first available model
-  const firstModelData = data.values().next().value as HourlyDataPoint[] | undefined;
-  if (!firstModelData || firstModelData.length === 0) {
-    return { timeLabels: [], seriesData: new Map() };
-  }
+    // Get time points from first available model
+    const firstModelData = data.values().next().value as HourlyDataPoint[] | undefined;
+    if (!firstModelData || firstModelData.length === 0) {
+        return { timeLabels: [], seriesData: new Map() };
+    }
 
-  // Extract time labels with timezone formatting
-  const timeLabels = firstModelData.map((point) => formatTimeLabel(point.time, timezone));
+    // Extract time labels with timezone formatting
+    const timeLabels = firstModelData.map((point) => formatTimeLabel(point.time, timezone));
 
-  // Extract series data for each model
-  const seriesData = new Map<WeatherModel, (number | null)[]>();
+    // Extract series data for each model
+    const seriesData = new Map<WeatherModel, (number | null)[]>();
 
-  for (const model of selectedModels) {
-    const modelData = data.get(model);
-    if (!modelData) continue;
+    for (const model of selectedModels) {
+        const modelData = data.get(model);
+        if (!modelData) continue;
 
-    const values = modelData.map((point) => {
-      const value = point[variable];
-      // Return null for missing data (creates gaps in charts)
-      if (typeof value !== 'number') return null;
+        const values = modelData.map((point) => {
+            const value = point[variable];
+            // Return null for missing data (creates gaps in charts)
+            if (typeof value !== 'number') return null;
 
-      // Convert to imperial if needed
-      if (unitSystem === 'imperial' && convertToImperial) {
-        return convertToImperial(value);
-      }
+            // Convert to imperial if needed
+            if (unitSystem === 'imperial' && convertToImperial) {
+                return convertToImperial(value);
+            }
 
-      return value;
-    });
+            return value;
+        });
 
-    seriesData.set(model, values);
-  }
+        seriesData.set(model, values);
+    }
 
-  return { timeLabels, seriesData };
+    return { timeLabels, seriesData };
 }
 
 /**
  * Calculate median of an array of numbers.
  */
 function calculateMedian(values: number[]): number {
-  if (values.length === 0) return 0;
-  const sorted = [...values].sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 === 0
-    ? (sorted[mid - 1] + sorted[mid]) / 2
-    : sorted[mid];
+    if (values.length === 0) return 0;
+    const sorted = [...values].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 === 0
+        ? (sorted[mid - 1] + sorted[mid]) / 2
+        : sorted[mid];
 }
 
 /**
  * Calculate mean of an array of numbers.
  */
 function calculateMean(values: number[]): number {
-  if (values.length === 0) return 0;
-  return values.reduce((sum, v) => sum + v, 0) / values.length;
+    if (values.length === 0) return 0;
+    return values.reduce((sum, v) => sum + v, 0) / values.length;
 }
 
 /**
  * Calculate aggregation series (median/mean) from model data.
  */
 function calculateAggregationSeries(
-  seriesData: Map<WeatherModel, (number | null)[]>,
-  aggregations: AggregationType[],
-  aggregationColors: Record<AggregationType, string>,
-  chartType: ChartType,
-  timePoints: number
+    seriesData: Map<WeatherModel, (number | null)[]>,
+    aggregations: AggregationType[],
+    aggregationColors: Record<AggregationType, string>,
+    chartType: ChartType,
+    timePoints: number
 ): SeriesConfig[] {
-  if (aggregations.length === 0 || seriesData.size < 2) {
-    return [];
-  }
-
-  const allDataArrays = Array.from(seriesData.values());
-  const configs: SeriesConfig[] = [];
-
-  for (const aggType of aggregations) {
-    const aggregatedData: (number | null)[] = [];
-
-    for (let i = 0; i < timePoints; i++) {
-      const valuesAtTime = allDataArrays
-        .map((arr) => arr[i])
-        .filter((v): v is number => v !== null && !isNaN(v));
-
-      if (valuesAtTime.length === 0) {
-        aggregatedData.push(null);
-      } else {
-        const value = aggType === 'median'
-          ? calculateMedian(valuesAtTime)
-          : calculateMean(valuesAtTime);
-        aggregatedData.push(value);
-      }
+    if (aggregations.length === 0 || seriesData.size < 2) {
+        return [];
     }
 
-    const color = aggregationColors[aggType] ?? (aggType === 'median' ? '#a855f7' : '#ec4899');
-    const name = aggType === 'median' ? 'Median' : 'Mean';
+    const allDataArrays = Array.from(seriesData.values());
+    const configs: SeriesConfig[] = [];
 
-    configs.push({
-      id: aggType,
-      name,
-      color,
-      type: chartType,
-      data: aggregatedData,
-      lineWidth: 2, // Same width as models, distinguished by opacity
-      opacity: 1,
-      zIndex: 100, // Render on top
-    });
-  }
+    for (const aggType of aggregations) {
+        const aggregatedData: (number | null)[] = [];
 
-  return configs;
+        for (let i = 0; i < timePoints; i++) {
+            const valuesAtTime = allDataArrays
+                .map((arr) => arr[i])
+                .filter((v): v is number => v !== null && !isNaN(v));
+
+            if (valuesAtTime.length === 0) {
+                aggregatedData.push(null);
+            } else {
+                const value = aggType === 'median'
+                    ? calculateMedian(valuesAtTime)
+                    : calculateMean(valuesAtTime);
+                aggregatedData.push(value);
+            }
+        }
+
+        const color = aggregationColors[aggType] ?? (aggType === 'median' ? '#a855f7' : '#ec4899');
+        const name = aggType === 'median' ? 'Median' : 'Mean';
+
+        configs.push({
+            id: aggType,
+            name,
+            color,
+            type: chartType,
+            data: aggregatedData,
+            lineWidth: 2, // Same width as models, distinguished by opacity
+            opacity: 1,
+            zIndex: 100, // Render on top
+        });
+    }
+
+    return configs;
 }
 
 /**
@@ -175,9 +175,9 @@ function calculateAggregationSeries(
  * More models = lower opacity so aggregation lines stand out.
  */
 function calculateModelOpacity(modelCount: number): number {
-  // Scale opacity: fewer models = more visible, more models = more faded
-  // Uses sqrt scaling for a smooth curve
-  return Math.max(0.05, 0.5 / Math.sqrt(modelCount));
+    // Scale opacity: fewer models = more visible, more models = more faded
+    // Uses sqrt scaling for a smooth curve
+    return Math.max(0.05, 0.5 / Math.sqrt(modelCount));
 }
 
 /**
@@ -185,36 +185,36 @@ function calculateModelOpacity(modelCount: number): number {
  * Skips models with no data or empty data arrays.
  */
 function buildSeriesConfigs(
-  seriesData: Map<WeatherModel, (number | null)[]>,
-  selectedModels: WeatherModel[],
-  chartType: ChartType,
-  hasAggregations: boolean
+    seriesData: Map<WeatherModel, (number | null)[]>,
+    selectedModels: WeatherModel[],
+    chartType: ChartType,
+    hasAggregations: boolean
 ): SeriesConfig[] {
-  const configs: SeriesConfig[] = [];
-  const modelOpacity = hasAggregations ? calculateModelOpacity(selectedModels.length) : 1;
+    const configs: SeriesConfig[] = [];
+    const modelOpacity = hasAggregations ? calculateModelOpacity(selectedModels.length) : 1;
 
-  for (const model of selectedModels) {
-    const data = seriesData.get(model);
-    // Skip if no data or empty array
-    if (!data || data.length === 0) continue;
+    for (const model of selectedModels) {
+        const data = seriesData.get(model);
+        // Skip if no data or empty array
+        if (!data || data.length === 0) continue;
 
-    const modelConfig = getModelConfig(model);
+        const modelConfig = getModelConfig(model);
 
-    configs.push({
-      id: model,
-      name: modelConfig.name,
-      color: modelConfig.color,
-      type: chartType,
-      data,
-      fillOpacity: chartType === 'area' ? 0.3 : undefined,
-      // Reduce opacity when aggregations are enabled, scaled by model count
-      opacity: modelOpacity,
-      lineWidth: 2,
-      zIndex: 2,
-    });
-  }
+        configs.push({
+            id: model,
+            name: modelConfig.name,
+            color: modelConfig.color,
+            type: chartType,
+            data,
+            fillOpacity: chartType === 'area' ? 0.3 : undefined,
+            // Reduce opacity when aggregations are enabled, scaled by model count
+            opacity: modelOpacity,
+            lineWidth: 2,
+            zIndex: 2,
+        });
+    }
 
-  return configs;
+    return configs;
 }
 
 /**
@@ -226,12 +226,12 @@ function buildSeriesConfigs(
  * not periods with zero precipitation.
  */
 function calculateAccumulation(values: (number | null)[]): (number | null)[] {
-  let sum = 0;
-  return values.map((v) => {
-    if (v === null) return null;
-    sum += v;
-    return sum;
-  });
+    let sum = 0;
+    return values.map((v) => {
+        if (v === null) return null;
+        sum += v;
+        return sum;
+    });
 }
 
 /**
@@ -240,231 +240,232 @@ function calculateAccumulation(values: (number | null)[]): (number | null)[] {
  * Returns multiple series (one per model) with solid lines.
  */
 function buildAccumulationSeries(
-  seriesData: Map<WeatherModel, (number | null)[]>,
-  selectedModels: WeatherModel[]
+    seriesData: Map<WeatherModel, (number | null)[]>,
+    selectedModels: WeatherModel[]
 ): SeriesConfig[] {
-  if (seriesData.size === 0) return [];
+    if (seriesData.size === 0) return [];
 
-  const accumulationSeries: SeriesConfig[] = [];
+    const accumulationSeries: SeriesConfig[] = [];
 
-  for (const model of selectedModels) {
-    const modelData = seriesData.get(model);
-    if (!modelData || modelData.length === 0) continue;
+    for (const model of selectedModels) {
+        const modelData = seriesData.get(model);
+        if (!modelData || modelData.length === 0) continue;
 
-    const modelConfig = getModelConfig(model);
+        const modelConfig = getModelConfig(model);
 
-    // Calculate cumulative accumulation for this model
-    const accumulationData = calculateAccumulation(modelData);
+        // Calculate cumulative accumulation for this model
+        const accumulationData = calculateAccumulation(modelData);
 
-    accumulationSeries.push({
-      id: `accumulation_${model}`,
-      name: `${modelConfig.name} (Accum)`,
-      color: modelConfig.color,
-      type: 'line',
-      data: accumulationData,
-      lineWidth: 2,
-      opacity: 0.9,
-      zIndex: 50, // Above model series but below aggregations
-      lineStyle: 'solid',
-      yAxisIndex: 1, // Use secondary Y-axis (right side)
-    });
-  }
+        accumulationSeries.push({
+            id: `accumulation_${model}`,
+            name: `${modelConfig.name} (Accum)`,
+            color: modelConfig.color,
+            type: 'line',
+            data: accumulationData,
+            lineWidth: 2,
+            opacity: 0.9,
+            zIndex: 50, // Above model series but below aggregations
+            lineStyle: 'solid',
+            yAxisIndex: 1, // Use secondary Y-axis (right side)
+        });
+    }
 
-  return accumulationSeries;
+    return accumulationSeries;
 }
 /**
  * Build elevation mark lines for freezing level chart.
  */
 function buildElevationMarkLines(
-  location: ElevationLocation,
-  currentElevation: number | undefined,
-  unitSystem: UnitSystem,
-  theme: ChartTheme
+    location: ElevationLocation,
+    currentElevation: number | undefined,
+    unitSystem: UnitSystem,
+    theme: ChartTheme
 ): MarkLineData[] {
-  const convert = unitSystem === 'imperial'
-    ? (m: number) => Math.round(m * 3.28084) // meters to feet
-    : (m: number) => m;
+    const convert = unitSystem === 'imperial'
+        ? (m: number) => Math.round(m * 3.28084) // meters to feet
+        : (m: number) => m;
 
-  const unitLabel = unitSystem === 'imperial' ? 'ft' : 'm';
+    const unitLabel = unitSystem === 'imperial' ? 'ft' : 'm';
 
-  const elevations = [
-    { name: 'Base', value: location.baseElevation },
-    { name: 'Mid', value: location.midElevation },
-    { name: 'Peak', value: location.topElevation },
-  ];
+    const elevations = [
+        { name: 'Base', value: location.baseElevation },
+        { name: 'Mid', value: location.midElevation },
+        { name: 'Peak', value: location.topElevation },
+    ];
 
-  return elevations.map(({ name, value }) => {
-    const isCurrent = value === currentElevation;
-    return {
-      yValue: convert(value),
-      label: `${name}: ${convert(value)}${unitLabel}`,
-      color: isCurrent ? theme.accent : theme.textSecondary,
-      lineWidth: isCurrent ? 2 : 1,
-      lineStyle: 'dashed' as const,
-    };
-  });
+    return elevations.map(({ name, value }) => {
+        const isCurrent = value === currentElevation;
+        return {
+            yValue: convert(value),
+            label: `${name}: ${convert(value)}${unitLabel}`,
+            color: isCurrent ? theme.accent : theme.textSecondary,
+            lineWidth: isCurrent ? 2 : 1,
+            lineStyle: 'dashed' as const,
+        };
+    });
 }
 
 /**
  * Build a complete ChartConfig from weather data and props.
  */
 export function buildWeatherChartConfig(
-  props: WeatherChartProps,
-  theme?: ChartTheme,
-  settings?: ChartBuildSettings
+    props: WeatherChartProps,
+    theme?: ChartTheme,
+    settings?: ChartBuildSettings
 ): ChartConfig | null {
-  const {
-    data,
-    selectedModels,
-    selectedAggregations = [],
-    aggregationColors = { median: '#a855f7', mean: '#ec4899' },
-    variable,
-    unitSystem,
-    timezoneInfo,
-    isChartLocked
-  } = props;
+    const {
+        data,
+        selectedModels,
+        selectedAggregations = [],
+        aggregationColors = { median: '#a855f7', mean: '#ec4899' },
+        variable,
+        unitSystem,
+        timezoneInfo,
+        isChartLocked
+    } = props;
 
-  // Handle empty data
-  if (!data || data.size === 0) {
-    return null;
-  }
-
-  // Get variable configuration
-  const variableConfig = getVariableConfig(variable);
-
-  // Use chart type override if provided, otherwise use default from config
-  const chartType = (settings?.chartTypeOverride ?? variableConfig.chartType) as ChartType;
-
-  // Transform data with timezone
-  const { timeLabels, seriesData } = transformToChartData(
-    data,
-    selectedModels,
-    variable,
-    unitSystem,
-    variableConfig.convertToImperial,
-    timezoneInfo?.timezone
-  );
-
-  // Handle no data after transformation
-  if (timeLabels.length === 0) {
-    return null;
-  }
-
-  // Determine if we have aggregations enabled
-  const hasAggregations = selectedAggregations.length > 0 && seriesData.size > 1;
-
-  // Build model series (with reduced opacity if aggregations enabled)
-  const modelSeries = buildSeriesConfigs(seriesData, selectedModels, chartType, hasAggregations);
-
-  // Build aggregation series
-  const aggregationSeries = calculateAggregationSeries(
-    seriesData,
-    selectedAggregations,
-    aggregationColors,
-    chartType,
-    timeLabels.length
-  );
-
-  // Combine all series (aggregations rendered on top)
-  const allSeries = [...modelSeries, ...aggregationSeries];
-
-  // Track if we need a secondary Y-axis for accumulation
-  let hasAccumulation = false;
-
-  // Add accumulation series if enabled
-  if (settings?.showAccumulation) {
-    const accSeries = buildAccumulationSeries(seriesData, selectedModels);
-    if (accSeries.length > 0) {
-      allSeries.push(...accSeries);
-      hasAccumulation = true;
+    // Handle empty data
+    if (!data || data.size === 0) {
+        return null;
     }
-  }
 
-  // Get unit string
-  const unit = unitSystem === 'imperial' ? variableConfig.unitImperial : variableConfig.unit;
+    // Get variable configuration
+    const variableConfig = getVariableConfig(variable);
 
-  // Use provided theme or get from CSS
-  const chartTheme = theme ?? getEChartsTheme();
+    // Use chart type override if provided, otherwise use default from config
+    const chartType = (settings?.chartTypeOverride ?? variableConfig.chartType) as ChartType;
 
-  // Build elevation mark lines if enabled
-  let markLines: MarkLineData[] | undefined;
-  if (settings?.showElevationLines && settings.location) {
-    markLines = buildElevationMarkLines(
-      settings.location,
-      settings.currentElevation,
-      unitSystem,
-      chartTheme
+    // Transform data with timezone
+    const { timeLabels, seriesData } = transformToChartData(
+        data,
+        selectedModels,
+        variable,
+        unitSystem,
+        variableConfig.convertToImperial,
+        timezoneInfo?.timezone
     );
-  }
 
-  // When chart is locked, reduce bottom margin since there's no dataZoom slider
-  // Keep enough space (60px) for legend labels that may wrap to multiple lines
-  const gridBottom = isChartLocked ? 60 : 80;
+    // Handle no data after transformation
+    if (timeLabels.length === 0) {
+        return null;
+    }
 
-  // Need more space on right when accumulation has secondary Y-axis
-  const gridRight = hasAccumulation ? 50 : 30;
+    // Determine if we have aggregations enabled
+    const hasAggregations = selectedAggregations.length > 0 && seriesData.size > 1;
 
-  // Build secondary Y-axis config if accumulation is enabled
-  const yAxisSecondary = hasAccumulation
-    ? {
-        type: 'value' as const,
-        label: `Accumulation (${unit})`,
-        formatter: (value: number) => `${Math.round(value)}`,
-      }
-    : undefined;
+    // Build model series (with reduced opacity if aggregations enabled)
+    const modelSeries = buildSeriesConfigs(seriesData, selectedModels, chartType, hasAggregations);
 
-  return {
-    type: chartType,
-    xAxis: {
-      type: 'category',
-      data: timeLabels,
-    },
-    yAxis: {
-      type: 'value',
-      label: `${variableConfig.label} (${unit})`,
-      domain: variableConfig.yAxisDomain,
-      formatter: (value: number) => `${Math.round(value)}`,
-    },
-    yAxisSecondary,
-    series: allSeries,
-    markLines,
-    tooltip: {
-      enabled: true,
-      trigger: 'axis',
-    },
-    legend: {
-      enabled: true,
-      position: 'bottom',
-    },
-    grid: {
-      top: 10,
-      right: gridRight,
-      bottom: gridBottom,
-      left: 10,
-      containLabel: true,
-    },
-    dataZoom: {
-      enabled: !isChartLocked,
-      type: 'both',
-      range: [0, 100],
-    },
-    theme: chartTheme,
-    height: 380,
-    animation: false,
-  };
+    // Build aggregation series
+    const aggregationSeries = calculateAggregationSeries(
+        seriesData,
+        selectedAggregations,
+        aggregationColors,
+        chartType,
+        timeLabels.length
+    );
+
+    // Combine all series (aggregations rendered on top)
+    const allSeries = [...modelSeries, ...aggregationSeries];
+
+    // Track if we need a secondary Y-axis for accumulation
+    let hasAccumulation = false;
+
+    // Add accumulation series if enabled
+    if (settings?.showAccumulation) {
+        const accSeries = buildAccumulationSeries(seriesData, selectedModels);
+        if (accSeries.length > 0) {
+            allSeries.push(...accSeries);
+            hasAccumulation = true;
+        }
+    }
+
+    // Get unit string
+    const unit = unitSystem === 'imperial' ? variableConfig.unitImperial : variableConfig.unit;
+
+    // Use provided theme or get from CSS
+    const chartTheme = theme ?? getEChartsTheme();
+
+    // Build elevation mark lines if enabled
+    let markLines: MarkLineData[] | undefined;
+    if (settings?.showElevationLines && settings.location) {
+        markLines = buildElevationMarkLines(
+            settings.location,
+            settings.currentElevation,
+            unitSystem,
+            chartTheme
+        );
+    }
+
+    // When chart is locked, reduce bottom margin since there's no dataZoom slider
+    // Keep enough space (60px) for legend labels that may wrap to multiple lines
+    const gridBottom = isChartLocked ? 60 : 80;
+
+    // Need more space on right when accumulation has secondary Y-axis
+    const gridRight = hasAccumulation ? 50 : 30;
+
+    // Build secondary Y-axis config if accumulation is enabled
+    const yAxisSecondary = hasAccumulation
+        ? {
+            type: 'value' as const,
+            label: `Accumulation (${unit})`,
+            formatter: (value: number) => `${Math.round(value)}`,
+        }
+        : undefined;
+
+    return {
+        type: chartType,
+        xAxis: {
+            type: 'category',
+            data: timeLabels,
+        },
+        yAxis: {
+            type: 'value',
+            label: `${variableConfig.label} (${unit})`,
+            domain: variableConfig.yAxisDomain,
+            formatter: (value: number) => `${Math.round(value)}`,
+        },
+        yAxisSecondary,
+        series: allSeries,
+        markLines,
+        tooltip: {
+            enabled: true,
+            trigger: 'axis',
+            appendToBody: true,
+        },
+        legend: {
+            enabled: true,
+            position: 'bottom',
+        },
+        grid: {
+            top: 10,
+            right: gridRight,
+            bottom: gridBottom,
+            left: 10,
+            containLabel: true,
+        },
+        dataZoom: {
+            enabled: !isChartLocked,
+            type: 'both',
+            range: [0, 100],
+        },
+        theme: chartTheme,
+        height: 380,
+        animation: false,
+    };
 }
 
 /**
  * Get the variable metadata for display (label, unit, color).
  */
 export function getVariableDisplayInfo(
-  variable: string,
-  unitSystem: UnitSystem
+    variable: string,
+    unitSystem: UnitSystem
 ): { label: string; unit: string; color: string } {
-  const config = getVariableConfig(variable as any);
-  return {
-    label: config.label,
-    unit: unitSystem === 'imperial' ? config.unitImperial : config.unit,
-    color: config.color,
-  };
+    const config = getVariableConfig(variable as any);
+    return {
+        label: config.label,
+        unit: unitSystem === 'imperial' ? config.unitImperial : config.unit,
+        color: config.color,
+    };
 }
