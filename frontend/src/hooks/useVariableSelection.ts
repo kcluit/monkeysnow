@@ -122,7 +122,11 @@ export function useVariableSelection({
       return orderedVariables;
     }
     const query = searchTerm.toLowerCase();
-    return orderedVariables.filter((varId) => varId.toLowerCase().includes(query));
+    return orderedVariables.filter((varId) => {
+      const config = VARIABLE_CONFIGS.get(varId);
+      const label = config?.label?.toLowerCase() || '';
+      return varId.toLowerCase().includes(query) || label.includes(query);
+    });
   }, [orderedVariables, searchTerm]);
 
   return {
