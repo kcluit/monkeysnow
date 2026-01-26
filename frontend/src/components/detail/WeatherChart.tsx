@@ -85,8 +85,9 @@ export function WeatherChart({
                     name={modelConfig.name}
                     stroke={modelConfig.color}
                     strokeWidth={2}
-                    dot={{ r: 4, strokeWidth: 2, fill: 'var(--color-cardBg)' }}
-                    activeDot={{ r: 6, strokeWidth: 2 }}
+                    dot={false}
+                    activeDot={{ r: 6, strokeWidth: 2, fill: 'var(--color-cardBg)' }}
+                    isAnimationActive={false}
                 />
             );
         });
