@@ -27,10 +27,11 @@ function DetailChartGridInner({
           variable={variable}
           unitSystem={unitSystem}
           timezoneInfo={timezoneInfo}
+          isChartLocked={isChartLocked}
         />
       </div>
     ));
-  }, [data, selectedModels, selectedVariables, unitSystem, timezoneInfo]);
+  }, [data, selectedModels, selectedVariables, unitSystem, timezoneInfo, isChartLocked]);
 
   if (!data || data.size === 0) {
     return (
