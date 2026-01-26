@@ -130,13 +130,14 @@ export function buildWeatherChartConfig(
   const variableConfig = getVariableConfig(variable);
   const chartType = variableConfig.chartType as ChartType;
 
-  // Transform data
+  // Transform data with timezone
   const { timeLabels, seriesData } = transformToChartData(
     data,
     selectedModels,
     variable,
     unitSystem,
-    variableConfig.convertToImperial
+    variableConfig.convertToImperial,
+    timezoneInfo?.timezone
   );
 
   // Handle no data after transformation
