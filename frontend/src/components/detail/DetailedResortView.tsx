@@ -24,10 +24,10 @@ export function DetailedResortView({
     DEFAULT_MODELS
   );
 
-  // State for selected variables - all selected by default
+  // State for selected variables - default selection
   const [selectedVariables, setSelectedVariables] = useLocalStorage<WeatherVariable[]>(
     'detailSelectedVariables',
-    ALL_VARIABLES
+    DEFAULT_VARIABLES
   );
 
   // State for elevation - default to mid elevation
