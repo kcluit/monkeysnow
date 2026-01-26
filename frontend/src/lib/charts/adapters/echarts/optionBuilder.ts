@@ -98,18 +98,26 @@ function buildXAxis(config: ChartConfig, theme: ChartTheme): ChartOption {
     data: config.xAxis.data,
     axisLine: {
       lineStyle: {
-        color: theme.border,
+        color: theme.gridLine,
       },
     },
     axisTick: {
       lineStyle: {
-        color: theme.border,
+        color: theme.gridLine,
       },
     },
     axisLabel: {
       color: theme.textSecondary,
       fontSize: 11,
       interval,
+    },
+    splitLine: {
+      show: true,
+      lineStyle: {
+        color: theme.gridLine,
+        opacity: 0.3,
+        type: 'dashed',
+      },
     },
   };
 }
