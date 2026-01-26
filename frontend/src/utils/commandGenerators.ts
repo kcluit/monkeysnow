@@ -438,5 +438,15 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
         params.setUnitSystem
       ),
     },
+    {
+      id: 'language',
+      name: 'Language',
+      icon: '🌐',
+      subCommands: generateLanguageCommands(
+        params.languageId,
+        params.setLanguage,
+        params.availableLanguages
+      ),
+    },
   ];
 }
