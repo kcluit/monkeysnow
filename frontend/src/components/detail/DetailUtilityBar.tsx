@@ -26,6 +26,8 @@ export function DetailUtilityBar({
     const [showVariableDropdown, setShowVariableDropdown] = useState(false);
     const [showElevationDropdown, setShowElevationDropdown] = useState(false);
     const [showForecastDropdown, setShowForecastDropdown] = useState(false);
+    const [showCustomElevationInput, setShowCustomElevationInput] = useState(false);
+    const [customElevationValue, setCustomElevationValue] = useState('');
 
     // Model hierarchy hook for modal
     const modelHierarchy = useModelHierarchy({
