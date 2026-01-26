@@ -89,8 +89,8 @@ function buildTooltip(config: ChartConfig, _theme: ChartTheme): ChartOption {
         // Performance: disable tooltip transitions completely
         transitionDuration: 0,
         // Performance: add delay to avoid rapid tooltip updates during fast mouse movement
-        showDelay: 80,
-        hideDelay: 80,
+        showDelay: 100,
+        hideDelay: 100,
         // Performance: confine tooltip to chart area (avoids expensive layout recalculations)
         confine: true,
         // Performance: position tooltip efficiently using fixed position calculation
