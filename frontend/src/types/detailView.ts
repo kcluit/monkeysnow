@@ -83,6 +83,8 @@ export interface DetailChartGridProps {
     data: Map<WeatherModel, import('./openMeteo').HourlyDataPoint[]>;
     selectedModels: WeatherModel[];
     selectedVariables: WeatherVariable[];
+    selectedAggregations: AggregationType[];
+    aggregationColors: Record<AggregationType, string>;
     unitSystem: UnitSystem;
     timezoneInfo?: TimezoneInfo;
     isChartLocked?: boolean;
@@ -91,6 +93,8 @@ export interface DetailChartGridProps {
 export interface WeatherChartProps {
     data: Map<WeatherModel, import('./openMeteo').HourlyDataPoint[]>;
     selectedModels: WeatherModel[];
+    selectedAggregations: AggregationType[];
+    aggregationColors: Record<AggregationType, string>;
     variable: WeatherVariable;
     unitSystem: UnitSystem;
     timezoneInfo?: TimezoneInfo;
