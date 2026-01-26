@@ -397,10 +397,10 @@ export function buildEChartsOption(config: ChartConfig): ChartOption {
         animationDuration: 0,
         animationDurationUpdate: 0,
         // Performance: use progressive rendering for large datasets
-        progressive: isLargeDataset ? 200 : 0,
-        progressiveThreshold: 1000,
-        // Performance: separate hover layer threshold - lower = more efficient for hover
-        hoverLayerThreshold: 1000,
+        progressive: 50,
+        progressiveThreshold: 500,
+        // Performance: CRITICAL - disable hover layer entirely (no separate layer for hover effects)
+        hoverLayerThreshold: Infinity,
         // Performance: use UTC to avoid timezone calculations
         useUTC: true,
         // Performance: CRITICAL - increase global throttle for pointer events
@@ -413,6 +413,8 @@ export function buildEChartsOption(config: ChartConfig): ChartOption {
         },
         // Performance: disable blend mode (avoids expensive compositing)
         blendMode: undefined,
+        // Performance: simplify renderer
+        silent: false, // Need events for tooltip, but series are silent
         grid: buildGrid(config),
         xAxis: buildXAxis(config, theme),
         yAxis: buildYAxis(config, theme),
