@@ -107,13 +107,14 @@ export function buildBarSeries(config: SeriesConfig): SeriesOption {
     z: config.zIndex ?? 2,
     // Performance: CRITICAL - silent mode disables event processing
     silent: true,
+    hoverLayerThreshold: Infinity,
     itemStyle: {
       color: config.color,
       opacity,
     },
     // Performance: Enable large mode with low threshold
-    large: isLarge,
-    largeThreshold: 50,
+    large: true,
+    largeThreshold: 20,
     // Performance: Clip data to visible area
     clip: true,
     // Performance: Disable all state effects
@@ -134,6 +135,9 @@ export function buildBarSeries(config: SeriesConfig): SeriesOption {
     universalTransition: {
       enabled: false,
     },
+    // Performance: Progressive rendering
+    progressive: 100,
+    progressiveThreshold: 500,
   };
 
   // Add yAxisIndex if specified (for secondary Y-axis)
