@@ -6,7 +6,7 @@
  * Optimized for high-frequency interactions like mouse hover.
  */
 
-import { useMemo, memo, useCallback, useRef, useEffect } from 'react';
+import { useMemo, memo, useCallback, useRef } from 'react';
 import ReactECharts from 'echarts-for-react';
 import type { ECharts } from 'echarts';
 import type { ChartRendererProps } from '../../types';
