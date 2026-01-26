@@ -2,7 +2,7 @@ import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useDetailedWeatherData } from '../../hooks/useDetailedWeatherData';
 import { DetailUtilityBar } from './DetailUtilityBar';
 import { DetailChartGrid } from './DetailChartGrid';
-import { ALL_VARIABLES, DEFAULT_MODELS } from '../../utils/chartConfigurations';
+import { DEFAULT_VARIABLES, DEFAULT_MODELS } from '../../utils/chartConfigurations';
 import type { DetailedResortViewProps } from '../../types/detailView';
 import type { WeatherModel, WeatherVariable } from '../../types/openMeteo';
 import type { UnitSystem } from '../../types';
