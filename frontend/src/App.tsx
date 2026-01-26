@@ -58,7 +58,7 @@ function App(): JSX.Element {
     const { isHideEmojiEnabled, setHideEmojiEnabled } = useHideEmoji();
     const { isHideBordersEnabled, setHideBordersEnabled } = useHideBorders();
     const { isShowDateEnabled, setShowDateEnabled } = useShowDate();
-    const { language, setLanguage, availableLanguages } = useLanguage();
+    const { t, language, setLanguage, availableLanguages } = useLanguage();
 
     // Detail view state hook
     const { isDetailView, selectedResortId, enterDetailView, exitDetailView } = useDetailViewState();
