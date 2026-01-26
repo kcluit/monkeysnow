@@ -179,7 +179,7 @@ function buildDataZoom(config: ChartConfig, theme: ChartTheme): ChartOption[] | 
       start: range[0],
       end: range[1],
       height: 40,
-      borderColor: theme.border,
+      borderColor: theme.gridLine,
       fillerColor: `${theme.accent}40`, // 25% opacity
       handleStyle: {
         color: theme.accent,
@@ -189,10 +189,10 @@ function buildDataZoom(config: ChartConfig, theme: ChartTheme): ChartOption[] | 
       },
       dataBackground: {
         lineStyle: {
-          color: theme.border,
+          color: theme.gridLine,
         },
         areaStyle: {
-          color: `${theme.border}40`,
+          color: `${theme.gridLine}40`,
         },
       },
     });
