@@ -229,6 +229,33 @@ function buildDataZoom(config: ChartConfig, theme: ChartTheme): ChartOption[] | 
 }
 
 /**
+ * Build ECharts markLine configuration from MarkLineData array.
+ */
+function buildMarkLine(markLines: MarkLineData[]): ChartOption {
+  return {
+    silent: true, // Don't trigger events
+    symbol: 'none', // No arrow symbols at ends
+    animation: false,
+    data: markLines.map((ml) => ({
+      yAxis: ml.yValue,
+      label: {
+        show: true,
+        formatter: ml.label,
+        position: 'insideEndTop',
+        color: ml.color,
+        fontSize: 11,
+        fontWeight: ml.lineWidth >= 2 ? 'bold' : 'normal',
+      },
+      lineStyle: {
+        color: ml.color,
+        width: ml.lineWidth,
+        type: ml.lineStyle,
+      },
+    })),
+  };
+}
+
+/**
  * Convert ChartConfig to complete ECharts option object.
  */
 export function buildEChartsOption(config: ChartConfig): ChartOption {
@@ -236,6 +263,11 @@ export function buildEChartsOption(config: ChartConfig): ChartOption {
 
   // Build series from config
   const series = config.series.map((s) => buildSeries(s));
+
+  // If we have markLines, attach them to the first series
+  if (config.markLines && config.markLines.length > 0 && series.length > 0) {
+    (series[0] as ChartOption).markLine = buildMarkLine(config.markLines);
+  }
 
   return {
     backgroundColor: theme.background,
