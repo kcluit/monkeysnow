@@ -22,9 +22,6 @@ export function buildLineSeries(config: SeriesConfig): SeriesOption {
   const lineWidth = config.lineWidth ?? 2;
   const opacity = config.opacity ?? 1;
   const lineType = mapLineStyle(config.lineStyle);
-  const dataLength = Array.isArray(config.data) ? config.data.length : 0;
-  // Enable large mode more aggressively for better hover performance
-  const isLarge = dataLength > 50;
 
   const series: SeriesOption = {
     type: 'line',
