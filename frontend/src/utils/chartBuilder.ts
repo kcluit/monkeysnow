@@ -400,15 +400,15 @@ export function buildWeatherChartConfig(
   // Combine all series (aggregations rendered on top)
   const allSeries = [...modelSeries, ...aggregationSeries];
 
+  // Track if we need a secondary Y-axis for accumulation
+  let hasAccumulation = false;
+
   // Add accumulation series if enabled
   if (settings?.showAccumulation) {
-    const accumulationSeries = buildAccumulationSeries(
-      seriesData,
-      timeLabels.length,
-      variableConfig.color
-    );
-    if (accumulationSeries) {
-      allSeries.push(accumulationSeries);
+    const accSeries = buildAccumulationSeries(seriesData, selectedModels);
+    if (accSeries.length > 0) {
+      allSeries.push(...accSeries);
+      hasAccumulation = true;
     }
   }
 
