@@ -67,7 +67,7 @@ function buildLegend(config: ChartConfig, theme: ChartTheme): ChartOption {
 /**
  * Build grid (margins) configuration for ECharts.
  */
-function buildGrid(config: ChartConfig): EChartsOption['grid'] {
+function buildGrid(config: ChartConfig): ChartOption {
   const grid = config.grid ?? {
     top: 10,
     right: 30,
