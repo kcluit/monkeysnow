@@ -1,9 +1,6 @@
 import type { ElevationLevel, SortOption, TemperatureMetric } from '../types';
-import { buildResortAliases, getDisplayNameFromHierarchy } from '../data/resortHierarchy';
 
-// Build resort aliases from the hierarchy (single source of truth)
-export const resortAliases: Record<string, string> = buildResortAliases();
-
+// Webcam URLs (static data, not from backend)
 export const webcamUrls: Record<string, string> = {
   "Apex Mountain": "https://apexresort.com/weather/?1#live-webcams",
   "Mt Baldy": "https://baldyresort.com/baldy-mt-resort/webcams/",
@@ -40,9 +37,6 @@ export const webcamUrls: Record<string, string> = {
   "Stevens Pass": "https://www.stevenspass.com/the-mountain/mountain-conditions/mountain-cams.aspx"
 };
 
-// Get API keys (resort IDs) from the aliases object
-export const skiResorts: string[] = Object.values(resortAliases);
-
 // Default settings
 export const defaultSelectedResorts: string[] = ["Cypress-Mountain", "Mount-Seymour", "Grouse-Mountain"];
 export const defaultElevation: ElevationLevel = "bot";
@@ -50,8 +44,35 @@ export const defaultSort: SortOption = "temperature";
 export const defaultSortDay: number = 0;
 export const defaultTemperatureMetric: TemperatureMetric = "max";
 
-// Helper function to get display name from API ID
-// Uses the hierarchy as the source of truth
+/**
+ * Fallback function to get display name from API ID.
+ * Simply converts kebab-case to Title Case.
+ *
+ * Note: For proper display names, use HierarchyContext's getDisplayName() instead.
+ */
+export function getDisplayNameFallback(apiId: string): string {
+  return apiId.replace(/-/g, ' ');
+}
+
+// ============================================================================
+// DEPRECATED: These exports are kept for backward compatibility during migration.
+// Components should migrate to using HierarchyContext instead.
+// ============================================================================
+
+/**
+ * @deprecated Use HierarchyContext's skiResorts instead.
+ * This empty array is a placeholder - the actual resort list comes from the backend.
+ */
+export const skiResorts: string[] = [];
+
+/**
+ * @deprecated Use HierarchyContext's resortAliases instead.
+ */
+export const resortAliases: Record<string, string> = {};
+
+/**
+ * @deprecated Use HierarchyContext's getDisplayName() instead.
+ */
 export function getDisplayName(apiId: string): string {
-  return getDisplayNameFromHierarchy(apiId);
+  return getDisplayNameFallback(apiId);
 }
