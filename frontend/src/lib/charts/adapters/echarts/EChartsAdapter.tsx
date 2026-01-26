@@ -18,6 +18,12 @@ import { buildEChartsOption } from './optionBuilder';
 const DEFAULT_HEIGHT = 380;
 
 /**
+ * Throttle interval for pointer events at the zrender level (ms).
+ * Higher values = better FPS during rapid mouse movement, but less responsive tooltip.
+ */
+const ZRENDER_THROTTLE_MS = 100;
+
+/**
  * ECharts adapter component.
  * Converts library-agnostic ChartConfig to ECharts and renders.
  * Performance optimizations:
@@ -64,12 +70,31 @@ function EChartsAdapterInner({
     const onChartReady = useCallback((chart: ECharts) => {
         chartRef.current = chart;
 
-        // Performance: Get the zrender instance and configure throttling
+        // Performance: Get the zrender instance and configure aggressive throttling
         const zr = chart.getZr();
         if (zr) {
-            // Set pointer event throttling to reduce event frequency during rapid mouse movement
-            // This is the key optimization for high-frequency hover interactions
-            (zr as unknown as { _bindThrottledHandler?: (eventName: string) => void })._bindThrottledHandler?.('mousemove');
+            // Access the handler object to configure throttling
+            const handler = (zr as unknown as { handler?: {
+                setHandlerProxy?: (proxy: unknown) => void;
+                _bindThrottledHandler?: (eventName: string, throttleMs: number) => void;
+            } }).handler;
+
+            if (handler?._bindThrottledHandler) {
+                // Throttle mousemove events aggressively
+                handler._bindThrottledHandler('mousemove', ZRENDER_THROTTLE_MS);
+            }
+
+            // Alternative approach: directly set animation options on zrender
+            (zr as unknown as { animation?: { clear?: () => void } }).animation?.clear?.();
+        }
+
+        // Performance: Disable tooltip trigger animation
+        const tooltipModel = chart.getModel()?.getComponent('tooltip');
+        if (tooltipModel) {
+            (tooltipModel as unknown as { option?: { transitionDuration?: number } }).option = {
+                ...(tooltipModel as unknown as { option?: object }).option,
+                transitionDuration: 0,
+            };
         }
     }, []);
 
