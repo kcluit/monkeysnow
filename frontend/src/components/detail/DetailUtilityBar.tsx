@@ -46,12 +46,32 @@ export function DetailUtilityBar({
                 setShowVariableDropdown(false);
                 setShowElevationDropdown(false);
                 setShowForecastDropdown(false);
+                setShowCustomElevationInput(false);
             }
         };
 
         document.addEventListener('click', handleClickOutside);
         return () => document.removeEventListener('click', handleClickOutside);
     }, []);
+
+    const handleCustomElevationSubmit = () => {
+        const value = parseInt(customElevationValue, 10);
+        if (!isNaN(value) && value >= 0 && value <= 9000) {
+            setElevation(value);
+            setShowElevationDropdown(false);
+            setShowCustomElevationInput(false);
+            setCustomElevationValue('');
+        }
+    };
+
+    const handleCustomElevationKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            handleCustomElevationSubmit();
+        } else if (e.key === 'Escape') {
+            setShowCustomElevationInput(false);
+            setCustomElevationValue('');
+        }
+    };
 
     const toggleVariable = (variableId: WeatherVariable) => {
         if (selectedVariables.includes(variableId)) {
