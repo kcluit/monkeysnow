@@ -293,6 +293,7 @@ function buildMarkLine(markLines: MarkLineData[]): ChartOption {
 
 /**
  * Convert ChartConfig to complete ECharts option object.
+ * Includes performance optimizations for large datasets and frequent interactions.
  */
 export function buildEChartsOption(config: ChartConfig): ChartOption {
     const theme = config.theme;
@@ -305,9 +306,25 @@ export function buildEChartsOption(config: ChartConfig): ChartOption {
         (series[0] as ChartOption).markLine = buildMarkLine(config.markLines);
     }
 
+    // Calculate total data points for performance tuning
+    const totalDataPoints = series.reduce((sum, s) => {
+        const data = (s as { data?: unknown[] }).data;
+        return sum + (Array.isArray(data) ? data.length : 0);
+    }, 0);
+
+    // Performance thresholds
+    const isLargeDataset = totalDataPoints > 2000;
+
     return {
         backgroundColor: theme.background,
         animation: config.animation ?? false, // Disable animation for performance by default
+        // Performance: use progressive rendering for large datasets
+        progressive: isLargeDataset ? 200 : 0,
+        progressiveThreshold: 1000,
+        // Performance: separate hover layer when many series
+        hoverLayerThreshold: series.length > 10 ? 3000 : Infinity,
+        // Performance: throttle updates during interactions
+        useUTC: true,
         grid: buildGrid(config),
         xAxis: buildXAxis(config, theme),
         yAxis: buildYAxis(config, theme),
