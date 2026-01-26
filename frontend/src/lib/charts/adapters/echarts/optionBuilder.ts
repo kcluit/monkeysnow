@@ -4,14 +4,16 @@
  * Converts library-agnostic ChartConfig to ECharts-specific option object.
  */
 
-import type { EChartsOption } from 'echarts';
 import type { ChartConfig, ChartTheme } from '../../types';
 import { buildSeries } from './seriesBuilders';
+
+/** Generic option type to avoid complex ECharts type conflicts */
+type ChartOption = Record<string, unknown>;
 
 /**
  * Build tooltip configuration for ECharts.
  */
-function buildTooltip(config: ChartConfig, theme: ChartTheme): EChartsOption['tooltip'] {
+function buildTooltip(config: ChartConfig, _theme: ChartTheme): ChartOption {
   if (config.tooltip?.enabled === false) {
     return { show: false };
   }
