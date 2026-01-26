@@ -1,23 +1,75 @@
 // Open-Meteo API types
 
-// Weather models available from Open-Meteo
+// Weather models available from Open-Meteo (all 46 models)
 export type WeatherModel =
   | 'best_match'
+  // ECMWF
   | 'ecmwf_ifs'
   | 'ecmwf_ifs025'
+  | 'ecmwf_aifs025_single'
+  // ICON (DWD Germany)
   | 'icon_seamless'
+  | 'icon_global'
   | 'icon_eu'
+  | 'icon_d2'
+  // GFS (NOAA USA)
   | 'gfs_seamless'
+  | 'gfs_global'
+  | 'gfs_hrrr'
+  | 'gfs_graphcast025'
+  // GEM (Canada)
   | 'gem_seamless'
+  | 'gem_global'
+  | 'gem_regional'
   | 'gem_hrdps_continental'
+  | 'gem_hrdps_west'
+  // Meteo-France
   | 'meteofrance_seamless'
+  | 'meteofrance_arpege_world'
   | 'meteofrance_arpege_europe'
+  | 'meteofrance_arome_france'
+  | 'meteofrance_arome_france_hd'
+  // MetNo (Norway)
   | 'metno_seamless'
   | 'metno_nordic'
+  // KNMI (Netherlands)
   | 'knmi_seamless'
-  | 'ncep_nbm_conus'
+  | 'knmi_harmonie_arome_europe'
+  | 'knmi_harmonie_arome_netherlands'
+  // JMA (Japan)
+  | 'jma_seamless'
+  | 'jma_msm'
+  | 'jma_gsm'
+  // UKMO (UK Met Office)
+  | 'ukmo_seamless'
+  | 'ukmo_global_deterministic_10km'
+  | 'ukmo_uk_deterministic_2km'
+  // DMI (Denmark)
+  | 'dmi_seamless'
+  | 'dmi_harmonie_arome_europe'
+  // MeteoSwiss
+  | 'meteoswiss_icon_seamless'
+  | 'meteoswiss_icon_ch1'
   | 'meteoswiss_icon_ch2'
-  | 'kma_gdps';
+  // KMA (Korea)
+  | 'kma_seamless'
+  | 'kma_gdps'
+  | 'kma_ldps'
+  // CMA (China)
+  | 'cma_grapes_global'
+  // BOM (Australia)
+  | 'bom_access_global'
+  // NCEP
+  | 'ncep_nbm_conus'
+  | 'ncep_nam_conus'
+  // Italia Meteo
+  | 'italia_meteo_arpae_icon_2i';
+
+// Aggregation types for model ensemble
+export type AggregationType = 'median' | 'mean';
+
+// Combined type for models and aggregations
+export type ModelOrAggregation = WeatherModel | AggregationType;
 
 // Weather variables available from Open-Meteo hourly endpoint
 export type WeatherVariable =
