@@ -244,6 +244,7 @@ export type {
   OpenMeteoResponse,
   ModelWeatherData,
   HourlyDataPoint,
+  TimezoneInfo,
 } from './openMeteo';
 
 export type {
