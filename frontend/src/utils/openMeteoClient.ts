@@ -148,7 +148,7 @@ export async function fetchOpenMeteoData(
       result.set(modelId, dataPoints);
     }
 
-    return result;
+    return { data: result, timezoneInfo };
   } catch (error) {
     console.error('Error fetching Open-Meteo data:', error);
     throw error;
