@@ -66,7 +66,6 @@ export function useDetailedWeatherData({
     prevParamsRef.current = paramsKey;
 
     let cancelled = false;
-    const controller = new AbortController();
 
     async function fetchData() {
       setLoading(true);
@@ -79,9 +78,7 @@ export function useDetailedWeatherData({
           elevation,
           models,
           variables,
-          forecastDays,
-          'auto',
-          controller.signal
+          forecastDays
         );
 
         if (!cancelled) {
