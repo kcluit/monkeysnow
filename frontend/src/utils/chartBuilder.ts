@@ -289,6 +289,11 @@ function adjustColorBrightness(hex: string, percent: number): string {
   // Remove # if present
   const cleanHex = hex.replace('#', '');
 
+  // Validate hex format (must be 6 hex characters)
+  if (!/^[0-9A-Fa-f]{6}$/.test(cleanHex)) {
+    return hex; // Return original if invalid
+  }
+
   // Parse RGB
   const r = parseInt(cleanHex.substring(0, 2), 16);
   const g = parseInt(cleanHex.substring(2, 4), 16);
