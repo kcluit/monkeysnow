@@ -16,11 +16,13 @@ function mapLineStyle(style?: 'solid' | 'dashed' | 'dotted'): 'solid' | 'dashed'
 
 /**
  * Build a line series option for ECharts.
+ * Includes performance optimizations for large datasets.
  */
 export function buildLineSeries(config: SeriesConfig): SeriesOption {
   const lineWidth = config.lineWidth ?? 2;
   const opacity = config.opacity ?? 1;
   const lineType = mapLineStyle(config.lineStyle);
+  const dataLength = Array.isArray(config.data) ? config.data.length : 0;
 
   const series: SeriesOption = {
     type: 'line',
@@ -38,11 +40,18 @@ export function buildLineSeries(config: SeriesConfig): SeriesOption {
       type: lineType,
     },
     symbol: 'none', // No data point markers for performance
+    // Performance: Enable large mode for datasets with many points
+    large: dataLength > 500,
+    largeThreshold: 500,
+    // Performance: Use sampling to reduce points when zoomed out
+    sampling: 'lttb', // Largest-Triangle-Three-Buckets algorithm preserves visual shape
+    // Performance: Disable hover state changes
     emphasis: {
-      focus: 'series',
-      lineStyle: {
-        width: lineWidth + 1,
-      },
+      disabled: true,
+    },
+    // Performance: Disable selection
+    select: {
+      disabled: true,
     },
   };
 
