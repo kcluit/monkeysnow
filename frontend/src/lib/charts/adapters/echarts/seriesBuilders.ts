@@ -89,14 +89,18 @@ export function buildBarSeries(config: SeriesConfig): SeriesOption {
       opacity,
     },
     // Performance: Enable large mode for datasets with many bars
-    large: dataLength > 500,
-    largeThreshold: 500,
-    // Performance: Disable hover state changes
+    large: dataLength > 300,
+    largeThreshold: 300,
+    // Performance: Disable hover state changes completely
     emphasis: {
       disabled: true,
     },
     // Performance: Disable selection
     select: {
+      disabled: true,
+    },
+    // Performance: Disable blur effect
+    blur: {
       disabled: true,
     },
   };
