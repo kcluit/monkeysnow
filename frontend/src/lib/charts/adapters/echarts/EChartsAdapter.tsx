@@ -14,8 +14,9 @@ import { buildEChartsOption } from './optionBuilder';
 
 /**
  * Default chart height if not specified in config.
+ * Lower height = smaller canvas = better performance
  */
-const DEFAULT_HEIGHT = 380;
+const DEFAULT_HEIGHT = 320;
 
 /**
  * Throttle interval for pointer events at the zrender level (ms).
