@@ -4,7 +4,7 @@
  * These functions operate on passed-in data rather than static data.
  */
 
-// Re-export types from the context for convenience
+// Re-export types from the hook for convenience
 export type {
   ResortInfo,
   ProvinceData,
@@ -14,7 +14,7 @@ export type {
   HierarchyNodeType,
 } from '../hooks/useHierarchyData';
 
-import type { HierarchyNode, ContinentData } from '../hooks/useHierarchyData';
+import type { HierarchyNode } from '../hooks/useHierarchyData';
 
 /**
  * Get all resort IDs under a hierarchy node.
