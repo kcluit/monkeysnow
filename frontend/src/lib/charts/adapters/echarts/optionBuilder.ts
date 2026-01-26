@@ -47,9 +47,13 @@ function buildLegend(config: ChartConfig, theme: ChartTheme): ChartOption {
     return { show: false };
   }
 
+  // When dataZoom is disabled (chart locked), legend can move down to where the slider was
+  const hasDataZoom = config.dataZoom?.enabled !== false;
+  const bottomPosition = hasDataZoom ? 50 : 10;
+
   const positionMap: Record<string, object> = {
     top: { top: 0 },
-    bottom: { bottom: 50 }, // Above dataZoom
+    bottom: { bottom: bottomPosition },
     left: { left: 0, orient: 'vertical' },
     right: { right: 0, orient: 'vertical' },
   };
