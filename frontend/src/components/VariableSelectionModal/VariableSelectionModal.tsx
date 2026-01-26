@@ -29,7 +29,6 @@ export function VariableSelectionModal({
     isOpen,
     closeModal,
     filteredVariables,
-    selectedVariables,
     isSelected,
     toggleVariable,
     selectAll,
