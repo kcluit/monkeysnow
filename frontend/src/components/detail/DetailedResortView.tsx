@@ -131,6 +131,7 @@ export function DetailedResortView({
                         selectedVariables={selectedVariables}
                         unitSystem={unitSystem}
                         timezoneInfo={timezoneInfo ?? undefined}
+                        isChartLocked={isChartLocked}
                     />
                     {loading && (
                         <div className="text-center py-2 text-sm text-theme-textSecondary animate-pulse">
