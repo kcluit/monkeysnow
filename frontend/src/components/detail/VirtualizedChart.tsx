@@ -65,7 +65,16 @@ function VirtualizedChartInner({
     });
 
     return (
-        <div ref={ref} data-chart-id={chartId}>
+        <div
+            ref={ref}
+            data-chart-id={chartId}
+            style={{
+                // Performance: CSS containment to isolate repaints
+                contain: 'layout style paint',
+                // Performance: hint browser to use GPU layer
+                willChange: 'contents',
+            }}
+        >
             {isVisible ? (
                 children
             ) : (
