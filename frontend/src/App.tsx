@@ -49,7 +49,7 @@ import type {
 } from './types';
 
 function App(): JSX.Element {
-    // Theme, font, fullscreen, FPS, rainbow, and hide emoji hooks
+    // Theme, font, fullscreen, FPS, rainbow, hide emoji, and language hooks
     const { setTheme, availableThemes } = useTheme();
     const { font, setFont, availableFonts } = useFont();
     const { isFullscreen, enterFullscreen, exitFullscreen } = useFullscreen();
@@ -58,6 +58,7 @@ function App(): JSX.Element {
     const { isHideEmojiEnabled, setHideEmojiEnabled } = useHideEmoji();
     const { isHideBordersEnabled, setHideBordersEnabled } = useHideBorders();
     const { isShowDateEnabled, setShowDateEnabled } = useShowDate();
+    const { language, setLanguage, availableLanguages } = useLanguage();
 
     // Detail view state hook
     const { isDetailView, selectedResortId, enterDetailView, exitDetailView } = useDetailViewState();
