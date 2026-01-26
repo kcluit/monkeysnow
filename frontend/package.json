@@ -21,10 +21,11 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.1.1",
+    "echarts": "^6.0.0",
+    "echarts-for-react": "^3.0.6",
     "openmeteo": "^1.1.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "recharts": "^2.15.0",
     "zod": "^3.23.8"
   }
 }
