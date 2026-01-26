@@ -69,14 +69,16 @@ export function useDetailedWeatherData({
         prevParamsRef.current = paramsKey;
 
         let cancelled = false;
+        let timezoneSet = false; // Track if timezone has been captured
 
         // Initialize with empty map or keep existing if only adding models?
         // For simplicity, we restart fetching.
         setData(new Map());
+        setTimezoneInfo(null); // Reset timezone on new fetch
         setLoading(true);
         setError(null);
 
-        async function fetchModel(model: WeatherModel, isFirst: boolean) {
+        async function fetchModel(model: WeatherModel) {
             try {
                 const result = await fetchOpenMeteoData(
                     latitude,
@@ -88,8 +90,9 @@ export function useDetailedWeatherData({
                 );
 
                 if (!cancelled) {
-                    // Store timezone from first successful response
-                    if (isFirst && result.timezoneInfo) {
+                    // Store timezone from first successful response (any model)
+                    if (!timezoneSet && result.timezoneInfo) {
+                        timezoneSet = true;
                         setTimezoneInfo(result.timezoneInfo);
                     }
 
@@ -110,8 +113,8 @@ export function useDetailedWeatherData({
         }
 
         async function fetchAll() {
-            // Create an array of promises, marking first model for timezone extraction
-            const promises = models.map((model, index) => fetchModel(model, index === 0));
+            // Create an array of promises for parallel fetching
+            const promises = models.map((model) => fetchModel(model));
 
             // Wait for all to settle (finish)
             await Promise.allSettled(promises);
