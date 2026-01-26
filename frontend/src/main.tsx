@@ -60,8 +60,6 @@ migrateResortIds();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-        <HierarchyProvider>
-            <App />
-        </HierarchyProvider>
+        <Root />
     </React.StrictMode>,
 )
