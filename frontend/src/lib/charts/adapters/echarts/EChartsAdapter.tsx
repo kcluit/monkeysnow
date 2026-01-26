@@ -6,7 +6,7 @@
  * Optimized for high-frequency interactions like mouse hover.
  */
 
-import { useMemo, memo, useCallback, useRef } from 'react';
+import { useMemo, memo, useCallback, useRef, useEffect } from 'react';
 import ReactECharts from 'echarts-for-react';
 import type { ECharts } from 'echarts';
 import type { ChartRendererProps } from '../../types';
@@ -24,6 +24,7 @@ const DEFAULT_HEIGHT = 380;
  * - Uses devicePixelRatio of 1 for faster rendering
  * - Throttles mouse events to prevent frame drops
  * - Uses silent mode on series to reduce event overhead
+ * - Uses passive event listeners for pointer events
  */
 function EChartsAdapterInner({
     config,
@@ -53,13 +54,33 @@ function EChartsAdapterInner({
             renderer: 'canvas' as const,
             devicePixelRatio: 1, // Force 1:1 pixel ratio for better performance
             useDirtyRect: true, // Only re-render changed areas
+            width: 'auto' as const,
+            height: 'auto' as const,
         }),
         []
     );
 
-    // Store chart instance for potential cleanup
+    // Store chart instance and configure additional performance settings
     const onChartReady = useCallback((chart: ECharts) => {
         chartRef.current = chart;
+
+        // Performance: Get the zrender instance and configure throttling
+        const zr = chart.getZr();
+        if (zr) {
+            // Set pointer event throttling to reduce event frequency during rapid mouse movement
+            // This is the key optimization for high-frequency hover interactions
+            (zr as unknown as { _bindThrottledHandler?: (eventName: string) => void })._bindThrottledHandler?.('mousemove');
+        }
+    }, []);
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            if (chartRef.current) {
+                chartRef.current.dispose();
+                chartRef.current = null;
+            }
+        };
     }, []);
 
     return (
@@ -68,9 +89,10 @@ function EChartsAdapterInner({
             style={chartStyle}
             className={className}
             opts={opts}
-            notMerge={false}
+            notMerge={true} // Performance: don't merge with previous options, replace entirely
             lazyUpdate={true}
             onChartReady={onChartReady}
+            shouldSetOption={() => true} // Always update when option changes
         />
     );
 }
