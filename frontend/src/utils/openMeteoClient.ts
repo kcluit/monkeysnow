@@ -6,6 +6,96 @@ import locationsData from '../../../backend/locations.json';
 
 const OPEN_METEO_URL = 'https://api.open-meteo.com/v1/forecast';
 
+// DEV MODE: Enable mock data for performance testing
+// Set window.__USE_MOCK_DATA = true in browser console to enable
+declare global {
+  interface Window {
+    __USE_MOCK_DATA?: boolean;
+  }
+}
+
+/**
+ * Generate mock weather data for performance testing.
+ * Creates realistic-looking data with sine wave patterns and noise.
+ */
+function generateMockData(
+  models: WeatherModel[],
+  variables: WeatherVariable[],
+  forecastDays: number
+): { data: Map<WeatherModel, HourlyDataPoint[]>; timezoneInfo: TimezoneInfo } {
+  const hoursCount = forecastDays * 24;
+  const startTime = new Date();
+  startTime.setMinutes(0, 0, 0);
+
+  const mockData = new Map<WeatherModel, HourlyDataPoint[]>();
+
+  // Base values and patterns for different variables
+  const varPatterns: Record<string, { base: number; amplitude: number; noise: number }> = {
+    temperature_2m: { base: 5, amplitude: 8, noise: 2 },
+    apparent_temperature: { base: 3, amplitude: 10, noise: 2 },
+    precipitation: { base: 0, amplitude: 2, noise: 1 },
+    rain: { base: 0, amplitude: 1.5, noise: 0.5 },
+    snowfall: { base: 0.5, amplitude: 2, noise: 1 },
+    snow_depth: { base: 50, amplitude: 20, noise: 5 },
+    wind_speed_10m: { base: 15, amplitude: 10, noise: 5 },
+    wind_gusts_10m: { base: 25, amplitude: 15, noise: 8 },
+    wind_direction_10m: { base: 180, amplitude: 90, noise: 30 },
+    relative_humidity_2m: { base: 70, amplitude: 20, noise: 10 },
+    surface_pressure: { base: 1013, amplitude: 15, noise: 3 },
+    cloud_cover: { base: 50, amplitude: 40, noise: 20 },
+    cloud_cover_low: { base: 30, amplitude: 25, noise: 15 },
+    cloud_cover_mid: { base: 40, amplitude: 30, noise: 15 },
+    cloud_cover_high: { base: 35, amplitude: 30, noise: 15 },
+    visibility: { base: 20000, amplitude: 15000, noise: 5000 },
+    freezing_level_height: { base: 2500, amplitude: 800, noise: 200 },
+    weather_code: { base: 50, amplitude: 40, noise: 20 },
+  };
+
+  models.forEach((model, modelIdx) => {
+    const hourlyData: HourlyDataPoint[] = [];
+    // Add model-specific offset for variation between models
+    const modelOffset = modelIdx * 0.3;
+
+    for (let i = 0; i < hoursCount; i++) {
+      const time = new Date(startTime.getTime() + i * 60 * 60 * 1000);
+      const point: HourlyDataPoint = {
+        time,
+        timestamp: time.getTime(),
+      };
+
+      variables.forEach((variable) => {
+        const pattern = varPatterns[variable] || { base: 10, amplitude: 5, noise: 2 };
+        // Create a wave pattern with model offset and random noise
+        const waveValue = Math.sin((i + modelOffset * 10) / 12) * pattern.amplitude;
+        const noise = (Math.random() - 0.5) * pattern.noise * 2;
+        let value = pattern.base + waveValue + noise;
+
+        // Clamp certain variables to realistic ranges
+        if (variable === 'precipitation' || variable === 'rain' || variable === 'snowfall') {
+          value = Math.max(0, value) * (Math.random() > 0.7 ? 1 : 0); // Intermittent precipitation
+        } else if (variable.includes('cloud_cover') || variable === 'relative_humidity_2m') {
+          value = Math.max(0, Math.min(100, value));
+        } else if (variable === 'wind_direction_10m') {
+          value = ((value % 360) + 360) % 360;
+        }
+
+        point[variable] = value;
+      });
+
+      hourlyData.push(point);
+    }
+    mockData.set(model, hourlyData);
+  });
+
+  return {
+    data: mockData,
+    timezoneInfo: {
+      timezone: 'America/Vancouver',
+      timezoneAbbreviation: 'PST',
+    },
+  };
+}
+
 // Location data structure from locations.json
 interface ResortLocation {
   bot: number;
