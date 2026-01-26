@@ -76,8 +76,8 @@ function buildTooltip(config: ChartConfig, _theme: ChartTheme): ChartOption {
         trigger: config.tooltip?.trigger ?? 'axis',
         // Performance: keep tooltip in chart container
         appendToBody: false,
-        // Performance: use richText render mode (faster than HTML DOM manipulation)
-        renderMode: 'richText',
+        // Performance: use html render mode (richText requires different format)
+        renderMode: 'html',
         backgroundColor: 'rgba(255, 255, 255, 0.95)',
         borderColor: '#ccc',
         borderWidth: 1,
