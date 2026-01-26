@@ -8,7 +8,7 @@
 
 import type { ChartConfig, ChartType, SeriesConfig, ChartTheme } from '../lib/charts';
 import type { WeatherChartProps } from '../types/detailView';
-import type { WeatherModel, HourlyDataPoint } from '../types/openMeteo';
+import type { WeatherModel, HourlyDataPoint, AggregationType } from '../types/openMeteo';
 import type { UnitSystem } from '../types';
 import { getModelConfig, getVariableConfig } from './chartConfigurations';
 import { getEChartsTheme } from '../lib/charts';
@@ -88,13 +88,87 @@ function transformToChartData(
 }
 
 /**
+ * Calculate median of an array of numbers.
+ */
+function calculateMedian(values: number[]): number {
+  if (values.length === 0) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0
+    ? (sorted[mid - 1] + sorted[mid]) / 2
+    : sorted[mid];
+}
+
+/**
+ * Calculate mean of an array of numbers.
+ */
+function calculateMean(values: number[]): number {
+  if (values.length === 0) return 0;
+  return values.reduce((sum, v) => sum + v, 0) / values.length;
+}
+
+/**
+ * Calculate aggregation series (median/mean) from model data.
+ */
+function calculateAggregationSeries(
+  seriesData: Map<WeatherModel, (number | null)[]>,
+  aggregations: AggregationType[],
+  aggregationColors: Record<AggregationType, string>,
+  chartType: ChartType,
+  timePoints: number
+): SeriesConfig[] {
+  if (aggregations.length === 0 || seriesData.size < 2) {
+    return [];
+  }
+
+  const allDataArrays = Array.from(seriesData.values());
+  const configs: SeriesConfig[] = [];
+
+  for (const aggType of aggregations) {
+    const aggregatedData: (number | null)[] = [];
+
+    for (let i = 0; i < timePoints; i++) {
+      const valuesAtTime = allDataArrays
+        .map((arr) => arr[i])
+        .filter((v): v is number => v !== null && !isNaN(v));
+
+      if (valuesAtTime.length === 0) {
+        aggregatedData.push(null);
+      } else {
+        const value = aggType === 'median'
+          ? calculateMedian(valuesAtTime)
+          : calculateMean(valuesAtTime);
+        aggregatedData.push(value);
+      }
+    }
+
+    const color = aggregationColors[aggType] ?? (aggType === 'median' ? '#a855f7' : '#ec4899');
+    const name = aggType === 'median' ? 'Median' : 'Mean';
+
+    configs.push({
+      id: aggType,
+      name,
+      color,
+      type: chartType,
+      data: aggregatedData,
+      lineWidth: 4, // Thicker line for aggregations
+      opacity: 1,
+      zIndex: 100, // Render on top
+    });
+  }
+
+  return configs;
+}
+
+/**
  * Build series configurations from weather model data.
  * Skips models with no data or empty data arrays.
  */
 function buildSeriesConfigs(
   seriesData: Map<WeatherModel, (number | null)[]>,
   selectedModels: WeatherModel[],
-  chartType: ChartType
+  chartType: ChartType,
+  hasAggregations: boolean
 ): SeriesConfig[] {
   const configs: SeriesConfig[] = [];
 
@@ -112,6 +186,10 @@ function buildSeriesConfigs(
       type: chartType,
       data,
       fillOpacity: chartType === 'area' ? 0.3 : undefined,
+      // Reduce opacity when aggregations are enabled
+      opacity: hasAggregations ? 0.25 : 1,
+      lineWidth: 2,
+      zIndex: 2,
     });
   }
 
@@ -125,7 +203,16 @@ export function buildWeatherChartConfig(
   props: WeatherChartProps,
   theme?: ChartTheme
 ): ChartConfig | null {
-  const { data, selectedModels, variable, unitSystem, timezoneInfo, isChartLocked } = props;
+  const {
+    data,
+    selectedModels,
+    selectedAggregations = [],
+    aggregationColors = { median: '#a855f7', mean: '#ec4899' },
+    variable,
+    unitSystem,
+    timezoneInfo,
+    isChartLocked
+  } = props;
 
   // Handle empty data
   if (!data || data.size === 0) {
@@ -151,8 +238,23 @@ export function buildWeatherChartConfig(
     return null;
   }
 
-  // Build series
-  const series = buildSeriesConfigs(seriesData, selectedModels, chartType);
+  // Determine if we have aggregations enabled
+  const hasAggregations = selectedAggregations.length > 0 && seriesData.size > 1;
+
+  // Build model series (with reduced opacity if aggregations enabled)
+  const modelSeries = buildSeriesConfigs(seriesData, selectedModels, chartType, hasAggregations);
+
+  // Build aggregation series
+  const aggregationSeries = calculateAggregationSeries(
+    seriesData,
+    selectedAggregations,
+    aggregationColors,
+    chartType,
+    timeLabels.length
+  );
+
+  // Combine all series (aggregations rendered on top)
+  const allSeries = [...modelSeries, ...aggregationSeries];
 
   // Get unit string
   const unit = unitSystem === 'imperial' ? variableConfig.unitImperial : variableConfig.unit;
@@ -172,7 +274,7 @@ export function buildWeatherChartConfig(
       domain: variableConfig.yAxisDomain,
       formatter: (value: number) => `${Math.round(value)}`,
     },
-    series,
+    series: allSeries,
     tooltip: {
       enabled: true,
       trigger: 'axis',
