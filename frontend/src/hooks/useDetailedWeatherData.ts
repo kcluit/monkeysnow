@@ -56,6 +56,7 @@ export function useDetailedWeatherData({
 
         if (models.length === 0 || variables.length === 0) {
             setData(null);
+            setTimezoneInfo(null);
             setLoading(false);
             setError(null);
             return;
