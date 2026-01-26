@@ -5,12 +5,14 @@
  */
 
 import type { SeriesConfig } from '../../types';
-import type { LineSeriesOption, BarSeriesOption } from 'echarts/charts';
+
+/** Generic series option type to avoid complex ECharts type conflicts */
+type SeriesOption = Record<string, unknown>;
 
 /**
  * Build a line series option for ECharts.
  */
-export function buildLineSeries(config: SeriesConfig): LineSeriesOption {
+export function buildLineSeries(config: SeriesConfig): SeriesOption {
   return {
     type: 'line',
     name: config.name,
@@ -36,7 +38,7 @@ export function buildLineSeries(config: SeriesConfig): LineSeriesOption {
 /**
  * Build a bar series option for ECharts.
  */
-export function buildBarSeries(config: SeriesConfig): BarSeriesOption {
+export function buildBarSeries(config: SeriesConfig): SeriesOption {
   return {
     type: 'bar',
     name: config.name,
@@ -59,7 +61,7 @@ export function buildBarSeries(config: SeriesConfig): BarSeriesOption {
  * Build an area series option for ECharts.
  * Area charts are line charts with areaStyle.
  */
-export function buildAreaSeries(config: SeriesConfig): LineSeriesOption {
+export function buildAreaSeries(config: SeriesConfig): SeriesOption {
   return {
     type: 'line',
     name: config.name,
@@ -89,9 +91,7 @@ export function buildAreaSeries(config: SeriesConfig): LineSeriesOption {
 /**
  * Build a series option based on chart type.
  */
-export function buildSeries(
-  config: SeriesConfig
-): LineSeriesOption | BarSeriesOption {
+export function buildSeries(config: SeriesConfig): SeriesOption {
   switch (config.type) {
     case 'bar':
       return buildBarSeries(config);
