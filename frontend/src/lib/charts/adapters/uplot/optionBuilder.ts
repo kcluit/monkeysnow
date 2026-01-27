@@ -93,28 +93,28 @@ export function buildUPlotOptions(
     const height = config.height ?? DEFAULT_HEIGHT;
     const theme = config.theme;
 
-    // Build plugins array
+    // Build plugins array using consolidated plugin architecture
     const plugins: uPlot.Plugin[] = [];
 
-    // Add zoom plugin if enabled
-    plugins.push(zoomPlugin(config.dataZoom));
+    // 1. Advanced zoom: wheel zoom + drag pan + optional range selector
+    plugins.push(advancedZoomPlugin(config.dataZoom, theme));
 
-    // Add enhanced tooltip plugin
+    // 2. Interactive overlay: tooltip + point snapping + highlight indicators
     const xAxisLabels = config.xAxis.type === 'category' ? config.xAxis.data : undefined;
-    plugins.push(tooltipPlugin(config.tooltip, theme, xAxisLabels));
+    plugins.push(interactiveOverlayPlugin(config.tooltip, config.series, theme, xAxisLabels));
 
-    // Add band fill plugin for range visualization
+    // 3. Band fill for uncertainty/range visualization
     plugins.push(bandFillPlugin(config.series));
 
-    // Add labels plugin for data point annotations
-    plugins.push(labelsPlugin(config.series, theme));
+    // 4. Smart labels with collision detection
+    plugins.push(smartLabelsPlugin(config.series, theme));
 
-    // Add mark lines plugin if configured
+    // 5. Mark lines (horizontal reference lines) if configured
     if (config.markLines && config.markLines.length > 0) {
         plugins.push(markLinesPlugin(config.markLines, theme));
     }
 
-    // Add interactive legend plugin if enabled
+    // 6. Interactive legend for series toggle
     plugins.push(legendPlugin(config.legend, theme));
 
     // Build series configurations
