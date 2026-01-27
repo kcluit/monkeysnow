@@ -543,8 +543,16 @@ export function buildWeatherChartConfig(
         timeLabels.length
     );
 
-    // Combine all series (aggregations rendered on top)
-    const allSeries = [...modelSeries, ...aggregationSeries];
+    // Build band fill series for aggregation ranges (e.g., min-max, p25-p75)
+    const bandSeries = buildBandFillSeries(
+        seriesData,
+        selectedAggregations,
+        aggregationColors,
+        timeLabels.length
+    );
+
+    // Combine all series: bands first (background), then models, then aggregations (foreground)
+    const allSeries = [...bandSeries, ...modelSeries, ...aggregationSeries];
 
     // Track if we need a secondary Y-axis for accumulation
     let hasAccumulation = false;
