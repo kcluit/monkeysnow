@@ -42,6 +42,15 @@ export function WeatherChart({
         `chartAccumulation_${variable}`,
         false
     );
+    const [zoomSyncExcluded, setZoomSyncExcluded] = useLocalStorage<boolean>(
+        `chartZoomSyncExcluded_${variable}`,
+        false
+    );
+
+    // Sync zoom exclusion setting to registry
+    useEffect(() => {
+        setChartZoomSyncExclusion(variable, zoomSyncExcluded);
+    }, [variable, zoomSyncExcluded]);
 
     // Settings modal state
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
