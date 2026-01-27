@@ -59,7 +59,8 @@ export function createLegendPlugin(options: LegendPluginOptions): uPlot.Plugin {
 
             // Label
             const label = document.createElement('span');
-            label.textContent = series.label || `Series ${i}`;
+            const labelText = typeof series.label === 'string' ? series.label : `Series ${i}`;
+            label.textContent = labelText;
             label.style.color = theme.textPrimary;
             label.style.whiteSpace = 'nowrap';
 
