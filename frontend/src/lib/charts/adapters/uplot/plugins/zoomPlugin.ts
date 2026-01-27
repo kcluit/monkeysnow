@@ -13,6 +13,9 @@ const ZOOM_FACTOR = 0.8;
 /** Throttle interval for zoom events (ms) */
 const ZOOM_THROTTLE_MS = 16; // ~60fps
 
+/** WeakMap to store cleanup functions, preventing memory leaks */
+const cleanupMap = new WeakMap<uPlot, () => void>();
+
 /**
  * Create a plugin that enables wheel zoom and drag-to-pan.
  */
@@ -21,17 +24,18 @@ export function zoomPlugin(zoomConfig: DataZoomConfig | undefined): uPlot.Plugin
         return { hooks: {} };
     }
 
-    let isPanning = false;
-    let panStartX = 0;
-    let panStartScaleMin = 0;
-    let panStartScaleMax = 0;
-    let lastZoomTime = 0;
-
     return {
         hooks: {
             init: (u: uPlot) => {
                 const canvas = u.over;
                 if (!canvas) return;
+
+                // State for this chart instance
+                let isPanning = false;
+                let panStartX = 0;
+                let panStartScaleMin = 0;
+                let panStartScaleMax = 0;
+                let lastZoomTime = 0;
 
                 // Wheel zoom
                 const handleWheel = (e: WheelEvent) => {
@@ -66,7 +70,10 @@ export function zoomPlugin(zoomConfig: DataZoomConfig | undefined): uPlot.Plugin
                     const clampedMin = Math.max(dataMin, newMin);
                     const clampedMax = Math.min(dataMax, newMax);
 
-                    u.setScale('x', { min: clampedMin, max: clampedMax });
+                    // Ensure min < max
+                    if (clampedMin < clampedMax) {
+                        u.setScale('x', { min: clampedMin, max: clampedMax });
+                    }
                 };
 
                 // Pan start
@@ -112,10 +119,13 @@ export function zoomPlugin(zoomConfig: DataZoomConfig | undefined): uPlot.Plugin
                         newMax = dataMax;
                     }
 
+                    // Final clamp and validation
                     newMin = Math.max(dataMin, newMin);
                     newMax = Math.min(dataMax, newMax);
 
-                    u.setScale('x', { min: newMin, max: newMax });
+                    if (newMin < newMax) {
+                        u.setScale('x', { min: newMin, max: newMax });
+                    }
                 };
 
                 // Pan end
@@ -142,20 +152,21 @@ export function zoomPlugin(zoomConfig: DataZoomConfig | undefined): uPlot.Plugin
                 document.addEventListener('mouseup', handleMouseUp);
                 canvas.addEventListener('dblclick', handleDblClick);
 
-                // Store cleanup function on the chart instance
-                (u as unknown as { _zoomCleanup?: () => void })._zoomCleanup = () => {
+                // Store cleanup function in WeakMap (automatically garbage collected)
+                const cleanup = () => {
                     canvas.removeEventListener('wheel', handleWheel);
                     canvas.removeEventListener('mousedown', handleMouseDown);
                     document.removeEventListener('mousemove', handleMouseMove);
                     document.removeEventListener('mouseup', handleMouseUp);
                     canvas.removeEventListener('dblclick', handleDblClick);
                 };
+                cleanupMap.set(u, cleanup);
             },
 
             destroy: (u: uPlot) => {
-                const cleanup = (u as unknown as { _zoomCleanup?: () => void })
-                    ._zoomCleanup;
+                const cleanup = cleanupMap.get(u);
                 cleanup?.();
+                cleanupMap.delete(u);
             },
         },
     };
