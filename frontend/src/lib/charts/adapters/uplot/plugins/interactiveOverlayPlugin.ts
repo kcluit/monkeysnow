@@ -315,7 +315,6 @@ export function interactiveOverlayPlugin(
                 tooltipEl?.remove();
                 tooltipEl = null;
                 currentHighlights = [];
-                currentDataIdx = null;
             },
         },
     };
