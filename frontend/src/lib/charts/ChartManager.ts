@@ -269,9 +269,8 @@ export class ChartManager {
             cursor: {
                 drag: { x: false, y: false },
                 focus: { prox: 30 },
-                sync: undefined,
             },
-            legend: { show: false },
+            legend: { show: true },
             padding: [
                 config.grid.top,
                 config.grid.right,
