@@ -30,8 +30,6 @@ function getStructuralKey(config: ChartConfig): string {
         seriesYAxisIndex: config.series.map(s => s.yAxisIndex ?? 0),
         hasBandData: config.series.map(s => !!s.bandData),
         hasSecondaryAxis: !!config.yAxisSecondary,
-        hasMarkLines: !!config.markLines?.length,
-        markLineCount: config.markLines?.length ?? 0,
         dataZoomEnabled: config.dataZoom?.enabled ?? false,
         height: config.height,
         // Theme affects colors
