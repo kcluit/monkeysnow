@@ -40,25 +40,25 @@ function formatTooltip(params: unknown): string {
     // Update the data index
     lastTooltipDataIndex = currentDataIndex;
 
-    // Build tooltip - minimal content for performance
+    // Build tooltip - show all series when MAX_TOOLTIP_SERIES is 0
     const header = first.axisValueLabel || '';
-    const displayCount = Math.min(params.length, MAX_TOOLTIP_SERIES);
-    const hasMore = params.length > MAX_TOOLTIP_SERIES;
+    const displayCount = MAX_TOOLTIP_SERIES > 0 ? Math.min(params.length, MAX_TOOLTIP_SERIES) : params.length;
+    const hasMore = MAX_TOOLTIP_SERIES > 0 && params.length > MAX_TOOLTIP_SERIES;
 
     // Pre-allocate array for faster join
-    const lines: string[] = [header];
+    const lines: string[] = [`<div style="font-weight:600;margin-bottom:4px">${header}</div>`];
     for (let i = 0; i < displayCount; i++) {
         const p = params[i] as { marker?: string; seriesName?: string; value?: unknown };
         if (p.value == null) continue;
         const val = typeof p.value === 'number' ? Math.round(p.value * 10) / 10 : p.value;
-        lines.push(`${p.marker || ''}${p.seriesName || ''}: ${val}`);
+        lines.push(`<div style="display:flex;justify-content:space-between;gap:12px"><span>${p.marker || ''}${p.seriesName || ''}</span><span style="font-weight:500">${val}</span></div>`);
     }
 
     if (hasMore) {
-        lines.push(`<span style="color:#999">+${params.length - MAX_TOOLTIP_SERIES} more</span>`);
+        lines.push(`<div style="color:#999;margin-top:4px">+${params.length - MAX_TOOLTIP_SERIES} more</div>`);
     }
 
-    pendingTooltipResult = lines.join('<br/>');
+    pendingTooltipResult = lines.join('');
     return pendingTooltipResult;
 }
 
