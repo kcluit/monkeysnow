@@ -279,13 +279,20 @@ function calculateModelOpacity(modelCount: number): number {
 /**
  * Build series configurations from weather model data.
  * Skips models with no data or empty data arrays.
+ * @param hideAggregationMembers - If true and aggregations are present, skip model series entirely
  */
 function buildSeriesConfigs(
     seriesData: Map<WeatherModel, (number | null)[]>,
     selectedModels: WeatherModel[],
     chartType: ChartType,
-    hasAggregations: boolean
+    hasAggregations: boolean,
+    hideAggregationMembers: boolean = false
 ): SeriesConfig[] {
+    // Skip model series entirely if hiding members and aggregations are active
+    if (hideAggregationMembers && hasAggregations) {
+        return [];
+    }
+
     const configs: SeriesConfig[] = [];
     const modelOpacity = hasAggregations ? calculateModelOpacity(selectedModels.length) : 1;
 
