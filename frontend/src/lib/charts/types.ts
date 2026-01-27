@@ -30,6 +30,15 @@ export interface SeriesConfig {
     lineStyle?: 'solid' | 'dashed' | 'dotted';
     /** Optional Y-axis index (0 = left/primary, 1 = right/secondary) */
     yAxisIndex?: number;
+    /** Show labels on data points (default: false) */
+    showLabels?: boolean;
+    /** Band fill configuration (only for type: 'band') */
+    bandData?: {
+        /** Upper bound values */
+        upper: (number | null)[];
+        /** Lower bound values */
+        lower: (number | null)[];
+    };
 }
 
 /** Configuration for horizontal reference lines (mark lines) */
