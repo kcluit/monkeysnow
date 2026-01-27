@@ -620,6 +620,7 @@ export function buildWeatherChartConfig(
         legend: {
             enabled: true,
             position: 'bottom',
+            interactive: true, // Enable click-to-toggle series visibility
         },
         grid: {
             top: 10,
