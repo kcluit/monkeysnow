@@ -47,6 +47,7 @@ function WeatherChartInner({
   selectedModels,
   selectedAggregations,
   aggregationColors,
+  hideAggregationMembers,
   variable,
   unitSystem,
   timezoneInfo,
