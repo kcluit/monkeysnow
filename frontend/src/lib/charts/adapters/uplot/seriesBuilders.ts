@@ -163,6 +163,21 @@ export function buildBarSeries(
 }
 
 /**
+ * Build a band series configuration for uPlot.
+ * Band series are rendered by the bandFillPlugin, not directly by uPlot.
+ * We create a hidden series to hold the data and allow proper scale calculation.
+ */
+export function buildBandSeries(config: SeriesConfig): uPlot.Series {
+    // Band series don't render directly - they're drawn by bandFillPlugin
+    // But we need a series entry for proper data array indexing
+    return {
+        label: config.name,
+        show: false, // Hidden - rendered by plugin
+        scale: config.yAxisIndex === 1 ? 'y2' : 'y',
+    };
+}
+
+/**
  * Build a series configuration based on chart type.
  */
 export function buildSeries(
@@ -175,6 +190,8 @@ export function buildSeries(
             return buildBarSeries(config, seriesIndex, totalBarSeries);
         case 'area':
             return buildAreaSeries(config);
+        case 'band':
+            return buildBandSeries(config);
         case 'line':
         default:
             return buildLineSeries(config);
