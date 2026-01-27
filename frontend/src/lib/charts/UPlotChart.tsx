@@ -328,8 +328,9 @@ export function UPlotChart({
         chartRef.current = new uPlot(opts, uplotData, containerRef.current);
     }, [config, onSeriesToggle, uplotData]);
 
-    // Handle structural changes (requires rebuild)
+    // Initialize chart on mount and handle structural changes
     useEffect(() => {
+        // Check if this is a structural change
         const isStructuralChange = currentStructuralKey !== structuralKeyRef.current;
 
         if (isStructuralChange) {
@@ -338,28 +339,37 @@ export function UPlotChart({
             // Save zoom state before destroying
             if (chartRef.current) {
                 zoomStateRef.current = extractZoomState(chartRef.current);
+                chartRef.current.destroy();
+                chartRef.current = null;
             }
 
             // Update structural key
             structuralKeyRef.current = currentStructuralKey;
 
-            // Rebuild with restored zoom
+            // Build new chart with restored zoom
             buildChart(zoomStateRef.current);
         }
+    }, [currentStructuralKey, buildChart]);
 
+    // Cleanup only on unmount
+    useEffect(() => {
         return () => {
-            // Cleanup on unmount
             if (chartRef.current) {
                 chartRef.current.destroy();
                 chartRef.current = null;
             }
         };
-    }, [currentStructuralKey, buildChart]);
+    }, []);
 
     // Handle data-only changes (use setData)
     useEffect(() => {
-        // Skip if no chart or if this is a structural change (handled above)
-        if (!chartRef.current || currentStructuralKey !== structuralKeyRef.current) {
+        // Skip if no chart yet or if structural key hasn't been set
+        if (!chartRef.current || structuralKeyRef.current === '') {
+            return;
+        }
+
+        // Skip if this render is a structural change (handled by the other effect)
+        if (currentStructuralKey !== structuralKeyRef.current) {
             return;
         }
 
