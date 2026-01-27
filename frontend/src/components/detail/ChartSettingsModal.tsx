@@ -41,18 +41,22 @@ export function ChartSettingsModal({
     onChartTypeChange,
     showAccumulation,
     onAccumulationChange,
+    zoomSyncExcluded,
+    onZoomSyncExcludedChange,
 }: ChartSettingsModalProps): JSX.Element | null {
     // Local state for changes before applying
     const [localChartType, setLocalChartType] = useState(chartType);
     const [localShowAccumulation, setLocalShowAccumulation] = useState(showAccumulation);
+    const [localZoomSyncExcluded, setLocalZoomSyncExcluded] = useState(zoomSyncExcluded);
 
     // Sync local state when modal opens
     useEffect(() => {
         if (isOpen) {
             setLocalChartType(chartType);
             setLocalShowAccumulation(showAccumulation);
+            setLocalZoomSyncExcluded(zoomSyncExcluded);
         }
-    }, [isOpen, chartType, showAccumulation]);
+    }, [isOpen, chartType, showAccumulation, zoomSyncExcluded]);
 
     // Prevent body scroll when open
     useEffect(() => {
