@@ -310,6 +310,7 @@ function App(): JSX.Element {
         isHideEmojiEnabled, setHideEmojiEnabled,
         isHideBordersEnabled, setHideBordersEnabled,
         isShowDateEnabled, setShowDateEnabled,
+        chartZoomSyncEnabled, setChartZoomSyncEnabled,
         selectedElevation, setSelectedElevation,
         selectedSort, setSelectedSort,
         selectedSortDay, setSelectedSortDay,
