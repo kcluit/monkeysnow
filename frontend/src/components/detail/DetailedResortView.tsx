@@ -17,6 +17,10 @@ interface DetailedResortViewPropsWithUnits extends DetailedResortViewProps {
 const DEFAULT_AGGREGATION_COLORS: Record<AggregationType, string> = {
     median: aggregationOptions.find(a => a.id === 'median')?.defaultColor ?? '#a855f7',
     mean: aggregationOptions.find(a => a.id === 'mean')?.defaultColor ?? '#ec4899',
+    min: aggregationOptions.find(a => a.id === 'min')?.defaultColor ?? '#14b8a6',
+    max: aggregationOptions.find(a => a.id === 'max')?.defaultColor ?? '#f97316',
+    p25: aggregationOptions.find(a => a.id === 'p25')?.defaultColor ?? '#3b82f6',
+    p75: aggregationOptions.find(a => a.id === 'p75')?.defaultColor ?? '#10b981',
 };
 
 export function DetailedResortView({
