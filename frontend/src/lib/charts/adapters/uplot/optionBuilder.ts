@@ -9,7 +9,7 @@ import type uPlot from 'uplot';
 import { buildAxes } from './axesBuilder';
 import { buildScales } from './scalesBuilder';
 import { buildSeriesArray } from './seriesBuilders';
-import { markLinesPlugin, legendPlugin, zoomPlugin } from './plugins';
+import { markLinesPlugin, legendPlugin, zoomPlugin, tooltipPlugin, bandFillPlugin, labelsPlugin } from './plugins';
 
 /** Default chart height if not specified */
 const DEFAULT_HEIGHT = 280;
