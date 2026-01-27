@@ -150,42 +150,6 @@ export function ChartSettingsModal({
                             </label>
                         </div>
                     )}
-
-                    {/* Elevation Lines Option (for freezing level) */}
-                    {hasElevationLines && (
-                        <div className="chart-settings-section">
-                            <h3 className="chart-settings-section-title">Reference Lines</h3>
-                            <label className="chart-settings-toggle">
-                                <input
-                                    type="checkbox"
-                                    checked={localShowElevationLines}
-                                    onChange={(e) => setLocalShowElevationLines(e.target.checked)}
-                                />
-                                <span className="chart-settings-toggle-label">
-                                    Show elevation lines
-                                </span>
-                                <span className="chart-settings-toggle-desc">
-                                    Shows base, mid, and peak elevation markers
-                                </span>
-                            </label>
-                            {localShowElevationLines && location && (
-                                <div className="elevation-preview">
-                                    <div className={`elevation-line ${currentElevation === location.topElevation ? 'current' : ''}`}>
-                                        <span>Peak</span>
-                                        <span>{location.topElevation}m</span>
-                                    </div>
-                                    <div className={`elevation-line ${currentElevation === location.midElevation ? 'current' : ''}`}>
-                                        <span>Mid</span>
-                                        <span>{location.midElevation}m</span>
-                                    </div>
-                                    <div className={`elevation-line ${currentElevation === location.baseElevation ? 'current' : ''}`}>
-                                        <span>Base</span>
-                                        <span>{location.baseElevation}m</span>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    )}
                 </div>
 
                 {/* Footer */}
