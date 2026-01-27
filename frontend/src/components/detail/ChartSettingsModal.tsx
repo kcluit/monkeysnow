@@ -158,6 +158,24 @@ export function ChartSettingsModal({
                             </label>
                         </div>
                     )}
+
+                    {/* Zoom Sync Option */}
+                    <div className="chart-settings-section">
+                        <h3 className="chart-settings-section-title">Zoom Sync</h3>
+                        <label className="chart-settings-toggle">
+                            <input
+                                type="checkbox"
+                                checked={!localZoomSyncExcluded}
+                                onChange={(e) => setLocalZoomSyncExcluded(!e.target.checked)}
+                            />
+                            <span className="chart-settings-toggle-label">
+                                Sync zoom with other charts
+                            </span>
+                            <span className="chart-settings-toggle-desc">
+                                When enabled, zooming this chart also zooms other charts
+                            </span>
+                        </label>
+                    </div>
                 </div>
 
                 {/* Footer */}
