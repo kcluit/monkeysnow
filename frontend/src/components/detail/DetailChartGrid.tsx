@@ -102,6 +102,7 @@ function DetailChartGridInner({
                     selectedModels={selectedModels}
                     selectedAggregations={selectedAggregations}
                     aggregationColors={aggregationColors}
+                    hideAggregationMembers={hideAggregationMembers}
                     variable={variable}
                     unitSystem={unitSystem}
                     timezoneInfo={timezoneInfo}
