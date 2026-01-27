@@ -28,10 +28,4 @@ export {
 } from './chartRegistry';
 
 // Plugins (for advanced usage)
-export {
-    createZoomPlugin,
-    createTooltipPlugin,
-    createLegendPlugin,
-    createMarkLinesPlugin,
-    createBandFillPlugin,
-} from './plugins';
+export { createZoomPlugin, createBandFillPlugin } from './plugins';
