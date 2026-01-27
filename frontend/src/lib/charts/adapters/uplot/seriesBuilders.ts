@@ -116,16 +116,22 @@ export function buildBarSeries(
             const stroke = new Path2D();
             const fill = new Path2D();
 
+            // Validate data exists
+            if (!u.data || !u.data[seriesIdx] || !u.data[0]) {
+                return { stroke, fill };
+            }
+
             const data = u.data[seriesIdx] as (number | null)[];
             const xData = u.data[0] as number[];
 
-            // Calculate bar width based on spacing
+            // Calculate bar width based on visible data points
             const xScale = u.scales.x;
-            if (!xScale.min || !xScale.max) return { stroke, fill };
+            if (xScale.min == null || xScale.max == null) return { stroke, fill };
 
             const plotWidth = u.bbox.width;
-            const dataRange = xScale.max - xScale.min;
-            const pointSpacing = dataRange > 0 ? plotWidth / dataRange : plotWidth;
+            // Calculate number of visible points (add 1 because indices are inclusive)
+            const visiblePoints = Math.floor(xScale.max) - Math.floor(xScale.min) + 1;
+            const pointSpacing = plotWidth / Math.max(visiblePoints, 1);
             const barGroupWidth = pointSpacing * 0.8; // 80% of available space
             const barWidth = barGroupWidth / Math.max(totalBarSeries, 1);
 
@@ -134,6 +140,7 @@ export function buildBarSeries(
             const barOffset = groupOffset + seriesIndex * barWidth + barWidth / 2;
 
             for (let i = idx0; i <= idx1; i++) {
+                if (i < 0 || i >= data.length) continue;
                 const val = data[i];
                 if (val == null) continue;
 
