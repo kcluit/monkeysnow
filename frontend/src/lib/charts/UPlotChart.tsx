@@ -8,7 +8,7 @@
 import { useEffect, useRef, useCallback, useMemo } from 'react';
 import uPlot from 'uplot';
 import 'uplot/dist/uPlot.min.css';
-import type { ChartConfig, SeriesDefinition } from './types';
+import type { ChartConfig } from './types';
 import {
     createZoomPlugin,
     createTooltipPlugin,
