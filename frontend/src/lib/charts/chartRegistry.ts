@@ -14,6 +14,78 @@ const charts = new Map<string, ChartManager>();
 // Counter for generating unique IDs
 let nextId = 1;
 
+// ============================================
+// Zoom Sync Event Bus
+// ============================================
+
+// Global sync state
+let globalZoomSyncEnabled = true;
+const chartSyncExclusions = new Set<string>();
+
+// Zoom event bus
+type ZoomListener = (min: number, max: number, sourceChartId: string) => void;
+const zoomListeners = new Set<ZoomListener>();
+
+/**
+ * Broadcast zoom change to all listening charts.
+ */
+export function broadcastZoomChange(min: number, max: number, sourceChartId: string): void {
+    if (!globalZoomSyncEnabled) return;
+    if (chartSyncExclusions.has(sourceChartId)) return;
+
+    zoomListeners.forEach(listener => {
+        listener(min, max, sourceChartId);
+    });
+}
+
+/**
+ * Subscribe to zoom changes from other charts.
+ * Returns unsubscribe function.
+ */
+export function subscribeToZoomChanges(listener: ZoomListener): () => void {
+    zoomListeners.add(listener);
+    return () => zoomListeners.delete(listener);
+}
+
+/**
+ * Enable or disable global zoom sync.
+ */
+export function setGlobalZoomSync(enabled: boolean): void {
+    globalZoomSyncEnabled = enabled;
+}
+
+/**
+ * Check if global zoom sync is enabled.
+ */
+export function isGlobalZoomSyncEnabled(): boolean {
+    return globalZoomSyncEnabled;
+}
+
+/**
+ * Set whether a specific chart is excluded from zoom sync.
+ */
+export function setChartZoomSyncExclusion(chartId: string, excluded: boolean): void {
+    if (excluded) {
+        chartSyncExclusions.add(chartId);
+    } else {
+        chartSyncExclusions.delete(chartId);
+    }
+}
+
+/**
+ * Check if a specific chart is excluded from zoom sync.
+ */
+export function isChartZoomSyncExcluded(chartId: string): boolean {
+    return chartSyncExclusions.has(chartId);
+}
+
+/**
+ * Check if a chart should participate in zoom sync.
+ */
+export function isChartZoomSyncEnabled(chartId: string): boolean {
+    return globalZoomSyncEnabled && !chartSyncExclusions.has(chartId);
+}
+
 /**
  * Generate a unique chart ID.
  */
