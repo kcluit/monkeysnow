@@ -34,10 +34,10 @@ function buildXAxis(config: ChartConfig, theme: ChartTheme): uPlot.Axis {
         },
         // Map numeric indices to category labels
         values: (_u: uPlot, vals: number[]) => {
-            return vals.map((v, i) => {
-                // Only show labels at intervals
-                if (i % interval !== 0) return '';
+            return vals.map((v) => {
+                // Only show labels at intervals based on the actual x-value
                 const idx = Math.floor(v);
+                if (idx % interval !== 0) return '';
                 return labels[idx] ?? '';
             });
         },
