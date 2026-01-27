@@ -188,25 +188,6 @@ function buildUPlotScales(config: ChartConfig): uPlot.Scales {
 }
 
 /**
- * Extract series definition for structural comparison.
- */
-function extractSeriesDefinition(series: ChartConfig['series'][0]): SeriesDefinition {
-    return {
-        id: series.id,
-        name: series.name,
-        color: series.color,
-        type: series.type,
-        lineWidth: series.lineWidth,
-        opacity: series.opacity,
-        fillOpacity: series.fillOpacity,
-        lineStyle: series.lineStyle,
-        zIndex: series.zIndex,
-        yAxisIndex: series.yAxisIndex,
-        hasBandData: !!series.bandData,
-    };
-}
-
-/**
  * Generate a structural key for comparison.
  * Only changes to structural properties should trigger a chart rebuild.
  */
