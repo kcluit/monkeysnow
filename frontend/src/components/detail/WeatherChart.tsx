@@ -2,7 +2,7 @@
  * Weather Chart Component
  *
  * Displays a single weather variable chart for the detail view.
- * Uses the chart abstraction layer with ECharts for rendering.
+ * Uses the chart abstraction layer with uPlot for rendering.
  * Includes visibility toggle and settings controls.
  */
 
