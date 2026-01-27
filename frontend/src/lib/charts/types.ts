@@ -8,7 +8,7 @@
 import type { CSSProperties } from 'react';
 
 /** Supported chart types */
-export type ChartType = 'line' | 'bar' | 'area';
+export type ChartType = 'line' | 'bar' | 'area' | 'band';
 
 /** Configuration for a single data series */
 export interface SeriesConfig {
