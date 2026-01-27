@@ -12,7 +12,7 @@ import type { WeatherModel, HourlyDataPoint, AggregationType } from '../types/op
 import type { UnitSystem } from '../types';
 import type { ChartDisplayType, ElevationLocation } from '../types/chartSettings';
 import { getModelConfig, getVariableConfig } from './chartConfigurations';
-import { getEChartsTheme } from '../lib/charts';
+import { getUPlotTheme } from '../lib/charts';
 import { aggregationOptions } from '../data/modelHierarchy';
 
 /** Additional chart settings passed from WeatherChart component */
