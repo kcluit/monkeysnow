@@ -21,6 +21,8 @@ export interface UPlotChartProps {
     config: ChartConfig;
     /** Additional CSS class */
     className?: string;
+    /** Stable key for this chart (used for zoom sync exclusions) */
+    chartKey?: string;
 }
 
 export function UPlotChart({
