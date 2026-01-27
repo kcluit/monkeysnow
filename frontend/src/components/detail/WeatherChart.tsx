@@ -176,6 +176,7 @@ export function WeatherChart({
             <UPlotChart
                 config={chartConfig}
                 className="weather-chart-canvas"
+                chartKey={variable}
             />
 
             {/* Settings Modal */}
