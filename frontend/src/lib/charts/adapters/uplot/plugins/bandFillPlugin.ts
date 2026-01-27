@@ -32,7 +32,7 @@ export function bandFillPlugin(seriesConfigs: SeriesConfig[]): uPlot.Plugin {
                 const ctx = u.ctx;
                 const { left, width } = u.bbox;
 
-                bandsToRender.forEach(({ config }) => {
+                bandsToRender.forEach((config) => {
                     if (!config.bandData) return;
 
                     const { upper, lower } = config.bandData;
