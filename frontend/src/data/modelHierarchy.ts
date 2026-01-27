@@ -37,7 +37,7 @@ export interface ModelHierarchyNode {
 }
 
 /**
- * Aggregation options (Median, Mean)
+ * Aggregation options (Median, Mean, Min, Max, Percentiles)
  */
 export const aggregationOptions: AggregationInfo[] = [
   {
@@ -51,6 +51,30 @@ export const aggregationOptions: AggregationInfo[] = [
     name: 'Mean',
     description: 'Average across selected models',
     defaultColor: '#ec4899', // Pink
+  },
+  {
+    id: 'min',
+    name: 'Min',
+    description: 'Minimum value across selected models',
+    defaultColor: '#14b8a6', // Teal
+  },
+  {
+    id: 'max',
+    name: 'Max',
+    description: 'Maximum value across selected models',
+    defaultColor: '#f97316', // Orange
+  },
+  {
+    id: 'p25',
+    name: '25th Percentile',
+    description: '25th percentile across selected models',
+    defaultColor: '#3b82f6', // Blue
+  },
+  {
+    id: 'p75',
+    name: '75th Percentile',
+    description: '75th percentile across selected models',
+    defaultColor: '#10b981', // Emerald
   },
 ];
 
