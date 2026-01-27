@@ -271,6 +271,15 @@ const ProviderSection = memo(function ProviderSection({
         <span className="resort-grid-count">
           {selectedCount}/{totalItems}
         </span>
+        {isAggregationsSection && onToggleHideMembers && (
+          <button
+            className={`aggregation-hide-toggle ${hideAggregationMembers ? 'active' : ''}`}
+            onClick={(e) => { e.stopPropagation(); onToggleHideMembers(); }}
+            title={hideAggregationMembers ? 'Show individual model lines' : 'Hide individual model lines'}
+          >
+            {hideAggregationMembers ? '👁️' : '👁️‍🗨️'}
+          </button>
+        )}
       </div>
       {isExpanded && node.children && (
         <div className="resort-grid-resorts model-grid-items">
