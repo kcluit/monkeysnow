@@ -41,9 +41,43 @@ export function createZoomPlugin(options: ZoomPluginOptions = {}): uPlot.Plugin 
                     }
                 };
 
+                // State for drag-to-pan (middle/right click)
+                let isPanning = false;
+                let panDragged = false;
+                let panStartLeft = 0;
+                let panStartXMin = 0;
+                let panStartXMax = 0;
+
+                // State for drag-to-zoom (left click)
+                let isZoomSelecting = false;
+                let zoomDragged = false;
+                let zoomSelectStartX = 0;
+                let zoomSelectRect: HTMLDivElement | null = null;
+
+                // Helper to clean up selection rectangle
+                const cleanupZoomRect = () => {
+                    if (zoomSelectRect) {
+                        if (over.contains(zoomSelectRect)) {
+                            over.removeChild(zoomSelectRect);
+                        }
+                        zoomSelectRect = null;
+                    }
+                };
+
+                // Helper to reset all drag state and cursor
+                const resetDragState = () => {
+                    if (isZoomSelecting || isPanning) {
+                        isZoomSelecting = false;
+                        isPanning = false;
+                        over.style.cursor = '';
+                        cleanupZoomRect();
+                    }
+                };
+
                 // Wheel zoom (centered on cursor)
                 const onWheel = (e: WheelEvent) => {
                     e.preventDefault();
+                    syncRect(); // Ensure fresh coordinates
                     ensureInitialBounds();
 
                     const xMin = u.scales.x.min!;
@@ -84,24 +118,14 @@ export function createZoomPlugin(options: ZoomPluginOptions = {}): uPlot.Plugin 
                     });
                 };
 
-                // State for drag-to-pan (middle/right click)
-                let isPanning = false;
-                let panDragged = false;
-                let panStartLeft = 0;
-                let panStartXMin = 0;
-                let panStartXMax = 0;
-
-                // State for drag-to-zoom (left click)
-                let isZoomSelecting = false;
-                let zoomSelectStartX = 0;
-                let zoomSelectRect: HTMLDivElement | null = null;
-
                 const onMouseDown = (e: MouseEvent) => {
+                    syncRect(); // Ensure fresh coordinates
                     ensureInitialBounds();
 
                     // Left click (button 0): Drag zoom selection
                     if (e.button === 0) {
                         isZoomSelecting = true;
+                        zoomDragged = false;
                         zoomSelectStartX = e.clientX;
                         over.style.cursor = 'crosshair';
                         e.preventDefault();
@@ -128,6 +152,7 @@ export function createZoomPlugin(options: ZoomPluginOptions = {}): uPlot.Plugin 
 
                         // Create selection rectangle after threshold
                         if (Math.abs(dx) > 3 && !zoomSelectRect) {
+                            zoomDragged = true;
                             zoomSelectRect = document.createElement('div');
                             zoomSelectRect.style.cssText = `
                                 position: absolute;
@@ -186,8 +211,10 @@ export function createZoomPlugin(options: ZoomPluginOptions = {}): uPlot.Plugin 
                             nextMin = initialMax - xRange;
                         }
 
-                        u.setScale('x', { min: nextMin, max: nextMax });
-                        onZoom?.(nextMin, nextMax);
+                        u.batch(() => {
+                            u.setScale('x', { min: nextMin, max: nextMax });
+                            onZoom?.(nextMin, nextMax);
+                        });
                     }
                 };
 
@@ -225,11 +252,7 @@ export function createZoomPlugin(options: ZoomPluginOptions = {}): uPlot.Plugin 
                                 }
                             }
 
-                            // Remove selection rectangle
-                            if (over.contains(zoomSelectRect)) {
-                                over.removeChild(zoomSelectRect);
-                            }
-                            zoomSelectRect = null;
+                            cleanupZoomRect();
                         }
 
                         e.preventDefault();
@@ -251,11 +274,12 @@ export function createZoomPlugin(options: ZoomPluginOptions = {}): uPlot.Plugin 
 
                 // Trap click to prevent unwanted behavior after drag operations
                 const onClick = (e: MouseEvent) => {
-                    if (panDragged) {
+                    if (panDragged || zoomDragged) {
                         e.preventDefault();
                         e.stopPropagation();
                         e.stopImmediatePropagation();
                         panDragged = false;
+                        zoomDragged = false;
                     }
                 };
 
@@ -280,6 +304,11 @@ export function createZoomPlugin(options: ZoomPluginOptions = {}): uPlot.Plugin 
                     e.preventDefault();
                 };
 
+                // Reset state when mouse leaves chart area during drag
+                const onMouseLeave = () => {
+                    resetDragState();
+                };
+
                 // Sync rect on resize
                 const resizeObserver = new ResizeObserver(syncRect);
                 resizeObserver.observe(over);
@@ -290,6 +319,7 @@ export function createZoomPlugin(options: ZoomPluginOptions = {}): uPlot.Plugin 
                 over.addEventListener('click', onClick, true);
                 over.addEventListener('dblclick', onDoubleClick);
                 over.addEventListener('contextmenu', onContextMenu);
+                over.addEventListener('mouseleave', onMouseLeave);
 
                 window.addEventListener('mousemove', onMouseMove);
                 window.addEventListener('mouseup', onMouseUp, true);
@@ -309,14 +339,11 @@ export function createZoomPlugin(options: ZoomPluginOptions = {}): uPlot.Plugin 
                     over.removeEventListener('click', onClick, true);
                     over.removeEventListener('dblclick', onDoubleClick);
                     over.removeEventListener('contextmenu', onContextMenu);
+                    over.removeEventListener('mouseleave', onMouseLeave);
                     window.removeEventListener('mousemove', onMouseMove);
                     window.removeEventListener('mouseup', onMouseUp, true);
                     resizeObserver.disconnect();
-
-                    // Clean up any lingering selection rect
-                    if (zoomSelectRect && over.contains(zoomSelectRect)) {
-                        over.removeChild(zoomSelectRect);
-                    }
+                    cleanupZoomRect();
                 };
             }],
             destroy: [(u: uPlot) => {
