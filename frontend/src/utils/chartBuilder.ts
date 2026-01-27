@@ -441,38 +441,6 @@ function buildAccumulationSeries(
 
     return accumulationSeries;
 }
-/**
- * Build elevation mark lines for freezing level chart.
- */
-function buildElevationMarkLines(
-    location: ElevationLocation,
-    currentElevation: number | undefined,
-    unitSystem: UnitSystem,
-    theme: ChartTheme
-): MarkLineData[] {
-    const convert = unitSystem === 'imperial'
-        ? (m: number) => Math.round(m * 3.28084) // meters to feet
-        : (m: number) => m;
-
-    const unitLabel = unitSystem === 'imperial' ? 'ft' : 'm';
-
-    const elevations = [
-        { name: 'Base', value: location.baseElevation },
-        { name: 'Mid', value: location.midElevation },
-        { name: 'Peak', value: location.topElevation },
-    ];
-
-    return elevations.map(({ name, value }) => {
-        const isCurrent = value === currentElevation;
-        return {
-            yValue: convert(value),
-            label: `${name}: ${convert(value)}${unitLabel}`,
-            color: isCurrent ? theme.accent : theme.textSecondary,
-            lineWidth: isCurrent ? 2 : 1,
-            lineStyle: 'dashed' as const,
-        };
-    });
-}
 
 /**
  * Build a complete ChartConfig from weather data and props.
