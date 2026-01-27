@@ -2,7 +2,7 @@
  * Chart Abstraction Layer - Library-Agnostic Types
  *
  * These types define a generic chart configuration interface that can be
- * implemented by any charting library (ECharts, Recharts, D3, etc.)
+ * implemented by any charting library (uPlot, Recharts, D3, etc.)
  */
 
 import type { CSSProperties } from 'react';
