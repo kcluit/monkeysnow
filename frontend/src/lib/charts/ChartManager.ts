@@ -175,13 +175,11 @@ export class ChartManager {
     private chart: uPlot | null = null;
     private currentConfig: ChartConfig | null = null;
     private structuralKey: string = '';
-    private options: ChartManagerOptions;
     private resizeObserver: ResizeObserver | null = null;
     private isDestroyed: boolean = false;
 
-    constructor(container: HTMLElement, options: ChartManagerOptions = {}) {
+    constructor(container: HTMLElement) {
         this.container = container;
-        this.options = options;
 
         // Set up resize observer
         this.resizeObserver = new ResizeObserver(() => {
