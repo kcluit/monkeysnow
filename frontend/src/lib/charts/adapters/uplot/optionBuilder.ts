@@ -19,8 +19,6 @@ const DEFAULT_HEIGHT = 280;
  * Uses uPlot's native crosshair cursor.
  */
 function buildCursor(config: ChartConfig): uPlot.Cursor {
-    const theme = config.theme;
-
     return {
         // Show vertical and horizontal crosshair lines
         x: true,
@@ -53,7 +51,7 @@ function buildCursor(config: ChartConfig): uPlot.Cursor {
         },
 
         // Add cursor crosshair styling via hooks
-        dataIdx: (u: uPlot, seriesIdx: number) => {
+        dataIdx: (u: uPlot, _seriesIdx: number) => {
             // Return the closest data point index
             const cx = u.cursor.left ?? 0;
             const idx = u.posToIdx(cx);
