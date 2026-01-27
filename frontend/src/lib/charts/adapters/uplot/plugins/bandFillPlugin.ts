@@ -33,7 +33,7 @@ export function bandFillPlugin(seriesConfigs: SeriesConfig[]): uPlot.Plugin {
         hooks: {
             draw: (u: uPlot) => {
                 const ctx = u.ctx;
-                const { left, width, top, height } = u.bbox;
+                const { left, width } = u.bbox;
 
                 bandsToRender.forEach(({ config }) => {
                     if (!config.bandData) return;
@@ -58,8 +58,6 @@ export function bandFillPlugin(seriesConfigs: SeriesConfig[]): uPlot.Plugin {
 
                     // Forward path (top edge - upper bounds)
                     let started = false;
-                    let lastValidX = 0;
-                    let lastValidY = 0;
 
                     for (let i = startIdx; i <= endIdx; i++) {
                         const upperVal = upper[i];
@@ -77,8 +75,6 @@ export function bandFillPlugin(seriesConfigs: SeriesConfig[]): uPlot.Plugin {
                         } else {
                             ctx.lineTo(x, y);
                         }
-                        lastValidX = x;
-                        lastValidY = y;
                     }
 
                     if (!started) {
