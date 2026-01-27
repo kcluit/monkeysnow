@@ -57,6 +57,10 @@ export function advancedZoomPlugin(
     let overviewDragStartMin = 0;
     let overviewDragStartMax = 0;
 
+    // Store overview handlers for cleanup
+    let overviewMouseMoveHandler: ((e: MouseEvent) => void) | null = null;
+    let overviewMouseUpHandler: (() => void) | null = null;
+
     /**
      * Draw the mini overview chart with selection overlay.
      */
