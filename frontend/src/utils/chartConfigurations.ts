@@ -220,7 +220,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     unit: '%',
     unitImperial: '%',
     color: '#94a3b8',
-    chartType: 'area',
+    chartType: 'line', // Changed from area to line for better multi-model comparison
     formatValue: (v) => `${Math.round(v)}%`,
     yAxisDomain: [0, 100],
   }],
@@ -230,7 +230,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     unit: '%',
     unitImperial: '%',
     color: '#cbd5e1',
-    chartType: 'area',
+    chartType: 'line', // Changed from area to line for better multi-model comparison
     formatValue: (v) => `${Math.round(v)}%`,
     yAxisDomain: [0, 100],
   }],
@@ -240,7 +240,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     unit: '%',
     unitImperial: '%',
     color: '#9ca3af',
-    chartType: 'area',
+    chartType: 'line', // Changed from area to line for better multi-model comparison
     formatValue: (v) => `${Math.round(v)}%`,
     yAxisDomain: [0, 100],
   }],
@@ -250,7 +250,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     unit: '%',
     unitImperial: '%',
     color: '#6b7280',
-    chartType: 'area',
+    chartType: 'line', // Changed from area to line for better multi-model comparison
     formatValue: (v) => `${Math.round(v)}%`,
     yAxisDomain: [0, 100],
   }],
