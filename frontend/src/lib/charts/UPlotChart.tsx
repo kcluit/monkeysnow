@@ -91,7 +91,7 @@ function buildUPlotSeries(config: ChartConfig): uPlot.Series[] {
  * Build uPlot axes configuration.
  */
 function buildUPlotAxes(config: ChartConfig): uPlot.Axis[] {
-    const { xAxis, yAxis, yAxisSecondary, theme, grid } = config;
+    const { xAxis, yAxis, yAxisSecondary, theme } = config;
 
     const axes: uPlot.Axis[] = [
         // X-axis (bottom)
@@ -99,7 +99,7 @@ function buildUPlotAxes(config: ChartConfig): uPlot.Axis[] {
             stroke: theme.textSecondary,
             grid: { show: true, stroke: theme.gridColor, width: 1 },
             ticks: { show: true, stroke: theme.gridColor, size: 5 },
-            values: (u, vals) =>
+            values: (_u, vals) =>
                 vals.map((v) => {
                     const idx = Math.round(v);
                     return xAxis.data[idx] || '';
@@ -113,7 +113,7 @@ function buildUPlotAxes(config: ChartConfig): uPlot.Axis[] {
             stroke: theme.textSecondary,
             grid: { show: true, stroke: theme.gridColor, width: 1 },
             ticks: { show: true, stroke: theme.gridColor, size: 5 },
-            values: (u, vals) => vals.map((v) => yAxis.formatter(v)),
+            values: (_u, vals) => vals.map((v) => yAxis.formatter(v)),
             gap: 8,
             size: 50,
             font: '11px system-ui, -apple-system, sans-serif',
@@ -127,7 +127,7 @@ function buildUPlotAxes(config: ChartConfig): uPlot.Axis[] {
             stroke: theme.textSecondary,
             grid: { show: false },
             ticks: { show: true, stroke: theme.gridColor, size: 5 },
-            values: (u, vals) => vals.map((v) => yAxisSecondary.formatter(v)),
+            values: (_u, vals) => vals.map((v) => yAxisSecondary.formatter(v)),
             gap: 8,
             size: 50,
             font: '11px system-ui, -apple-system, sans-serif',
