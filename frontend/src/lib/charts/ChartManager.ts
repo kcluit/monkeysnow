@@ -244,49 +244,13 @@ export class ChartManager {
             return;
         }
 
-        const { theme, tooltip, legend, dataZoom, markLines, series } = config;
-        const { onSeriesToggle } = this.options;
+        const { dataZoom, series } = config;
 
         // Build plugins
         const plugins: uPlot.Plugin[] = [];
 
         if (dataZoom?.enabled) {
             plugins.push(createZoomPlugin({}));
-        }
-
-        if (tooltip.enabled) {
-            plugins.push(
-                createTooltipPlugin({
-                    theme,
-                    xLabels: config.xAxis.data,
-                    formatValue: (seriesIdx, value) => {
-                        if (value === null || value === undefined) return 'N/A';
-                        const seriesConfig = series[seriesIdx - 1];
-                        if (seriesConfig?.yAxisIndex === 1 && config.yAxisSecondary) {
-                            return config.yAxisSecondary.formatter(value);
-                        }
-                        return config.yAxis.formatter(value);
-                    },
-                })
-            );
-        }
-
-        if (legend.enabled) {
-            plugins.push(
-                createLegendPlugin({
-                    theme,
-                    onToggle: (seriesIdx, visible) => {
-                        const seriesConfig = series[seriesIdx - 1];
-                        if (seriesConfig && onSeriesToggle) {
-                            onSeriesToggle(seriesConfig.id, visible);
-                        }
-                    },
-                })
-            );
-        }
-
-        if (markLines && markLines.length > 0) {
-            plugins.push(createMarkLinesPlugin({ markLines, theme }));
         }
 
         const bandSeries = series.filter((s) => s.type === 'band' && s.bandData);
