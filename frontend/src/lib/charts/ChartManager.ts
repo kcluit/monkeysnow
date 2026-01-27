@@ -183,8 +183,23 @@ export class ChartManager {
     private resizeObserver: ResizeObserver | null = null;
     private isDestroyed: boolean = false;
 
-    constructor(container: HTMLElement) {
+    // Zoom sync
+    private chartId: string;
+    private unsubscribeZoom: (() => void) | null = null;
+    private isApplyingExternalZoom: boolean = false;
+
+    constructor(container: HTMLElement, chartId: string) {
         this.container = container;
+        this.chartId = chartId;
+
+        // Subscribe to zoom changes from other charts
+        this.unsubscribeZoom = subscribeToZoomChanges((min, max, sourceChartId) => {
+            if (sourceChartId !== this.chartId &&
+                isChartZoomSyncEnabled(this.chartId) &&
+                !this.isApplyingExternalZoom) {
+                this.applyExternalZoom(min, max);
+            }
+        });
 
         // Set up resize observer
         this.resizeObserver = new ResizeObserver(() => {
