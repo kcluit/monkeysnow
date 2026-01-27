@@ -1,11 +1,7 @@
-import { memo, useMemo } from 'react';
+
 import { WeatherChart } from './WeatherChart';
-import { VirtualizedChart } from './VirtualizedChart';
 import type { DetailChartGridProps } from '../../types/detailView';
 import type { WeatherVariable } from '../../types/openMeteo';
-
-/** Threshold for enabling virtualization - only virtualize when many charts */
-const VIRTUALIZATION_THRESHOLD = 5;
 
 interface ChartCardProps {
     data: DetailChartGridProps['data'];
@@ -20,13 +16,12 @@ interface ChartCardProps {
     onToggleVariable?: (variable: WeatherVariable) => void;
     location?: DetailChartGridProps['location'];
     currentElevation?: DetailChartGridProps['currentElevation'];
-    useVirtualization: boolean;
 }
 
 /**
- * Individual chart card - either virtualized or direct render
+ * Individual chart card
  */
-const ChartCard = memo(function ChartCard({
+function ChartCard({
     data,
     selectedModels,
     selectedAggregations,
@@ -39,9 +34,8 @@ const ChartCard = memo(function ChartCard({
     onToggleVariable,
     location,
     currentElevation,
-    useVirtualization,
 }: ChartCardProps) {
-    const chartElement = (
+    return (
         <WeatherChart
             data={data}
             selectedModels={selectedModels}
@@ -57,19 +51,9 @@ const ChartCard = memo(function ChartCard({
             currentElevation={currentElevation}
         />
     );
+}
 
-    if (useVirtualization) {
-        return (
-            <VirtualizedChart chartId={`chart-${variable}`}>
-                {chartElement}
-            </VirtualizedChart>
-        );
-    }
-
-    return chartElement;
-});
-
-function DetailChartGridInner({
+function DetailChartGrid({
     data,
     selectedModels,
     selectedVariables,
@@ -83,53 +67,6 @@ function DetailChartGridInner({
     location,
     currentElevation,
 }: DetailChartGridProps): JSX.Element {
-    // Enable virtualization when we have many charts
-    const useVirtualization = selectedVariables.length >= VIRTUALIZATION_THRESHOLD;
-
-    // Memoize the chart cards to prevent unnecessary re-renders
-    const chartCards = useMemo(() => {
-        if (!data || data.size === 0) {
-            return null;
-        }
-
-        return selectedVariables.map((variable) => (
-            <div
-                key={variable}
-                className="resort-card rounded-none py-4 border-x-0"
-            >
-                <ChartCard
-                    data={data}
-                    selectedModels={selectedModels}
-                    selectedAggregations={selectedAggregations}
-                    aggregationColors={aggregationColors}
-                    hideAggregationMembers={hideAggregationMembers}
-                    variable={variable}
-                    unitSystem={unitSystem}
-                    timezoneInfo={timezoneInfo}
-                    isChartLocked={isChartLocked}
-                    onToggleVariable={onToggleVariable}
-                    location={location}
-                    currentElevation={currentElevation}
-                    useVirtualization={useVirtualization}
-                />
-            </div>
-        ));
-    }, [
-        data,
-        selectedModels,
-        selectedVariables,
-        selectedAggregations,
-        aggregationColors,
-        hideAggregationMembers,
-        unitSystem,
-        timezoneInfo,
-        isChartLocked,
-        onToggleVariable,
-        location,
-        currentElevation,
-        useVirtualization,
-    ]);
-
     if (!data || data.size === 0) {
         return (
             <div className="text-center py-12">
@@ -140,10 +77,30 @@ function DetailChartGridInner({
 
     return (
         <div className="space-y-6">
-            {chartCards}
+            {selectedVariables.map((variable) => (
+                <div
+                    key={variable}
+                    className="resort-card rounded-none py-4 border-x-0"
+                >
+                    <ChartCard
+                        data={data}
+                        selectedModels={selectedModels}
+                        selectedAggregations={selectedAggregations}
+                        aggregationColors={aggregationColors}
+                        hideAggregationMembers={hideAggregationMembers}
+                        variable={variable}
+                        unitSystem={unitSystem}
+                        timezoneInfo={timezoneInfo}
+                        isChartLocked={isChartLocked}
+                        onToggleVariable={onToggleVariable}
+                        location={location}
+                        currentElevation={currentElevation}
+                    />
+                </div>
+            ))}
         </div>
     );
 }
 
-// Export memoized component
-export const DetailChartGrid = memo(DetailChartGridInner);
+// Export component
+export { DetailChartGrid };
