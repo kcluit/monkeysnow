@@ -20,8 +20,6 @@ export function DetailChartGrid({
     timezoneInfo,
     isChartLocked,
     onToggleVariable,
-    location,
-    currentElevation,
 }: DetailChartGridProps): JSX.Element {
 
     return (
@@ -41,8 +39,6 @@ export function DetailChartGrid({
                     onToggleVisibility={
                         onToggleVariable ? () => onToggleVariable(variable) : undefined
                     }
-                    location={location}
-                    currentElevation={currentElevation}
                 />
             ))}
         </div>
