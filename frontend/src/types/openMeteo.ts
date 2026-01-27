@@ -66,7 +66,7 @@ export type WeatherModel =
   | 'italia_meteo_arpae_icon_2i';
 
 // Aggregation types for model ensemble
-export type AggregationType = 'median' | 'mean';
+export type AggregationType = 'median' | 'mean' | 'min' | 'max' | 'p25' | 'p75';
 
 // Combined type for models and aggregations
 export type ModelOrAggregation = WeatherModel | AggregationType;
