@@ -21,14 +21,11 @@ export interface UPlotChartProps {
     config: ChartConfig;
     /** Additional CSS class */
     className?: string;
-    /** Callback when series visibility changes */
-    onSeriesToggle?: (seriesId: string, visible: boolean) => void;
 }
 
 export function UPlotChart({
     config,
     className,
-    onSeriesToggle,
 }: UPlotChartProps): JSX.Element {
     const containerRef = useRef<HTMLDivElement>(null);
     const initializedRef = useRef(false);
@@ -41,7 +38,7 @@ export function UPlotChart({
         // Check if chart already exists (handles StrictMode double-mount)
         if (!hasChart(container)) {
             console.log('[UPlotChart] Initializing chart via registry');
-            getOrCreateChart(container, { onSeriesToggle });
+            getOrCreateChart(container);
         }
 
         initializedRef.current = true;
@@ -57,7 +54,7 @@ export function UPlotChart({
                 }
             }, 0);
         };
-    }, [onSeriesToggle]);
+    }, []);
 
     // Update config when it changes
     useEffect(() => {
