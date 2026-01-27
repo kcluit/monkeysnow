@@ -189,10 +189,6 @@ export function WeatherChart({
                 onChartTypeChange={setChartType}
                 showAccumulation={showAccumulation}
                 onAccumulationChange={setShowAccumulation}
-                showElevationLines={showElevationLines}
-                onElevationLinesChange={setShowElevationLines}
-                location={location}
-                currentElevation={currentElevation}
             />
         </div>
     );
