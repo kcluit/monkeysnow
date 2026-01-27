@@ -24,6 +24,9 @@ export {
 // Main chart component
 export { UPlotChart, type UPlotChartProps } from './UPlotChart';
 
+// Chart manager (vanilla JS)
+export { ChartManager, type ChartManagerOptions } from './ChartManager';
+
 // Plugins (for advanced usage)
 export {
     createZoomPlugin,
