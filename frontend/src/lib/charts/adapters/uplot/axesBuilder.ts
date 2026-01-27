@@ -1,22 +1,21 @@
 /**
  * uPlot Axes Builder
  *
- * Builds axis configurations for uPlot charts.
+ * Builds axis configurations for uPlot charts with smart label density.
  */
 
 import type { ChartConfig, ChartTheme } from '../../types';
 import type uPlot from 'uplot';
 
+/** Minimum pixels between X-axis labels to prevent overlap */
+const MIN_LABEL_SPACING = 60;
+
 /**
  * Build X-axis configuration for category data.
+ * Uses smart label density based on zoom level and available space.
  */
 function buildXAxis(config: ChartConfig, theme: ChartTheme): uPlot.Axis {
     const labels = config.xAxis.data ?? [];
-    const labelCount = labels.length;
-
-    // Calculate interval to show ~12-14 labels
-    const targetLabels = 14;
-    const interval = Math.max(1, Math.ceil(labelCount / targetLabels));
 
     return {
         stroke: theme.textSecondary,
@@ -32,11 +31,26 @@ function buildXAxis(config: ChartConfig, theme: ChartTheme): uPlot.Axis {
             width: 1,
             size: 5,
         },
-        // Map numeric indices to category labels
-        values: (_u: uPlot, vals: number[]) => {
+        // Map numeric indices to category labels with zoom-aware density
+        values: (u: uPlot, vals: number[]) => {
+            // Calculate visible range from current zoom state
+            const xScale = u.scales.x;
+            const visibleMin = xScale.min ?? 0;
+            const visibleMax = xScale.max ?? labels.length - 1;
+            const visibleRange = visibleMax - visibleMin;
+
+            // Calculate max labels that fit without overlap
+            const availableWidth = u.bbox.width;
+            const maxLabels = Math.max(2, Math.floor(availableWidth / MIN_LABEL_SPACING));
+
+            // Calculate interval based on visible range (not total data)
+            const interval = Math.max(1, Math.ceil(visibleRange / maxLabels));
+
             return vals.map((v) => {
-                // Only show labels at intervals based on the actual x-value
                 const idx = Math.floor(v);
+                // Skip labels outside visible range
+                if (idx < visibleMin || idx > visibleMax) return '';
+                // Show labels at calculated intervals
                 if (idx % interval !== 0) return '';
                 return labels[idx] ?? '';
             });
