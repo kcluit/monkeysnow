@@ -264,7 +264,6 @@ export function interactiveOverlayPlugin(
                         tooltipEl.style.display = 'none';
                     }
                     currentHighlights = [];
-                    currentDataIdx = null;
                     return;
                 }
 
