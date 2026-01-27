@@ -14,7 +14,7 @@ export { getUPlotTheme } from './theme';
 export { UPlotChart, type UPlotChartProps } from './UPlotChart';
 
 // Chart manager (vanilla JS)
-export { ChartManager, type ChartManagerOptions } from './ChartManager';
+export { ChartManager } from './ChartManager';
 
 // Chart registry (for React-independent chart management)
 export {
