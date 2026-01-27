@@ -149,6 +149,7 @@ export function destroyChart(container: HTMLElement): void {
     if (manager) {
         manager.destroy();
         charts.delete(chartId);
+        chartSyncExclusions.delete(chartId); // Clean up exclusion state
         console.log(`[chartRegistry] Destroyed chart ${chartId}`);
     }
 
