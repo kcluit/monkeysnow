@@ -181,12 +181,34 @@ export function createZoomPlugin(options: ZoomPluginOptions = {}): uPlot.Plugin 
                 window.addEventListener('mousemove', onMouseMove);
                 window.addEventListener('mouseup', onMouseUp, true);
 
-                // Initialize initials
+                // Initialize initials and optionally restore zoom state
                 const xMin = u.scales.x.min;
                 const xMax = u.scales.x.max;
                 if (xMin !== undefined && xMax !== undefined) {
                     (u.scales.x as any)._initialMin = xMin;
                     (u.scales.x as any)._initialMax = xMax;
+
+                    // Restore zoom state if provided
+                    if (initialZoomState) {
+                        // Normalize the old zoom position and apply to new range
+                        const oldRange = initialZoomState.initialMax - initialZoomState.initialMin;
+                        const newRange = xMax - xMin;
+
+                        if (oldRange > 0 && newRange > 0) {
+                            // Calculate normalized positions (0-1)
+                            const startPct = (initialZoomState.min - initialZoomState.initialMin) / oldRange;
+                            const endPct = (initialZoomState.max - initialZoomState.initialMin) / oldRange;
+
+                            // Apply to new range
+                            const newMin = xMin + startPct * newRange;
+                            const newMax = xMin + endPct * newRange;
+
+                            // Only apply if actually zoomed (not full range)
+                            if (endPct - startPct < 0.999) {
+                                u.setScale('x', { min: newMin, max: newMax });
+                            }
+                        }
+                    }
                 }
 
                 (u as any)._zoomCleanup = () => {
