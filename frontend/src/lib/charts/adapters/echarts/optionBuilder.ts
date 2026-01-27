@@ -84,7 +84,7 @@ function buildTooltip(config: ChartConfig, _theme: ChartTheme, _totalDataPoints:
         },
         transitionDuration: 0,
         showDelay: 0,
-        hideDelay: 0, // No hide delay - tooltip hides when mouse leaves chart
+        hideDelay: 200, // Short delay allows user to move mouse into tooltip for scrolling
         confine: false, // Allow tooltip to render anywhere on screen
         alwaysShowContent: true, // Keep tooltip visible while mouse is in chart area
         axisPointer: {
