@@ -10,7 +10,7 @@
 
 import { memo } from 'react';
 import type { ChartRendererProps } from './types';
-import { UPlotAdapter } from './adapters/uplot';
+import { UPlotChart } from './uplot/UPlotChart';
 
 /**
  * Main chart renderer component.
@@ -18,7 +18,7 @@ import { UPlotAdapter } from './adapters/uplot';
  * Uses uPlot for high-performance chart rendering.
  */
 function ChartRendererInner(props: ChartRendererProps): JSX.Element {
-  return <UPlotAdapter {...props} />;
+    return <UPlotChart {...props} />;
 }
 
 /**

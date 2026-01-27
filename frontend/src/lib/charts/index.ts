@@ -10,19 +10,19 @@ export { ChartRenderer } from './ChartRenderer';
 
 // Types
 export type {
-  ChartConfig,
-  ChartRendererProps,
-  ChartType,
-  SeriesConfig,
-  AxisConfig,
-  TooltipConfig,
-  TooltipParams,
-  LegendConfig,
-  GridConfig,
-  DataZoomConfig,
-  ChartTheme,
-  MarkLineData,
+    ChartConfig,
+    ChartRendererProps,
+    ChartType,
+    SeriesConfig,
+    AxisConfig,
+    TooltipConfig,
+    TooltipParams,
+    LegendConfig,
+    GridConfig,
+    DataZoomConfig,
+    ChartTheme,
+    MarkLineData,
 } from './types';
 
 // Theme utilities
-export { getUPlotTheme } from './adapters/uplot';
+export { getUPlotTheme } from './uplot/options';
