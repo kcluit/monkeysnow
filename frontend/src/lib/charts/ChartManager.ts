@@ -356,16 +356,6 @@ export class ChartManager {
     }
 
     /**
-     * Get the current zoom state.
-     */
-    getZoomState(): ZoomState | null {
-        if (this.chart) {
-            return extractZoomState(this.chart);
-        }
-        return this.zoomState;
-    }
-
-    /**
      * Destroy the chart and clean up resources.
      */
     destroy(): void {
@@ -386,6 +376,5 @@ export class ChartManager {
         }
 
         this.currentConfig = null;
-        this.zoomState = null;
     }
 }
