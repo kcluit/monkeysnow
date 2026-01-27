@@ -124,6 +124,8 @@ export function DetailedResortView({
                 setSelectedAggregations={setSelectedAggregations}
                 aggregationColors={aggregationColors}
                 setAggregationColors={setAggregationColors}
+                hideAggregationMembers={hideAggregationMembers}
+                setHideAggregationMembers={setHideAggregationMembers}
                 elevation={elevation}
                 setElevation={setElevation}
                 forecastDays={forecastDays}
