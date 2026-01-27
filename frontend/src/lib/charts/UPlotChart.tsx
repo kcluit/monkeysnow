@@ -28,6 +28,7 @@ export interface UPlotChartProps {
 export function UPlotChart({
     config,
     className,
+    chartKey,
 }: UPlotChartProps): JSX.Element {
     const containerRef = useRef<HTMLDivElement>(null);
     const initializedRef = useRef(false);
@@ -40,7 +41,7 @@ export function UPlotChart({
         // Check if chart already exists (handles StrictMode double-mount)
         if (!hasChart(container)) {
             console.log('[UPlotChart] Initializing chart via registry');
-            getOrCreateChart(container);
+            getOrCreateChart(container, chartKey);
         }
 
         initializedRef.current = true;
