@@ -66,6 +66,8 @@ export interface DetailUtilityBarProps {
     setSelectedAggregations: (aggregations: AggregationType[] | ((prev: AggregationType[]) => AggregationType[])) => void;
     aggregationColors: Record<AggregationType, string>;
     setAggregationColors: (colors: Record<AggregationType, string>) => void;
+    hideAggregationMembers: boolean;
+    setHideAggregationMembers: (hide: boolean) => void;
     elevation: number;
     setElevation: (elevation: number) => void;
     forecastDays: number;
