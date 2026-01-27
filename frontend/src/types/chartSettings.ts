@@ -18,24 +18,7 @@ export const ACCUMULATION_VARIABLES: WeatherVariable[] = [
   'snow_depth',
 ];
 
-/** Variables that support elevation lines */
-export const ELEVATION_LINE_VARIABLES: WeatherVariable[] = [
-  'freezing_level_height',
-];
-
 /** Check if a variable supports accumulation overlay */
 export function supportsAccumulation(variable: WeatherVariable): boolean {
   return ACCUMULATION_VARIABLES.includes(variable);
-}
-
-/** Check if a variable supports elevation lines */
-export function supportsElevationLines(variable: WeatherVariable): boolean {
-  return ELEVATION_LINE_VARIABLES.includes(variable);
-}
-
-/** Location elevation data */
-export interface ElevationLocation {
-  baseElevation: number;
-  midElevation: number;
-  topElevation: number;
 }
