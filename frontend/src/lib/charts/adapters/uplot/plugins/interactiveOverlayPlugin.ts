@@ -270,7 +270,6 @@ export function interactiveOverlayPlugin(
 
                 // Find snap point
                 const dataIdx = findSnapDataIndex(u, left);
-                currentDataIdx = dataIdx;
 
                 // Collect highlight points
                 currentHighlights = collectHighlights(u, dataIdx);
