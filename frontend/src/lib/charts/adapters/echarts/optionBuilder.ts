@@ -74,21 +74,22 @@ function buildTooltip(config: ChartConfig, _theme: ChartTheme, _totalDataPoints:
     return {
         show: true,
         trigger: config.tooltip?.trigger ?? 'axis',
-        appendToBody: false,
+        appendToBody: true, // Render tooltip in document body to allow overflow outside chart card
         renderMode: 'html',
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        borderColor: '#ccc',
+        backgroundColor: 'rgba(255, 255, 255, 0.97)',
+        borderColor: '#ddd',
         borderWidth: 1,
-        padding: [8, 12],
+        borderRadius: 6,
+        padding: [10, 14],
         textStyle: {
-            color: '#000',
+            color: '#1f2937',
             fontSize: 12,
         },
         transitionDuration: 0,
-        showDelay: 100,
-        hideDelay: 100,
-        confine: true,
-        position: (point: number[]) => [point[0] + 10, point[1] - 10],
+        showDelay: 0,
+        hideDelay: 0, // No hide delay - tooltip hides when mouse leaves chart
+        confine: false, // Allow tooltip to render anywhere on screen
+        alwaysShowContent: true, // Keep tooltip visible while mouse is in chart area
         axisPointer: {
             type: 'line',
             animation: false,
@@ -103,8 +104,9 @@ function buildTooltip(config: ChartConfig, _theme: ChartTheme, _totalDataPoints:
                 show: false,
             },
         },
-        extraCssText: 'max-height: 200px; overflow: hidden; pointer-events: none;',
-        enterable: false,
+        // Allow scrolling for many models, use screen space efficiently
+        extraCssText: 'max-height: 70vh; overflow-y: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.15); pointer-events: auto;',
+        enterable: true, // Allow mouse to enter tooltip for scrolling
         formatter: formatTooltip,
     };
 }
