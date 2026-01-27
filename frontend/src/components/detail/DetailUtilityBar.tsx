@@ -14,6 +14,8 @@ export function DetailUtilityBar({
     setSelectedAggregations,
     aggregationColors,
     setAggregationColors,
+    hideAggregationMembers,
+    setHideAggregationMembers,
     elevation,
     setElevation,
     forecastDays,
