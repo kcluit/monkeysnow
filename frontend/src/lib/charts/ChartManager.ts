@@ -259,9 +259,7 @@ export class ChartManager {
         const plugins: uPlot.Plugin[] = [];
 
         if (dataZoom?.enabled) {
-            plugins.push(createZoomPlugin({
-                initialZoomState: this.zoomState,
-            }));
+            plugins.push(createZoomPlugin({}));
         }
 
         if (tooltip.enabled) {
