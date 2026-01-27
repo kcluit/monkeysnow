@@ -6,7 +6,17 @@
  * chart abstraction layer.
  */
 
-import type { ChartConfig, ChartType, SeriesConfig, ChartTheme, MarkLineData } from '../lib/charts';
+import type {
+    ChartConfig,
+    ChartType,
+    SeriesConfig,
+    ChartTheme,
+    MarkLineData,
+    ChartStructure,
+    ChartData,
+    SeriesDefinition,
+    SeparatedChartConfig,
+} from '../lib/charts';
 import type { WeatherChartProps } from '../types/detailView';
 import type { WeatherModel, HourlyDataPoint, AggregationType } from '../types/openMeteo';
 import type { UnitSystem } from '../types';
@@ -585,7 +595,7 @@ export function buildWeatherChartConfig(
 
     // When chart is locked, reduce bottom margin since there's no dataZoom slider
     // Keep enough space (60px) for legend labels that may wrap to multiple lines
-    const gridBottom = isChartLocked ? 60 : 80;
+    const gridBottom = 70;
 
     // Build secondary Y-axis config if accumulation is enabled
     const yAxisSecondary = hasAccumulation
