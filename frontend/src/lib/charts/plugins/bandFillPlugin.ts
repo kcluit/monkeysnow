@@ -56,7 +56,6 @@ export function createBandFillPlugin(options: BandFillPluginOptions): uPlot.Plug
 
     function draw(u: uPlot) {
         const ctx = u.ctx;
-        const { left, top, width, height } = u.bbox;
 
         ctx.save();
 
@@ -67,10 +66,8 @@ export function createBandFillPlugin(options: BandFillPluginOptions): uPlot.Plug
             const fillOpacity = series.fillOpacity ?? 0.1;
             const fillColor = colorWithOpacity(series.color, fillOpacity);
 
-            ctx.beginPath();
             ctx.fillStyle = fillColor;
 
-            let started = false;
             const pathPoints: Array<{ x: number; yUpper: number; yLower: number }> = [];
 
             // Collect valid points
@@ -81,10 +78,9 @@ export function createBandFillPlugin(options: BandFillPluginOptions): uPlot.Plug
                 if (upperVal === null || lowerVal === null) {
                     // Draw accumulated path if any
                     if (pathPoints.length > 0) {
-                        drawBandPath(ctx, u, pathPoints, left, top, width, height);
+                        drawBandPath(ctx, pathPoints);
                         pathPoints.length = 0;
                     }
-                    started = false;
                     continue;
                 }
 
@@ -97,7 +93,7 @@ export function createBandFillPlugin(options: BandFillPluginOptions): uPlot.Plug
 
             // Draw remaining path
             if (pathPoints.length > 0) {
-                drawBandPath(ctx, u, pathPoints, left, top, width, height);
+                drawBandPath(ctx, pathPoints);
             }
         }
 
@@ -113,12 +109,7 @@ export function createBandFillPlugin(options: BandFillPluginOptions): uPlot.Plug
 
 function drawBandPath(
     ctx: CanvasRenderingContext2D,
-    u: uPlot,
-    points: Array<{ x: number; yUpper: number; yLower: number }>,
-    left: number,
-    top: number,
-    width: number,
-    height: number
+    points: Array<{ x: number; yUpper: number; yLower: number }>
 ): void {
     if (points.length < 2) return;
 
