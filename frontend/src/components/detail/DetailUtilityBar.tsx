@@ -277,7 +277,11 @@ export function DetailUtilityBar({
             </button>
 
             {/* Model Selection Modal */}
-            <ModelSelectionGridModal hierarchy={modelHierarchy} />
+            <ModelSelectionGridModal
+                hierarchy={modelHierarchy}
+                hideAggregationMembers={hideAggregationMembers}
+                onToggleHideMembers={() => setHideAggregationMembers(!hideAggregationMembers)}
+            />
 
             {/* Variable Selection Modal */}
             <VariableSelectionModal selection={variableSelection} />
