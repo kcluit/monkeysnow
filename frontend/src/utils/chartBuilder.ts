@@ -550,9 +550,9 @@ export function buildWeatherChartConfig(
         },
         grid: {
             top: 10,
-            right: gridRight,
+            right: 0,
             bottom: gridBottom,
-            left: 10,
+            left: 0,
             containLabel: true,
         },
         dataZoom: {
