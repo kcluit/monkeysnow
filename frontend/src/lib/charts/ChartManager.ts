@@ -238,34 +238,9 @@ export class ChartManager {
             console.log('[ChartManager] Structural change - rebuilding chart');
             this.rebuildChart(config, newStructuralKey);
         } else if (this.chart) {
-            console.log('[ChartManager] Data-only change - using setData()');
-
-            // Save current zoom state BEFORE setData
-            const currentZoom = extractZoomState(this.chart);
-
-            // Update data
+            // Data-only change - use setData with resetScales=false to preserve zoom
             const data = transformToUPlotData(config);
-            this.chart.setData(data);
-
-            // Restore zoom state AFTER setData (setData resets scales)
-            if (currentZoom) {
-                // Check if user was zoomed in (not at full range)
-                const wasZoomed =
-                    currentZoom.min > currentZoom.initialMin + 0.01 ||
-                    currentZoom.max < currentZoom.initialMax - 0.01;
-
-                if (wasZoomed) {
-                    console.log('[ChartManager] Restoring zoom after setData', currentZoom);
-                    this.chart.setScale('x', {
-                        min: currentZoom.min,
-                        max: currentZoom.max,
-                    });
-                }
-
-                // Preserve the initial bounds for zoom plugin
-                (this.chart.scales.x as any)._initialMin = currentZoom.initialMin;
-                (this.chart.scales.x as any)._initialMax = currentZoom.initialMax;
-            }
+            this.chart.setData(data, false);
         }
 
         this.currentConfig = config;
