@@ -75,9 +75,6 @@ export interface ChartConfig {
     yAxis: YAxisConfig;
     yAxisSecondary?: YAxisConfig;
     series: SeriesConfig[];
-    markLines?: MarkLineData[];
-    tooltip: TooltipConfig;
-    legend: LegendConfig;
     grid: GridConfig;
     dataZoom?: DataZoomConfig;
     theme: ChartTheme;
