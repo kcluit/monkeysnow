@@ -6,13 +6,7 @@
  * chart abstraction layer.
  */
 
-import type {
-    ChartConfig,
-    ChartType,
-    SeriesConfig,
-    ChartTheme,
-    MarkLineData,
-} from '../lib/charts';
+import type { ChartConfig, ChartType, SeriesConfig, ChartTheme } from '../lib/charts';
 import type { WeatherChartProps } from '../types/detailView';
 import type { WeatherModel, HourlyDataPoint, AggregationType } from '../types/openMeteo';
 import type { UnitSystem } from '../types';
