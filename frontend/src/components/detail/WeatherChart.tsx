@@ -5,10 +5,11 @@
  * Includes settings modal for chart type and overlay options.
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useChartTheme } from '../../hooks/useChartTheme';
 import { UPlotChart } from '../../lib/charts';
+import { setChartZoomSyncExclusion } from '../../lib/charts/chartRegistry';
 import { buildWeatherChartConfig } from '../../utils/chartBuilder';
 import { ChartSettingsModal } from './ChartSettingsModal';
 import { getVariableConfig } from '../../utils/chartConfigurations';
