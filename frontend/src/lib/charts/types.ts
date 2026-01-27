@@ -61,6 +61,8 @@ export interface AxisConfig {
 export interface TooltipConfig {
     enabled: boolean;
     trigger: 'axis' | 'item';
+    /** Interaction mode: 'move' (default, tooltip follows mouse) or 'stop' (tooltip shows when mouse stops) */
+    interactionMode?: 'move' | 'stop';
     /** Custom formatter for tooltip content */
     formatter?: (params: TooltipParams[]) => string;
     /** Whether to append tooltip to body (avoids clipping in overflowing containers) */

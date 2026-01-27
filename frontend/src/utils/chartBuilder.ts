@@ -524,6 +524,7 @@ export function buildWeatherChartConfig(
         tooltip: {
             enabled: true,
             trigger: 'axis',
+            interactionMode: 'stop',
             appendToBody: false, // Keep in chart container for better performance
         },
         legend: {

@@ -77,10 +77,12 @@ function EChartsAdapterInner({
         const zr = chart.getZr();
         if (zr) {
             // Access the handler object to configure throttling
-            const handler = (zr as unknown as { handler?: {
-                setHandlerProxy?: (proxy: unknown) => void;
-                _bindThrottledHandler?: (eventName: string, throttleMs: number) => void;
-            } }).handler;
+            const handler = (zr as unknown as {
+                handler?: {
+                    setHandlerProxy?: (proxy: unknown) => void;
+                    _bindThrottledHandler?: (eventName: string, throttleMs: number) => void;
+                }
+            }).handler;
 
             if (handler?._bindThrottledHandler) {
                 // Throttle mousemove events aggressively
@@ -92,7 +94,59 @@ function EChartsAdapterInner({
         }
 
         // Note: Additional tooltip configuration is done in optionBuilder.ts
-    }, []);
+
+        // Custom interaction mode: 'stop'
+        // Only show tooltip when mouse stops moving
+        if (config.tooltip?.interactionMode === 'stop') {
+            // Override triggerOn to manual
+            chart.setOption({
+                tooltip: {
+                    triggerOn: 'none'
+                }
+            });
+
+            let timer: ReturnType<typeof setTimeout> | null = null;
+            const delay = 200; // ms to wait before showing tooltip
+
+            const zr = chart.getZr();
+            if (zr) {
+                zr.on('mousemove', (e) => {
+                    // Hide tooltip immediately when moving
+                    chart.dispatchAction({
+                        type: 'hideTip'
+                    });
+
+                    // Clear existing timer
+                    if (timer) {
+                        clearTimeout(timer);
+                    }
+
+                    // Set new timer to show tooltip
+                    timer = setTimeout(() => {
+                        chart.dispatchAction({
+                            type: 'showTip',
+                            x: e.offsetX,
+                            y: e.offsetY
+                        });
+                    }, delay);
+                });
+
+                zr.on('mouseout', () => {
+                    if (timer) {
+                        clearTimeout(timer);
+                    }
+                    chart.dispatchAction({
+                        type: 'hideTip'
+                    });
+                });
+
+                // Cleanup function for useEffect (if we had one, but this is a callback)
+                // In a real component, we might want to return a cleanup closure, 
+                // but ReactECharts doesn't use it.
+                // The zrender instance is tied to the chart and cleaned up with it.
+            }
+        }
+    }, [config.tooltip?.interactionMode]);
 
     return (
         <ReactECharts
