@@ -17,10 +17,10 @@ const MAX_TOOLTIP_SERIES = 0;
 const POINTER_THROTTLE_MS = 100;
 
 /**
- * RAF-throttled tooltip formatter for smooth 60fps performance.
- * Uses requestAnimationFrame pattern to ensure tooltip updates don't block rendering.
+ * Tooltip formatter with caching for smooth performance.
+ * Cache key includes data index and series count to handle multiple charts.
  */
-let lastTooltipDataIndex: number | undefined;
+let lastTooltipCacheKey = '';
 let pendingTooltipResult = '';
 
 function formatTooltip(params: unknown): string {
@@ -28,14 +28,16 @@ function formatTooltip(params: unknown): string {
 
     const first = params[0] as { axisValueLabel?: string; dataIndex?: number };
     const currentDataIndex = first.dataIndex;
+    // Include series count in cache key to differentiate between charts with different series
+    const cacheKey = `${currentDataIndex}-${params.length}`;
 
-    // If same data point, return cached result immediately
-    if (currentDataIndex === lastTooltipDataIndex && pendingTooltipResult) {
+    // If same data point and same series count, return cached result immediately
+    if (cacheKey === lastTooltipCacheKey && pendingTooltipResult) {
         return pendingTooltipResult;
     }
 
-    // Update the data index
-    lastTooltipDataIndex = currentDataIndex;
+    // Update the cache key
+    lastTooltipCacheKey = cacheKey;
 
     // Build tooltip - show all series when MAX_TOOLTIP_SERIES is 0
     const header = first.axisValueLabel || '';
