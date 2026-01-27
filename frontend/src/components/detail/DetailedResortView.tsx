@@ -115,26 +115,28 @@ export function DetailedResortView({
             </div>
 
             {/* Utility Bar */}
-            <DetailUtilityBar
-                selectedModels={selectedModels}
-                setSelectedModels={setSelectedModels}
-                selectedVariables={selectedVariables}
-                setSelectedVariables={setSelectedVariables}
-                selectedAggregations={selectedAggregations}
-                setSelectedAggregations={setSelectedAggregations}
-                aggregationColors={aggregationColors}
-                setAggregationColors={setAggregationColors}
-                hideAggregationMembers={hideAggregationMembers}
-                setHideAggregationMembers={setHideAggregationMembers}
-                elevation={elevation}
-                setElevation={setElevation}
-                forecastDays={forecastDays}
-                setForecastDays={setForecastDays}
-                location={location}
-                onBack={onBack}
-                isChartLocked={isChartLocked}
-                setIsChartLocked={setIsChartLocked}
-            />
+            <div className="px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
+                <DetailUtilityBar
+                    selectedModels={selectedModels}
+                    setSelectedModels={setSelectedModels}
+                    selectedVariables={selectedVariables}
+                    setSelectedVariables={setSelectedVariables}
+                    selectedAggregations={selectedAggregations}
+                    setSelectedAggregations={setSelectedAggregations}
+                    aggregationColors={aggregationColors}
+                    setAggregationColors={setAggregationColors}
+                    hideAggregationMembers={hideAggregationMembers}
+                    setHideAggregationMembers={setHideAggregationMembers}
+                    elevation={elevation}
+                    setElevation={setElevation}
+                    forecastDays={forecastDays}
+                    setForecastDays={setForecastDays}
+                    location={location}
+                    onBack={onBack}
+                    isChartLocked={isChartLocked}
+                    setIsChartLocked={setIsChartLocked}
+                />
+            </div>
 
             {/* Loading State - Only show when no data at all */}
             {loading && !data && (
