@@ -652,6 +652,123 @@ export function buildWeatherChartConfig(
 }
 
 /**
+ * Extract series definition (structure) from SeriesConfig.
+ */
+function extractSeriesDefinition(series: SeriesConfig): SeriesDefinition {
+    return {
+        id: series.id,
+        name: series.name,
+        color: series.color,
+        type: series.type,
+        lineWidth: series.lineWidth,
+        opacity: series.opacity,
+        fillOpacity: series.fillOpacity,
+        lineStyle: series.lineStyle,
+        zIndex: series.zIndex,
+        yAxisIndex: series.yAxisIndex,
+        hasBandData: !!series.bandData,
+    };
+}
+
+/**
+ * Build chart structure (without data) - changes to this require chart rebuild.
+ */
+export function buildChartStructure(
+    props: WeatherChartProps,
+    theme?: ChartTheme,
+    settings?: ChartBuildSettings
+): ChartStructure | null {
+    // Build full config to extract structure
+    const fullConfig = buildWeatherChartConfig(props, theme, settings);
+    if (!fullConfig) return null;
+
+    return {
+        type: fullConfig.type,
+        xAxisType: fullConfig.xAxis.type,
+        yAxis: fullConfig.yAxis,
+        yAxisSecondary: fullConfig.yAxisSecondary,
+        seriesDefinitions: fullConfig.series.map(extractSeriesDefinition),
+        markLines: fullConfig.markLines,
+        tooltip: fullConfig.tooltip,
+        legend: fullConfig.legend,
+        grid: fullConfig.grid,
+        dataZoom: fullConfig.dataZoom,
+        theme: fullConfig.theme,
+        height: fullConfig.height,
+        animation: fullConfig.animation,
+    };
+}
+
+/**
+ * Build chart data (without structure) - can be updated via setData().
+ */
+export function buildChartData(
+    props: WeatherChartProps,
+    theme?: ChartTheme,
+    settings?: ChartBuildSettings
+): ChartData | null {
+    // Build full config to extract data
+    const fullConfig = buildWeatherChartConfig(props, theme, settings);
+    if (!fullConfig) return null;
+
+    const seriesData = new Map<string, (number | null)[]>();
+    const bandData = new Map<string, { upper: (number | null)[]; lower: (number | null)[] }>();
+
+    for (const series of fullConfig.series) {
+        seriesData.set(series.id, series.data);
+        if (series.bandData) {
+            bandData.set(series.id, series.bandData);
+        }
+    }
+
+    return {
+        xLabels: fullConfig.xAxis.data,
+        seriesData,
+        bandData: bandData.size > 0 ? bandData : undefined,
+    };
+}
+
+/**
+ * Build separated chart config with structure and data split.
+ */
+export function buildSeparatedChartConfig(
+    props: WeatherChartProps,
+    theme?: ChartTheme,
+    settings?: ChartBuildSettings
+): SeparatedChartConfig | null {
+    const structure = buildChartStructure(props, theme, settings);
+    const data = buildChartData(props, theme, settings);
+
+    if (!structure || !data) return null;
+
+    return { structure, data };
+}
+
+/**
+ * Generate a structural key for comparison.
+ * Only changes to structural properties should trigger a chart rebuild.
+ */
+export function getStructuralKey(structure: ChartStructure): string {
+    return JSON.stringify({
+        type: structure.type,
+        xAxisType: structure.xAxisType,
+        seriesIds: structure.seriesDefinitions.map(s => s.id),
+        seriesTypes: structure.seriesDefinitions.map(s => s.type),
+        seriesColors: structure.seriesDefinitions.map(s => s.color),
+        seriesYAxisIndex: structure.seriesDefinitions.map(s => s.yAxisIndex ?? 0),
+        hasBandData: structure.seriesDefinitions.map(s => s.hasBandData ?? false),
+        hasSecondaryAxis: !!structure.yAxisSecondary,
+        hasMarkLines: !!structure.markLines?.length,
+        markLineCount: structure.markLines?.length ?? 0,
+        dataZoomEnabled: structure.dataZoom?.enabled ?? false,
+        height: structure.height,
+        // Theme affects colors so include key colors
+        themeAccent: structure.theme.accent,
+        themeBackground: structure.theme.background,
+    });
+}
+
+/**
  * Get the variable metadata for display (label, unit, color).
  */
 export function getVariableDisplayInfo(
