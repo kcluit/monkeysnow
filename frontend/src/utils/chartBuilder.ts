@@ -264,6 +264,88 @@ function calculateModelOpacity(modelCount: number): number {
 }
 
 /**
+ * Build band fill series for aggregation ranges.
+ * Creates band fills between complementary aggregation pairs (min/max, p25/p75).
+ */
+function buildBandFillSeries(
+    seriesData: Map<WeatherModel, (number | null)[]>,
+    aggregations: AggregationType[],
+    aggregationColors: Record<AggregationType, string>,
+    timePoints: number
+): SeriesConfig[] {
+    if (aggregations.length < 2 || seriesData.size < 2) {
+        return [];
+    }
+
+    const allDataArrays = Array.from(seriesData.values());
+    const configs: SeriesConfig[] = [];
+
+    // Check for band pairs
+    const hasMinMax = aggregations.includes('min') && aggregations.includes('max');
+    const hasPercentiles = aggregations.includes('p25') && aggregations.includes('p75');
+
+    // Helper to calculate aggregation data
+    const calculateAggData = (aggType: AggregationType): (number | null)[] => {
+        const data: (number | null)[] = [];
+        for (let i = 0; i < timePoints; i++) {
+            const valuesAtTime = allDataArrays
+                .map((arr) => arr[i])
+                .filter((v): v is number => v !== null && !isNaN(v));
+            if (valuesAtTime.length === 0) {
+                data.push(null);
+            } else {
+                data.push(calculateAggregationValue(valuesAtTime, aggType));
+            }
+        }
+        return data;
+    };
+
+    // Build min-max band if both are selected
+    if (hasMinMax) {
+        const minData = calculateAggData('min');
+        const maxData = calculateAggData('max');
+        const color = aggregationColors['max'] ?? getDefaultAggregationColor('max');
+
+        configs.push({
+            id: 'band_min_max',
+            name: 'Min-Max Range',
+            color,
+            type: 'band',
+            data: maxData, // Use max data for y-scale calculation
+            fillOpacity: 0.1,
+            bandData: {
+                upper: maxData,
+                lower: minData,
+            },
+            zIndex: 1, // Render behind lines
+        });
+    }
+
+    // Build p25-p75 band if both are selected
+    if (hasPercentiles) {
+        const p25Data = calculateAggData('p25');
+        const p75Data = calculateAggData('p75');
+        const color = aggregationColors['p75'] ?? getDefaultAggregationColor('p75');
+
+        configs.push({
+            id: 'band_p25_p75',
+            name: '25th-75th Percentile',
+            color,
+            type: 'band',
+            data: p75Data, // Use p75 data for y-scale calculation
+            fillOpacity: 0.15,
+            bandData: {
+                upper: p75Data,
+                lower: p25Data,
+            },
+            zIndex: 1, // Render behind lines
+        });
+    }
+
+    return configs;
+}
+
+/**
  * Build series configurations from weather model data.
  * Skips models with no data or empty data arrays.
  * @param hideAggregationMembers - If true and aggregations are present, skip model series entirely
