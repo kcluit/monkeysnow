@@ -457,8 +457,8 @@ export function buildWeatherChartConfig(
     // Determine if we have aggregations enabled
     const hasAggregations = selectedAggregations.length > 0 && seriesData.size > 1;
 
-    // Build model series (with reduced opacity if aggregations enabled)
-    const modelSeries = buildSeriesConfigs(seriesData, selectedModels, chartType, hasAggregations);
+    // Build model series (with reduced opacity if aggregations enabled, or hidden if hideAggregationMembers)
+    const modelSeries = buildSeriesConfigs(seriesData, selectedModels, chartType, hasAggregations, hideAggregationMembers);
 
     // Build aggregation series
     const aggregationSeries = calculateAggregationSeries(
