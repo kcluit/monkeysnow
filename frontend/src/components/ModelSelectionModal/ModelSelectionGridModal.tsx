@@ -316,6 +316,8 @@ const ProviderSection = memo(function ProviderSection({
 // Main modal component
 export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
   hierarchy,
+  hideAggregationMembers,
+  onToggleHideMembers,
 }: ModelSelectionGridModalProps): JSX.Element | null {
   const {
     isOpen,
