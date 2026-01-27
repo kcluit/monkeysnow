@@ -10,8 +10,8 @@ import { buildSeries } from './seriesBuilders';
 /** Generic option type to avoid complex ECharts type conflicts */
 type ChartOption = Record<string, unknown>;
 
-/** Maximum number of series to show in tooltip for performance */
-const MAX_TOOLTIP_SERIES = 3;
+/** Maximum number of series to show in tooltip (0 = unlimited) */
+const MAX_TOOLTIP_SERIES = 0;
 
 /** Global throttle value for pointer events (ms) */
 const POINTER_THROTTLE_MS = 100;
