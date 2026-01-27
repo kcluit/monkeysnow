@@ -211,6 +211,8 @@ const ProviderSection = memo(function ProviderSection({
   onDeselectAll,
   getSelectionState,
   onColorChange,
+  hideAggregationMembers,
+  onToggleHideMembers,
 }: {
   node: ModelHierarchyNode;
   expandedNodes: Set<string>;
@@ -224,6 +226,8 @@ const ProviderSection = memo(function ProviderSection({
   onDeselectAll: (node: ModelHierarchyNode) => void;
   getSelectionState: (node: ModelHierarchyNode) => 'all' | 'some' | 'none';
   onColorChange: (aggType: AggregationType, color: string) => void;
+  hideAggregationMembers?: boolean;
+  onToggleHideMembers?: () => void;
 }) {
   const isExpanded = expandedNodes.has(node.id);
   const selectionState = getSelectionState(node);
