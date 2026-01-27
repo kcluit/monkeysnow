@@ -8,8 +8,8 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { WeatherVariable } from '../../types/openMeteo';
-import type { ChartDisplayType, ElevationLocation } from '../../types/chartSettings';
-import { supportsAccumulation, supportsElevationLines } from '../../types/chartSettings';
+import type { ChartDisplayType } from '../../types/chartSettings';
+import { supportsAccumulation } from '../../types/chartSettings';
 import { getVariableConfig } from '../../utils/chartConfigurations';
 
 interface ChartSettingsModalProps {
@@ -22,12 +22,6 @@ interface ChartSettingsModalProps {
     // Accumulation (for precip variables)
     showAccumulation: boolean;
     onAccumulationChange: (show: boolean) => void;
-    // Elevation lines (for freezing level)
-    showElevationLines: boolean;
-    onElevationLinesChange: (show: boolean) => void;
-    // Location info for elevation display
-    location?: ElevationLocation;
-    currentElevation?: number;
 }
 
 const CHART_TYPES: { type: ChartDisplayType; label: string; icon: string }[] = [
