@@ -151,7 +151,73 @@ function calculatePercentile(values: number[], percentile: number): number {
 }
 
 /**
- * Calculate aggregation series (median/mean) from model data.
+ * Calculate aggregation value based on type.
+ */
+function calculateAggregationValue(values: number[], aggType: AggregationType): number {
+    switch (aggType) {
+        case 'median':
+            return calculateMedian(values);
+        case 'mean':
+            return calculateMean(values);
+        case 'min':
+            return calculateMin(values);
+        case 'max':
+            return calculateMax(values);
+        case 'p25':
+            return calculatePercentile(values, 25);
+        case 'p75':
+            return calculatePercentile(values, 75);
+        default:
+            return calculateMean(values);
+    }
+}
+
+/**
+ * Get display name for aggregation type.
+ */
+function getAggregationDisplayName(aggType: AggregationType): string {
+    switch (aggType) {
+        case 'median':
+            return 'Median';
+        case 'mean':
+            return 'Mean';
+        case 'min':
+            return 'Min';
+        case 'max':
+            return 'Max';
+        case 'p25':
+            return '25th %ile';
+        case 'p75':
+            return '75th %ile';
+        default:
+            return aggType;
+    }
+}
+
+/**
+ * Get default color for aggregation type.
+ */
+function getDefaultAggregationColor(aggType: AggregationType): string {
+    switch (aggType) {
+        case 'median':
+            return '#a855f7'; // Purple
+        case 'mean':
+            return '#ec4899'; // Pink
+        case 'min':
+            return '#14b8a6'; // Teal
+        case 'max':
+            return '#f97316'; // Orange
+        case 'p25':
+            return '#3b82f6'; // Blue
+        case 'p75':
+            return '#10b981'; // Emerald
+        default:
+            return '#8b5cf6'; // Default purple
+    }
+}
+
+/**
+ * Calculate aggregation series from model data.
  */
 function calculateAggregationSeries(
     seriesData: Map<WeatherModel, (number | null)[]>,
@@ -178,15 +244,12 @@ function calculateAggregationSeries(
             if (valuesAtTime.length === 0) {
                 aggregatedData.push(null);
             } else {
-                const value = aggType === 'median'
-                    ? calculateMedian(valuesAtTime)
-                    : calculateMean(valuesAtTime);
-                aggregatedData.push(value);
+                aggregatedData.push(calculateAggregationValue(valuesAtTime, aggType));
             }
         }
 
-        const color = aggregationColors[aggType] ?? (aggType === 'median' ? '#a855f7' : '#ec4899');
-        const name = aggType === 'median' ? 'Median' : 'Mean';
+        const color = aggregationColors[aggType] ?? getDefaultAggregationColor(aggType);
+        const name = getAggregationDisplayName(aggType);
 
         configs.push({
             id: aggType,
