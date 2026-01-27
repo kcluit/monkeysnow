@@ -6,19 +6,16 @@
  */
 
 import type uPlot from 'uplot';
-import type { ZoomState } from '../utils/zoomState';
 
 export interface ZoomPluginOptions {
     /** Zoom factor (0.9 = zoom in 10%, 1.1 = zoom out 10%) */
     factor?: number;
     /** Callback when zoom/pan changes */
     onZoom?: (min: number, max: number) => void;
-    /** Initial zoom state to restore (from previous chart instance) */
-    initialZoomState?: ZoomState | null;
 }
 
 export function createZoomPlugin(options: ZoomPluginOptions = {}): uPlot.Plugin {
-    const { factor = 0.75, onZoom, initialZoomState } = options;
+    const { factor = 0.75, onZoom } = options;
 
     return {
         hooks: {
@@ -181,34 +178,12 @@ export function createZoomPlugin(options: ZoomPluginOptions = {}): uPlot.Plugin 
                 window.addEventListener('mousemove', onMouseMove);
                 window.addEventListener('mouseup', onMouseUp, true);
 
-                // Initialize initials and optionally restore zoom state
+                // Store initial bounds for zoom clamping
                 const xMin = u.scales.x.min;
                 const xMax = u.scales.x.max;
                 if (xMin !== undefined && xMax !== undefined) {
                     (u.scales.x as any)._initialMin = xMin;
                     (u.scales.x as any)._initialMax = xMax;
-
-                    // Restore zoom state if provided
-                    if (initialZoomState) {
-                        // Normalize the old zoom position and apply to new range
-                        const oldRange = initialZoomState.initialMax - initialZoomState.initialMin;
-                        const newRange = xMax - xMin;
-
-                        if (oldRange > 0 && newRange > 0) {
-                            // Calculate normalized positions (0-1)
-                            const startPct = (initialZoomState.min - initialZoomState.initialMin) / oldRange;
-                            const endPct = (initialZoomState.max - initialZoomState.initialMin) / oldRange;
-
-                            // Apply to new range
-                            const newMin = xMin + startPct * newRange;
-                            const newMax = xMin + endPct * newRange;
-
-                            // Only apply if actually zoomed (not full range)
-                            if (endPct - startPct < 0.999) {
-                                u.setScale('x', { min: newMin, max: newMax });
-                            }
-                        }
-                    }
                 }
 
                 (u as any)._zoomCleanup = () => {
