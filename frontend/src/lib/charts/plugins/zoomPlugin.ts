@@ -18,7 +18,7 @@ export interface ZoomPluginOptions {
 }
 
 export function createZoomPlugin(options: ZoomPluginOptions = {}): uPlot.Plugin {
-    const { factor = 0.75, onZoom } = options;
+    const { factor = 0.75, onZoom, initialZoomState } = options;
 
     return {
         hooks: {
