@@ -102,6 +102,7 @@ export interface WeatherChartProps {
     selectedModels: WeatherModel[];
     selectedAggregations: AggregationType[];
     aggregationColors: Record<AggregationType, string>;
+    hideAggregationMembers?: boolean;
     variable: WeatherVariable;
     unitSystem: UnitSystem;
     timezoneInfo?: TimezoneInfo;
