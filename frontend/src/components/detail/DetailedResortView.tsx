@@ -54,6 +54,12 @@ export function DetailedResortView({
         DEFAULT_AGGREGATION_COLORS
     );
 
+    // State for hiding aggregation members (individual model lines)
+    const [hideAggregationMembers, setHideAggregationMembers] = useLocalStorage<boolean>(
+        'detailHideAggregationMembers',
+        false
+    );
+
     // State for elevation - default to mid elevation
     const [elevation, setElevation] = useLocalStorage<number>(
         'detailElevation',
