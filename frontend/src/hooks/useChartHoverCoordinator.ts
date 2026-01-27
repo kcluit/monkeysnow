@@ -1,7 +1,7 @@
 /**
  * Chart Hover Coordinator Hook
  *
- * Optimizes performance when multiple ECharts instances are on the page by:
+ * Optimizes performance when multiple chart instances are on the page by:
  * 1. Using CSS pointer-events to disable mouse interaction on non-hovered charts
  * 2. Only the chart container being hovered will process mouse events
  *
