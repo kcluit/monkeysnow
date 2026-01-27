@@ -98,6 +98,7 @@ export function ChartSettingsModal({
     const handleApply = () => {
         onChartTypeChange(localChartType);
         onAccumulationChange(localShowAccumulation);
+        onZoomSyncExcludedChange(localZoomSyncExcluded);
         onClose();
     };
 
