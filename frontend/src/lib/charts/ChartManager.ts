@@ -246,20 +246,15 @@ export class ChartManager {
     }
 
     /**
-     * Rebuild the chart from scratch, preserving zoom state.
+     * Rebuild the chart from scratch.
      */
     private rebuildChart(config: ChartConfig, newStructuralKey: string): void {
-        // Save zoom state before destroying
         if (this.chart) {
-            this.zoomState = extractZoomState(this.chart);
             this.chart.destroy();
             this.chart = null;
         }
 
-        // Update structural key
         this.structuralKey = newStructuralKey;
-
-        // Build new chart
         this.createChart(config);
     }
 
