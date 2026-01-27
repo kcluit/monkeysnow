@@ -10,6 +10,17 @@ export * from './types';
 // Theme utilities
 export { getUPlotTheme } from './theme';
 
+// Zoom state utilities
+export {
+    extractZoomState,
+    normalizeZoomState,
+    denormalizeZoomState,
+    isZoomed,
+    applyZoomState,
+    type ZoomState,
+    type NormalizedZoomState,
+} from './utils/zoomState';
+
 // Main chart component
 export { UPlotChart, type UPlotChartProps } from './UPlotChart';
 
