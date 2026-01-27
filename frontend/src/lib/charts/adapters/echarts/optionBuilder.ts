@@ -87,7 +87,6 @@ function buildTooltip(config: ChartConfig, _theme: ChartTheme, _totalDataPoints:
         },
         transitionDuration: 0,
         showDelay: 0,
-        hideDelay: 200, // Short delay allows user to move mouse into tooltip for scrolling
         confine: false, // Allow tooltip to render anywhere on screen
         alwaysShowContent: true, // Keep tooltip visible while mouse is in chart area
         axisPointer: {
@@ -104,9 +103,9 @@ function buildTooltip(config: ChartConfig, _theme: ChartTheme, _totalDataPoints:
                 show: false,
             },
         },
-        // Allow scrolling for many models, use screen space efficiently
-        extraCssText: 'max-height: 70vh; overflow-y: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.15); pointer-events: auto;',
-        enterable: true, // Allow mouse to enter tooltip for scrolling
+        // Multi-column layout uses screen space efficiently without scrolling
+        extraCssText: 'box-shadow: 0 4px 20px rgba(0,0,0,0.15);',
+        enterable: false,
         formatter: formatTooltip,
     };
 }
