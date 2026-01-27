@@ -18,6 +18,8 @@ import type { WeatherModel, AggregationType } from '../../types/openMeteo';
 
 interface ModelSelectionGridModalProps {
   hierarchy: UseModelHierarchyReturn;
+  hideAggregationMembers?: boolean;
+  onToggleHideMembers?: () => void;
 }
 
 // Color picker presets
