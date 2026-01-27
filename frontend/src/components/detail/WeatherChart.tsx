@@ -68,9 +68,6 @@ export function WeatherChart({
             {
                 chartTypeOverride: chartType,
                 showAccumulation,
-                showElevationLines,
-                location,
-                currentElevation,
             }
         );
     }, [
@@ -86,9 +83,6 @@ export function WeatherChart({
         theme,
         chartType,
         showAccumulation,
-        showElevationLines,
-        location,
-        currentElevation,
     ]);
 
     // Handle no data
