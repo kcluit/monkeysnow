@@ -40,7 +40,7 @@ interface HighlightPoint {
  */
 export function interactiveOverlayPlugin(
     tooltipConfig: TooltipConfig | undefined,
-    seriesConfigs: SeriesConfig[],
+    _seriesConfigs: SeriesConfig[],
     theme: ChartTheme,
     xAxisLabels?: string[]
 ): uPlot.Plugin {
@@ -51,7 +51,6 @@ export function interactiveOverlayPlugin(
     let tooltipEl: HTMLElement | null = null;
     let currentHighlights: HighlightPoint[] = [];
     let lastUpdateTime = 0;
-    let currentDataIdx: number | null = null;
 
     /**
      * Find the data index closest to cursor position (snap-to-point).
