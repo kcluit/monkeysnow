@@ -480,7 +480,7 @@ export function buildWeatherChartConfig(
     const unit = unitSystem === 'imperial' ? variableConfig.unitImperial : variableConfig.unit;
 
     // Use provided theme or get from CSS
-    const chartTheme = theme ?? getEChartsTheme();
+    const chartTheme = theme ?? getUPlotTheme();
 
     // Build elevation mark lines if enabled
     let markLines: MarkLineData[] | undefined;
