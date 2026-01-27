@@ -91,13 +91,11 @@ export function ChartSettingsModal({
     const handleApply = () => {
         onChartTypeChange(localChartType);
         onAccumulationChange(localShowAccumulation);
-        onElevationLinesChange(localShowElevationLines);
         onClose();
     };
 
     const variableConfig = getVariableConfig(variable);
     const hasAccumulation = supportsAccumulation(variable);
-    const hasElevationLines = supportsElevationLines(variable);
 
     return createPortal(
         <div className="command-palette-backdrop" onClick={handleBackdropClick}>
