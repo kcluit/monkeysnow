@@ -76,6 +76,8 @@ export interface TooltipConfig {
     formatter?: (params: TooltipParams[]) => string;
     /** Whether to append tooltip to body (avoids clipping in overflowing containers) */
     appendToBody?: boolean;
+    /** Show all series values at cursor position (default: true) */
+    showAllSeries?: boolean;
 }
 
 /** Individual tooltip parameter */
