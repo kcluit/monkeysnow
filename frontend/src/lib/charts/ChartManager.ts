@@ -205,7 +205,6 @@ export class ChartManager {
     private chart: uPlot | null = null;
     private currentConfig: ChartConfig | null = null;
     private structuralKey: string = '';
-    private zoomState: ZoomState | null = null;
     private options: ChartManagerOptions;
     private resizeObserver: ResizeObserver | null = null;
     private isDestroyed: boolean = false;
