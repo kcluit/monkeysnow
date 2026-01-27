@@ -27,6 +27,17 @@ export { UPlotChart, type UPlotChartProps } from './UPlotChart';
 // Chart manager (vanilla JS)
 export { ChartManager, type ChartManagerOptions } from './ChartManager';
 
+// Chart registry (for React-independent chart management)
+export {
+    generateChartId,
+    getOrCreateChart,
+    updateChart,
+    destroyChart,
+    getChart,
+    hasChart,
+    getActiveCharts,
+} from './chartRegistry';
+
 // Plugins (for advanced usage)
 export {
     createZoomPlugin,
