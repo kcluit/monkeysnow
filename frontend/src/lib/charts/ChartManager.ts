@@ -11,11 +11,6 @@ import type { ChartConfig } from './types';
 import { createZoomPlugin, createBandFillPlugin } from './plugins';
 import { colorWithOpacity } from './utils/colorUtils';
 
-export interface ChartManagerOptions {
-    /** Callback when series visibility changes */
-    onSeriesToggle?: (seriesId: string, visible: boolean) => void;
-}
-
 /**
  * Generate a structural key for comparison.
  * Only changes to structural properties should trigger a chart rebuild.
