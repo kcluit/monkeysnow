@@ -88,6 +88,7 @@ export interface DetailChartGridProps {
     selectedVariables: WeatherVariable[];
     selectedAggregations: AggregationType[];
     aggregationColors: Record<AggregationType, string>;
+    hideAggregationMembers?: boolean;
     unitSystem: UnitSystem;
     timezoneInfo?: TimezoneInfo;
     isChartLocked?: boolean;
