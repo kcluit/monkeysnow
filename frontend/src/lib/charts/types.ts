@@ -38,15 +38,6 @@ export interface SeriesConfig {
     };
 }
 
-/** Horizontal reference line */
-export interface MarkLineData {
-    yValue: number;
-    label: string;
-    color: string;
-    lineWidth: number;
-    lineStyle: 'solid' | 'dashed';
-}
-
 /** X-axis configuration */
 export interface XAxisConfig {
     type: 'category' | 'time';
