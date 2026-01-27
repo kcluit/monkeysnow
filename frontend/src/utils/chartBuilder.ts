@@ -10,7 +10,7 @@ import type { ChartConfig, ChartType, SeriesConfig, ChartTheme } from '../lib/ch
 import type { WeatherChartProps } from '../types/detailView';
 import type { WeatherModel, HourlyDataPoint, AggregationType } from '../types/openMeteo';
 import type { UnitSystem } from '../types';
-import type { ChartDisplayType, ElevationLocation } from '../types/chartSettings';
+import type { ChartDisplayType } from '../types/chartSettings';
 import { getModelConfig, getVariableConfig } from './chartConfigurations';
 import { getUPlotTheme } from '../lib/charts';
 import { aggregationOptions } from '../data/modelHierarchy';
