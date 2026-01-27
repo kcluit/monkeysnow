@@ -92,6 +92,8 @@ export interface TooltipParams {
 export interface LegendConfig {
     enabled: boolean;
     position: 'top' | 'bottom' | 'left' | 'right';
+    /** Enable click-to-toggle series visibility (default: false) */
+    interactive?: boolean;
 }
 
 /** Grid/margin configuration */
