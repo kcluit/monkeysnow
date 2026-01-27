@@ -453,6 +453,10 @@ export function advancedZoomPlugin(
                         overviewDragMode = null;
                     };
 
+                    // Store handlers for cleanup
+                    overviewMouseMoveHandler = handleOverviewMouseMove;
+                    overviewMouseUpHandler = handleOverviewMouseUp;
+
                     // Add overview event listeners
                     overviewCanvas.addEventListener('mousedown', handleOverviewMouseDown);
                     document.addEventListener('mousemove', handleOverviewMouseMove);
@@ -472,6 +476,16 @@ export function advancedZoomPlugin(
                     document.removeEventListener('mousemove', handleMouseMove);
                     document.removeEventListener('mouseup', handleMouseUp);
                     canvas.removeEventListener('dblclick', handleDblClick);
+
+                    // Clean up overview event listeners
+                    if (overviewMouseMoveHandler) {
+                        document.removeEventListener('mousemove', overviewMouseMoveHandler);
+                        overviewMouseMoveHandler = null;
+                    }
+                    if (overviewMouseUpHandler) {
+                        document.removeEventListener('mouseup', overviewMouseUpHandler);
+                        overviewMouseUpHandler = null;
+                    }
 
                     if (overviewContainer) {
                         overviewContainer.remove();
