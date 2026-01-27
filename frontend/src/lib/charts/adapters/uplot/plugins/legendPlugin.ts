@@ -119,7 +119,8 @@ export function legendPlugin(
             },
 
             // Update legend items when series visibility changes externally
-            setSeries: (u: uPlot, seriesIdx: number) => {
+            setSeries: (u: uPlot, seriesIdx: number | null) => {
+                if (seriesIdx === null) return;
                 const item = legendItems.get(seriesIdx);
                 if (item) {
                     const isVisible = u.series[seriesIdx].show !== false;
