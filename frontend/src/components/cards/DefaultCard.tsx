@@ -2,7 +2,7 @@ import { useRef, useState, MouseEvent } from 'react';
 import { webcamUrls } from '../../utils/constants';
 import { calculateSnowTotals } from '../../utils/weather';
 import { calculateDayStats, formatWeatherText, getTemperatureClass, getSnowClass, getWindClass } from './cardUtils';
-import { formatTemp, formatSnow, formatWind } from '../../utils/unitConversion';
+import { formatTemp, formatSnow, formatRain, formatWind } from '../../utils/unitConversion';
 import type { CardProps } from '../../types';
 
 export function DefaultCard({ resort, temperatureMetric = 'max', showDate = false, unitSystem = 'metric', onResortClick }: CardProps): JSX.Element {
@@ -95,11 +95,15 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
                                     <div className="rounded-xl p-3 backdrop-blur-sm" style={{ backgroundColor: 'var(--secondary)' }}>
                                         <div className="flex items-center gap-2">
                                             <div className={`text-2xl font-bold ${getTemperatureClass(dayStats.maxTemp)}`}>{formatTemp(dayStats.maxTemp, unitSystem)}</div>
-                                            {dayStats.snow > 0 && (
+                                            {dayStats.snow > 0 ? (
                                                 <div className={`text-sm font-bold ${getSnowClass(dayStats.snow, unitSystem)}`}>
                                                     {formatSnow(dayStats.snow, unitSystem)} snow
                                                 </div>
-                                            )}
+                                            ) : dayStats.rain > 0 ? (
+                                                <div className="text-sm font-bold text-theme-accent">
+                                                    {formatRain(dayStats.rain, unitSystem)} rain
+                                                </div>
+                                            ) : null}
                                         </div>
                                         <div className="text-sm text-theme-textPrimary mt-1 font-medium truncate" title={weatherText}>{weatherText}</div>
                                         <div className={`text-xs font-medium ${getWindClass(dayStats.wind, unitSystem)} mt-1`}>

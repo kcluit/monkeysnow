@@ -39,10 +39,11 @@ export function formatWeatherText(periods: Period[]): string {
  */
 export function calculateDayStats(day: DayForecast, temperatureMetric: TemperatureMetric = 'max'): DayStats {
     const periods = day.periods;
-    if (!periods.length) return { maxTemp: 0, snow: 0, wind: 0 };
+    if (!periods.length) return { maxTemp: 0, snow: 0, rain: 0, wind: 0 };
 
     let aggregatedTemp = 0;
     let totalSnow = 0;
+    let totalRain = 0;
 
     // Get PM wind or fallback to available wind
     let wind = 0;
@@ -78,16 +79,20 @@ export function calculateDayStats(day: DayForecast, temperatureMetric: Temperatu
     periods.forEach(period => {
         const snowAmount = parseFloat(period.snow.replace(/[^\d.-]/g, '')) || 0;
         totalSnow += snowAmount;
+
+        const rainAmount = parseFloat(period.rain.replace(/[^\d.-]/g, '')) || 0;
+        totalRain += rainAmount;
     });
 
     // Round based on metric: ceil for max, floor for min, round for avg/median
     const roundedTemp = temperatureMetric === 'max' ? Math.ceil(aggregatedTemp)
-                      : temperatureMetric === 'min' ? Math.floor(aggregatedTemp)
-                      : Math.round(aggregatedTemp);
+        : temperatureMetric === 'min' ? Math.floor(aggregatedTemp)
+            : Math.round(aggregatedTemp);
 
     return {
         maxTemp: roundedTemp,
         snow: Math.round(totalSnow * 10) / 10,
+        rain: Math.round(totalRain * 10) / 10,
         wind: Math.round(wind)
     };
 }

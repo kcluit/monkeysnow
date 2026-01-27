@@ -158,6 +158,7 @@ export interface SnowTotals {
 export interface DayStats {
     maxTemp: number;
     snow: number;
+    rain: number;
     wind: number;
 }
 
