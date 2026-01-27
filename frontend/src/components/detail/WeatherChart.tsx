@@ -43,10 +43,6 @@ export function WeatherChart({
         `chartAccumulation_${variable}`,
         false
     );
-    const [showElevationLines, setShowElevationLines] = useLocalStorage<boolean>(
-        `chartElevationLines_${variable}`,
-        false
-    );
 
     // Settings modal state
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
