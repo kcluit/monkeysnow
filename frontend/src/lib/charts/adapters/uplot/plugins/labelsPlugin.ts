@@ -35,6 +35,9 @@ export function labelsPlugin(
                     const seriesConfig = seriesConfigs[i - 1];
                     if (!seriesConfig || seriesConfig.showLabels !== true) return;
 
+                    // Validate data exists
+                    if (!u.data || !u.data[0] || !u.data[i]) return;
+
                     const data = u.data[i] as (number | null)[];
                     const xData = u.data[0] as number[];
                     const scale = s.scale ?? 'y';
