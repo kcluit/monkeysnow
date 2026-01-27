@@ -1,20 +1,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
-import { PerformanceTest } from './pages/PerformanceTest'
 import { HierarchyProvider } from './contexts/HierarchyContext'
 import './style.css'
 
-// Simple URL-based routing for test pages
+// Main app wrapper
 function Root(): JSX.Element {
-    // Check if we're on the performance test page
-    const isPerformanceTest = window.location.hash === '#/perf-test' ||
-        window.location.pathname === '/perf-test';
-
-    if (isPerformanceTest) {
-        return <PerformanceTest />;
-    }
-
     return (
         <HierarchyProvider>
             <App />
