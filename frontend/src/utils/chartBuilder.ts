@@ -12,10 +12,6 @@ import type {
     SeriesConfig,
     ChartTheme,
     MarkLineData,
-    ChartStructure,
-    ChartData,
-    SeriesDefinition,
-    SeparatedChartConfig,
 } from '../lib/charts';
 import type { WeatherChartProps } from '../types/detailView';
 import type { WeatherModel, HourlyDataPoint, AggregationType } from '../types/openMeteo';
