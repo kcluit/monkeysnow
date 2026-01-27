@@ -6,138 +6,201 @@
  */
 
 import type uPlot from 'uplot';
+import type { ZoomState } from '../utils/zoomState';
 
 export interface ZoomPluginOptions {
     /** Zoom factor (0.9 = zoom in 10%, 1.1 = zoom out 10%) */
     factor?: number;
     /** Callback when zoom/pan changes */
     onZoom?: (min: number, max: number) => void;
+    /** Initial zoom state to restore (from previous chart instance) */
+    initialZoomState?: ZoomState | null;
 }
 
 export function createZoomPlugin(options: ZoomPluginOptions = {}): uPlot.Plugin {
-    const { factor = 0.9, onZoom } = options;
+    const { factor = 0.75, onZoom } = options;
 
     return {
         hooks: {
             ready: [(u: uPlot) => {
                 const over = u.over;
+                let rect = over.getBoundingClientRect();
 
-                // Store initial range for reset
-                const initialMin = u.scales.x.min ?? 0;
-                const initialMax = u.scales.x.max ?? 1;
+                // Keep rect synced
+                const syncRect = () => {
+                    rect = over.getBoundingClientRect();
+                };
 
                 // Wheel zoom
                 const onWheel = (e: WheelEvent) => {
                     e.preventDefault();
 
-                    const rect = over.getBoundingClientRect();
-                    const left = e.clientX - rect.left;
-
-                    const xMin = u.scales.x.min ?? 0;
-                    const xMax = u.scales.x.max ?? 1;
+                    const xMin = u.scales.x.min!;
+                    const xMax = u.scales.x.max!;
                     const xRange = xMax - xMin;
 
-                    // Get x value at cursor position
+                    // Mouse position relative to canvas
+                    const left = e.clientX - rect.left;
+
                     const xVal = u.posToVal(left, 'x');
-                    const pct = (xVal - xMin) / xRange;
 
-                    // Zoom in or out
-                    const zoomFactor = e.deltaY < 0 ? factor : 1 / factor;
-                    const newRange = xRange * zoomFactor;
+                    if (Number.isNaN(xVal)) return;
 
-                    // Clamp to initial range
-                    const clampedRange = Math.min(newRange, initialMax - initialMin);
+                    const zoomMult = e.deltaY < 0 ? factor : 1 / factor;
+                    const newRange = xRange * zoomMult;
 
-                    // Calculate new bounds centered on cursor
-                    let newMin = xVal - clampedRange * pct;
-                    let newMax = xVal + clampedRange * (1 - pct);
+                    const initialMin = (u.scales.x as any)._initialMin ?? u.scales.x.min!;
+                    const initialMax = (u.scales.x as any)._initialMax ?? u.scales.x.max!;
+                    const maxRange = initialMax - initialMin;
 
-                    // Clamp to initial bounds
-                    if (newMin < initialMin) {
-                        newMin = initialMin;
-                        newMax = initialMin + clampedRange;
-                    }
-                    if (newMax > initialMax) {
-                        newMax = initialMax;
-                        newMin = initialMax - clampedRange;
+                    if ((u.scales.x as any)._initialMin === undefined) {
+                        (u.scales.x as any)._initialMin = initialMin;
+                        (u.scales.x as any)._initialMax = initialMax;
                     }
 
-                    u.setScale('x', { min: newMin, max: newMax });
-                    onZoom?.(newMin, newMax);
+                    let clampedRange = newRange;
+                    if (clampedRange > maxRange) clampedRange = maxRange;
+
+                    // Center zoom on cursor
+                    const xPct = (xVal - xMin) / xRange;
+                    let nextMin = xVal - clampedRange * xPct;
+                    let nextMax = xVal + clampedRange * (1 - xPct);
+
+                    // Clamp to bounds
+                    if (nextMin < initialMin) {
+                        nextMin = initialMin;
+                        nextMax = initialMin + clampedRange;
+                    }
+                    if (nextMax > initialMax) {
+                        nextMax = initialMax;
+                        nextMin = initialMax - clampedRange;
+                    }
+
+                    u.batch(() => {
+                        u.setScale('x', { min: nextMin, max: nextMax });
+                        onZoom?.(nextMin, nextMax);
+                    });
                 };
 
                 // Drag to pan
-                let dragging = false;
-                let dragStartX = 0;
-                let dragStartMin = 0;
-                let dragStartMax = 0;
+                let isDragging = false;
+                let dragged = false;
+                let dragStartLeft = 0;
+                let dragStartXMin = 0;
+                let dragStartXMax = 0;
 
                 const onMouseDown = (e: MouseEvent) => {
-                    if (e.button !== 0) return; // Left click only
+                    // Left click only
+                    if (e.button !== 0) return;
 
-                    dragging = true;
-                    dragStartX = e.clientX;
-                    dragStartMin = u.scales.x.min ?? 0;
-                    dragStartMax = u.scales.x.max ?? 1;
+                    if ((u.scales.x as any)._initialMin === undefined) {
+                        (u.scales.x as any)._initialMin = u.scales.x.min;
+                        (u.scales.x as any)._initialMax = u.scales.x.max;
+                    }
 
-                    over.style.cursor = 'grabbing';
+                    isDragging = true;
+                    dragged = false;
+                    dragStartLeft = e.clientX;
+                    dragStartXMin = u.scales.x.min!;
+                    dragStartXMax = u.scales.x.max!;
+
+                    // Prevent default to avoid text selection and native drag
+                    e.preventDefault();
                 };
 
                 const onMouseMove = (e: MouseEvent) => {
-                    if (!dragging) return;
+                    if (!isDragging) return;
+                    e.preventDefault();
 
-                    const rect = over.getBoundingClientRect();
-                    const dx = e.clientX - dragStartX;
-                    const xRange = dragStartMax - dragStartMin;
-                    const pxRange = rect.width;
-                    const shift = (dx / pxRange) * xRange;
+                    const dx = e.clientX - dragStartLeft;
 
-                    let newMin = dragStartMin - shift;
-                    let newMax = dragStartMax - shift;
-
-                    // Clamp to initial bounds
-                    if (newMin < initialMin) {
-                        newMin = initialMin;
-                        newMax = initialMin + xRange;
-                    }
-                    if (newMax > initialMax) {
-                        newMax = initialMax;
-                        newMin = initialMax - xRange;
+                    // Threshold to detect actual drag vs slightly sloppy click
+                    if (!dragged && Math.abs(dx) > 3) {
+                        dragged = true;
+                        over.style.cursor = 'move';
                     }
 
-                    u.setScale('x', { min: newMin, max: newMax });
-                    onZoom?.(newMin, newMax);
+                    if (!dragged) return;
+
+                    const xRange = dragStartXMax - dragStartXMin;
+                    const unitsPerPx = xRange / rect.width;
+                    const shift = -dx * unitsPerPx;
+
+                    let nextMin = dragStartXMin + shift;
+                    let nextMax = dragStartXMax + shift;
+
+                    const initialMin = (u.scales.x as any)._initialMin;
+                    const initialMax = (u.scales.x as any)._initialMax;
+
+                    // Hard clamp to bounds
+                    if (nextMin < initialMin) {
+                        nextMin = initialMin;
+                        nextMax = initialMin + xRange;
+                    }
+                    if (nextMax > initialMax) {
+                        nextMax = initialMax;
+                        nextMin = initialMax - xRange;
+                    }
+
+                    u.setScale('x', { min: nextMin, max: nextMax });
+                    onZoom?.(nextMin, nextMax);
                 };
 
-                const onMouseUp = () => {
-                    dragging = false;
-                    over.style.cursor = '';
+                const onMouseUp = (e: MouseEvent) => {
+                    if (isDragging) {
+                        isDragging = false;
+                        over.style.cursor = '';
+
+                        // If we dragged, we need to prevent default behavior (like click/reset)
+                        if (dragged) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                    }
                 };
 
-                // Double-click to reset
-                const onDblClick = () => {
-                    u.setScale('x', { min: initialMin, max: initialMax });
-                    onZoom?.(initialMin, initialMax);
+                // Trap click to prevent reset when dragging
+                const onClick = (e: MouseEvent) => {
+                    if (dragged) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
+                        dragged = false;
+                    }
                 };
 
+                // Sync rect on resize
+                const resizeObserver = new ResizeObserver(syncRect);
+                resizeObserver.observe(over);
+
+                // Listeners
                 over.addEventListener('wheel', onWheel, { passive: false });
                 over.addEventListener('mousedown', onMouseDown);
-                window.addEventListener('mousemove', onMouseMove);
-                window.addEventListener('mouseup', onMouseUp);
-                over.addEventListener('dblclick', onDblClick);
+                over.addEventListener('click', onClick, true);
 
-                // Cleanup stored in u for destroy hook
+                window.addEventListener('mousemove', onMouseMove);
+                window.addEventListener('mouseup', onMouseUp, true);
+
+                // Initialize initials
+                const xMin = u.scales.x.min;
+                const xMax = u.scales.x.max;
+                if (xMin !== undefined && xMax !== undefined) {
+                    (u.scales.x as any)._initialMin = xMin;
+                    (u.scales.x as any)._initialMax = xMax;
+                }
+
                 (u as any)._zoomCleanup = () => {
                     over.removeEventListener('wheel', onWheel);
                     over.removeEventListener('mousedown', onMouseDown);
+                    over.removeEventListener('click', onClick, true);
                     window.removeEventListener('mousemove', onMouseMove);
-                    window.removeEventListener('mouseup', onMouseUp);
-                    over.removeEventListener('dblclick', onDblClick);
+                    window.removeEventListener('mouseup', onMouseUp, true);
+                    resizeObserver.disconnect();
                 };
             }],
             destroy: [(u: uPlot) => {
                 (u as any)._zoomCleanup?.();
-            }],
-        },
+            }]
+        }
     };
 }
