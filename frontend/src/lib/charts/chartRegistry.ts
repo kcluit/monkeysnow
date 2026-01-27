@@ -109,7 +109,7 @@ export function getOrCreateChart(container: HTMLElement): ChartManager {
     chartId = generateChartId();
     container.dataset.chartId = chartId;
 
-    const manager = new ChartManager(container);
+    const manager = new ChartManager(container, chartId);
     charts.set(chartId, manager);
 
     console.log(`[chartRegistry] Created chart ${chartId}`);
