@@ -143,7 +143,7 @@ function buildUPlotAxes(config: ChartConfig): uPlot.Axis[] {
  * Build uPlot scales configuration.
  */
 function buildUPlotScales(config: ChartConfig): uPlot.Scales {
-    const { xAxis, yAxis, yAxisSecondary, series } = config;
+    const { yAxis, yAxisSecondary } = config;
 
     const scales: uPlot.Scales = {
         x: {
@@ -163,14 +163,16 @@ function buildUPlotScales(config: ChartConfig): uPlot.Scales {
                 range: [min, max],
             };
         } else if (min !== 'auto') {
-            // Min specified, auto max
+            // Min specified, auto max - use range function
             scales.y = {
-                auto: (u, min0, max0) => [min, max0],
+                auto: true,
+                range: (_u: uPlot, _dataMin: number, dataMax: number) => [min, dataMax],
             };
         } else if (max !== 'auto') {
-            // Auto min, max specified
+            // Auto min, max specified - use range function
             scales.y = {
-                auto: (u, min0, max0) => [min0, max],
+                auto: true,
+                range: (_u: uPlot, dataMin: number, _dataMax: number) => [dataMin, max],
             };
         }
     }
