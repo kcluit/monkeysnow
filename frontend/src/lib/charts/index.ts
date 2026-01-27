@@ -18,9 +18,6 @@ export {
     createZoomPlugin,
     createTooltipPlugin,
     createLegendPlugin,
-    createSyncPlugin,
-    syncAllCharts,
-    resetAllCharts,
     createMarkLinesPlugin,
     createBandFillPlugin,
 } from './plugins';
