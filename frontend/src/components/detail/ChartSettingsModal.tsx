@@ -22,6 +22,9 @@ interface ChartSettingsModalProps {
     // Accumulation (for precip variables)
     showAccumulation: boolean;
     onAccumulationChange: (show: boolean) => void;
+    // Zoom sync exclusion
+    zoomSyncExcluded: boolean;
+    onZoomSyncExcludedChange: (excluded: boolean) => void;
 }
 
 const CHART_TYPES: { type: ChartDisplayType; label: string; icon: string }[] = [
