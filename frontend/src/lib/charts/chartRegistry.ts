@@ -96,8 +96,10 @@ export function generateChartId(): string {
 /**
  * Get or create a chart for a container element.
  * Uses data-chart-id attribute to track the chart.
+ * @param container - The container element
+ * @param chartKey - Optional stable key for this chart (used for zoom sync exclusions)
  */
-export function getOrCreateChart(container: HTMLElement): ChartManager {
+export function getOrCreateChart(container: HTMLElement, chartKey?: string): ChartManager {
     // Check if container already has a chart
     let chartId = container.dataset.chartId;
 
@@ -105,8 +107,8 @@ export function getOrCreateChart(container: HTMLElement): ChartManager {
         return charts.get(chartId)!;
     }
 
-    // Create new chart
-    chartId = generateChartId();
+    // Create new chart - use chartKey if provided, otherwise generate
+    chartId = chartKey || generateChartId();
     container.dataset.chartId = chartId;
 
     const manager = new ChartManager(container, chartId);
