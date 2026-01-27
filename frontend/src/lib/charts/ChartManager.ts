@@ -10,6 +10,11 @@ import 'uplot/dist/uPlot.min.css';
 import type { ChartConfig } from './types';
 import { createZoomPlugin, createBandFillPlugin } from './plugins';
 import { colorWithOpacity } from './utils/colorUtils';
+import {
+    subscribeToZoomChanges,
+    broadcastZoomChange,
+    isChartZoomSyncEnabled,
+} from './chartRegistry';
 
 /**
  * Generate a structural key for comparison.
