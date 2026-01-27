@@ -24,5 +24,5 @@ export type {
   MarkLineData,
 } from './types';
 
-// Theme utilities
-export { getEChartsTheme } from './adapters/echarts';
+// Theme utilities (aliased for backward compatibility)
+export { getUPlotTheme as getEChartsTheme } from './adapters/uplot';
