@@ -5,7 +5,7 @@
  * Charts are identified by a unique ID stored in a data attribute on their container.
  */
 
-import { ChartManager, type ChartManagerOptions } from './ChartManager';
+import { ChartManager } from './ChartManager';
 import type { ChartConfig } from './types';
 
 // Global chart registry
@@ -25,10 +25,7 @@ export function generateChartId(): string {
  * Get or create a chart for a container element.
  * Uses data-chart-id attribute to track the chart.
  */
-export function getOrCreateChart(
-    container: HTMLElement,
-    options: ChartManagerOptions = {}
-): ChartManager {
+export function getOrCreateChart(container: HTMLElement): ChartManager {
     // Check if container already has a chart
     let chartId = container.dataset.chartId;
 
@@ -40,7 +37,7 @@ export function getOrCreateChart(
     chartId = generateChartId();
     container.dataset.chartId = chartId;
 
-    const manager = new ChartManager(container, options);
+    const manager = new ChartManager(container);
     charts.set(chartId, manager);
 
     console.log(`[chartRegistry] Created chart ${chartId}`);
