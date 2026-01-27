@@ -93,46 +93,7 @@ export interface DataZoomConfig {
     range: [number, number];
 }
 
-/** Series definition WITHOUT data - for structural comparison */
-export interface SeriesDefinition {
-    id: string;
-    name: string;
-    color: string;
-    type: ChartType;
-    lineWidth?: number;
-    opacity?: number;
-    fillOpacity?: number;
-    lineStyle?: LineStyle;
-    zIndex?: number;
-    yAxisIndex?: number;
-    hasBandData?: boolean;
-}
-
-/** Structural config - changes require chart rebuild */
-export interface ChartStructure {
-    type: ChartType;
-    xAxisType: 'category' | 'time';
-    yAxis: YAxisConfig;
-    yAxisSecondary?: YAxisConfig;
-    seriesDefinitions: SeriesDefinition[];
-    markLines?: MarkLineData[];
-    tooltip: TooltipConfig;
-    legend: LegendConfig;
-    grid: GridConfig;
-    dataZoom?: DataZoomConfig;
-    theme: ChartTheme;
-    height: number;
-    animation: boolean;
-}
-
-/** Data only - can update via setData() without rebuild */
-export interface ChartData {
-    xLabels: string[];
-    seriesData: Map<string, (number | null)[]>;
-    bandData?: Map<string, { upper: (number | null)[]; lower: (number | null)[] }>;
-}
-
-/** Complete chart configuration (legacy format for backwards compatibility) */
+/** Complete chart configuration */
 export interface ChartConfig {
     type: ChartType;
     xAxis: XAxisConfig;
@@ -147,10 +108,4 @@ export interface ChartConfig {
     theme: ChartTheme;
     height: number;
     animation: boolean;
-}
-
-/** New separated config format */
-export interface SeparatedChartConfig {
-    structure: ChartStructure;
-    data: ChartData;
 }
