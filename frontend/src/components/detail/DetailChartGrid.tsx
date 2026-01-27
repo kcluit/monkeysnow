@@ -5,9 +5,11 @@
  * Coordinates zoom/pan synchronization across all charts.
  */
 
-import { useMemo } from 'react';
 import { WeatherChart } from './WeatherChart';
 import type { DetailChartGridProps } from '../../types/detailView';
+
+/** Sync key for coordinating zoom/pan across charts in this grid */
+const CHART_SYNC_KEY = 'detail-chart-grid-sync';
 
 export function DetailChartGrid({
     data,
@@ -23,9 +25,6 @@ export function DetailChartGrid({
     location,
     currentElevation,
 }: DetailChartGridProps): JSX.Element {
-    // Generate a stable sync key for coordinating zoom/pan across charts
-    // Using a constant key ensures all charts stay in sync within this grid
-    const syncKey = useMemo(() => 'detail-chart-grid-sync', []);
 
     return (
         <div className="detail-chart-grid">
