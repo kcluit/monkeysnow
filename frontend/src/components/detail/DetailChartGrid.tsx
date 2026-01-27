@@ -95,7 +95,7 @@ function DetailChartGridInner({
         return selectedVariables.map((variable) => (
             <div
                 key={variable}
-                className="resort-card rounded-2xl p-4 shadow-lg"
+                className="resort-card rounded-none py-4 shadow-top-bottom"
             >
                 <ChartCard
                     data={data}
