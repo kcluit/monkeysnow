@@ -2,6 +2,7 @@
  * uPlot Option Builder
  *
  * Converts library-agnostic ChartConfig to uPlot-specific options object.
+ * Uses the new consolidated plugin architecture for better cohesion.
  */
 
 import type { ChartConfig } from '../../types';
@@ -9,7 +10,14 @@ import type uPlot from 'uplot';
 import { buildAxes } from './axesBuilder';
 import { buildScales } from './scalesBuilder';
 import { buildSeriesArray } from './seriesBuilders';
-import { markLinesPlugin, legendPlugin, zoomPlugin, tooltipPlugin, bandFillPlugin, labelsPlugin } from './plugins';
+import {
+    interactiveOverlayPlugin,
+    smartLabelsPlugin,
+    advancedZoomPlugin,
+    bandFillPlugin,
+    legendPlugin,
+    markLinesPlugin,
+} from './plugins';
 
 /** Default chart height if not specified */
 const DEFAULT_HEIGHT = 280;
