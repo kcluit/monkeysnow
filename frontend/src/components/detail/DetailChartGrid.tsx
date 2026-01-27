@@ -75,6 +75,7 @@ function DetailChartGridInner({
     selectedVariables,
     selectedAggregations,
     aggregationColors,
+    hideAggregationMembers,
     unitSystem,
     timezoneInfo,
     isChartLocked,
