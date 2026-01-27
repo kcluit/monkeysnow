@@ -91,12 +91,22 @@ export function buildUPlotOptions(
     // Add zoom plugin if enabled
     plugins.push(zoomPlugin(config.dataZoom));
 
+    // Add enhanced tooltip plugin
+    const xAxisLabels = config.xAxis.type === 'category' ? config.xAxis.data : undefined;
+    plugins.push(tooltipPlugin(config.tooltip, theme, xAxisLabels));
+
+    // Add band fill plugin for range visualization
+    plugins.push(bandFillPlugin(config.series));
+
+    // Add labels plugin for data point annotations
+    plugins.push(labelsPlugin(config.series, theme));
+
     // Add mark lines plugin if configured
     if (config.markLines && config.markLines.length > 0) {
         plugins.push(markLinesPlugin(config.markLines, theme));
     }
 
-    // Add legend plugin if enabled
+    // Add interactive legend plugin if enabled
     plugins.push(legendPlugin(config.legend, theme));
 
     // Build series configurations
