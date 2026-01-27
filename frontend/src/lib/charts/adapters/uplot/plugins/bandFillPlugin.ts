@@ -14,14 +14,11 @@ import { applyOpacity } from '../seriesBuilders';
  */
 export function bandFillPlugin(seriesConfigs: SeriesConfig[]): uPlot.Plugin {
     // Filter series with band configuration
-    const bandsToRender: Array<{
-        seriesIdx: number;
-        config: SeriesConfig;
-    }> = [];
+    const bandsToRender: SeriesConfig[] = [];
 
-    seriesConfigs.forEach((config, idx) => {
+    seriesConfigs.forEach((config) => {
         if (config.type === 'band' && config.bandData) {
-            bandsToRender.push({ seriesIdx: idx + 1, config }); // +1 for x-axis offset
+            bandsToRender.push(config);
         }
     });
 
