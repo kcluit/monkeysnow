@@ -175,6 +175,7 @@ export function DetailedResortView({
                         selectedVariables={selectedVariables}
                         selectedAggregations={selectedAggregations}
                         aggregationColors={aggregationColors}
+                        hideAggregationMembers={hideAggregationMembers}
                         unitSystem={unitSystem}
                         timezoneInfo={timezoneInfo ?? undefined}
                         isChartLocked={isChartLocked}
