@@ -197,24 +197,10 @@ function getAggregationDisplayName(aggType: AggregationType): string {
 
 /**
  * Get default color for aggregation type.
+ * Uses the single source of truth from aggregationOptions.
  */
 function getDefaultAggregationColor(aggType: AggregationType): string {
-    switch (aggType) {
-        case 'median':
-            return '#a855f7'; // Purple
-        case 'mean':
-            return '#ec4899'; // Pink
-        case 'min':
-            return '#14b8a6'; // Teal
-        case 'max':
-            return '#f97316'; // Orange
-        case 'p25':
-            return '#3b82f6'; // Blue
-        case 'p75':
-            return '#10b981'; // Emerald
-        default:
-            return '#8b5cf6'; // Default purple
-    }
+    return aggregationOptions.find(a => a.id === aggType)?.defaultColor ?? '#8b5cf6';
 }
 
 /**
