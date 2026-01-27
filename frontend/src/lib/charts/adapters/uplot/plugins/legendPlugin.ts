@@ -65,7 +65,9 @@ export function legendPlugin(
 
                     // Label text
                     const labelSpan = document.createElement('span');
-                    labelSpan.textContent = s.label ?? `Series ${i}`;
+                    // s.label can be string or HTMLElement in uPlot types
+                    const labelText = typeof s.label === 'string' ? s.label : `Series ${i}`;
+                    labelSpan.textContent = labelText;
                     labelSpan.style.cssText = `
                         overflow: hidden;
                         text-overflow: ellipsis;
