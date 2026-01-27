@@ -39,25 +39,26 @@ function formatTooltip(params: unknown): string {
     // Update the cache key
     lastTooltipCacheKey = cacheKey;
 
-    // Build tooltip - show all series when MAX_TOOLTIP_SERIES is 0
+    // Build tooltip - show all series in multi-column layout
     const header = first.axisValueLabel || '';
     const displayCount = MAX_TOOLTIP_SERIES > 0 ? Math.min(params.length, MAX_TOOLTIP_SERIES) : params.length;
     const hasMore = MAX_TOOLTIP_SERIES > 0 && params.length > MAX_TOOLTIP_SERIES;
 
-    // Pre-allocate array for faster join
-    const lines: string[] = [`<div style="font-weight:600;margin-bottom:4px">${header}</div>`];
+    // Build items for multi-column grid layout
+    const items: string[] = [];
     for (let i = 0; i < displayCount; i++) {
         const p = params[i] as { marker?: string; seriesName?: string; value?: unknown };
         if (p.value == null) continue;
         const val = typeof p.value === 'number' ? Math.round(p.value * 10) / 10 : p.value;
-        lines.push(`<div style="display:flex;justify-content:space-between;gap:12px"><span>${p.marker || ''}${p.seriesName || ''}</span><span style="font-weight:500">${val}</span></div>`);
+        items.push(`<div style="display:flex;justify-content:space-between;gap:8px;white-space:nowrap"><span>${p.marker || ''}${p.seriesName || ''}</span><span style="font-weight:500">${val}</span></div>`);
     }
 
     if (hasMore) {
-        lines.push(`<div style="color:#999;margin-top:4px">+${params.length - MAX_TOOLTIP_SERIES} more</div>`);
+        items.push(`<div style="color:#999">+${params.length - MAX_TOOLTIP_SERIES} more</div>`);
     }
 
-    pendingTooltipResult = lines.join('');
+    // Use CSS columns for multi-column layout
+    pendingTooltipResult = `<div style="font-weight:600;margin-bottom:6px">${header}</div><div style="columns:auto 180px;column-gap:16px">${items.join('')}</div>`;
     return pendingTooltipResult;
 }
 
