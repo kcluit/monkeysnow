@@ -45,7 +45,7 @@ export function DetailChartGrid({
                     }
                     location={location}
                     currentElevation={currentElevation}
-                    syncKey={syncKey}
+                    syncKey={CHART_SYNC_KEY}
                 />
             ))}
         </div>
