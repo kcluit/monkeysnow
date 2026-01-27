@@ -537,21 +537,6 @@ export function buildWeatherChartConfig(
     // Use provided theme or get from CSS
     const chartTheme = theme ?? getUPlotTheme();
 
-    // Build elevation mark lines if enabled
-    let markLines: MarkLineData[] | undefined;
-    if (settings?.showElevationLines && settings.location) {
-        markLines = buildElevationMarkLines(
-            settings.location,
-            settings.currentElevation,
-            unitSystem,
-            chartTheme
-        );
-    }
-
-    // When chart is locked, reduce bottom margin since there's no dataZoom slider
-    // Keep enough space (60px) for legend labels that may wrap to multiple lines
-    const gridBottom = 70;
-
     // Build secondary Y-axis config if accumulation is enabled
     const yAxisSecondary = hasAccumulation
         ? {
@@ -575,23 +560,10 @@ export function buildWeatherChartConfig(
         },
         yAxisSecondary,
         series: allSeries,
-        markLines,
-        tooltip: {
-            enabled: true,
-            trigger: 'axis',
-            interactionMode: 'stop',
-            appendToBody: false, // Keep in chart container for better performance
-            showAllSeries: true, // Show all series values at cursor position
-        },
-        legend: {
-            enabled: true,
-            position: 'bottom',
-            interactive: true, // Enable click-to-toggle series visibility
-        },
         grid: {
             top: 10,
             right: 0,
-            bottom: gridBottom,
+            bottom: 70,
             left: 0,
             containLabel: true,
         },
