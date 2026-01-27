@@ -13,6 +13,7 @@ import type { UnitSystem } from '../types';
 import type { ChartDisplayType, ElevationLocation } from '../types/chartSettings';
 import { getModelConfig, getVariableConfig } from './chartConfigurations';
 import { getEChartsTheme } from '../lib/charts';
+import { aggregationOptions } from '../data/modelHierarchy';
 
 /** Additional chart settings passed from WeatherChart component */
 export interface ChartBuildSettings {
