@@ -118,6 +118,39 @@ function calculateMean(values: number[]): number {
 }
 
 /**
+ * Calculate minimum of an array of numbers.
+ */
+function calculateMin(values: number[]): number {
+    if (values.length === 0) return 0;
+    return Math.min(...values);
+}
+
+/**
+ * Calculate maximum of an array of numbers.
+ */
+function calculateMax(values: number[]): number {
+    if (values.length === 0) return 0;
+    return Math.max(...values);
+}
+
+/**
+ * Calculate percentile of an array of numbers.
+ * @param values - Array of numbers
+ * @param percentile - Percentile to calculate (0-100)
+ */
+function calculatePercentile(values: number[], percentile: number): number {
+    if (values.length === 0) return 0;
+    const sorted = [...values].sort((a, b) => a - b);
+    const index = (percentile / 100) * (sorted.length - 1);
+    const lower = Math.floor(index);
+    const upper = Math.ceil(index);
+    if (lower === upper) return sorted[lower];
+    // Linear interpolation between lower and upper bounds
+    const fraction = index - lower;
+    return sorted[lower] + fraction * (sorted[upper] - sorted[lower]);
+}
+
+/**
  * Calculate aggregation series (median/mean) from model data.
  */
 function calculateAggregationSeries(
