@@ -19,9 +19,6 @@ import { aggregationOptions } from '../data/modelHierarchy';
 export interface ChartBuildSettings {
     chartTypeOverride?: ChartDisplayType;
     showAccumulation?: boolean;
-    showElevationLines?: boolean;
-    location?: ElevationLocation;
-    currentElevation?: number;
 }
 
 /**
