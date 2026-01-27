@@ -198,6 +198,8 @@ export function WeatherChart({
                 onChartTypeChange={setChartType}
                 showAccumulation={showAccumulation}
                 onAccumulationChange={setShowAccumulation}
+                zoomSyncExcluded={zoomSyncExcluded}
+                onZoomSyncExcludedChange={setZoomSyncExcluded}
             />
         </div>
     );
