@@ -16,8 +16,6 @@ import type { WeatherChartProps } from '../../types/detailView';
 import type { ChartDisplayType } from '../../types/chartSettings';
 
 interface WeatherChartComponentProps extends WeatherChartProps {
-    /** Sync key for coordinating zoom/pan across charts */
-    syncKey?: string;
 }
 
 export function WeatherChart({
@@ -33,7 +31,6 @@ export function WeatherChart({
     onToggleVisibility,
     location,
     currentElevation,
-    syncKey,
 }: WeatherChartComponentProps): JSX.Element {
     const variableConfig = getVariableConfig(variable);
 
@@ -190,7 +187,6 @@ export function WeatherChart({
             {/* Chart */}
             <UPlotChart
                 config={chartConfig}
-                syncKey={isChartLocked ? undefined : syncKey}
                 className="weather-chart-canvas"
             />
 
