@@ -7,44 +7,11 @@
 
 import type uPlot from 'uplot';
 import type { SeriesConfig } from '../types';
+import { colorWithOpacity } from '../utils/colorUtils';
 
 export interface BandFillPluginOptions {
     /** Series configurations that include band data */
     series: SeriesConfig[];
-}
-
-/**
- * Parse color and apply opacity.
- */
-function colorWithOpacity(color: string, opacity: number): string {
-    // Handle hex colors
-    if (color.startsWith('#')) {
-        const hex = color.slice(1);
-        let r: number, g: number, b: number;
-
-        if (hex.length === 3) {
-            r = parseInt(hex[0] + hex[0], 16);
-            g = parseInt(hex[1] + hex[1], 16);
-            b = parseInt(hex[2] + hex[2], 16);
-        } else {
-            r = parseInt(hex.slice(0, 2), 16);
-            g = parseInt(hex.slice(2, 4), 16);
-            b = parseInt(hex.slice(4, 6), 16);
-        }
-
-        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-    }
-
-    // Handle rgb/rgba colors
-    if (color.startsWith('rgb')) {
-        const match = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-        if (match) {
-            return `rgba(${match[1]}, ${match[2]}, ${match[3]}, ${opacity})`;
-        }
-    }
-
-    // Fallback
-    return color;
 }
 
 export function createBandFillPlugin(options: BandFillPluginOptions): uPlot.Plugin {
