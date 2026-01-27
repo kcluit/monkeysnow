@@ -1,11 +1,59 @@
 /**
  * uPlot Scales Builder
  *
- * Builds scale configurations for Y-axes.
+ * Builds scale configurations for Y-axes with smart minimum range handling.
  */
 
 import type { ChartConfig } from '../../types';
 import type uPlot from 'uplot';
+
+/** Default minimum range for flat data to ensure visible scale */
+const DEFAULT_MIN_RANGE = 5;
+
+/**
+ * Calculate smart Y-axis range with minimum spread for flat data.
+ * Prevents invisible scales when all values are the same (e.g., all zeros for snowfall).
+ */
+function getSmartRange(
+    dataMin: number,
+    dataMax: number,
+    domain: [number | 'auto', number | 'auto'],
+    minRange: number = DEFAULT_MIN_RANGE
+): [number, number] {
+    // Apply domain constraints
+    let min = domain[0] === 'auto' ? dataMin : (domain[0] as number);
+    let max = domain[1] === 'auto' ? dataMax : (domain[1] as number);
+
+    const range = max - min;
+
+    // Handle flat data (range is very small or zero)
+    // This commonly happens with snowfall when all values are 0
+    if (range < minRange) {
+        const center = (min + max) / 2;
+
+        // If domain has a fixed minimum (like 0 for snowfall), respect it
+        if (domain[0] !== 'auto') {
+            // Fixed min, expand max only
+            max = min + minRange;
+        } else if (domain[1] !== 'auto') {
+            // Fixed max, expand min only
+            min = max - minRange;
+        } else {
+            // Both auto, expand symmetrically from center
+            min = center - minRange / 2;
+            max = center + minRange / 2;
+        }
+    }
+
+    // Add padding (5% of range or minimum range, whichever is used)
+    const effectiveRange = max - min;
+    const padding = effectiveRange * 0.05;
+
+    return [
+        domain[0] === 'auto' ? min - padding : min,
+        domain[1] === 'auto' ? max + padding : max,
+    ];
+}
 
 /**
  * Build scales configuration for uPlot.
@@ -20,7 +68,7 @@ export function buildScales(config: ChartConfig): Record<string, uPlot.Scale> {
             time: false, // Not a time scale, using indices
         },
 
-        // Primary Y-axis scale
+        // Primary Y-axis scale with smart minimum range
         y: {
             auto: primaryDomain[0] === 'auto' && primaryDomain[1] === 'auto',
             range: (
@@ -28,19 +76,7 @@ export function buildScales(config: ChartConfig): Record<string, uPlot.Scale> {
                 dataMin: number,
                 dataMax: number
             ): [number, number] => {
-                const min =
-                    primaryDomain[0] === 'auto' ? dataMin : (primaryDomain[0] as number);
-                const max =
-                    primaryDomain[1] === 'auto' ? dataMax : (primaryDomain[1] as number);
-
-                // Add padding
-                const range = max - min || 1;
-                const padding = range * 0.05;
-
-                return [
-                    primaryDomain[0] === 'auto' ? min - padding : min,
-                    primaryDomain[1] === 'auto' ? max + padding : max,
-                ];
+                return getSmartRange(dataMin, dataMax, primaryDomain);
             },
         },
     };
@@ -56,23 +92,7 @@ export function buildScales(config: ChartConfig): Record<string, uPlot.Scale> {
                 dataMin: number,
                 dataMax: number
             ): [number, number] => {
-                const min =
-                    secondaryDomain[0] === 'auto'
-                        ? dataMin
-                        : (secondaryDomain[0] as number);
-                const max =
-                    secondaryDomain[1] === 'auto'
-                        ? dataMax
-                        : (secondaryDomain[1] as number);
-
-                // Add padding
-                const range = max - min || 1;
-                const padding = range * 0.05;
-
-                return [
-                    secondaryDomain[0] === 'auto' ? min - padding : min,
-                    secondaryDomain[1] === 'auto' ? max + padding : max,
-                ];
+                return getSmartRange(dataMin, dataMax, secondaryDomain);
             },
         };
     }
