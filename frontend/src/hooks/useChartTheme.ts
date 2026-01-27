@@ -7,7 +7,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { ChartTheme } from '../lib/charts';
-import { getEChartsTheme } from '../lib/charts';
+import { getUPlotTheme } from '../lib/charts';
 
 /**
  * Debounce delay in milliseconds.
@@ -20,7 +20,7 @@ const DEBOUNCE_DELAY = 100;
  * Observes CSS variable changes on document root with debouncing.
  */
 export function useChartTheme(): ChartTheme {
-  const [theme, setTheme] = useState(() => getEChartsTheme());
+  const [theme, setTheme] = useState(() => getUPlotTheme());
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Debounced theme update function
@@ -29,7 +29,7 @@ export function useChartTheme(): ChartTheme {
       clearTimeout(timeoutRef.current);
     }
     timeoutRef.current = setTimeout(() => {
-      setTheme(getEChartsTheme());
+      setTheme(getUPlotTheme());
     }, DEBOUNCE_DELAY);
   }, []);
 
