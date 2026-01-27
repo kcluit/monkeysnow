@@ -12,6 +12,7 @@ interface ChartCardProps {
     selectedModels: DetailChartGridProps['selectedModels'];
     selectedAggregations: DetailChartGridProps['selectedAggregations'];
     aggregationColors: DetailChartGridProps['aggregationColors'];
+    hideAggregationMembers?: DetailChartGridProps['hideAggregationMembers'];
     variable: WeatherVariable;
     unitSystem: DetailChartGridProps['unitSystem'];
     timezoneInfo: DetailChartGridProps['timezoneInfo'];
