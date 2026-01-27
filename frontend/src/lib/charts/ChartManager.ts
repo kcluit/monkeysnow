@@ -8,13 +8,7 @@
 import uPlot from 'uplot';
 import 'uplot/dist/uPlot.min.css';
 import type { ChartConfig } from './types';
-import {
-    createZoomPlugin,
-    createTooltipPlugin,
-    createLegendPlugin,
-    createMarkLinesPlugin,
-    createBandFillPlugin,
-} from './plugins';
+import { createZoomPlugin, createBandFillPlugin } from './plugins';
 import { colorWithOpacity } from './utils/colorUtils';
 
 export interface ChartManagerOptions {
