@@ -616,6 +616,7 @@ export function buildWeatherChartConfig(
             trigger: 'axis',
             interactionMode: 'stop',
             appendToBody: false, // Keep in chart container for better performance
+            showAllSeries: true, // Show all series values at cursor position
         },
         legend: {
             enabled: true,
