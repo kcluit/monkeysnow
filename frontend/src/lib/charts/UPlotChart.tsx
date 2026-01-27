@@ -47,7 +47,7 @@ function transformToUPlotData(config: ChartConfig): uPlot.AlignedData {
  * Build uPlot series configuration from ChartConfig.
  */
 function buildUPlotSeries(config: ChartConfig): uPlot.Series[] {
-    const { series, theme } = config;
+    const { series } = config;
 
     // First series is always x-axis placeholder
     const uplotSeries: uPlot.Series[] = [{}];
