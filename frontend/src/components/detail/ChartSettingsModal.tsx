@@ -38,24 +38,18 @@ export function ChartSettingsModal({
     onChartTypeChange,
     showAccumulation,
     onAccumulationChange,
-    showElevationLines,
-    onElevationLinesChange,
-    location,
-    currentElevation,
 }: ChartSettingsModalProps): JSX.Element | null {
     // Local state for changes before applying
     const [localChartType, setLocalChartType] = useState(chartType);
     const [localShowAccumulation, setLocalShowAccumulation] = useState(showAccumulation);
-    const [localShowElevationLines, setLocalShowElevationLines] = useState(showElevationLines);
 
     // Sync local state when modal opens
     useEffect(() => {
         if (isOpen) {
             setLocalChartType(chartType);
             setLocalShowAccumulation(showAccumulation);
-            setLocalShowElevationLines(showElevationLines);
         }
-    }, [isOpen, chartType, showAccumulation, showElevationLines]);
+    }, [isOpen, chartType, showAccumulation]);
 
     // Prevent body scroll when open
     useEffect(() => {
