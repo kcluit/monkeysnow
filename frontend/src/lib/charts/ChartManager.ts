@@ -181,23 +181,6 @@ function buildUPlotScales(config: ChartConfig): uPlot.Scales {
 }
 
 /**
- * Extract zoom state from a uPlot instance.
- */
-function extractZoomState(u: uPlot): ZoomState | null {
-    const xScale = u.scales.x;
-    if (!xScale || xScale.min === undefined || xScale.max === undefined) {
-        return null;
-    }
-
-    const min = xScale.min;
-    const max = xScale.max;
-    const initialMin = (xScale as any)._initialMin ?? min;
-    const initialMax = (xScale as any)._initialMax ?? max;
-
-    return { min, max, initialMin, initialMax };
-}
-
-/**
  * ChartManager - Manages uPlot lifecycle independently of React
  */
 export class ChartManager {
