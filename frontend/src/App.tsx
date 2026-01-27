@@ -250,6 +250,25 @@ function App(): JSX.Element {
                     },
                 ],
             },
+            {
+                id: 'chart-zoom-sync',
+                name: 'Sync chart zoom',
+                icon: '🔗',
+                subCommands: [
+                    {
+                        id: 'chart-zoom-sync-on',
+                        name: 'On',
+                        icon: chartZoomSyncEnabled ? '✔️' : '',
+                        action: () => setChartZoomSyncEnabled(true),
+                    },
+                    {
+                        id: 'chart-zoom-sync-off',
+                        name: 'Off',
+                        icon: !chartZoomSyncEnabled ? '✔️' : '',
+                        action: () => setChartZoomSyncEnabled(false),
+                    },
+                ],
+            },
         ];
 
         // Control panel commands
