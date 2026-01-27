@@ -49,6 +49,10 @@ const STRESS_TEST_MODELS: WeatherModel[] = [
 const DEFAULT_AGGREGATION_COLORS: Record<AggregationType, string> = {
     median: '#a855f7',
     mean: '#ec4899',
+    min: '#14b8a6',
+    max: '#f97316',
+    p25: '#3b82f6',
+    p75: '#10b981',
 };
 
 /**
