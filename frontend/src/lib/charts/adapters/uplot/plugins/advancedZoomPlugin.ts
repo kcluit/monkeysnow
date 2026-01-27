@@ -106,7 +106,10 @@ export function advancedZoomPlugin(
         }
 
         const yRange = yMax - yMin;
-        const dataLength = u.data[0]?.length ?? 1;
+        const dataLength = u.data[0]?.length ?? 0;
+
+        // Guard against empty or single-point data (can't draw meaningful overview)
+        if (dataLength <= 1) return;
 
         // Draw simplified line chart for each visible series
         u.series.forEach((s, i) => {
