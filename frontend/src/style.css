@@ -1543,6 +1543,30 @@ input[type="checkbox"] {
     background: rgba(10, 132, 255, 0.1);
 }
 
+/* Hide aggregation members toggle button */
+.aggregation-hide-toggle {
+    margin-left: auto;
+    padding: 4px 8px;
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+    border-radius: 6px;
+    background: var(--secondary, #2c2c2e);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.15s ease;
+    opacity: 0.7;
+}
+
+.aggregation-hide-toggle:hover {
+    background: var(--cardBg, #3c3c3e);
+    opacity: 1;
+}
+
+.aggregation-hide-toggle.active {
+    background: var(--accent, #0a84ff);
+    border-color: var(--accent, #0a84ff);
+    opacity: 1;
+}
+
 /* Responsive adjustments for model grid */
 @media (max-width: 768px) {
     .model-grid-modal {
