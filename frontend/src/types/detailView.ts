@@ -92,8 +92,6 @@ export interface DetailChartGridProps {
     timezoneInfo?: TimezoneInfo;
     isChartLocked?: boolean;
     onToggleVariable?: (variable: WeatherVariable) => void;
-    location?: ElevationLocation;
-    currentElevation?: number;
 }
 
 export interface WeatherChartProps {
