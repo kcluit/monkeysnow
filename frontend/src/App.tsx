@@ -573,9 +573,8 @@ function App(): JSX.Element {
                                 </div>
                             )}
                         </div>
-                    </>
+                    </div>
                 )}
-            </div>
         </div>
     );
 }
