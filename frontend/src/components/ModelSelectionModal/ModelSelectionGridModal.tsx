@@ -492,6 +492,8 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
                   onDeselectAll={deselectAllInNode}
                   getSelectionState={getSelectionState}
                   onColorChange={setAggregationColor}
+                  hideAggregationMembers={hideAggregationMembers}
+                  onToggleHideMembers={onToggleHideMembers}
                 />
               ))}
             </div>
