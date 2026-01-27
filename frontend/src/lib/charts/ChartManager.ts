@@ -16,7 +16,6 @@ import {
     createBandFillPlugin,
 } from './plugins';
 import { colorWithOpacity } from './utils/colorUtils';
-import type { ZoomState } from './utils/zoomState';
 
 export interface ChartManagerOptions {
     /** Callback when series visibility changes */
