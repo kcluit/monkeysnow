@@ -2,26 +2,25 @@
  * UPlot Chart Component
  *
  * React wrapper for uPlot that handles lifecycle, plugins, and data transformation.
+ * Supports data-only updates via setData() to preserve zoom state.
  */
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useMemo } from 'react';
 import uPlot from 'uplot';
 import 'uplot/dist/uPlot.min.css';
-import type { ChartConfig } from './types';
+import type { ChartConfig, SeriesDefinition } from './types';
 import {
     createZoomPlugin,
     createTooltipPlugin,
     createLegendPlugin,
-    createSyncPlugin,
     createMarkLinesPlugin,
     createBandFillPlugin,
 } from './plugins';
 import { colorWithOpacity } from './utils/colorUtils';
+import { extractZoomState, type ZoomState } from './utils/zoomState';
 
 export interface UPlotChartProps {
     config: ChartConfig;
-    /** Sync key for coordinating zoom/pan across charts */
-    syncKey?: string;
     /** Additional CSS class */
     className?: string;
     /** Callback when series visibility changes */
@@ -188,21 +187,79 @@ function buildUPlotScales(config: ChartConfig): uPlot.Scales {
     return scales;
 }
 
+/**
+ * Extract series definition for structural comparison.
+ */
+function extractSeriesDefinition(series: ChartConfig['series'][0]): SeriesDefinition {
+    return {
+        id: series.id,
+        name: series.name,
+        color: series.color,
+        type: series.type,
+        lineWidth: series.lineWidth,
+        opacity: series.opacity,
+        fillOpacity: series.fillOpacity,
+        lineStyle: series.lineStyle,
+        zIndex: series.zIndex,
+        yAxisIndex: series.yAxisIndex,
+        hasBandData: !!series.bandData,
+    };
+}
+
+/**
+ * Generate a structural key for comparison.
+ * Only changes to structural properties should trigger a chart rebuild.
+ */
+function getStructuralKey(config: ChartConfig): string {
+    return JSON.stringify({
+        type: config.type,
+        xAxisType: config.xAxis.type,
+        seriesIds: config.series.map(s => s.id),
+        seriesTypes: config.series.map(s => s.type),
+        seriesColors: config.series.map(s => s.color),
+        seriesYAxisIndex: config.series.map(s => s.yAxisIndex ?? 0),
+        hasBandData: config.series.map(s => !!s.bandData),
+        hasSecondaryAxis: !!config.yAxisSecondary,
+        hasMarkLines: !!config.markLines?.length,
+        markLineCount: config.markLines?.length ?? 0,
+        dataZoomEnabled: config.dataZoom?.enabled ?? false,
+        height: config.height,
+        // Theme affects colors so include key colors
+        themeAccent: config.theme.accent,
+        themeBackground: config.theme.background,
+    });
+}
+
 export function UPlotChart({
     config,
-    syncKey,
     className,
     onSeriesToggle,
 }: UPlotChartProps): JSX.Element {
     const containerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<uPlot | null>(null);
+    const structuralKeyRef = useRef<string>('');
+    const zoomStateRef = useRef<ZoomState | null>(null);
 
-    // Build chart
-    const buildChart = useCallback(() => {
+    // Compute structural key for the current config
+    const currentStructuralKey = useMemo(() => getStructuralKey(config), [config]);
+
+    // Transform data for uPlot
+    const uplotData = useMemo(() => transformToUPlotData(config), [config]);
+
+    // Build chart (called on structural changes)
+    const buildChart = useCallback((initialZoomState: ZoomState | null = null) => {
         if (!containerRef.current) return;
 
+        console.log('[UPlotChart] buildChart called', {
+            configId: config.series[0]?.name,
+            hasInitialZoom: !!initialZoomState,
+        });
+
         // Destroy existing chart
-        chartRef.current?.destroy();
+        if (chartRef.current) {
+            console.log('[UPlotChart] Destroying existing chart');
+            chartRef.current.destroy();
+        }
 
         const width = containerRef.current.offsetWidth;
         const { theme, tooltip, legend, dataZoom, markLines, series } = config;
@@ -212,12 +269,9 @@ export function UPlotChart({
 
         // Zoom plugin (if enabled)
         if (dataZoom?.enabled) {
-            plugins.push(createZoomPlugin({}));
-        }
-
-        // Sync plugin (if syncKey provided)
-        if (syncKey) {
-            plugins.push(createSyncPlugin({ syncKey }));
+            plugins.push(createZoomPlugin({
+                initialZoomState,
+            }));
         }
 
         // Tooltip plugin
@@ -276,12 +330,7 @@ export function UPlotChart({
             cursor: {
                 drag: { x: false, y: false }, // Handled by zoom plugin
                 focus: { prox: 30 },
-                sync: syncKey
-                    ? {
-                          key: syncKey,
-                          setSeries: true,
-                      }
-                    : undefined,
+                sync: undefined,
             },
             legend: {
                 show: false, // Custom legend via plugin
@@ -294,22 +343,50 @@ export function UPlotChart({
             ],
         };
 
-        // Transform data
-        const data = transformToUPlotData(config);
-
         // Create chart
-        chartRef.current = new uPlot(opts, data, containerRef.current);
-    }, [config, syncKey, onSeriesToggle]);
+        chartRef.current = new uPlot(opts, uplotData, containerRef.current);
+    }, [config, onSeriesToggle, uplotData]);
 
-    // Initialize chart
+    // Handle structural changes (requires rebuild)
     useEffect(() => {
-        buildChart();
+        const isStructuralChange = currentStructuralKey !== structuralKeyRef.current;
+
+        if (isStructuralChange) {
+            console.log('[UPlotChart] Structural change detected - rebuilding chart');
+
+            // Save zoom state before destroying
+            if (chartRef.current) {
+                zoomStateRef.current = extractZoomState(chartRef.current);
+            }
+
+            // Update structural key
+            structuralKeyRef.current = currentStructuralKey;
+
+            // Rebuild with restored zoom
+            buildChart(zoomStateRef.current);
+        }
 
         return () => {
-            chartRef.current?.destroy();
-            chartRef.current = null;
+            // Cleanup on unmount
+            if (chartRef.current) {
+                chartRef.current.destroy();
+                chartRef.current = null;
+            }
         };
-    }, [buildChart]);
+    }, [currentStructuralKey, buildChart]);
+
+    // Handle data-only changes (use setData)
+    useEffect(() => {
+        // Skip if no chart or if this is a structural change (handled above)
+        if (!chartRef.current || currentStructuralKey !== structuralKeyRef.current) {
+            return;
+        }
+
+        console.log('[UPlotChart] Data-only update - using setData()');
+
+        // Use setData() to update data without rebuilding
+        chartRef.current.setData(uplotData);
+    }, [uplotData, currentStructuralKey]);
 
     // Handle resize
     useEffect(() => {
