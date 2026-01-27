@@ -64,16 +64,16 @@ export function legendPlugin(
                     `;
 
                     // Label text
-                    const label = document.createElement('span');
-                    label.textContent = s.label ?? `Series ${i}`;
-                    label.style.cssText = `
+                    const labelSpan = document.createElement('span');
+                    labelSpan.textContent = s.label ?? `Series ${i}`;
+                    labelSpan.style.cssText = `
                         overflow: hidden;
                         text-overflow: ellipsis;
                     `;
 
                     item.appendChild(dot);
-                    item.appendChild(label);
-                    legendEl.appendChild(item);
+                    item.appendChild(labelSpan);
+                    legendEl!.appendChild(item);
                 });
 
                 // Append to chart container
