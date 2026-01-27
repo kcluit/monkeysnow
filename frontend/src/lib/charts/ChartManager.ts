@@ -330,6 +330,29 @@ export class ChartManager {
     }
 
     /**
+     * Apply zoom from another chart (sync) without re-broadcasting.
+     */
+    private applyExternalZoom(min: number, max: number): void {
+        if (!this.chart || this.isDestroyed) return;
+
+        this.isApplyingExternalZoom = true;
+        try {
+            this.chart.batch(() => {
+                this.chart!.setScale('x', { min, max });
+            });
+        } finally {
+            this.isApplyingExternalZoom = false;
+        }
+    }
+
+    /**
+     * Get the chart ID.
+     */
+    getChartId(): string {
+        return this.chartId;
+    }
+
+    /**
      * Destroy the chart and clean up resources.
      */
     destroy(): void {
@@ -338,6 +361,12 @@ export class ChartManager {
         console.log('[ChartManager] Destroying');
 
         this.isDestroyed = true;
+
+        // Unsubscribe from zoom events
+        if (this.unsubscribeZoom) {
+            this.unsubscribeZoom();
+            this.unsubscribeZoom = null;
+        }
 
         if (this.resizeObserver) {
             this.resizeObserver.disconnect();
