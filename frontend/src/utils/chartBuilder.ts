@@ -421,6 +421,7 @@ export function buildWeatherChartConfig(
         selectedModels,
         selectedAggregations = [],
         aggregationColors = { median: '#a855f7', mean: '#ec4899' },
+        hideAggregationMembers = false,
         variable,
         unitSystem,
         timezoneInfo,
