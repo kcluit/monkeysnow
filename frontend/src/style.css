@@ -1831,3 +1831,124 @@ input[type="checkbox"] {
     width: 16px;
     height: 16px;
 }
+
+/* ========================================
+   Detail Chart Grid - uPlot Weather Charts
+   ======================================== */
+
+.detail-chart-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+@media (min-width: 1024px) {
+    .detail-chart-grid {
+        padding: 1.5rem 2rem;
+    }
+}
+
+/* Individual Weather Chart */
+.weather-chart {
+    background: var(--cardBg, #1a1a1c);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    border: 1px solid var(--border, #2c2c2e);
+}
+
+.weather-chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    padding: 0 0.25rem;
+}
+
+.weather-chart-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--textPrimary, #f5f5f7);
+}
+
+.weather-chart-color-indicator {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.weather-chart-actions {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.weather-chart-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: var(--textSecondary, #a1a1a6);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.weather-chart-btn:hover {
+    background: var(--secondary, rgba(255, 255, 255, 0.1));
+    color: var(--textPrimary, #f5f5f7);
+}
+
+.weather-chart-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.weather-chart-canvas {
+    width: 100%;
+}
+
+.weather-chart-no-data {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 0.875rem;
+}
+
+.weather-chart-empty {
+    opacity: 0.6;
+}
+
+/* uPlot customizations */
+.uplot {
+    font-family: inherit;
+}
+
+.uplot .u-legend {
+    display: none; /* We use our custom legend plugin */
+}
+
+/* Custom legend styling (via plugin) */
+.uplot-legend {
+    font-family: inherit;
+}
+
+.uplot-legend-item {
+    user-select: none;
+}
+
+/* Tooltip styling (via plugin) */
+.uplot-tooltip {
+    font-family: inherit;
+}
