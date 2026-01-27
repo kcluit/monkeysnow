@@ -85,7 +85,13 @@ function App(): JSX.Element {
     const [viewMode, setViewMode] = useLocalStorage<ViewMode>('viewMode', 'default');
     const [selectedTemperatureMetric, setSelectedTemperatureMetric] = useLocalStorage<TemperatureMetric>('temperatureMetric', defaultTemperatureMetric);
     const [snowfallEstimateMode, setSnowfallEstimateMode] = useLocalStorage<SnowfallEstimateMode>('snowfallEstimateMode', 'model');
+    const [chartZoomSyncEnabled, setChartZoomSyncEnabled] = useLocalStorage<boolean>('chartZoomSync', true);
     const [unitSystem, setUnitSystem] = useUnitSystem();
+
+    // Sync chart zoom sync setting to registry
+    useEffect(() => {
+        setGlobalZoomSync(chartZoomSyncEnabled);
+    }, [chartZoomSyncEnabled]);
     const [resortData, setResortData] = useState<Map<string, ProcessedResortData>>(new Map());
 
     // Resort hierarchy hook for modal
