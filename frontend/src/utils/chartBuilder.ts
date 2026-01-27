@@ -403,18 +403,16 @@ export function buildWeatherChartConfig(
     theme?: ChartTheme,
     settings?: ChartBuildSettings
 ): ChartConfig | null {
+    // Build default colors from single source of truth
+    const defaultAggregationColors = Object.fromEntries(
+        aggregationOptions.map(a => [a.id, a.defaultColor])
+    ) as Record<AggregationType, string>;
+
     const {
         data,
         selectedModels,
         selectedAggregations = [],
-        aggregationColors = {
-            median: '#a855f7',
-            mean: '#ec4899',
-            min: '#14b8a6',
-            max: '#f97316',
-            p25: '#3b82f6',
-            p75: '#10b981',
-        },
+        aggregationColors = defaultAggregationColors,
         hideAggregationMembers = false,
         variable,
         unitSystem,
