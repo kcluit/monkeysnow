@@ -512,9 +512,6 @@ export function buildWeatherChartConfig(
     // Keep enough space (60px) for legend labels that may wrap to multiple lines
     const gridBottom = isChartLocked ? 60 : 80;
 
-    // Need more space on right when accumulation has secondary Y-axis
-    const gridRight = hasAccumulation ? 50 : 30;
-
     // Build secondary Y-axis config if accumulation is enabled
     const yAxisSecondary = hasAccumulation
         ? {
