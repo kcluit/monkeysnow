@@ -52,22 +52,6 @@ export interface YAxisConfig {
     formatter: (value: number) => string;
 }
 
-/** Tooltip configuration */
-export interface TooltipConfig {
-    enabled: boolean;
-    trigger: 'axis' | 'item';
-    interactionMode: 'stop' | 'follow';
-    appendToBody: boolean;
-    showAllSeries: boolean;
-}
-
-/** Legend configuration */
-export interface LegendConfig {
-    enabled: boolean;
-    position: 'top' | 'bottom';
-    interactive: boolean;
-}
-
 /** Grid padding configuration */
 export interface GridConfig {
     top: number;
