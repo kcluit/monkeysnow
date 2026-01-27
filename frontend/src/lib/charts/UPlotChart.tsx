@@ -16,6 +16,7 @@ import {
     createMarkLinesPlugin,
     createBandFillPlugin,
 } from './plugins';
+import { colorWithOpacity } from './utils/colorUtils';
 
 export interface UPlotChartProps {
     config: ChartConfig;
