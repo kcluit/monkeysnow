@@ -406,8 +406,12 @@ export function advancedZoomPlugin(
                         const rect = overviewCanvas.getBoundingClientRect();
                         const mouseX = e.clientX - rect.left;
                         const dx = mouseX - overviewDragStartX;
-                        const dataLength = u.data[0]?.length ?? 1;
+                        const dataLength = u.data[0]?.length ?? 0;
                         const padding = 4;
+
+                        // Guard against division by zero
+                        if (dataLength <= 1) return;
+
                         const pxPerUnit = (rect.width - padding * 2) / (dataLength - 1);
                         const unitOffset = dx / pxPerUnit;
 
