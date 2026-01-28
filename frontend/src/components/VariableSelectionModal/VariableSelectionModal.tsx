@@ -275,11 +275,9 @@ export function VariableSelectionModal({
 
         {/* Footer */}
         <div className="command-palette-footer">
-          {isSearching && (
-            <span className="command-hint">
-              <kbd>↕</kbd> drag to reorder
-            </span>
-          )}
+          <span className="command-hint">
+            <kbd>↕</kbd> drag to reorder
+          </span>
           <span className="command-hint">
             <kbd>esc</kbd> close
           </span>
