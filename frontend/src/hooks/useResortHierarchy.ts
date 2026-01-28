@@ -285,6 +285,7 @@ export function useResortHierarchy({
     selectAllInNode,
     deselectAllInNode,
     getSelectionState,
+    getResortsUnderNode: cachedGetResortsUnderNode,
 
     // Keyboard navigation
     selectedIndex,
