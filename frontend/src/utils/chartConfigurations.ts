@@ -284,6 +284,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     chartType: 'line',
     formatValue: (v, u) => u === 'metric' ? `${(v / 1000).toFixed(1)}km` : `${(mToFt(v) / 5280).toFixed(1)}mi`,
     convertToImperial: mToFt,
+    description: 'Viewing distance influenced by clouds, humidity and aerosols',
   }],
   ['freezing_level_height', {
     id: 'freezing_level_height',
