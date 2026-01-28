@@ -149,40 +149,40 @@ function App(): JSX.Element {
             {
                 id: 'theme',
                 name: 'Theme',
-                icon: '🌗',
+                icon: icons.theme,
                 subCommands: availableThemes.map((t) => ({
                     id: `theme-${t.id}`,
                     name: t.name,
-                    icon: t.isDark ? '🌑' : '🌕',
+                    icon: t.isDark ? icons.dark : icons.light,
                     action: () => setTheme(t.id),
                 })),
             },
             {
                 id: 'font',
                 name: 'Font',
-                icon: '📄',
+                icon: icons.font,
                 subCommands: availableFonts.map((f) => ({
                     id: `font-${f.id}`,
                     name: f.name,
-                    icon: f.isMonospace ? '💾' : '📝',
+                    icon: f.isMonospace ? icons.monospace : icons.regular,
                     action: () => setFont(f.id),
                 })),
             },
             {
                 id: 'rainbow',
                 name: 'Rainbow text',
-                icon: '💎',
+                icon: icons.rainbow,
                 subCommands: [
                     {
                         id: 'rainbow-on',
                         name: 'On',
-                        icon: isRainbowEnabled ? '✔️' : '',
+                        icon: isRainbowEnabled ? icons.check : undefined,
                         action: () => setRainbowEnabled(true),
                     },
                     {
                         id: 'rainbow-off',
                         name: 'Off',
-                        icon: !isRainbowEnabled ? '✔️' : '',
+                        icon: !isRainbowEnabled ? icons.check : undefined,
                         action: () => setRainbowEnabled(false),
                     },
                 ],
@@ -190,19 +190,19 @@ function App(): JSX.Element {
             {
                 id: 'fullscreen',
                 name: 'Fullscreen',
-                icon: '📺',
+                icon: icons.fullscreen,
                 shortcut: 'F11',
                 subCommands: [
                     {
                         id: 'fullscreen-on',
                         name: 'On',
-                        icon: isFullscreen ? '✔️' : '',
+                        icon: isFullscreen ? icons.check : undefined,
                         action: enterFullscreen,
                     },
                     {
                         id: 'fullscreen-off',
                         name: 'Off',
-                        icon: !isFullscreen ? '✔️' : '',
+                        icon: !isFullscreen ? icons.check : undefined,
                         action: exitFullscreen,
                     },
                 ],
@@ -210,56 +210,56 @@ function App(): JSX.Element {
             {
                 id: 'fps',
                 name: 'FPS counter',
-                icon: '⚡',
+                icon: icons.fps,
                 subCommands: [
                     {
                         id: 'fps-on',
                         name: 'On',
-                        icon: isFPSEnabled ? '✔️' : '',
+                        icon: isFPSEnabled ? icons.check : undefined,
                         action: () => setFPSEnabled(true),
                     },
                     {
                         id: 'fps-off',
                         name: 'Off',
-                        icon: !isFPSEnabled ? '✔️' : '',
+                        icon: !isFPSEnabled ? icons.check : undefined,
                         action: () => setFPSEnabled(false),
                     },
                 ],
             },
             {
-                id: 'hide-emoji',
-                name: 'Hide emoji',
-                icon: '👻',
+                id: 'hide-icons',
+                name: 'Hide icons',
+                icon: icons.hideIcons,
                 subCommands: [
                     {
-                        id: 'hide-emoji-on',
+                        id: 'hide-icons-on',
                         name: 'On',
-                        icon: isHideEmojiEnabled ? '✔️' : '',
-                        action: () => setHideEmojiEnabled(true),
+                        icon: isHideIconsEnabled ? icons.check : undefined,
+                        action: () => setHideIconsEnabled(true),
                     },
                     {
-                        id: 'hide-emoji-off',
+                        id: 'hide-icons-off',
                         name: 'Off',
-                        icon: !isHideEmojiEnabled ? '✔️' : '',
-                        action: () => setHideEmojiEnabled(false),
+                        icon: !isHideIconsEnabled ? icons.check : undefined,
+                        action: () => setHideIconsEnabled(false),
                     },
                 ],
             },
             {
                 id: 'show-borders',
                 name: 'Show borders',
-                icon: '🔲',
+                icon: icons.borders,
                 subCommands: [
                     {
                         id: 'show-borders-on',
                         name: 'On',
-                        icon: !isHideBordersEnabled ? '✔️' : '',
+                        icon: !isHideBordersEnabled ? icons.check : undefined,
                         action: () => setHideBordersEnabled(false),
                     },
                     {
                         id: 'show-borders-off',
                         name: 'Off',
-                        icon: isHideBordersEnabled ? '✔️' : '',
+                        icon: isHideBordersEnabled ? icons.check : undefined,
                         action: () => setHideBordersEnabled(true),
                     },
                 ],
@@ -267,18 +267,18 @@ function App(): JSX.Element {
             {
                 id: 'show-date',
                 name: 'Show date',
-                icon: '📅',
+                icon: icons.date,
                 subCommands: [
                     {
                         id: 'show-date-on',
                         name: 'On',
-                        icon: isShowDateEnabled ? '✔️' : '',
+                        icon: isShowDateEnabled ? icons.check : undefined,
                         action: () => setShowDateEnabled(true),
                     },
                     {
                         id: 'show-date-off',
                         name: 'Off',
-                        icon: !isShowDateEnabled ? '✔️' : '',
+                        icon: !isShowDateEnabled ? icons.check : undefined,
                         action: () => setShowDateEnabled(false),
                     },
                 ],
@@ -286,18 +286,18 @@ function App(): JSX.Element {
             {
                 id: 'chart-zoom-sync',
                 name: 'Sync chart zoom',
-                icon: '🔗',
+                icon: icons.link,
                 subCommands: [
                     {
                         id: 'chart-zoom-sync-on',
                         name: 'On',
-                        icon: chartZoomSyncEnabled ? '✔️' : '',
+                        icon: chartZoomSyncEnabled ? icons.check : undefined,
                         action: () => setChartZoomSyncEnabled(true),
                     },
                     {
                         id: 'chart-zoom-sync-off',
                         name: 'Off',
-                        icon: !chartZoomSyncEnabled ? '✔️' : '',
+                        icon: !chartZoomSyncEnabled ? icons.check : undefined,
                         action: () => setChartZoomSyncEnabled(false),
                     },
                 ],
