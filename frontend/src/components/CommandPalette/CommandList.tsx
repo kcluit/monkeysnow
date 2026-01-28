@@ -7,7 +7,7 @@ interface CommandListProps {
   selectedIndex: number;
   onSelect: (index: number) => void;
   onHover: (index: number) => void;
-  hideEmoji?: boolean;
+  hideIcons?: boolean;
 }
 
 export const CommandList = memo(function CommandList({
@@ -15,7 +15,7 @@ export const CommandList = memo(function CommandList({
   selectedIndex,
   onSelect,
   onHover,
-  hideEmoji,
+  hideIcons,
 }: CommandListProps): JSX.Element {
   const selectedRef = useRef<HTMLDivElement>(null);
 
