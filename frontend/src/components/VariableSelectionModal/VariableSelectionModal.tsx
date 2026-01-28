@@ -37,6 +37,9 @@ export function VariableSelectionModal({
     reorderVariables,
     searchTerm,
     setSearchTerm,
+    orderedCategories,
+    reorderCategories,
+    reorderVariableAcrossCategories,
   } = selection;
 
   // Track which categories are expanded (all expanded by default)
