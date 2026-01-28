@@ -6,6 +6,9 @@
 import { memo, useCallback } from 'react';
 import type { HierarchyNode } from '../../contexts/HierarchyContext';
 import { getResortsUnderNode } from '../../data/resortHierarchy';
+import { Icon } from '../Icon';
+import { icons } from '../../constants/icons';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
 interface ResortTreeNodeProps {
   node: HierarchyNode;
@@ -16,7 +19,7 @@ interface ResortTreeNodeProps {
   onNavigate: (node: HierarchyNode) => void;
   onHover: (index: number) => void;
   onToggleAll: (node: HierarchyNode, select: boolean) => void;
-  hideEmoji?: boolean;
+  hideIcons?: boolean;
 }
 
 export const ResortTreeNode = memo(function ResortTreeNode({
