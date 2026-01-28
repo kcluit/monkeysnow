@@ -352,6 +352,10 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
   hierarchy,
   hideAggregationMembers,
   onToggleHideMembers,
+  showMinMaxFill,
+  onToggleMinMaxFill,
+  showPercentileFill,
+  onTogglePercentileFill,
 }: ModelSelectionGridModalProps): JSX.Element | null {
   const {
     isOpen,
