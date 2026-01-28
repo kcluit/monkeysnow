@@ -367,6 +367,7 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
     selectAllInNode,
     deselectAllInNode,
     getSelectionState,
+    getResortsUnderNode,
     searchTerm,
     setSearchTerm,
   } = hierarchy;
