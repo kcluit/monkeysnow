@@ -411,6 +411,9 @@ export class ChartManager {
             plugins.push(createWindArrowPlugin({ series: windArrowSeries }));
         }
 
+        // Zero axis plugin - draws bold line at y=0 for charts that cross zero
+        plugins.push(createZeroAxisPlugin({ theme: config.theme }));
+
         // Build uPlot options
         const opts: uPlot.Options = {
             width,
