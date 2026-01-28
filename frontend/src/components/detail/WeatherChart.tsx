@@ -169,6 +169,11 @@ export function WeatherChart({
                             </span>
                         )}
                     </span>
+                    {variableConfig.description && (
+                        <span className="weather-chart-description">
+                            {variableConfig.description}
+                        </span>
+                    )}
                 </div>
                 <div className="weather-chart-actions">
                     {/* Fullscreen toggle button */}
