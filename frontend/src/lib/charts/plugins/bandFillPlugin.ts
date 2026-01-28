@@ -42,7 +42,9 @@ export function createBandFillPlugin(options: BandFillPluginOptions): uPlot.Plug
                 const upperVal = upper[i];
                 const lowerVal = lower[i];
 
-                if (upperVal === null || lowerVal === null) {
+                // Skip null/undefined/NaN values
+                if (upperVal === null || lowerVal === null ||
+                    !Number.isFinite(upperVal) || !Number.isFinite(lowerVal)) {
                     // Draw accumulated path if any
                     if (pathPoints.length > 0) {
                         drawBandPath(ctx, pathPoints);
@@ -54,6 +56,15 @@ export function createBandFillPlugin(options: BandFillPluginOptions): uPlot.Plug
                 const x = u.valToPos(i, 'x', true);
                 const yUpper = u.valToPos(upperVal, 'y', true);
                 const yLower = u.valToPos(lowerVal, 'y', true);
+
+                // Skip if positions are invalid (NaN or Infinity)
+                if (!Number.isFinite(x) || !Number.isFinite(yUpper) || !Number.isFinite(yLower)) {
+                    if (pathPoints.length > 0) {
+                        drawBandPath(ctx, pathPoints);
+                        pathPoints.length = 0;
+                    }
+                    continue;
+                }
 
                 pathPoints.push({ x, yUpper, yLower });
             }
