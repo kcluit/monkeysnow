@@ -367,6 +367,12 @@ export class ChartManager {
             }
         }
 
+        // Wind arrow plugin - draws directional arrows on wind speed charts
+        const windArrowSeries = series.find((s) => s.windArrowData);
+        if (windArrowSeries) {
+            plugins.push(createWindArrowPlugin({ series: windArrowSeries }));
+        }
+
         // Build uPlot options
         const opts: uPlot.Options = {
             width,
