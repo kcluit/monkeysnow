@@ -12,7 +12,6 @@ interface IconProps {
   className?: string;
   size?: SizeProp;
   fixedWidth?: boolean;
-  style?: React.CSSProperties;
 }
 
 export const Icon = memo(function Icon({
@@ -20,7 +19,6 @@ export const Icon = memo(function Icon({
   className,
   size,
   fixedWidth = true,
-  style,
 }: IconProps): JSX.Element | null {
   if (!icon) {
     return null;
@@ -32,7 +30,6 @@ export const Icon = memo(function Icon({
       className={className}
       size={size}
       fixedWidth={fixedWidth}
-      style={style}
     />
   );
 });
