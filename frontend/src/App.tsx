@@ -333,33 +333,11 @@ function App(): JSX.Element {
         });
 
         return [...baseCommands, ...controlCommands];
-    }, [
-        availableThemes, setTheme,
-        availableFonts, setFont,
-        isRainbowEnabled, setRainbowEnabled,
-        isFullscreen, enterFullscreen, exitFullscreen,
-        isFPSEnabled, setFPSEnabled,
-        isHideEmojiEnabled, setHideEmojiEnabled,
-        isHideBordersEnabled, setHideBordersEnabled,
-        isShowDateEnabled, setShowDateEnabled,
-        chartZoomSyncEnabled, setChartZoomSyncEnabled,
-        selectedElevation, setSelectedElevation,
-        selectedSort, setSelectedSort,
-        selectedSortDay, setSelectedSortDay,
-        sortDayData,
-        isReversed, setIsReversed,
-        viewMode, setViewMode,
-        selectedTemperatureMetric, setSelectedTemperatureMetric,
-        snowfallEstimateMode, setSnowfallEstimateMode,
-        showUtilityBar, setShowUtilityBar,
-        utilityBarStyle, setUtilityBarStyle,
-        unitSystem, setUnitSystem,
-        resortHierarchy.openModal,
-        language.id, setLanguage, availableLanguages, t,
-    ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, commandDeps);
 
-    // Command palette hook
-    const commandPalette = useCommandPalette(commands);
+    // Command palette hook with lazy generation
+    const commandPalette = useCommandPalette(commandFactory, commandDeps);
 
     // Load resort data
     const loadResort = useCallback(async (resortName: string): Promise<boolean> => {
