@@ -509,6 +509,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     chartType: 'line',
     formatValue: (v, u) => u === 'metric' ? `${Math.round(v)}C` : `${Math.round(tempToImperial(v))}F`,
     convertToImperial: tempToImperial,
+    description: 'Temperature at the soil/water surface',
   }],
   ['soil_moisture_0_to_1cm', {
     id: 'soil_moisture_0_to_1cm',
