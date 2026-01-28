@@ -379,7 +379,7 @@ const updateWeatherData = async () => {
         const freezingParams = {
             latitude: batch.freezingLats,
             longitude: batch.freezingLons,
-            models: model,
+            models: 'gfs_seamless',
             hourly: ["freezing_level_height"],
             forecast_days: 14,
             timezone: "auto"
