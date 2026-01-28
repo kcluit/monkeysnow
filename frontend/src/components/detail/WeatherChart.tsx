@@ -32,6 +32,7 @@ export function WeatherChart({
     timezoneInfo,
     isChartLocked,
     onToggleVisibility,
+    location,
 }: WeatherChartComponentProps): JSX.Element {
     const variableConfig = getVariableConfig(variable);
 
