@@ -120,7 +120,7 @@ export function generateSortDayCommands(
     commands.push({
       id: `sortday-${option.value}`,
       name: option.name,
-      icon: selectedSortDay === option.value ? '✓' : '',
+      icon: selectedSortDay === option.value ? icons.check : undefined,
       action: () => setSelectedSortDay(option.value as SortDay),
     });
   }
@@ -130,7 +130,7 @@ export function generateSortDayCommands(
     commands.push({
       id: `sortday-${index}`,
       name: day.name,
-      icon: selectedSortDay === index ? '✓' : '',
+      icon: selectedSortDay === index ? icons.check : undefined,
       action: () => setSelectedSortDay(index),
     });
   });
