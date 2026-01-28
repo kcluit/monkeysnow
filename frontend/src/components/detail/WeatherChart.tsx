@@ -293,6 +293,8 @@ export function WeatherChart({
                 onChartTypeChange={setChartType}
                 showAccumulation={showAccumulation}
                 onAccumulationChange={setShowAccumulation}
+                showOverlays={showOverlays}
+                onOverlaysChange={setShowOverlays}
                 zoomSyncExcluded={zoomSyncExcluded}
                 onZoomSyncExcludedChange={setZoomSyncExcluded}
                 chartHeight={chartHeight}
