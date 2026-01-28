@@ -846,7 +846,7 @@ export function buildWeatherChartConfig(
             range: [0, 100],
         },
         theme: chartTheme,
-        height: chartType === 'heatmap' ? 300 : 380, // Shorter height for heatmaps
+        height: settings?.customHeight ?? (chartType === 'heatmap' ? 300 : 380),
         animation: false,
     };
 }
