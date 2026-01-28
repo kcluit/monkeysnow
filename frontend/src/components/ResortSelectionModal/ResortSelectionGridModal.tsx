@@ -7,7 +7,6 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
 import { useHierarchy, type HierarchyNode } from '../../contexts/HierarchyContext';
-import { getResortsUnderNode } from '../../data/resortHierarchy';
 import type { UseResortHierarchyReturn } from '../../hooks/useResortHierarchy';
 
 interface ResortSelectionGridModalProps {
