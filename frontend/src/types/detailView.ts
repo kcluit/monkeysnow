@@ -92,6 +92,8 @@ export interface DetailChartGridProps {
     selectedAggregations: AggregationType[];
     aggregationColors: Record<AggregationType, string>;
     hideAggregationMembers?: boolean;
+    showMinMaxFill?: boolean;
+    showPercentileFill?: boolean;
     unitSystem: UnitSystem;
     timezoneInfo?: TimezoneInfo;
     isChartLocked?: boolean;
