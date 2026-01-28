@@ -45,7 +45,7 @@ export interface Translations {
     'command.rainbowText': string;
     'command.fullscreen': string;
     'command.fpsCounter': string;
-    'command.hideEmoji': string;
+    'command.hideIcons': string;
     'command.showBorders': string;
     'command.showDate': string;
     'command.elevation': string;
