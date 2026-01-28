@@ -460,6 +460,71 @@ function buildAccumulationSeries(
 }
 
 /**
+ * Build overlay series for multi-level variables (e.g., wind at different altitudes).
+ * Shows median across models for each overlay level.
+ */
+function buildOverlaySeries(
+    data: Map<WeatherModel, HourlyDataPoint[]>,
+    selectedModels: WeatherModel[],
+    baseVariable: string,
+    unitSystem: UnitSystem,
+    chartType: ChartType,
+    timezone?: string
+): SeriesConfig[] {
+    const overlayConfig = getOverlayConfig(baseVariable as any);
+    if (!overlayConfig) return [];
+
+    const series: SeriesConfig[] = [];
+
+    for (const overlay of overlayConfig.overlays) {
+        const overlayVarConfig = getVariableConfig(overlay.variable);
+
+        // Transform overlay data
+        const { seriesData } = transformToChartData(
+            data,
+            selectedModels,
+            overlay.variable,
+            unitSystem,
+            overlayVarConfig.convertToImperial,
+            timezone
+        );
+
+        // Skip if no data
+        if (seriesData.size === 0) continue;
+
+        // Calculate median across models for this overlay
+        const allDataArrays = Array.from(seriesData.values());
+        const timePoints = allDataArrays[0]?.length ?? 0;
+        const medianData: (number | null)[] = [];
+
+        for (let i = 0; i < timePoints; i++) {
+            const valuesAtTime = allDataArrays
+                .map((arr) => arr[i])
+                .filter((v): v is number => v !== null && !isNaN(v));
+
+            if (valuesAtTime.length === 0) {
+                medianData.push(null);
+            } else {
+                medianData.push(calculateMedian(valuesAtTime));
+            }
+        }
+
+        series.push({
+            id: overlay.variable,
+            name: overlay.label,
+            color: overlay.color,
+            type: chartType,
+            data: medianData,
+            lineWidth: 2,
+            opacity: overlay.opacity ?? 0.7,
+            zIndex: 60, // Above models, below aggregations
+        });
+    }
+
+    return series;
+}
+
+/**
  * Calculate box-whisker data from model ensemble.
  * Computes min/Q1/median/Q3/max across all models at each time point.
  */
