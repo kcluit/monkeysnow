@@ -44,7 +44,7 @@ export function VariableSelectionModal({
 
   // Track which categories are expanded (all expanded by default)
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
-    () => new Set(VARIABLE_CATEGORIES.map(c => c.id))
+    () => new Set(orderedCategories.map(c => c.id))
   );
 
   // Configure sensors for drag-and-drop
