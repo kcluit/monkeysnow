@@ -464,6 +464,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     chartType: 'line',
     formatValue: (v) => `${v.toFixed(1)}`,
     yAxisDomain: [0, 12],
+    description: 'UV radiation intensity index',
   }],
   ['uv_index_clear_sky', {
     id: 'uv_index_clear_sky',
