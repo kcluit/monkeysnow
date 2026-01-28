@@ -19,6 +19,8 @@ import { aggregationOptions } from '../data/modelHierarchy';
 export interface ChartBuildSettings {
     chartTypeOverride?: ChartDisplayType;
     showAccumulation?: boolean;
+    /** Custom chart height in pixels (default: 380, or 300 for heatmaps) */
+    customHeight?: number;
 }
 
 /**
