@@ -172,19 +172,19 @@ export function generateViewModeCommands(
     {
       id: 'viewmode-default',
       name: 'Default',
-      icon: viewMode === 'default' ? '✓' : '',
+      icon: viewMode === 'default' ? icons.check : undefined,
       action: () => setViewMode('default'),
     },
     {
       id: 'viewmode-full',
       name: 'Full',
-      icon: viewMode === 'full' ? '✓' : '',
+      icon: viewMode === 'full' ? icons.check : undefined,
       action: () => setViewMode('full'),
     },
     {
       id: 'viewmode-compact',
       name: 'Compact',
-      icon: viewMode === 'compact' ? '✓' : '',
+      icon: viewMode === 'compact' ? icons.check : undefined,
       action: () => setViewMode('compact'),
     },
   ];
