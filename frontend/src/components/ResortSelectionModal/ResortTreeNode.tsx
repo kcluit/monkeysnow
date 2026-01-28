@@ -31,7 +31,7 @@ export const ResortTreeNode = memo(function ResortTreeNode({
   onNavigate,
   onHover,
   onToggleAll,
-  hideEmoji,
+  hideIcons,
 }: ResortTreeNodeProps): JSX.Element {
   const isResort = node.type === 'resort';
   const hasChildren = !isResort && node.children && node.children.length > 0;
