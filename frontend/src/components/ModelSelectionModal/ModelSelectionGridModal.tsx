@@ -8,6 +8,8 @@
 import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { Icon } from '../Icon';
+import { icons } from '../../constants/icons';
 import {
   buildModelHierarchyTree,
   getModelsUnderNode,
