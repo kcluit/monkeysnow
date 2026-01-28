@@ -538,6 +538,7 @@ function App(): JSX.Element {
                             location={selectedResortLocation}
                             onBack={exitDetailView}
                             unitSystem={unitSystem}
+                            showUtilityBar={showUtilityBar}
                         />
                     </Suspense>
                 </>
