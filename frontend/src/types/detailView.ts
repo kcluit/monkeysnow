@@ -98,6 +98,12 @@ export interface DetailChartGridProps {
     timezoneInfo?: TimezoneInfo;
     isChartLocked?: boolean;
     onToggleVariable?: (variable: WeatherVariable) => void;
+    /** Location elevations for freezing level chart reference lines */
+    location?: {
+        baseElevation: number;
+        midElevation: number;
+        topElevation: number;
+    };
 }
 
 export interface WeatherChartProps {
