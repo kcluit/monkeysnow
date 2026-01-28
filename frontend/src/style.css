@@ -1812,7 +1812,7 @@ input[type="checkbox"] {
 }
 
 .model-grid-footer-note {
-    font-size: 10px;
+    font-size: 12px;
     color: var(--textSecondary, #a1a1a6);
     line-height: 1.4;
     opacity: 0.8;
@@ -1954,7 +1954,7 @@ input[type="checkbox"] {
     transition: all 0.15s ease;
 }
 
-.chart-settings-toggle input:checked + .chart-settings-toggle-label::before {
+.chart-settings-toggle input:checked+.chart-settings-toggle-label::before {
     background: var(--accent, #0a84ff);
     border-color: var(--accent, #0a84ff);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/%3E%3C/svg%3E");
@@ -2116,6 +2116,22 @@ input[type="checkbox"] {
     opacity: 0.7;
 }
 
+.weather-chart-description {
+    font-weight: 400;
+    font-size: 0.75rem;
+    opacity: 0.5;
+    margin-left: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+    .weather-chart-description {
+        display: none;
+    }
+}
+
 .weather-chart-color-indicator {
     width: 0.6rem;
     height: 0.6rem;
@@ -2266,7 +2282,8 @@ input[type="checkbox"] {
 }
 
 .uplot .u-legend {
-    display: none; /* We use our custom legend plugin */
+    display: none;
+    /* We use our custom legend plugin */
 }
 
 /* Custom legend styling (via plugin) */
