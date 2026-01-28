@@ -822,7 +822,7 @@ export function buildWeatherChartConfig(
     // For heatmaps, adjust grid to accommodate hour labels on left
     const gridConfig = chartType === 'heatmap'
         ? { top: 10, right: 10, bottom: 40, left: 50, containLabel: false }
-        : { top: 10, right: 0, bottom: 70, left: 0, containLabel: true };
+        : { top: 10, right: 0, bottom: 40, left: 0, containLabel: true };
 
     return {
         type: chartType,
