@@ -60,6 +60,17 @@ export function DetailedResortView({
         false
     );
 
+    // State for band fill visibility (disabled by default)
+    const [showMinMaxFill, setShowMinMaxFill] = useLocalStorage<boolean>(
+        'detailShowMinMaxFill',
+        false
+    );
+
+    const [showPercentileFill, setShowPercentileFill] = useLocalStorage<boolean>(
+        'detailShowPercentileFill',
+        false
+    );
+
     // State for elevation - default to mid elevation
     const [elevation, setElevation] = useLocalStorage<number>(
         'detailElevation',
