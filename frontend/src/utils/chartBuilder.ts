@@ -568,8 +568,26 @@ export function buildWeatherChartConfig(
         timeLabels.length
     );
 
+    // Build box & whisker series if chart type is boxwhisker
+    const boxWhiskerSeriesList: SeriesConfig[] = [];
+    if (chartType === 'boxwhisker' && seriesData.size > 1) {
+        const boxWhiskerData = calculateBoxWhiskerData(seriesData, timeLabels.length);
+        boxWhiskerSeriesList.push({
+            id: 'ensemble_boxwhisker',
+            name: 'Ensemble Spread',
+            color: aggregationColors['median'] ?? variableConfig.color,
+            type: 'boxwhisker',
+            data: boxWhiskerData.median, // Use median for y-scale calculation
+            boxWhiskerData,
+            zIndex: 50,
+        });
+    }
+
     // Combine all series: bands first (background), then models, then aggregations (foreground)
-    const allSeries = [...bandSeries, ...modelSeries, ...aggregationSeries];
+    // For boxwhisker, skip regular model/aggregation series and use boxwhisker series instead
+    const allSeries = chartType === 'boxwhisker'
+        ? [...boxWhiskerSeriesList]
+        : [...bandSeries, ...modelSeries, ...aggregationSeries];
 
     // Track if we need a secondary Y-axis for accumulation
     let hasAccumulation = false;
