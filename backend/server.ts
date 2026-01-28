@@ -414,9 +414,9 @@ const updateWeatherData = async () => {
 
             if (!dailyChunks[dateKey]) {
                 dailyChunks[dateKey] = {
-                    AM: { hourly: [], minutely: [] },
-                    PM: { hourly: [], minutely: [] },
-                    NIGHT: { hourly: [], minutely: [] }
+                    AM: { hourly: [], freezingData: [] },
+                    PM: { hourly: [], freezingData: [] },
+                    NIGHT: { hourly: [], freezingData: [] }
                 };
             }
 
