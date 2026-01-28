@@ -35,8 +35,6 @@ function getStructuralKey(config: ChartConfig): string {
         // Theme affects colors
         themeAccent: config.theme.accent,
         themeBackground: config.theme.background,
-        // Unit system affects axis labels and data values
-        unitSystem: config.unitSystem,
     });
 }
 
