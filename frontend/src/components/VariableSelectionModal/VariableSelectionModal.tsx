@@ -109,24 +109,21 @@ export function VariableSelectionModal({
 
   // Expand/collapse all categories
   const expandAllCategories = useCallback(() => {
-    setExpandedCategories(new Set(VARIABLE_CATEGORIES.map(c => c.id)));
-  }, []);
+    setExpandedCategories(new Set(orderedCategories.map(c => c.id)));
+  }, [orderedCategories]);
 
   const collapseAllCategories = useCallback(() => {
     setExpandedCategories(new Set());
   }, []);
 
-  // Check if searching
-  const isSearching = searchTerm.trim().length > 0;
-
   // Filter categories to only show those with matching variables
   const filteredCategories = useMemo(() => {
     const filteredSet = new Set(filteredVariables);
-    return VARIABLE_CATEGORIES.map(category => ({
+    return orderedCategories.map(category => ({
       ...category,
       variables: category.variables.filter(v => filteredSet.has(v)),
     })).filter(cat => cat.variables.length > 0);
-  }, [filteredVariables]);
+  }, [filteredVariables, orderedCategories]);
 
   // Prevent body scroll when open
   useEffect(() => {
