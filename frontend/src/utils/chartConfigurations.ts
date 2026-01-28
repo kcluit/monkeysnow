@@ -229,6 +229,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     chartType: 'line',
     formatValue: (v, u) => u === 'metric' ? `${Math.round(v)}hPa` : `${hpaToInHg(v).toFixed(2)}inHg`,
     convertToImperial: hpaToInHg,
+    description: 'Atmospheric air pressure at surface',
   }],
   ['cloud_cover', {
     id: 'cloud_cover',
