@@ -431,7 +431,7 @@ export class ChartManager {
                 drag: { x: false, y: false },
                 focus: { prox: 30 },
             },
-            legend: { show: false },
+            legend: { show: true },
             padding: [
                 config.grid.top,
                 config.grid.right,
