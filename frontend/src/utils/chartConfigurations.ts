@@ -306,6 +306,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     chartType: 'line',
     formatValue: (v) => `${Math.round(v)}`,
     yAxisDomain: [0, 100],
+    description: 'Weather condition as a numeric WMO code',
   }],
   // New variables
   ['dew_point_2m', {
