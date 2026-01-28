@@ -46,6 +46,34 @@ export function useVariableSelection({
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Category order persisted to localStorage (only affects modal display)
+  const [categoryOrder, setCategoryOrder] = useLocalStorage<string[]>(
+    'detailCategoryOrder',
+    VARIABLE_CATEGORIES.map(c => c.id)
+  );
+
+  // Compute ordered categories based on custom order
+  const orderedCategories = useMemo(() => {
+    const categoryMap = new Map(VARIABLE_CATEGORIES.map(c => [c.id, c]));
+    const ordered: VariableCategory[] = [];
+
+    // Add categories in custom order
+    for (const id of categoryOrder) {
+      const cat = categoryMap.get(id);
+      if (cat) {
+        ordered.push(cat);
+        categoryMap.delete(id);
+      }
+    }
+
+    // Add any remaining categories (new ones not in custom order)
+    for (const cat of categoryMap.values()) {
+      ordered.push(cat);
+    }
+
+    return ordered;
+  }, [categoryOrder]);
+
   // The order of selectedVariables determines chart display order
   // We maintain a separate ordered list that includes unselected variables for the modal
   const orderedVariables = useMemo(() => {
