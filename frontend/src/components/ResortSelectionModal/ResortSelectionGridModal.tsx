@@ -284,7 +284,7 @@ const ContinentColumn = memo(function ContinentColumn({
   onDeselectAll,
   getSelectionState,
   getResortsUnderNode,
-  hideEmoji,
+  hideIcons,
 }: {
   node: HierarchyNode;
   expandedNodes: Set<string>;
@@ -295,7 +295,7 @@ const ContinentColumn = memo(function ContinentColumn({
   onDeselectAll: (node: HierarchyNode) => void;
   getSelectionState: (node: HierarchyNode) => 'all' | 'some' | 'none';
   getResortsUnderNode: (node: HierarchyNode) => string[];
-  hideEmoji?: boolean;
+  hideIcons?: boolean;
 }) {
   const isExpanded = expandedNodes.has(node.id);
   const selectionState = getSelectionState(node);
@@ -324,10 +324,10 @@ const ContinentColumn = memo(function ContinentColumn({
           aria-expanded={isExpanded}
           aria-label={isExpanded ? 'Collapse' : 'Expand'}
         >
-          ▶
+          <Icon icon={isExpanded ? icons.caretDown : icons.caretRight} />
         </button>
         <Checkbox state={selectionState} onClick={(e) => { e.stopPropagation(); handleHeaderClick(); }} />
-        {!hideEmoji && <span className="resort-grid-header-icon">🌍</span>}
+        {!hideIcons && <span className="resort-grid-header-icon"><Icon icon={icons.continent} /></span>}
         <span className="resort-grid-continent-name">{node.name}</span>
         <span className="resort-grid-count">
           {selectedCount}/{resortsUnder.length}
@@ -347,7 +347,7 @@ const ContinentColumn = memo(function ContinentColumn({
               onDeselectAll={onDeselectAll}
               getSelectionState={getSelectionState}
               getResortsUnderNode={getResortsUnderNode}
-              hideEmoji={hideEmoji}
+              hideIcons={hideIcons}
             />
           ))}
         </div>
