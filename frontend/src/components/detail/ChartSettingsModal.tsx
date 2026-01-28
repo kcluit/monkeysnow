@@ -138,6 +138,8 @@ export function ChartSettingsModal({
 
     const variableConfig = getVariableConfig(variable);
     const hasAccumulation = supportsAccumulation(variable);
+    const hasOverlayLevels = hasOverlays(variable);
+    const overlayConfig = hasOverlayLevels ? getOverlayConfig(variable) : null;
 
     return createPortal(
         <div className="command-palette-backdrop" onClick={handleBackdropClick}>
