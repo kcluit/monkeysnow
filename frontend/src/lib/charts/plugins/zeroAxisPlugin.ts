@@ -46,8 +46,8 @@ export function createZeroAxisPlugin(options: ZeroAxisPluginOptions): uPlot.Plug
         const left = u.bbox.left;
         const width = u.bbox.width;
 
-        // Draw bold zero line in accent color
-        ctx.strokeStyle = theme.accent;
+        // Draw bold zero line in textSecondary color (standard axis style)
+        ctx.strokeStyle = theme.textSecondary;
         ctx.lineWidth = lineWidth;
         ctx.beginPath();
         ctx.moveTo(left, y);
