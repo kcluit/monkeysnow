@@ -690,6 +690,89 @@ input[type="checkbox"] {
     flex-shrink: 0;
 }
 
+/* Category drag handle wrapper */
+.variable-category-header-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.category-drag-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 100%;
+    padding: 10px 6px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    color: var(--textSecondary, #a1a1a6);
+    cursor: grab;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+    opacity: 0.5;
+}
+
+.category-drag-handle:hover {
+    background: var(--cardBg, rgba(255, 255, 255, 0.1));
+    color: var(--textPrimary, #f5f5f7);
+    opacity: 1;
+}
+
+.category-drag-handle:active {
+    cursor: grabbing;
+}
+
+.variable-category-dragging {
+    opacity: 0.6;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Variable card draggable wrapper */
+.variable-card-draggable {
+    position: relative;
+}
+
+.variable-card-draggable.dragging {
+    opacity: 0.5;
+    z-index: 1000;
+}
+
+.variable-card-draggable .variable-card {
+    position: relative;
+}
+
+.variable-card-drag-handle {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    color: var(--textSecondary, #a1a1a6);
+    cursor: grab;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    background: none;
+    border: none;
+}
+
+.variable-card:hover .variable-card-drag-handle,
+.variable-card-selected .variable-card-drag-handle {
+    opacity: 0.6;
+}
+
+.variable-card-drag-handle:hover {
+    opacity: 1;
+}
+
+.variable-card-drag-handle:active {
+    cursor: grabbing;
+}
+
 /* FPS Counter Styles */
 .fps-counter {
     position: fixed;
