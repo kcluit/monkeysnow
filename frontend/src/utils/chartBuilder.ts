@@ -324,7 +324,7 @@ function buildBandFillSeries(
             color,
             type: 'band',
             data: maxData, // Use max data for y-scale calculation
-            fillOpacity: 0.1,
+            fillOpacity: 0.05,
             bandData: {
                 upper: maxData,
                 lower: minData,
@@ -345,7 +345,7 @@ function buildBandFillSeries(
             color,
             type: 'band',
             data: p75Data, // Use p75 data for y-scale calculation
-            fillOpacity: 0.15,
+            fillOpacity: 0.05,
             bandData: {
                 upper: p75Data,
                 lower: p25Data,
@@ -665,6 +665,8 @@ export function buildWeatherChartConfig(
         selectedAggregations = [],
         aggregationColors = defaultAggregationColors,
         hideAggregationMembers = false,
+        showMinMaxFill = false,
+        showPercentileFill = false,
         variable,
         unitSystem,
         timezoneInfo,
@@ -821,8 +823,8 @@ export function buildWeatherChartConfig(
 
     // For heatmaps, adjust grid to accommodate hour labels on left
     const gridConfig = chartType === 'heatmap'
-        ? { top: 10, right: 10, bottom: 40, left: 50, containLabel: false }
-        : { top: 10, right: 0, bottom: 40, left: 0, containLabel: true };
+        ? { top: 10, right: 10, bottom: 1, left: 50, containLabel: false }
+        : { top: 10, right: 0, bottom: 1, left: 0, containLabel: true };
 
     return {
         type: chartType,
