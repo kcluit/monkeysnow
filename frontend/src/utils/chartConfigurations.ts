@@ -172,6 +172,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     formatValue: (v, u) => u === 'metric' ? `${v.toFixed(2)}m` : `${mToFt(v).toFixed(1)}ft`,
     convertToImperial: mToFt,
     yAxisDomain: [0, 'auto'],
+    description: 'Snow depth on the ground',
   }],
   ['wind_speed_10m', {
     id: 'wind_speed_10m',
