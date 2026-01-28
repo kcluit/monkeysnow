@@ -475,6 +475,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     chartType: 'line',
     formatValue: (v) => `${v.toFixed(1)}`,
     yAxisDomain: [0, 12],
+    description: 'UV index assuming clear sky conditions',
   }],
   ['sunshine_duration', {
     id: 'sunshine_duration',
