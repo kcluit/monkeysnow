@@ -575,6 +575,121 @@ input[type="checkbox"] {
     font-size: 12px;
 }
 
+/* Variable Category Grid Styles */
+.variable-categories {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.variable-category {
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.variable-category-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: var(--cardBg, rgba(255, 255, 255, 0.05));
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    user-select: none;
+}
+
+.variable-category-header:hover {
+    background: var(--secondary, rgba(255, 255, 255, 0.1));
+}
+
+.variable-category-toggle {
+    font-size: 10px;
+    color: var(--textSecondary, #a1a1a6);
+    transition: transform 0.2s ease;
+    transform: rotate(0deg);
+}
+
+.variable-category-toggle.expanded {
+    transform: rotate(90deg);
+}
+
+.variable-category-name {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--textPrimary, #f5f5f7);
+}
+
+.variable-category-count {
+    font-size: 11px;
+    color: var(--textSecondary, #a1a1a6);
+    padding: 2px 8px;
+    background: var(--border, rgba(255, 255, 255, 0.1));
+    border-radius: 10px;
+}
+
+.variable-category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 6px;
+    padding: 8px;
+    background: var(--background, #000);
+}
+
+.variable-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: var(--cardBg, rgba(255, 255, 255, 0.05));
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.variable-card:hover {
+    background: var(--secondary, rgba(255, 255, 255, 0.1));
+}
+
+.variable-card-selected {
+    border-color: var(--accent, #0a84ff);
+    background: rgba(10, 132, 255, 0.1);
+}
+
+.variable-card-checkbox {
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: var(--accent, #0a84ff);
+    flex-shrink: 0;
+}
+
+.variable-card-color {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.variable-card-label {
+    flex: 1;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--textPrimary, #f5f5f7);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.variable-card-unit {
+    font-size: 10px;
+    color: var(--textSecondary, #a1a1a6);
+    flex-shrink: 0;
+}
+
 /* FPS Counter Styles */
 .fps-counter {
     position: fixed;
