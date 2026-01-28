@@ -237,5 +237,8 @@ export function useVariableSelection({
     searchTerm,
     setSearchTerm,
     filteredVariables,
+    orderedCategories,
+    reorderCategories,
+    reorderVariableAcrossCategories,
   };
 }
