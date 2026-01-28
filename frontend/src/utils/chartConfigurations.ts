@@ -498,6 +498,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     chartType: 'area',
     formatValue: (v) => v === 1 ? 'Day' : 'Night',
     yAxisDomain: [0, 1],
+    description: '1 if daylight, 0 at night',
   }],
   ['soil_temperature_0cm', {
     id: 'soil_temperature_0cm',
