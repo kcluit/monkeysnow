@@ -10,7 +10,7 @@ import { createPortal } from 'react-dom';
 import type { WeatherVariable } from '../../types/openMeteo';
 import type { ChartDisplayType } from '../../types/chartSettings';
 import { supportsAccumulation } from '../../types/chartSettings';
-import { getVariableConfig } from '../../utils/chartConfigurations';
+import { getVariableConfig, hasOverlays, getOverlayConfig } from '../../utils/chartConfigurations';
 import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
