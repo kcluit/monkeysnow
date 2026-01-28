@@ -20,12 +20,12 @@ export function getUPlotTheme(): ChartTheme {
     };
 
     return {
-        background: getVar('--color-background', '#ffffff'),
-        textPrimary: getVar('--color-text-primary', '#1f2937'),
-        textSecondary: getVar('--color-text-secondary', '#6b7280'),
-        gridColor: getVar('--color-border', '#e5e7eb'),
-        accent: getVar('--color-accent', '#3b82f6'),
-        tooltipBg: getVar('--color-card-background', '#ffffff'),
-        tooltipBorder: getVar('--color-border', '#e5e7eb'),
+        background: getVar('--background', '#ffffff'),
+        textPrimary: getVar('--textPrimary', '#1f2937'),
+        textSecondary: getVar('--textSecondary', '#6b7280'),
+        gridColor: getVar('--gridLine', '#e5e7eb'),
+        accent: getVar('--accent', '#3b82f6'),
+        tooltipBg: getVar('--cardBg', '#ffffff'),
+        tooltipBorder: getVar('--border', '#e5e7eb'),
     };
 }
