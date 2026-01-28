@@ -576,6 +576,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     chartType: 'line',
     formatValue: (v) => `${Math.round(v)}J/kg`,
     yAxisDomain: ['auto', 0],
+    description: 'Energy needed to overcome and trigger convection',
   }],
 ]);
 
