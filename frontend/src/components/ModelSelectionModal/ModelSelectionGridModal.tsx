@@ -217,6 +217,10 @@ const ProviderSection = memo(function ProviderSection({
   onColorChange,
   hideAggregationMembers,
   onToggleHideMembers,
+  showMinMaxFill,
+  onToggleMinMaxFill,
+  showPercentileFill,
+  onTogglePercentileFill,
 }: {
   node: ModelHierarchyNode;
   expandedNodes: Set<string>;
@@ -232,6 +236,10 @@ const ProviderSection = memo(function ProviderSection({
   onColorChange: (aggType: AggregationType, color: string) => void;
   hideAggregationMembers?: boolean;
   onToggleHideMembers?: () => void;
+  showMinMaxFill?: boolean;
+  onToggleMinMaxFill?: () => void;
+  showPercentileFill?: boolean;
+  onTogglePercentileFill?: () => void;
 }) {
   const isExpanded = expandedNodes.has(node.id);
   const selectionState = getSelectionState(node);
