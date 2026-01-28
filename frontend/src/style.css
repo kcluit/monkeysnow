@@ -1912,7 +1912,10 @@ input[type="checkbox"] {
 }
 
 .chart-type-icon {
-    font-size: 20px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .chart-type-label {
