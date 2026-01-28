@@ -14,8 +14,15 @@ export type ChartDisplayType = 'line' | 'bar' | 'area' | 'boxwhisker' | 'heatmap
 export const ACCUMULATION_VARIABLES: WeatherVariable[] = [
   'precipitation',
   'rain',
+  'showers',
   'snowfall',
   'snow_depth',
+  'sunshine_duration',
+  'evapotranspiration',
+  'et0_fao_evapotranspiration',
+  'shortwave_radiation',
+  'direct_radiation',
+  'diffuse_radiation',
 ];
 
 /** Check if a variable supports accumulation overlay */
