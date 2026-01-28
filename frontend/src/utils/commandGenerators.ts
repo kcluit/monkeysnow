@@ -224,13 +224,13 @@ export function generateUtilityBarStyleCommands(
     {
       id: 'utilitybar-style-compact',
       name: 'Compact',
-      icon: utilityBarStyle === 'compact' ? '✓' : '',
+      icon: utilityBarStyle === 'compact' ? icons.check : undefined,
       action: () => setUtilityBarStyle('compact'),
     },
     {
       id: 'utilitybar-style-large',
       name: 'Large',
-      icon: utilityBarStyle === 'large' ? '✓' : '',
+      icon: utilityBarStyle === 'large' ? icons.check : undefined,
       action: () => setUtilityBarStyle('large'),
     },
   ];
