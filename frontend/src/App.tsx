@@ -518,10 +518,10 @@ function App(): JSX.Element {
     return (
         <div className="min-h-screen bg-theme-background transition-colors duration-300 overflow-x-hidden">
             {/* Command Palette */}
-            <CommandPalette palette={commandPalette} hideEmoji={isHideEmojiEnabled} />
+            <CommandPalette palette={commandPalette} hideIcons={isHideIconsEnabled} />
 
             {/* Resort Selection Grid Modal */}
-            <ResortSelectionGridModal hierarchy={resortHierarchy} hideEmoji={isHideEmojiEnabled} />
+            <ResortSelectionGridModal hierarchy={resortHierarchy} hideIcons={isHideIconsEnabled} />
 
             {/* FPS Counter */}
             <FPSCounter fps={fps} isVisible={isFPSEnabled} />
