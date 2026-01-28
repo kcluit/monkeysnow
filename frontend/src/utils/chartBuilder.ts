@@ -715,12 +715,18 @@ export function buildWeatherChartConfig(
     );
 
     // Build band fill series for aggregation ranges (e.g., min-max, p25-p75)
-    const bandSeries = buildBandFillSeries(
+    // Filter based on user toggle settings
+    const allBandSeries = buildBandFillSeries(
         seriesData,
         selectedAggregations,
         aggregationColors,
         timeLabels.length
     );
+    const bandSeries = allBandSeries.filter(band => {
+        if (band.id === 'band_min_max' && !showMinMaxFill) return false;
+        if (band.id === 'band_p25_p75' && !showPercentileFill) return false;
+        return true;
+    });
 
     // Build box & whisker series if chart type is boxwhisker
     const boxWhiskerSeriesList: SeriesConfig[] = [];
