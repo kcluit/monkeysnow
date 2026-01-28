@@ -456,6 +456,45 @@ function buildAccumulationSeries(
 }
 
 /**
+ * Calculate box-whisker data from model ensemble.
+ * Computes min/Q1/median/Q3/max across all models at each time point.
+ */
+function calculateBoxWhiskerData(
+    seriesData: Map<WeatherModel, (number | null)[]>,
+    timePoints: number
+): BoxWhiskerData {
+    const min: (number | null)[] = [];
+    const q1: (number | null)[] = [];
+    const median: (number | null)[] = [];
+    const q3: (number | null)[] = [];
+    const max: (number | null)[] = [];
+
+    const allDataArrays = Array.from(seriesData.values());
+
+    for (let i = 0; i < timePoints; i++) {
+        const valuesAtTime = allDataArrays
+            .map((arr) => arr[i])
+            .filter((v): v is number => v !== null && Number.isFinite(v));
+
+        if (valuesAtTime.length === 0) {
+            min.push(null);
+            q1.push(null);
+            median.push(null);
+            q3.push(null);
+            max.push(null);
+        } else {
+            min.push(calculateMin(valuesAtTime));
+            q1.push(calculatePercentile(valuesAtTime, 25));
+            median.push(calculateMedian(valuesAtTime));
+            q3.push(calculatePercentile(valuesAtTime, 75));
+            max.push(calculateMax(valuesAtTime));
+        }
+    }
+
+    return { min, q1, median, q3, max };
+}
+
+/**
  * Build a complete ChartConfig from weather data and props.
  */
 export function buildWeatherChartConfig(
