@@ -305,13 +305,13 @@ export function generateUnitSystemCommands(
     {
       id: 'units-metric',
       name: 'Metric (°C, cm, km/h)',
-      icon: unitSystem === 'metric' ? '✓' : '',
+      icon: unitSystem === 'metric' ? icons.check : undefined,
       action: () => { setUnitSystem('metric'); window.location.reload(); },
     },
     {
       id: 'units-imperial',
       name: 'Imperial (°F, in, mph)',
-      icon: unitSystem === 'imperial' ? '✓' : '',
+      icon: unitSystem === 'imperial' ? icons.check : undefined,
       action: () => { setUnitSystem('imperial'); window.location.reload(); },
     },
   ];
