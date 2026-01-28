@@ -96,12 +96,17 @@ function buildUPlotAxes(config: ChartConfig): uPlot.Axis[] {
 
     const axes: uPlot.Axis[] = [
         {
+            scale: 'x',
             stroke: theme.textSecondary,
             grid: { show: true, stroke: theme.gridColor, width: 1 },
             ticks: { show: true, stroke: theme.gridColor, size: 5 },
             values: (_u, vals) =>
                 vals.map((v) => {
                     const idx = Math.round(v);
+                    // Ensure index is within bounds
+                    if (idx < 0 || idx >= xAxis.data.length) {
+                        return '';
+                    }
                     return xAxis.data[idx] || '';
                 }),
             gap: 8,
