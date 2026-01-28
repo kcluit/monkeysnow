@@ -416,6 +416,9 @@ export class ChartManager {
         // Tooltip plugin - shows values at cursor position
         plugins.push(createTooltipPlugin({ config }));
 
+        // Legend plugin - interactive series toggle
+        plugins.push(createLegendPlugin({ config }));
+
         // Build uPlot options
         const opts: uPlot.Options = {
             width,
