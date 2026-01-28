@@ -135,6 +135,11 @@ export function WeatherChart({
                                 </span>
                             )}
                         </span>
+                        {variableConfig.description && (
+                            <span className="weather-chart-description">
+                                {variableConfig.description}
+                            </span>
+                        )}
                     </div>
                 </div>
                 <div className="weather-chart-no-data">
