@@ -8,7 +8,7 @@
 import uPlot from 'uplot';
 import 'uplot/dist/uPlot.min.css';
 import type { ChartConfig } from './types';
-import { createZoomPlugin, createBandFillPlugin, createZeroAxisPlugin, createBoxWhiskerPlugin, createHeatmapPlugin } from './plugins';
+import { createZoomPlugin, createBandFillPlugin, createZeroAxisPlugin, createBoxWhiskerPlugin, createHeatmapPlugin, createWindArrowPlugin } from './plugins';
 import { colorWithOpacity } from './utils/colorUtils';
 import {
     subscribeToZoomChanges,
