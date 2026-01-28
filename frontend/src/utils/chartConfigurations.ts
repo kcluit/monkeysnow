@@ -218,6 +218,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     chartType: 'line',
     formatValue: (v) => `${Math.round(v)}%`,
     yAxisDomain: [0, 100],
+    description: 'Relative humidity at 2 meters above ground',
   }],
   ['surface_pressure', {
     id: 'surface_pressure',
