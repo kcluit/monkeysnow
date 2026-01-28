@@ -590,17 +590,19 @@ function App(): JSX.Element {
                         )}
 
                         <div className={viewMode === 'compact' ? "compact-grid" : "space-y-8"}>
-                            {displayResorts.map((resort, index) => (
-                                <div key={`${resort.name}-${index}`}>
-                                    {viewMode === 'full' ? (
-                                        <FullView resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} unitSystem={unitSystem} onResortClick={handleResortClick} />
-                                    ) : viewMode === 'compact' ? (
-                                        <CompactCard resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} unitSystem={unitSystem} onResortClick={handleResortClick} />
-                                    ) : (
-                                        <DefaultCard resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} unitSystem={unitSystem} onResortClick={handleResortClick} />
-                                    )}
-                                </div>
-                            ))}
+                            <Suspense fallback={<div className="text-center py-4 text-theme-textSecondary">Loading...</div>}>
+                                {displayResorts.map((resort, index) => (
+                                    <div key={`${resort.name}-${index}`}>
+                                        {viewMode === 'full' ? (
+                                            <FullView resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} unitSystem={unitSystem} onResortClick={handleResortClick} />
+                                        ) : viewMode === 'compact' ? (
+                                            <CompactCard resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} unitSystem={unitSystem} onResortClick={handleResortClick} />
+                                        ) : (
+                                            <DefaultCard resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} unitSystem={unitSystem} onResortClick={handleResortClick} />
+                                        )}
+                                    </div>
+                                ))}
+                            </Suspense>
 
                             {selectedResorts.length === 0 && (
                                 <div className="text-center py-12">
