@@ -518,7 +518,7 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
                   onDeselectAll={deselectAllInNode}
                   getSelectionState={getSelectionState}
                   getResortsUnderNode={getResortsUnderNode}
-                  hideEmoji={hideEmoji}
+                  hideIcons={hideIcons}
                 />
               ))}
             </div>
