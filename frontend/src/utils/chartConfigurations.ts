@@ -520,6 +520,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     chartType: 'area',
     formatValue: (v) => `${v.toFixed(3)}`,
     yAxisDomain: [0, 1],
+    description: 'Average soil water content at 0-1 cm depth',
   }],
   ['evapotranspiration', {
     id: 'evapotranspiration',
