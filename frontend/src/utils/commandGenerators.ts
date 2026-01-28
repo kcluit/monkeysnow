@@ -247,25 +247,25 @@ export function generateTemperatureMetricCommands(
     {
       id: 'tempmetric-max',
       name: 'Max temperature',
-      icon: selectedMetric === 'max' ? '✓' : '',
+      icon: selectedMetric === 'max' ? icons.check : undefined,
       action: () => setSelectedMetric('max'),
     },
     {
       id: 'tempmetric-min',
       name: 'Min temperature',
-      icon: selectedMetric === 'min' ? '✓' : '',
+      icon: selectedMetric === 'min' ? icons.check : undefined,
       action: () => setSelectedMetric('min'),
     },
     {
       id: 'tempmetric-avg',
       name: 'Average temperature',
-      icon: selectedMetric === 'avg' ? '✓' : '',
+      icon: selectedMetric === 'avg' ? icons.check : undefined,
       action: () => setSelectedMetric('avg'),
     },
     {
       id: 'tempmetric-median',
       name: 'Median temperature',
-      icon: selectedMetric === 'median' ? '✓' : '',
+      icon: selectedMetric === 'median' ? icons.check : undefined,
       action: () => setSelectedMetric('median'),
     },
   ];
