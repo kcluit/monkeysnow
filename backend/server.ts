@@ -11,6 +11,7 @@ interface LocationData {
     mid: number;
     top: number;
     loc?: [number, number];
+    country?: string;
 }
 
 // Hierarchy types for /hierarchy endpoint
