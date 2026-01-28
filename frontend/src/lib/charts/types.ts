@@ -109,7 +109,5 @@ export interface ChartConfig {
     theme: ChartTheme;
     /** Chart height in pixels */
     height: number;
-    /** Chart width as percentage (20-100), only used in fullscreen mode */
-    width?: number;
     animation: boolean;
 }
