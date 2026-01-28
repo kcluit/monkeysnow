@@ -1261,9 +1261,12 @@ input[type="checkbox"] {
 }
 
 .resort-grid-item-icon {
-    font-size: 12px;
+    font-size: 11px;
     width: 16px;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--textSecondary);
 }
 
 .resort-grid-item-name {
