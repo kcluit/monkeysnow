@@ -47,6 +47,20 @@ export function WeatherChart({
         false
     );
 
+    // Chart dimension settings
+    const defaultHeight = variableConfig.chartType === 'heatmap' ? 300 : 380;
+    const [chartHeight, setChartHeight] = useLocalStorage<number>(
+        `chartHeight_${variable}`,
+        defaultHeight
+    );
+    const [chartWidth, setChartWidth] = useLocalStorage<number>(
+        `chartWidth_${variable}`,
+        100 // percentage
+    );
+
+    // Fullscreen state
+    const [isFullscreen, setIsFullscreen] = useState(false);
+
     // Sync zoom exclusion setting to registry
     useEffect(() => {
         setChartZoomSyncExclusion(variable, zoomSyncExcluded);
