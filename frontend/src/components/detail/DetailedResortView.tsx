@@ -138,6 +138,10 @@ export function DetailedResortView({
                     setAggregationColors={setAggregationColors}
                     hideAggregationMembers={hideAggregationMembers}
                     setHideAggregationMembers={setHideAggregationMembers}
+                    showMinMaxFill={showMinMaxFill}
+                    setShowMinMaxFill={setShowMinMaxFill}
+                    showPercentileFill={showPercentileFill}
+                    setShowPercentileFill={setShowPercentileFill}
                     elevation={elevation}
                     setElevation={setElevation}
                     forecastDays={forecastDays}
