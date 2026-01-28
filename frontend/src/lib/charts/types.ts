@@ -57,6 +57,12 @@ export interface SeriesConfig {
         upper: (number | null)[];
         lower: (number | null)[];
     };
+    /** Box & whisker data for ensemble spread visualization */
+    boxWhiskerData?: BoxWhiskerData;
+    /** Heatmap data for hour-of-day matrix visualization */
+    heatmapData?: HeatmapData;
+    /** Wind direction data for arrow overlay */
+    windArrowData?: WindArrowData;
 }
 
 /** X-axis configuration */
