@@ -1,11 +1,37 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import type { Command, UseCommandPaletteReturn } from '../types';
 
-export function useCommandPalette(commands: Command[]): UseCommandPaletteReturn {
+/**
+ * Hook for managing command palette state with lazy command generation.
+ * Commands are only generated when the palette opens, not on every state change.
+ *
+ * @param commandFactory - Function that returns the command array
+ * @param dependencies - Dependencies that trigger command regeneration when palette is open
+ */
+export function useCommandPalette(
+  commandFactory: () => Command[],
+  dependencies: unknown[]
+): UseCommandPaletteReturn {
   const [isOpen, setIsOpen] = useState(false);
+  const [commands, setCommands] = useState<Command[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [commandStack, setCommandStack] = useState<Command[][]>([]);
+
+  // Store latest factory in ref to avoid stale closures
+  const factoryRef = useRef(commandFactory);
+  useEffect(() => {
+    factoryRef.current = commandFactory;
+  });
+
+  // Generate commands lazily when palette opens or dependencies change while open
+  useEffect(() => {
+    if (isOpen) {
+      const newCommands = factoryRef.current();
+      setCommands(newCommands);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, ...dependencies]);
 
   // Current commands are either from subcommand stack or root commands
   const currentCommands = useMemo(() => {
