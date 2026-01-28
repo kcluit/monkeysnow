@@ -162,7 +162,6 @@ function buildUPlotAxes(config: ChartConfig): uPlot.Axis[] {
             stroke: theme.textSecondary,
             grid: { show: true, stroke: theme.gridColor, width: 1 },
             ticks: { show: true, stroke: theme.gridColor, size: 5 },
-            border: { show: true, stroke: theme.textSecondary, width: 2 },
             values: (_u, vals) =>
                 vals.map((v) => {
                     const idx = Math.round(v);
@@ -180,7 +179,6 @@ function buildUPlotAxes(config: ChartConfig): uPlot.Axis[] {
             stroke: theme.textSecondary,
             grid: { show: true, stroke: theme.gridColor, width: 1 },
             ticks: { show: true, stroke: theme.gridColor, size: 5 },
-            border: { show: true, stroke: theme.textSecondary, width: 2 },
             values: (_u, vals) => vals.map((v) => yAxis.formatter(v)),
             gap: 8,
             size: 50,
