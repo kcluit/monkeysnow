@@ -193,6 +193,8 @@ export function DetailedResortView({
                         selectedAggregations={selectedAggregations}
                         aggregationColors={aggregationColors}
                         hideAggregationMembers={hideAggregationMembers}
+                        showMinMaxFill={showMinMaxFill}
+                        showPercentileFill={showPercentileFill}
                         unitSystem={unitSystem}
                         timezoneInfo={timezoneInfo ?? undefined}
                         isChartLocked={isChartLocked}
