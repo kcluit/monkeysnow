@@ -120,6 +120,8 @@ export function ChartSettingsModal({
         onChartTypeChange(localChartType);
         onAccumulationChange(localShowAccumulation);
         onZoomSyncExcludedChange(localZoomSyncExcluded);
+        onChartHeightChange(localChartHeight);
+        onChartWidthChange(localChartWidth);
         onClose();
     };
 
