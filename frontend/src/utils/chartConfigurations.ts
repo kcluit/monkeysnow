@@ -251,6 +251,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     chartType: 'line', // Changed from area to line for better multi-model comparison
     formatValue: (v) => `${Math.round(v)}%`,
     yAxisDomain: [0, 100],
+    description: 'Low level clouds and fog up to 3 km altitude',
   }],
   ['cloud_cover_mid', {
     id: 'cloud_cover_mid',
