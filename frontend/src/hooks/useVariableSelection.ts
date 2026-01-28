@@ -32,6 +32,11 @@ export interface UseVariableSelectionReturn {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   filteredVariables: WeatherVariable[];
+
+  // Category ordering (for drag-and-drop in modal)
+  orderedCategories: VariableCategory[];
+  reorderCategories: (activeId: string, overId: string) => void;
+  reorderVariableAcrossCategories: (activeId: string, overId: string) => void;
 }
 
 export function useVariableSelection({
