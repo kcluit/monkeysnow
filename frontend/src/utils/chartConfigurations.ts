@@ -453,6 +453,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     chartType: 'line',
     formatValue: (v) => `${Math.round(v)}W/m²`,
     yAxisDomain: [0, 'auto'],
+    description: 'Longwave radiation emitted by Earth surface',
   }],
   ['uv_index', {
     id: 'uv_index',
