@@ -107,6 +107,9 @@ export interface ChartConfig {
     grid: GridConfig;
     dataZoom?: DataZoomConfig;
     theme: ChartTheme;
+    /** Chart height in pixels */
     height: number;
+    /** Chart width as percentage (20-100), only used in fullscreen mode */
+    width?: number;
     animation: boolean;
 }
