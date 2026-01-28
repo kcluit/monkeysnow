@@ -8,6 +8,8 @@ import type { WeatherModel, AggregationType } from '../../types/openMeteo';
 import type { ModelHierarchyNode } from '../../data/modelHierarchy';
 import { getModelsUnderNode, getAggregationsUnderNode } from '../../data/modelHierarchy';
 import { getModelConfig } from '../../utils/chartConfigurations';
+import { Icon } from '../Icon';
+import { icons } from '../../constants/icons';
 
 interface ModelTreeNodeProps {
   node: ModelHierarchyNode;
