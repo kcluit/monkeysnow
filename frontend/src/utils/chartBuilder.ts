@@ -630,8 +630,14 @@ function extractWindDirectionData(
         if (directionsAtTime.length === 0) {
             direction.push(null);
         } else {
-            // Use median direction (handles circular nature of angles approximately)
-            direction.push(calculateMedian(directionsAtTime));
+            // Use circular mean for wind directions (handles 0°/360° boundary correctly)
+            // Convert to unit vectors, average, then convert back to angle
+            const radians = directionsAtTime.map(d => d * Math.PI / 180);
+            const avgX = radians.reduce((sum, r) => sum + Math.cos(r), 0) / radians.length;
+            const avgY = radians.reduce((sum, r) => sum + Math.sin(r), 0) / radians.length;
+            let circularMean = Math.atan2(avgY, avgX) * 180 / Math.PI;
+            if (circularMean < 0) circularMean += 360; // Normalize to 0-360
+            direction.push(circularMean);
         }
     }
 
