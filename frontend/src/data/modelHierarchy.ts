@@ -32,6 +32,7 @@ export interface ModelHierarchyNode {
   name: string;
   type: ModelNodeType;
   description?: string;
+  resolution?: string;
   children?: ModelHierarchyNode[];
   modelId?: WeatherModel;
   aggregationType?: AggregationType;
