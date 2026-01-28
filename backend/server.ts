@@ -561,47 +561,48 @@ const updateWeatherData = async () => {
     };
 
     // --- Main Loop ---
-    // We iterate by resort. There are N resorts.
-    // mainResponses has N * 3 items.
-    // freezingResponses has N items.
+    // Process each country's responses
+    for (const country of countries) {
+        const batch = countryBatches[country];
+        const responses = countryResponses[country];
 
-    // We assume the order matches the insertion order (Bot, Mid, Top for each resort)
-    const resorts = Object.keys(locations);
+        for (let i = 0; i < batch.resortNames.length; i++) {
+            const resortName = batch.resortNames[i];
+            const resortData = locations[resortName];
+            const [lat, lon] = resortData.loc!;
 
-    for (let i = 0; i < resorts.length; i++) {
-        const resortName = resorts[i];
-        const resortData = locations[resortName];
-        const [lat, lon] = resortData.loc!;
-        const freezingResp = freezingResponses[i];
+            // Freezing response: 1 per resort
+            const freezingResp = responses.freezing[i];
 
-        // Indices in mainResponses
-        const idxBot = i * 3;
-        const idxMid = i * 3 + 1;
-        const idxTop = i * 3 + 2;
+            // Main responses: 3 per resort (Bot, Mid, Top)
+            const idxBot = i * 3;
+            const idxMid = i * 3 + 1;
+            const idxTop = i * 3 + 2;
 
-        const respBot = mainResponses[idxBot];
-        const respMid = mainResponses[idxMid];
-        const respTop = mainResponses[idxTop];
+            const respBot = responses.main[idxBot];
+            const respMid = responses.main[idxMid];
+            const respTop = responses.main[idxTop];
 
-        // Process each level
-        const forecastBot = processLocation(respBot, freezingResp);
-        const forecastMid = processLocation(respMid, freezingResp);
-        const forecastTop = processLocation(respTop, freezingResp);
+            // Process each level
+            const forecastBot = processLocation(respBot, freezingResp);
+            const forecastMid = processLocation(respMid, freezingResp);
+            const forecastTop = processLocation(respTop, freezingResp);
 
-        structuredData[resortName] = {
-            bot: {
-                metadata: { elevation: resortData.bot, lat, lon },
-                forecast: forecastBot
-            },
-            mid: {
-                metadata: { elevation: resortData.mid, lat, lon },
-                forecast: forecastMid
-            },
-            top: {
-                metadata: { elevation: resortData.top, lat, lon },
-                forecast: forecastTop
-            }
-        };
+            structuredData[resortName] = {
+                bot: {
+                    metadata: { elevation: resortData.bot, lat, lon },
+                    forecast: forecastBot
+                },
+                mid: {
+                    metadata: { elevation: resortData.mid, lat, lon },
+                    forecast: forecastMid
+                },
+                top: {
+                    metadata: { elevation: resortData.top, lat, lon },
+                    forecast: forecastTop
+                }
+            };
+        }
     }
 
     weatherCache = structuredData;
