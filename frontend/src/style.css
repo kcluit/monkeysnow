@@ -1287,20 +1287,18 @@ input[type="checkbox"] {
     background: transparent;
     border: none;
     color: var(--textSecondary, #a1a1a6);
-    font-size: 8px;
+    font-size: 10px;
     cursor: pointer;
-    transition: transform 0.15s ease;
     padding: 0;
 }
 
-.resort-grid-toggle.expanded {
-    transform: rotate(90deg);
-}
-
 .resort-grid-header-icon {
-    font-size: 14px;
+    font-size: 12px;
     width: 18px;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--textSecondary);
 }
 
 .resort-grid-count {
