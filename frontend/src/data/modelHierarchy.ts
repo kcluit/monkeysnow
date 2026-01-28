@@ -9,6 +9,7 @@ export interface ModelInfo {
   id: WeatherModel;
   name: string;
   description?: string;
+  resolution?: string;
 }
 
 export interface AggregationInfo {
