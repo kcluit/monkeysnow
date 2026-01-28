@@ -19,6 +19,7 @@ export interface VariableConfig {
     convertToImperial?: (value: number) => number;
     yAxisDomain?: [number | 'auto', number | 'auto'];
     description?: string;
+    defaultHeight?: number;
 }
 
 // Configuration for a weather model (how to display it in charts)
