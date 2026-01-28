@@ -433,7 +433,7 @@ const updateWeatherData = async () => {
             });
         }
 
-        // Group Freezing Data (Minutely)
+        // Group Freezing Data (Hourly)
         if (freezingLevels.length > 0) {
             for (let i = 0; i < freezingLevels.length; i++) {
                 const timestamp = (freezingTimeStart + i * freezingInterval + utcOffset) * 1000;
@@ -443,7 +443,7 @@ const updateWeatherData = async () => {
                 let chunk = hour < 12 ? 'AM' : (hour < 18 ? 'PM' : 'NIGHT');
 
                 if (dailyChunks[dateKey]) {
-                    dailyChunks[dateKey][chunk].minutely.push(freezingLevels[i]);
+                    dailyChunks[dateKey][chunk].freezingData.push(freezingLevels[i]);
                 }
             }
         }
