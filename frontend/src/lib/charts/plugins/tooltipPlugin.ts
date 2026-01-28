@@ -56,7 +56,7 @@ export function createTooltipPlugin(options: TooltipPluginOptions): uPlot.Plugin
             const value = u.data[i][idx];
             if (value === null || value === undefined) continue;
 
-            const formattedValue = config.yAxis.formatter(value);
+            const formattedValue = value.toFixed(2);
             const color = seriesConfig.color;
 
             content += `<div><span style="color:${color}">●</span> ${seriesConfig.name}: ${formattedValue}</div>`;
