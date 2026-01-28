@@ -1272,6 +1272,12 @@ input[type="checkbox"] {
     color: var(--textPrimary, #f5f5f7);
 }
 
+.model-resolution-label {
+    font-size: 9px;
+    color: var(--textTertiary, #6e6e73);
+    margin-left: 4px;
+}
+
 /* Shared styles */
 .resort-grid-toggle {
     display: flex;
