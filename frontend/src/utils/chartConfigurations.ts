@@ -431,6 +431,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     chartType: 'line',
     formatValue: (v) => `${Math.round(v)}W/m²`,
     yAxisDomain: [0, 'auto'],
+    description: 'Direct solar radiation perpendicular to the sun',
   }],
   ['global_tilted_irradiance', {
     id: 'global_tilted_irradiance',
