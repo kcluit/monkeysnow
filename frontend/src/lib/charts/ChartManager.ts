@@ -155,6 +155,10 @@ function buildUPlotSeries(config: ChartConfig): uPlot.Series[] {
  * Smaller ranges get more precision for readable axis labels.
  */
 function getDecimalPlaces(range: number): number {
+    // Handle invalid ranges (zero, negative, NaN, Infinity)
+    if (!Number.isFinite(range) || range <= 0) {
+        return 0; // Safe default: integers
+    }
     if (range >= 10) return 0;
     if (range >= 1) return 1;
     if (range >= 0.1) return 2;
