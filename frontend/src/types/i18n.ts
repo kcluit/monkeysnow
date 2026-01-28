@@ -179,7 +179,7 @@ export const TranslationsSchema = z.object({
     'command.rainbowText': z.string(),
     'command.fullscreen': z.string(),
     'command.fpsCounter': z.string(),
-    'command.hideEmoji': z.string(),
+    'command.hideIcons': z.string(),
     'command.showBorders': z.string(),
     'command.showDate': z.string(),
     'command.elevation': z.string(),
