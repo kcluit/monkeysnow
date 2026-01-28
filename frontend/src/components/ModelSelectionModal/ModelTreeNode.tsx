@@ -146,8 +146,8 @@ export const ModelTreeNode = memo(function ModelTreeNode({
           role="checkbox"
           aria-checked={checkboxState === 'checked' ? true : checkboxState === 'indeterminate' ? 'mixed' : false}
         >
-          {checkboxState === 'checked' && '✓'}
-          {checkboxState === 'indeterminate' && '−'}
+          {checkboxState === 'checked' && <Icon icon={icons.check} />}
+          {checkboxState === 'indeterminate' && <Icon icon={icons.minus} />}
         </span>
 
         {/* Color dot for models and aggregations */}
