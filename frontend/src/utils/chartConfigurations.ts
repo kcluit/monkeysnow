@@ -184,6 +184,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     formatValue: (v, u) => u === 'metric' ? `${Math.round(v)}km/h` : `${Math.round(kmhToMph(v))}mph`,
     convertToImperial: kmhToMph,
     yAxisDomain: [0, 'auto'],
+    description: 'Wind speed at 10 meters above ground',
   }],
   ['wind_gusts_10m', {
     id: 'wind_gusts_10m',
