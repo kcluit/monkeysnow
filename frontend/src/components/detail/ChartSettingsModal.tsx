@@ -129,6 +129,7 @@ export function ChartSettingsModal({
     const handleApply = () => {
         onChartTypeChange(localChartType);
         onAccumulationChange(localShowAccumulation);
+        onOverlaysChange(localShowOverlays);
         onZoomSyncExcludedChange(localZoomSyncExcluded);
         onChartHeightChange(localChartHeight);
         onChartWidthChange(localChartWidth);
