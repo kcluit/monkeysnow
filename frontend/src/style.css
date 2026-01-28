@@ -348,23 +348,18 @@ input[type="checkbox"] {
 }
 
 .command-icon {
-    font-size: 16px;
+    font-size: 14px;
     width: 20px;
     text-align: center;
-    background: var(--textSecondary);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
+    color: var(--textSecondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Selected state - white emoji to match white text */
+/* Selected state - white icon to match white text */
 .command-item.selected .command-icon {
-    background: #ffffff;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
+    color: #ffffff;
 }
 
 .command-name {
