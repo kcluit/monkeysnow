@@ -1,5 +1,6 @@
 import type { Theme } from './themes';
 import type { UnitSystem as UnitSystemType } from '../utils/unitConversion';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
 // Unit system
 export type UnitSystem = UnitSystemType;
@@ -9,7 +10,7 @@ export interface Command {
     id: string;
     name: string;
     shortcut?: string;
-    icon?: string;
+    icon?: IconDefinition;
     action?: () => void;
     subCommands?: Command[];
 }
