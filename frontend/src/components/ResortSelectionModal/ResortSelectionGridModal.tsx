@@ -359,7 +359,7 @@ const ContinentColumn = memo(function ContinentColumn({
 // Main modal component
 export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
   hierarchy,
-  hideEmoji,
+  hideIcons,
 }: ResortSelectionGridModalProps): JSX.Element | null {
   const {
     isOpen,
