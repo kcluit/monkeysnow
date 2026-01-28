@@ -47,6 +47,7 @@ function VariableCardDraggableInner({
             {...attributes}
             {...listeners}
             onClick={(e) => e.preventDefault()}
+            aria-label={`Drag to reorder ${config?.label || variable}`}
           >
             <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
               <circle cx="5" cy="4" r="1.5" />
