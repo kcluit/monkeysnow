@@ -357,6 +357,16 @@ export class ChartManager {
             plugins.push(createBoxWhiskerPlugin({ series: boxWhiskerSeries }));
         }
 
+        // Heatmap plugin - draws hour-of-day matrix visualization
+        const heatmapSeries = series.find((s) => s.type === 'heatmap' && s.heatmapData);
+        if (heatmapSeries && heatmapSeries.heatmapData) {
+            const allValues = heatmapSeries.heatmapData.values.flat().filter((v): v is number => v !== null && Number.isFinite(v));
+            if (allValues.length > 0) {
+                const valueRange: [number, number] = [Math.min(...allValues), Math.max(...allValues)];
+                plugins.push(createHeatmapPlugin({ series: heatmapSeries, valueRange, theme: config.theme }));
+            }
+        }
+
         // Build uPlot options
         const opts: uPlot.Options = {
             width,
