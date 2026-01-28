@@ -32,6 +32,7 @@ import { useLanguage } from './hooks/useLanguage';
 import { useHierarchy } from './contexts/HierarchyContext';
 import { processResortData } from './utils/weather';
 import { generateControlCommands } from './utils/commandGenerators';
+import { icons } from './constants/icons';
 import { setGlobalZoomSync } from './lib/charts/chartRegistry';
 import { getSortDayData } from './utils/sortDayHelpers';
 import { getResortLocation } from './utils/openMeteoClient';
