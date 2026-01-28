@@ -71,6 +71,8 @@ export interface DataZoomConfig {
 /** Complete chart configuration */
 export interface ChartConfig {
     type: ChartType;
+    /** The weather variable this chart displays (e.g., 'temperature_2m') */
+    variable?: string;
     xAxis: XAxisConfig;
     yAxis: YAxisConfig;
     yAxisSecondary?: YAxisConfig;
