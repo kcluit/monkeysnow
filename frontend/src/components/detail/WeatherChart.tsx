@@ -25,6 +25,8 @@ export function WeatherChart({
     selectedAggregations,
     aggregationColors,
     hideAggregationMembers,
+    showMinMaxFill,
+    showPercentileFill,
     variable,
     unitSystem,
     timezoneInfo,
