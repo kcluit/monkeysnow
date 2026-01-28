@@ -43,8 +43,27 @@ function getStructuralKey(config: ChartConfig): string {
  */
 function transformToUPlotData(config: ChartConfig): uPlot.AlignedData {
     const { xAxis, series } = config;
+    const expectedLength = xAxis.data.length;
     const xData = xAxis.data.map((_, idx) => idx);
-    const yData = series.map((s) => s.data.map((v) => (v === null ? null : v)));
+
+    const yData = series.map((s) => {
+        // Ensure series data matches x-axis length
+        const data = s.data.slice(0, expectedLength);
+
+        // Pad with nulls if series is shorter
+        while (data.length < expectedLength) {
+            data.push(null);
+        }
+
+        // Convert values, ensuring nulls and NaN become null
+        return data.map((v) => {
+            if (v === null || v === undefined || !Number.isFinite(v)) {
+                return null;
+            }
+            return v;
+        });
+    });
+
     return [xData, ...yData] as uPlot.AlignedData;
 }
 
