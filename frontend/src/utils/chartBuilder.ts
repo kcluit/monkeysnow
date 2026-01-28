@@ -495,6 +495,109 @@ function calculateBoxWhiskerData(
 }
 
 /**
+ * Transform time-series data into hour-of-day heatmap format.
+ * Groups data by hour (0-23) and date, computing median across models for each cell.
+ */
+function transformToHeatmap(
+    data: Map<WeatherModel, HourlyDataPoint[]>,
+    selectedModels: WeatherModel[],
+    variable: string,
+    unitSystem: UnitSystem,
+    convertToImperial?: (value: number) => number,
+    timezone?: string
+): HeatmapData {
+    // Get time points from first available model
+    const firstModelData = data.values().next().value as HourlyDataPoint[] | undefined;
+    if (!firstModelData || firstModelData.length === 0) {
+        return { hours: [], dates: [], values: [] };
+    }
+
+    // Group data points by date and hour
+    const dateHourMap = new Map<string, Map<number, number[]>>();
+    const dateOrder: string[] = [];
+
+    for (const point of firstModelData) {
+        const date = new Date(point.time);
+
+        // Apply timezone if provided
+        let dateStr: string;
+        let hour: number;
+
+        if (timezone) {
+            try {
+                const options: Intl.DateTimeFormatOptions = {
+                    timeZone: timezone,
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                };
+                dateStr = date.toLocaleDateString('en-US', options);
+                hour = parseInt(date.toLocaleString('en-US', { timeZone: timezone, hour: 'numeric', hour12: false }));
+            } catch {
+                dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                hour = date.getHours();
+            }
+        } else {
+            dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            hour = date.getHours();
+        }
+
+        // Track date order
+        if (!dateHourMap.has(dateStr)) {
+            dateHourMap.set(dateStr, new Map());
+            dateOrder.push(dateStr);
+        }
+
+        const hourMap = dateHourMap.get(dateStr)!;
+        if (!hourMap.has(hour)) {
+            hourMap.set(hour, []);
+        }
+
+        // Collect values from all models at this time point
+        for (const model of selectedModels) {
+            const modelData = data.get(model);
+            if (!modelData) continue;
+
+            const idx = firstModelData.indexOf(point);
+            if (idx >= 0 && idx < modelData.length) {
+                const value = modelData[idx][variable];
+                if (typeof value === 'number' && Number.isFinite(value)) {
+                    let finalValue = value;
+                    if (unitSystem === 'imperial' && convertToImperial) {
+                        const converted = convertToImperial(value);
+                        if (Number.isFinite(converted)) {
+                            finalValue = converted;
+                        }
+                    }
+                    hourMap.get(hour)!.push(finalValue);
+                }
+            }
+        }
+    }
+
+    // Build the values matrix [hour][date]
+    const hours = Array.from({ length: 24 }, (_, i) => i);
+    const dates = dateOrder;
+    const values: (number | null)[][] = [];
+
+    for (let h = 0; h < 24; h++) {
+        const hourRow: (number | null)[] = [];
+        for (const dateStr of dates) {
+            const hourMap = dateHourMap.get(dateStr);
+            const cellValues = hourMap?.get(h);
+            if (cellValues && cellValues.length > 0) {
+                hourRow.push(calculateMedian(cellValues));
+            } else {
+                hourRow.push(null);
+            }
+        }
+        values.push(hourRow);
+    }
+
+    return { hours, dates, values };
+}
+
+/**
  * Build a complete ChartConfig from weather data and props.
  */
 export function buildWeatherChartConfig(
