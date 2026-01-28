@@ -899,3 +899,89 @@ export function getVariableConfig(variableId: WeatherVariable): VariableConfig {
     formatValue: (v) => `${Number.isInteger(v) ? v : parseFloat(v.toFixed(2))}`,
   };
 }
+
+// Overlay level configuration
+export interface OverlayLevel {
+  variable: WeatherVariable;
+  label: string;
+  color: string;
+  opacity?: number;
+}
+
+// Overlay configuration for a base variable
+export interface OverlayConfig {
+  baseVariable: WeatherVariable;
+  overlays: OverlayLevel[];
+  description: string;
+}
+
+// Overlay configurations - maps base variables to their overlay levels
+export const OVERLAY_CONFIGS: OverlayConfig[] = [
+  {
+    baseVariable: 'wind_speed_10m',
+    overlays: [
+      { variable: 'wind_speed_80m', label: '80m', color: '#22c55e', opacity: 0.7 },
+      { variable: 'wind_speed_120m', label: '120m', color: '#16a34a', opacity: 0.6 },
+      { variable: 'wind_speed_180m', label: '180m', color: '#15803d', opacity: 0.5 },
+    ],
+    description: 'altitude levels',
+  },
+  {
+    baseVariable: 'wind_direction_10m',
+    overlays: [
+      { variable: 'wind_direction_80m', label: '80m', color: '#4ade80', opacity: 0.7 },
+      { variable: 'wind_direction_120m', label: '120m', color: '#22c55e', opacity: 0.6 },
+      { variable: 'wind_direction_180m', label: '180m', color: '#16a34a', opacity: 0.5 },
+    ],
+    description: 'altitude levels',
+  },
+  {
+    baseVariable: 'soil_temperature_0cm',
+    overlays: [
+      { variable: 'soil_temperature_6cm', label: '6cm', color: '#ca8a04', opacity: 0.7 },
+      { variable: 'soil_temperature_18cm', label: '18cm', color: '#a16207', opacity: 0.6 },
+      { variable: 'soil_temperature_54cm', label: '54cm', color: '#854d0e', opacity: 0.5 },
+    ],
+    description: 'depth levels',
+  },
+  {
+    baseVariable: 'soil_moisture_0_to_1cm',
+    overlays: [
+      { variable: 'soil_moisture_1_to_3cm', label: '1-3cm', color: '#a16207', opacity: 0.7 },
+      { variable: 'soil_moisture_3_to_9cm', label: '3-9cm', color: '#92400e', opacity: 0.6 },
+      { variable: 'soil_moisture_9_to_27cm', label: '9-27cm', color: '#78350f', opacity: 0.5 },
+      { variable: 'soil_moisture_27_to_81cm', label: '27-81cm', color: '#713f12', opacity: 0.4 },
+    ],
+    description: 'depth levels',
+  },
+];
+
+// Get overlay config for a base variable
+export function getOverlayConfig(baseVariable: WeatherVariable): OverlayConfig | undefined {
+  return OVERLAY_CONFIGS.find(config => config.baseVariable === baseVariable);
+}
+
+// Check if a variable has overlays
+export function hasOverlays(variable: WeatherVariable): boolean {
+  return OVERLAY_CONFIGS.some(config => config.baseVariable === variable);
+}
+
+// Get all overlay variable names (for filtering from selection UI)
+export function getAllOverlayVariables(): Set<WeatherVariable> {
+  const overlayVars = new Set<WeatherVariable>();
+  for (const config of OVERLAY_CONFIGS) {
+    config.overlays.forEach(o => overlayVars.add(o.variable));
+  }
+  return overlayVars;
+}
+
+// Check if a variable is an overlay variable (not a base variable)
+export function isOverlayVariable(variable: WeatherVariable): boolean {
+  return getAllOverlayVariables().has(variable);
+}
+
+// Get all overlay variables for a base variable
+export function getOverlayVariablesFor(baseVariable: WeatherVariable): WeatherVariable[] {
+  const config = getOverlayConfig(baseVariable);
+  return config ? config.overlays.map(o => o.variable) : [];
+}
