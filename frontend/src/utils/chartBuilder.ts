@@ -833,6 +833,15 @@ export function buildWeatherChartConfig(
         ? { top: 10, right: 10, bottom: 1, left: 50, containLabel: false }
         : { top: 10, right: 0, bottom: 1, left: 0, containLabel: true };
 
+    // Build elevation lines config for freezing level chart
+    const M_TO_FT = 3.28084;
+    const elevationLines = variable === 'freezing_level_height' && location ? {
+        base: unitSystem === 'imperial' ? location.baseElevation * M_TO_FT : location.baseElevation,
+        mid: unitSystem === 'imperial' ? location.midElevation * M_TO_FT : location.midElevation,
+        top: unitSystem === 'imperial' ? location.topElevation * M_TO_FT : location.topElevation,
+        unit: unitSystem === 'imperial' ? 'ft' : 'm',
+    } : undefined;
+
     return {
         type: chartType,
         variable, // Pass variable for plugin decisions (e.g., zero axis exclusion)
@@ -857,6 +866,7 @@ export function buildWeatherChartConfig(
         theme: chartTheme,
         height: settings?.customHeight ?? (chartType === 'heatmap' ? 300 : 380),
         animation: false,
+        elevationLines,
     };
 }
 
