@@ -58,19 +58,19 @@ export function generateElevationCommands(
     {
       id: 'elevation-bot',
       name: 'Base forecast',
-      icon: selectedElevation === 'bot' ? '✓' : '',
+      icon: selectedElevation === 'bot' ? icons.check : undefined,
       action: () => setSelectedElevation('bot'),
     },
     {
       id: 'elevation-mid',
       name: 'Mid forecast',
-      icon: selectedElevation === 'mid' ? '✓' : '',
+      icon: selectedElevation === 'mid' ? icons.check : undefined,
       action: () => setSelectedElevation('mid'),
     },
     {
       id: 'elevation-top',
       name: 'Peak forecast',
-      icon: selectedElevation === 'top' ? '✓' : '',
+      icon: selectedElevation === 'top' ? icons.check : undefined,
       action: () => setSelectedElevation('top'),
     },
   ];
