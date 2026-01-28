@@ -59,7 +59,7 @@ export function CommandPalette({ palette, hideIcons }: CommandPaletteProps): JSX
           selectedIndex={selectedIndex}
           onSelect={selectAtIndex}
           onHover={setSelectedIndex}
-          hideEmoji={hideEmoji}
+          hideIcons={hideIcons}
         />
         <div className="command-palette-footer">
           <span className="command-hint">
