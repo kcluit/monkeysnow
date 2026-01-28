@@ -1,5 +1,7 @@
 import { memo, useCallback } from 'react';
 import type { Command } from '../../types';
+import { Icon } from '../Icon';
+import { icons } from '../../constants/icons';
 
 interface CommandItemProps {
     command: Command;
@@ -7,7 +9,7 @@ interface CommandItemProps {
     isSelected: boolean;
     onSelect: (index: number) => void;
     onHover: (index: number) => void;
-    hideEmoji?: boolean;
+    hideIcons?: boolean;
 }
 
 export const CommandItem = memo(function CommandItem({
@@ -16,7 +18,7 @@ export const CommandItem = memo(function CommandItem({
     isSelected,
     onSelect,
     onHover,
-    hideEmoji,
+    hideIcons,
 }: CommandItemProps): JSX.Element {
     const hasSubCommands = command.subCommands && command.subCommands.length > 0;
 
@@ -36,14 +38,14 @@ export const CommandItem = memo(function CommandItem({
             onMouseEnter={handleMouseEnter}
         >
             <div className="command-item-content">
-                {!hideEmoji && command.icon && <span className="command-icon">{command.icon}</span>}
+                {!hideIcons && command.icon && <Icon icon={command.icon} className="command-icon" />}
                 <span className="command-name">{command.name}</span>
             </div>
             <div className="command-item-meta">
                 {command.shortcut && (
                     <span className="command-shortcut">{command.shortcut}</span>
                 )}
-                {hasSubCommands && <span className="command-arrow">&gt;</span>}
+                {hasSubCommands && <Icon icon={icons.chevronRight} className="command-arrow" />}
             </div>
         </button>
     );
