@@ -598,6 +598,47 @@ function transformToHeatmap(
 }
 
 /**
+ * Extract wind direction data for wind arrow overlay.
+ * Returns the median direction across all models at each time point.
+ */
+function extractWindDirectionData(
+    data: Map<WeatherModel, HourlyDataPoint[]>,
+    selectedModels: WeatherModel[],
+    timePoints: number
+): WindArrowData {
+    const direction: (number | null)[] = [];
+
+    // Get time points from first available model
+    const firstModelData = data.values().next().value as HourlyDataPoint[] | undefined;
+    if (!firstModelData) {
+        return { direction: [] };
+    }
+
+    for (let i = 0; i < timePoints; i++) {
+        const directionsAtTime: number[] = [];
+
+        for (const model of selectedModels) {
+            const modelData = data.get(model);
+            if (!modelData || i >= modelData.length) continue;
+
+            const dir = modelData[i]['wind_direction_10m'];
+            if (typeof dir === 'number' && Number.isFinite(dir)) {
+                directionsAtTime.push(dir);
+            }
+        }
+
+        if (directionsAtTime.length === 0) {
+            direction.push(null);
+        } else {
+            // Use median direction (handles circular nature of angles approximately)
+            direction.push(calculateMedian(directionsAtTime));
+        }
+    }
+
+    return { direction };
+}
+
+/**
  * Build a complete ChartConfig from weather data and props.
  */
 export function buildWeatherChartConfig(
