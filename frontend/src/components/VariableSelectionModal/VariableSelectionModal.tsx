@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState, useMemo } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -16,6 +16,8 @@ import {
 } from '@dnd-kit/sortable';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { VariableDraggableItem } from './VariableDraggableItem';
+import { VariableCategorySection } from './VariableCategorySection';
+import { VARIABLE_CATEGORIES } from '../../data/variableCategories';
 import type { UseVariableSelectionReturn } from '../../hooks/useVariableSelection';
 
 interface VariableSelectionModalProps {
@@ -37,6 +39,11 @@ export function VariableSelectionModal({
     searchTerm,
     setSearchTerm,
   } = selection;
+
+  // Track which categories are expanded (all expanded by default)
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
+    () => new Set(VARIABLE_CATEGORIES.map(c => c.id))
+  );
 
   // Configure sensors for drag-and-drop
   const sensors = useSensors(
@@ -66,6 +73,40 @@ export function VariableSelectionModal({
     },
     [reorderVariables]
   );
+
+  // Toggle category expansion
+  const toggleCategoryExpand = useCallback((categoryId: string) => {
+    setExpandedCategories(prev => {
+      const next = new Set(prev);
+      if (next.has(categoryId)) {
+        next.delete(categoryId);
+      } else {
+        next.add(categoryId);
+      }
+      return next;
+    });
+  }, []);
+
+  // Expand/collapse all categories
+  const expandAllCategories = useCallback(() => {
+    setExpandedCategories(new Set(VARIABLE_CATEGORIES.map(c => c.id)));
+  }, []);
+
+  const collapseAllCategories = useCallback(() => {
+    setExpandedCategories(new Set());
+  }, []);
+
+  // Check if searching
+  const isSearching = searchTerm.trim().length > 0;
+
+  // Filter categories to only show those with matching variables
+  const filteredCategories = useMemo(() => {
+    const filteredSet = new Set(filteredVariables);
+    return VARIABLE_CATEGORIES.map(category => ({
+      ...category,
+      variables: category.variables.filter(v => filteredSet.has(v)),
+    })).filter(cat => cat.variables.length > 0);
+  }, [filteredVariables]);
 
   // Prevent body scroll when open
   useEffect(() => {
@@ -104,20 +145,18 @@ export function VariableSelectionModal({
     }
   };
 
-  // SortableContext needs all filtered items, but individual items handle their disabled state
-  const draggableIds = filteredVariables;
-
   // Calculate how many selected items are shown in filtered list
   const selectedInFilteredCount = filteredVariables.filter(v => isSelected(v)).length;
+  const allExpanded = expandedCategories.size === VARIABLE_CATEGORIES.length;
 
   return (
     <div className="command-palette-backdrop" onClick={handleBackdropClick}>
       <div className="command-palette variable-selection-modal">
         {/* Header */}
         <div className="variable-selection-header">
-          <h2 className="variable-selection-title">Select & Reorder Variables</h2>
+          <h2 className="variable-selection-title">Select Variables</h2>
           <p className="variable-selection-subtitle">
-            Drag to reorder charts. Check/uncheck to show/hide.
+            Choose which weather variables to display in charts.
           </p>
         </div>
 
@@ -149,41 +188,70 @@ export function VariableSelectionModal({
           >
             Deselect All
           </button>
+          {!isSearching && (
+            <button
+              type="button"
+              onClick={allExpanded ? collapseAllCategories : expandAllCategories}
+              className="variable-action-button"
+            >
+              {allExpanded ? 'Collapse All' : 'Expand All'}
+            </button>
+          )}
           <span className="variable-selection-count">
-            {selectedInFilteredCount} of {filteredVariables.length} shown
+            {selectedInFilteredCount} of {filteredVariables.length}
           </span>
         </div>
 
-        {/* Variable list with drag-and-drop */}
+        {/* Variable content */}
         <div className="variable-selection-content">
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-            modifiers={[restrictToVerticalAxis]}
-          >
-            <SortableContext
-              items={draggableIds}
-              strategy={verticalListSortingStrategy}
+          {isSearching ? (
+            // Search mode: flat list with drag-and-drop
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+              modifiers={[restrictToVerticalAxis]}
             >
-              {filteredVariables.map((variable) => (
-                <VariableDraggableItem
-                  key={variable}
-                  variable={variable}
-                  isSelected={isSelected(variable)}
-                  onToggle={() => toggleVariable(variable)}
-                  isDragDisabled={!isSelected(variable)}
+              <SortableContext
+                items={filteredVariables}
+                strategy={verticalListSortingStrategy}
+              >
+                {filteredVariables.map((variable) => (
+                  <VariableDraggableItem
+                    key={variable}
+                    variable={variable}
+                    isSelected={isSelected(variable)}
+                    onToggle={() => toggleVariable(variable)}
+                    isDragDisabled={!isSelected(variable)}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
+          ) : (
+            // Normal mode: categorized grid
+            <div className="variable-categories">
+              {filteredCategories.map(category => (
+                <VariableCategorySection
+                  key={category.id}
+                  category={category}
+                  variables={category.variables}
+                  isSelected={isSelected}
+                  onToggle={toggleVariable}
+                  isExpanded={expandedCategories.has(category.id)}
+                  onToggleExpand={() => toggleCategoryExpand(category.id)}
                 />
               ))}
-            </SortableContext>
-          </DndContext>
+            </div>
+          )}
         </div>
 
         {/* Footer */}
         <div className="command-palette-footer">
-          <span className="command-hint">
-            <kbd>↕</kbd> drag to reorder
-          </span>
+          {isSearching && (
+            <span className="command-hint">
+              <kbd>↕</kbd> drag to reorder
+            </span>
+          )}
           <span className="command-hint">
             <kbd>esc</kbd> close
           </span>
