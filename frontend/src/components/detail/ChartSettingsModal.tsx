@@ -27,10 +27,12 @@ interface ChartSettingsModalProps {
     onZoomSyncExcludedChange: (excluded: boolean) => void;
 }
 
-const CHART_TYPES: { type: ChartDisplayType; label: string; icon: string }[] = [
+const CHART_TYPES: { type: ChartDisplayType; label: string; icon: string; requiresMultipleModels?: boolean }[] = [
     { type: 'line', label: 'Line', icon: '📈' },
     { type: 'bar', label: 'Bar', icon: '📊' },
     { type: 'area', label: 'Area', icon: '📉' },
+    { type: 'boxwhisker', label: 'Box & Whisker', icon: '📦', requiresMultipleModels: true },
+    { type: 'heatmap', label: 'Heatmap', icon: '🗓️', requiresMultipleModels: true },
 ];
 
 export function ChartSettingsModal({
