@@ -363,6 +363,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     chartType: 'line',
     formatValue: (v, u) => u === 'metric' ? `${Math.round(v)}hPa` : `${hpaToInHg(v).toFixed(2)}inHg`,
     convertToImperial: hpaToInHg,
+    description: 'Atmospheric air pressure reduced to mean sea level',
   }],
   ['vapour_pressure_deficit', {
     id: 'vapour_pressure_deficit',
