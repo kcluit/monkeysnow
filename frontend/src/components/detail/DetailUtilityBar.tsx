@@ -285,6 +285,10 @@ export function DetailUtilityBar({
                 hierarchy={modelHierarchy}
                 hideAggregationMembers={hideAggregationMembers}
                 onToggleHideMembers={() => setHideAggregationMembers(!hideAggregationMembers)}
+                showMinMaxFill={showMinMaxFill}
+                onToggleMinMaxFill={() => setShowMinMaxFill(!showMinMaxFill)}
+                showPercentileFill={showPercentileFill}
+                onTogglePercentileFill={() => setShowPercentileFill(!showPercentileFill)}
             />
 
             {/* Variable Selection Modal */}
