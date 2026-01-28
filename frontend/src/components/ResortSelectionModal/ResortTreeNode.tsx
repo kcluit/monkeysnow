@@ -103,12 +103,12 @@ export const ResortTreeNode = memo(function ResortTreeNode({
           role="checkbox"
           aria-checked={checkboxState === 'checked' ? true : checkboxState === 'indeterminate' ? 'mixed' : false}
         >
-          {checkboxState === 'checked' && '✓'}
-          {checkboxState === 'indeterminate' && '−'}
+          {checkboxState === 'checked' && <Icon icon={icons.check} />}
+          {checkboxState === 'indeterminate' && <Icon icon={icons.minus} />}
         </span>
 
         {/* Icon */}
-        {!hideEmoji && <span className="resort-tree-icon">{getIcon()}</span>}
+        {!hideIcons && <span className="resort-tree-icon"><Icon icon={getIcon()} /></span>}
 
         {/* Name */}
         <span className="resort-tree-name">{node.name}</span>
