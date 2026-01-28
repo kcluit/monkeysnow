@@ -319,6 +319,28 @@ const ProviderSection = memo(function ProviderSection({
             }
             return null;
           })}
+          {/* Band fill toggle options - only in Aggregations section */}
+          {isAggregationsSection && (
+            <>
+              <div className="model-fill-options-divider" />
+              <label className="resort-grid-item fill-option-item" onClick={(e) => { e.preventDefault(); onToggleMinMaxFill?.(); }}>
+                <Checkbox state={showMinMaxFill ? 'all' : 'none'} onClick={(e) => { e.stopPropagation(); onToggleMinMaxFill?.(); }} />
+                <span className="fill-option-icon">▒</span>
+                <div className="model-tree-info">
+                  <span className="resort-grid-item-name">Min-Max Fill</span>
+                  <span className="model-tree-description">Shaded area between min and max lines</span>
+                </div>
+              </label>
+              <label className="resort-grid-item fill-option-item" onClick={(e) => { e.preventDefault(); onTogglePercentileFill?.(); }}>
+                <Checkbox state={showPercentileFill ? 'all' : 'none'} onClick={(e) => { e.stopPropagation(); onTogglePercentileFill?.(); }} />
+                <span className="fill-option-icon">▒</span>
+                <div className="model-tree-info">
+                  <span className="resort-grid-item-name">25th-75th Fill</span>
+                  <span className="model-tree-description">Shaded area between percentile lines</span>
+                </div>
+              </label>
+            </>
+          )}
         </div>
       )}
     </div>
