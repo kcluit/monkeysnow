@@ -40,6 +40,12 @@ const CHART_TYPES: { type: ChartDisplayType; label: string; icon: string; requir
     { type: 'heatmap', label: 'Heatmap', icon: '🗓️', requiresMultipleModels: true },
 ];
 
+// Dimension constraints
+const HEIGHT_MIN = 200;
+const HEIGHT_MAX = 800;
+const WIDTH_MIN = 20;
+const WIDTH_MAX = 100;
+
 export function ChartSettingsModal({
     isOpen,
     onClose,
@@ -50,11 +56,17 @@ export function ChartSettingsModal({
     onAccumulationChange,
     zoomSyncExcluded,
     onZoomSyncExcludedChange,
+    chartHeight,
+    onChartHeightChange,
+    chartWidth,
+    onChartWidthChange,
 }: ChartSettingsModalProps): JSX.Element | null {
     // Local state for changes before applying
     const [localChartType, setLocalChartType] = useState(chartType);
     const [localShowAccumulation, setLocalShowAccumulation] = useState(showAccumulation);
     const [localZoomSyncExcluded, setLocalZoomSyncExcluded] = useState(zoomSyncExcluded);
+    const [localChartHeight, setLocalChartHeight] = useState(chartHeight);
+    const [localChartWidth, setLocalChartWidth] = useState(chartWidth);
 
     // Sync local state when modal opens
     useEffect(() => {
@@ -62,8 +74,10 @@ export function ChartSettingsModal({
             setLocalChartType(chartType);
             setLocalShowAccumulation(showAccumulation);
             setLocalZoomSyncExcluded(zoomSyncExcluded);
+            setLocalChartHeight(chartHeight);
+            setLocalChartWidth(chartWidth);
         }
-    }, [isOpen, chartType, showAccumulation, zoomSyncExcluded]);
+    }, [isOpen, chartType, showAccumulation, zoomSyncExcluded, chartHeight, chartWidth]);
 
     // Prevent body scroll when open
     useEffect(() => {
