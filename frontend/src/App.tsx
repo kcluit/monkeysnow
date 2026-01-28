@@ -115,8 +115,34 @@ function App(): JSX.Element {
         [selectedResorts, allWeatherData, selectedElevation]
     );
 
-    // Build commands for command palette
-    const commands: Command[] = useMemo(() => {
+    // Dependencies for command palette lazy generation
+    const commandDeps = [
+        availableThemes, setTheme,
+        availableFonts, setFont,
+        isRainbowEnabled, setRainbowEnabled,
+        isFullscreen, enterFullscreen, exitFullscreen,
+        isFPSEnabled, setFPSEnabled,
+        isHideEmojiEnabled, setHideEmojiEnabled,
+        isHideBordersEnabled, setHideBordersEnabled,
+        isShowDateEnabled, setShowDateEnabled,
+        chartZoomSyncEnabled, setChartZoomSyncEnabled,
+        selectedElevation, setSelectedElevation,
+        selectedSort, setSelectedSort,
+        selectedSortDay, setSelectedSortDay,
+        sortDayData,
+        isReversed, setIsReversed,
+        viewMode, setViewMode,
+        selectedTemperatureMetric, setSelectedTemperatureMetric,
+        snowfallEstimateMode, setSnowfallEstimateMode,
+        showUtilityBar, setShowUtilityBar,
+        utilityBarStyle, setUtilityBarStyle,
+        unitSystem, setUnitSystem,
+        resortHierarchy.openModal,
+        language.id, setLanguage, availableLanguages,
+    ];
+
+    // Command factory for lazy generation - commands only built when palette opens
+    const commandFactory = useCallback(() => {
         // Base commands (Theme, Font, etc.)
         const baseCommands: Command[] = [
             {
