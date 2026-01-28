@@ -140,6 +140,11 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
 .claude
+.agent
+.agents
+.cursor
+.gemini
+.opencode
 CLAUDE.md
 # Turborepo
 .turbo/
