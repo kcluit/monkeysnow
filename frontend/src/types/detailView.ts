@@ -119,4 +119,10 @@ export interface WeatherChartProps {
     timezoneInfo?: TimezoneInfo;
     isChartLocked?: boolean;
     onToggleVisibility?: () => void;
+    /** Location elevations for freezing level chart reference lines */
+    location?: {
+        baseElevation: number;
+        midElevation: number;
+        topElevation: number;
+    };
 }
