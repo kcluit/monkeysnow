@@ -1930,6 +1930,96 @@ input[type="checkbox"] {
     opacity: 0.6;
 }
 
+/* Chart fullscreen mode */
+.weather-chart-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    margin: 0;
+    padding: 1.5rem;
+    border-radius: 0;
+    overflow: auto;
+    background: var(--background, #1c1c1e);
+    display: flex;
+    flex-direction: column;
+}
+
+.weather-chart-fullscreen .weather-chart-canvas {
+    flex: 1;
+    width: 100% !important;
+    min-height: 0;
+}
+
+/* Chart settings slider controls */
+.chart-settings-slider {
+    margin: 0.75rem 0;
+}
+
+.chart-settings-slider-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.875rem;
+    color: var(--textPrimary, #f5f5f7);
+    margin-bottom: 0.5rem;
+}
+
+.chart-settings-slider-value {
+    color: var(--accent, #0a84ff);
+    font-weight: 600;
+    font-size: 0.8125rem;
+}
+
+.chart-settings-slider-desc {
+    display: block;
+    margin-top: 0.5rem;
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 0.75rem;
+}
+
+.chart-settings-range {
+    width: 100%;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--secondary, rgba(255, 255, 255, 0.1));
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+}
+
+.chart-settings-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--accent, #0a84ff);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.chart-settings-range::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+}
+
+.chart-settings-range::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: var(--accent, #0a84ff);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.chart-settings-range::-moz-range-thumb:hover {
+    transform: scale(1.15);
+}
+
 /* uPlot customizations */
 .uplot {
     font-family: inherit;
