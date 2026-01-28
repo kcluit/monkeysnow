@@ -532,6 +532,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     formatValue: (v, u) => u === 'metric' ? `${v.toFixed(2)}mm` : `${mmToInches(v).toFixed(3)}in`,
     convertToImperial: mmToInches,
     yAxisDomain: [0, 'auto'],
+    description: 'Water loss from land surface and plants',
   }],
   ['et0_fao_evapotranspiration', {
     id: 'et0_fao_evapotranspiration',
