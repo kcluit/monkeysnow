@@ -62,7 +62,7 @@ function App(): JSX.Element {
     const { isFullscreen, enterFullscreen, exitFullscreen } = useFullscreen();
     const { fps, isEnabled: isFPSEnabled, setEnabled: setFPSEnabled } = useFPSCounter();
     const { isRainbowEnabled, setRainbowEnabled } = useRainbowText();
-    const { isHideEmojiEnabled, setHideEmojiEnabled } = useHideEmoji();
+    const { isHideIconsEnabled, setHideIconsEnabled } = useHideIcons();
     const { isHideBordersEnabled, setHideBordersEnabled } = useHideBorders();
     const { isShowDateEnabled, setShowDateEnabled } = useShowDate();
     const { t, language, setLanguage, availableLanguages } = useLanguage();
