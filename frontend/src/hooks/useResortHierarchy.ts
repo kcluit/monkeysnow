@@ -192,7 +192,7 @@ export function useResortHierarchy({
   }, [onResortsChange]);
 
   const selectAllInNode = useCallback((node: HierarchyNode) => {
-    const resortIds = getResortsUnderNode(node);
+    const resortIds = cachedGetResortsUnderNode(node);
     onResortsChange((prev) => {
       const newSet = new Set(prev);
       for (const id of resortIds) {
@@ -200,24 +200,16 @@ export function useResortHierarchy({
       }
       return Array.from(newSet);
     });
-  }, [onResortsChange]);
+  }, [onResortsChange, cachedGetResortsUnderNode]);
 
   const deselectAllInNode = useCallback((node: HierarchyNode) => {
-    const resortIds = getResortsUnderNode(node);
+    const resortIds = cachedGetResortsUnderNode(node);
     const resortIdSet = new Set(resortIds);
     onResortsChange((prev) => prev.filter((id) => !resortIdSet.has(id)));
-  }, [onResortsChange]);
+  }, [onResortsChange, cachedGetResortsUnderNode]);
 
-  const getSelectionState = useCallback((node: HierarchyNode): 'all' | 'some' | 'none' => {
-    const resortIds = getResortsUnderNode(node);
-    if (resortIds.length === 0) return 'none';
-
-    const selectedCount = resortIds.filter((id) => selectedResorts.includes(id)).length;
-
-    if (selectedCount === 0) return 'none';
-    if (selectedCount === resortIds.length) return 'all';
-    return 'some';
-  }, [selectedResorts]);
+  // Use cached version for O(1) lookups
+  const getSelectionState = cachedGetSelectionState;
 
   // Keyboard navigation
   const navigateUp = useCallback(() => {
