@@ -349,7 +349,7 @@ const updateWeatherData = async () => {
         latitude: freezingLats,
         longitude: freezingLons,
         models: "best_match",
-        minutely_15: "freezing_level_height",
+        hourly: ["freezing_level_height"],
         forecast_days: 14,
         timezone: "auto"
     };
