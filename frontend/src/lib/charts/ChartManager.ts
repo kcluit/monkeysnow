@@ -227,7 +227,7 @@ function buildUPlotAxes(config: ChartConfig): uPlot.Axis[] {
                 const scale = u.scales.y2;
                 const min = scale?.min ?? 0;
                 const max = scale?.max ?? 100;
-                return vals.map((v) => formatYAxisValue(v, min, max));
+                return vals.map((v) => Number.isFinite(v) ? formatYAxisValue(v, min, max) : '');
             },
             gap: 8,
             size: 50,
