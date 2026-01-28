@@ -1,7 +1,7 @@
 /**
  * Zero Axis Plugin
  *
- * Draws a bold line at y=0 in textSecondary color (like a standard graph axis)
+ * Draws a bold line at y=0 in accent color (matching X/Y axis borders)
  * for variables where data crosses zero. Improves readability for temperature
  * charts and other metrics where zero is a meaningful threshold.
  */
