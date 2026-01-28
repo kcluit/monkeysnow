@@ -123,7 +123,7 @@ function App(): JSX.Element {
         isRainbowEnabled, setRainbowEnabled,
         isFullscreen, enterFullscreen, exitFullscreen,
         isFPSEnabled, setFPSEnabled,
-        isHideEmojiEnabled, setHideEmojiEnabled,
+        isHideIconsEnabled, setHideIconsEnabled,
         isHideBordersEnabled, setHideBordersEnabled,
         isShowDateEnabled, setShowDateEnabled,
         chartZoomSyncEnabled, setChartZoomSyncEnabled,
