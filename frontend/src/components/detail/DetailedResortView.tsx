@@ -45,7 +45,7 @@ export function DetailedResortView({
     // State for selected aggregations (median, mean)
     const [selectedAggregations, setSelectedAggregations] = useLocalStorage<AggregationType[]>(
         'detailSelectedAggregations',
-        []
+        ['median', 'mean']
     );
 
     // State for aggregation colors (user configurable)
