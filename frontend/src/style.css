@@ -2091,6 +2091,11 @@ input[type="checkbox"] {
     color: var(--textPrimary, #f5f5f7);
 }
 
+.weather-chart-unit {
+    font-weight: 400;
+    opacity: 0.7;
+}
+
 .weather-chart-color-indicator {
     width: 0.6rem;
     height: 0.6rem;
