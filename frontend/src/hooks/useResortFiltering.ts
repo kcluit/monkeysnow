@@ -108,9 +108,16 @@ export function useResortFiltering(
       }, 0);
     };
 
+    // PRE-COMPUTE all resort data ONCE to avoid O(N log N) calls to expensive processResortData
+    // This reduces complexity from O(N log N × D × P) to O(N × D × P)
+    const resortDataMap = new Map<string, ReturnType<typeof processResortData>>();
+    for (const resort of resorts) {
+      resortDataMap.set(resort, processResortData(allWeatherData, resort, selectedElevation, temperatureMetric, snowfallEstimateMode, unitSystem));
+    }
+
     let sortedResorts = [...resorts].sort((a, b) => {
-      const resortDataA = processResortData(allWeatherData, a, selectedElevation, temperatureMetric, snowfallEstimateMode, unitSystem);
-      const resortDataB = processResortData(allWeatherData, b, selectedElevation, temperatureMetric, snowfallEstimateMode, unitSystem);
+      const resortDataA = resortDataMap.get(a);  // O(1) lookup
+      const resortDataB = resortDataMap.get(b);  // O(1) lookup
 
       if (!resortDataA || !resortDataB) return 0;
 
