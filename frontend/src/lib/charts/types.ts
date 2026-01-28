@@ -95,6 +95,14 @@ export interface DataZoomConfig {
     range: [number, number];
 }
 
+/** Elevation lines configuration for freezing level charts */
+export interface ElevationLinesConfig {
+    base: number;
+    mid: number;
+    top: number;
+    unit: string;
+}
+
 /** Complete chart configuration */
 export interface ChartConfig {
     type: ChartType;
@@ -110,4 +118,6 @@ export interface ChartConfig {
     /** Chart height in pixels */
     height: number;
     animation: boolean;
+    /** Optional elevation lines for freezing level charts */
+    elevationLines?: ElevationLinesConfig;
 }
