@@ -487,6 +487,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     formatValue: (v, u) => u === 'metric' ? `${Math.round(v)}s` : `${secToMin(v).toFixed(1)}min`,
     convertToImperial: secToMin,
     yAxisDomain: [0, 'auto'],
+    description: 'Duration of direct sunlight per hour',
   }],
   ['is_day', {
     id: 'is_day',
