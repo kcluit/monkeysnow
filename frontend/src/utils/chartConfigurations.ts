@@ -555,6 +555,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     chartType: 'line',
     formatValue: (v) => `${Math.round(v)}J/kg`,
     yAxisDomain: [0, 'auto'],
+    description: 'Convective Available Potential Energy; storm indicator',
   }],
   ['lifted_index', {
     id: 'lifted_index',
