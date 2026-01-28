@@ -164,7 +164,7 @@ export function VariableSelectionModal({
 
   // Calculate how many selected items are shown in filtered list
   const selectedInFilteredCount = filteredVariables.filter(v => isSelected(v)).length;
-  const allExpanded = expandedCategories.size === orderedCategories.length;
+  const allExpanded = orderedCategories.every(c => expandedCategories.has(c.id));
 
   return (
     <div className="command-palette-backdrop" onClick={handleBackdropClick}>
