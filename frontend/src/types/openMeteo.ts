@@ -85,10 +85,17 @@ export type WeatherVariable =
   | 'showers'
   | 'snowfall'
   | 'snow_depth'
-  // Wind
+  // Wind (base level)
   | 'wind_speed_10m'
   | 'wind_gusts_10m'
   | 'wind_direction_10m'
+  // Wind (multi-level overlays)
+  | 'wind_speed_80m'
+  | 'wind_speed_120m'
+  | 'wind_speed_180m'
+  | 'wind_direction_80m'
+  | 'wind_direction_120m'
+  | 'wind_direction_180m'
   // Atmosphere
   | 'relative_humidity_2m'
   | 'surface_pressure'
