@@ -47,6 +47,9 @@ export function VariableSelectionModal({
     () => new Set(orderedCategories.map(c => c.id))
   );
 
+  // Check if searching (defined early for use in handleDragEnd)
+  const isSearching = searchTerm.trim().length > 0;
+
   // Configure sensors for drag-and-drop
   const sensors = useSensors(
     useSensor(PointerSensor, {
