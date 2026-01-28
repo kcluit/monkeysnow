@@ -45,7 +45,7 @@ export const CommandList = memo(function CommandList({
             isSelected={index === selectedIndex}
             onSelect={onSelect}
             onHover={onHover}
-            hideEmoji={hideEmoji}
+            hideIcons={hideIcons}
           />
         </div>
       ))}
