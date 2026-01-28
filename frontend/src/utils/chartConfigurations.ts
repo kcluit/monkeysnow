@@ -113,6 +113,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     chartType: 'line',
     formatValue: (v, u) => u === 'metric' ? `${Math.round(v)}C` : `${Math.round(tempToImperial(v))}F`,
     convertToImperial: tempToImperial,
+    description: 'Air temperature at 2 meters above ground',
   }],
   ['apparent_temperature', {
     id: 'apparent_temperature',
