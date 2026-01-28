@@ -261,6 +261,7 @@ const CountrySection = memo(function CountrySection({
               onSelectAll={onSelectAll}
               onDeselectAll={onDeselectAll}
               getSelectionState={getSelectionState}
+              getResortsUnderNode={getResortsUnderNode}
               hideEmoji={hideEmoji}
             />
           ))}
