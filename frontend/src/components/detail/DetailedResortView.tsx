@@ -199,6 +199,7 @@ export function DetailedResortView({
                         timezoneInfo={timezoneInfo ?? undefined}
                         isChartLocked={isChartLocked}
                         onToggleVariable={toggleVariable}
+                        location={location}
                     />
                     {loading && (
                         <div className="text-center py-2 text-sm text-theme-textSecondary animate-pulse">
