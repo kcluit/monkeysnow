@@ -87,19 +87,19 @@ export function generateSortCommands(
     {
       id: 'sort-temperature',
       name: 'Sort by Temperature',
-      icon: selectedSort === 'temperature' ? '✓' : '',
+      icon: selectedSort === 'temperature' ? icons.check : undefined,
       action: () => setSelectedSort('temperature'),
     },
     {
       id: 'sort-snowfall',
       name: 'Sort by Snowfall',
-      icon: selectedSort === 'snowfall' ? '✓' : '',
+      icon: selectedSort === 'snowfall' ? icons.check : undefined,
       action: () => setSelectedSort('snowfall'),
     },
     {
       id: 'sort-wind',
       name: 'Sort by Wind',
-      icon: selectedSort === 'wind' ? '✓' : '',
+      icon: selectedSort === 'wind' ? icons.check : undefined,
       action: () => setSelectedSort('wind'),
     },
   ];
