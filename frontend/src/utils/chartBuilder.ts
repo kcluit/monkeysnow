@@ -686,11 +686,40 @@ export function buildWeatherChartConfig(
         });
     }
 
-    // Combine all series: bands first (background), then models, then aggregations (foreground)
-    // For boxwhisker, skip regular model/aggregation series and use boxwhisker series instead
-    const allSeries = chartType === 'boxwhisker'
-        ? [...boxWhiskerSeriesList]
-        : [...bandSeries, ...modelSeries, ...aggregationSeries];
+    // Build heatmap series if chart type is heatmap
+    const heatmapSeriesList: SeriesConfig[] = [];
+    if (chartType === 'heatmap') {
+        const heatmapData = transformToHeatmap(
+            data,
+            selectedModels,
+            variable,
+            unitSystem,
+            variableConfig.convertToImperial,
+            timezoneInfo?.timezone
+        );
+        if (heatmapData.dates.length > 0) {
+            heatmapSeriesList.push({
+                id: 'heatmap',
+                name: `${variableConfig.label} by Hour`,
+                color: variableConfig.color,
+                type: 'heatmap',
+                data: [], // Heatmap doesn't use standard data array
+                heatmapData,
+                zIndex: 1,
+            });
+        }
+    }
+
+    // Combine all series based on chart type
+    let allSeries: SeriesConfig[];
+    if (chartType === 'boxwhisker') {
+        allSeries = [...boxWhiskerSeriesList];
+    } else if (chartType === 'heatmap') {
+        allSeries = [...heatmapSeriesList];
+    } else {
+        // Standard chart types: bands first (background), then models, then aggregations (foreground)
+        allSeries = [...bandSeries, ...modelSeries, ...aggregationSeries];
+    }
 
     // Track if we need a secondary Y-axis for accumulation
     let hasAccumulation = false;
