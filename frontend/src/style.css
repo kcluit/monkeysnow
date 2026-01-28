@@ -1805,6 +1805,26 @@ input[type="checkbox"] {
     }
 }
 
+/* Model grid footer styles */
+.model-grid-footer {
+    flex-direction: column;
+    gap: 8px;
+}
+
+.model-grid-footer-note {
+    font-size: 10px;
+    color: var(--textSecondary, #a1a1a6);
+    line-height: 1.4;
+    opacity: 0.8;
+}
+
+.model-grid-footer-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
 /* Chart Settings Modal Styles */
 .chart-settings-modal {
     max-width: 400px;
