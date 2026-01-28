@@ -1,9 +1,9 @@
 /**
  * Zero Axis Plugin
  *
- * Draws a bold line at y=0 in the primary (accent) color for variables
- * where data crosses zero. Improves readability for temperature charts
- * and other metrics where zero is a meaningful threshold.
+ * Draws a bold line at y=0 in textSecondary color (like a standard graph axis)
+ * for variables where data crosses zero. Improves readability for temperature
+ * charts and other metrics where zero is a meaningful threshold.
  */
 
 import type uPlot from 'uplot';
