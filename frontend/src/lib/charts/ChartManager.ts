@@ -151,6 +151,26 @@ function buildUPlotSeries(config: ChartConfig): uPlot.Series[] {
 }
 
 /**
+ * Determine decimal places based on data range.
+ * Smaller ranges get more precision for readable axis labels.
+ */
+function getDecimalPlaces(range: number): number {
+    if (range >= 10) return 0;
+    if (range >= 1) return 1;
+    if (range >= 0.1) return 2;
+    return 3;
+}
+
+/**
+ * Format a y-axis value with appropriate decimal places based on the scale range.
+ */
+function formatYAxisValue(value: number, scaleMin: number, scaleMax: number): string {
+    const range = scaleMax - scaleMin;
+    const decimals = getDecimalPlaces(range);
+    return decimals === 0 ? Math.round(value).toString() : value.toFixed(decimals);
+}
+
+/**
  * Build uPlot axes configuration.
  */
 function buildUPlotAxes(config: ChartConfig): uPlot.Axis[] {
@@ -162,7 +182,7 @@ function buildUPlotAxes(config: ChartConfig): uPlot.Axis[] {
             stroke: theme.textSecondary,
             grid: { show: true, stroke: theme.gridColor, width: 1 },
             ticks: { show: true, stroke: theme.gridColor, size: 5 },
-            border: { show: true, stroke: theme.accent, width: 2 },
+            border: { show: true, stroke: theme.textSecondary, width: 2 },
             values: (_u, vals) =>
                 vals.map((v) => {
                     const idx = Math.round(v);
@@ -180,8 +200,13 @@ function buildUPlotAxes(config: ChartConfig): uPlot.Axis[] {
             stroke: theme.textSecondary,
             grid: { show: true, stroke: theme.gridColor, width: 1 },
             ticks: { show: true, stroke: theme.gridColor, size: 5 },
-            border: { show: true, stroke: theme.accent, width: 2 },
-            values: (_u, vals) => vals.map((v) => yAxis.formatter(v)),
+            border: { show: true, stroke: theme.textSecondary, width: 2 },
+            values: (u, vals) => {
+                const scale = u.scales.y;
+                const min = scale?.min ?? 0;
+                const max = scale?.max ?? 100;
+                return vals.map((v) => formatYAxisValue(v, min, max));
+            },
             gap: 8,
             size: 50,
             font: '11px system-ui, -apple-system, sans-serif',
@@ -194,7 +219,12 @@ function buildUPlotAxes(config: ChartConfig): uPlot.Axis[] {
             stroke: theme.textSecondary,
             grid: { show: false },
             ticks: { show: true, stroke: theme.gridColor, size: 5 },
-            values: (_u, vals) => vals.map((v) => yAxisSecondary.formatter(v)),
+            values: (u, vals) => {
+                const scale = u.scales.y2;
+                const min = scale?.min ?? 0;
+                const max = scale?.max ?? 100;
+                return vals.map((v) => formatYAxisValue(v, min, max));
+            },
             gap: 8,
             size: 50,
             font: '11px system-ui, -apple-system, sans-serif',
