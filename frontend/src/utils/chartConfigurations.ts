@@ -352,6 +352,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     formatValue: (v, u) => u === 'metric' ? `${v.toFixed(1)}mm` : `${mmToInches(v).toFixed(2)}in`,
     convertToImperial: mmToInches,
     yAxisDomain: [0, 'auto'],
+    description: 'Showers from convective precipitation',
   }],
   ['pressure_msl', {
     id: 'pressure_msl',
