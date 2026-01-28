@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { WeatherVariable } from '../../types/openMeteo';
-import type { VariableConfig } from '../../utils/chartConfigurations';
+import type { VariableConfig } from '../../types/detailView';
 
 interface VariableCardDraggableProps {
   variable: WeatherVariable;
