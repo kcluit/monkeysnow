@@ -50,10 +50,10 @@ export function WeatherChart({
         false
     );
 
-    // Chart dimension settings (default height is 380px, user can adjust via settings)
+    // Chart dimension settings (default height varies by variable, user can adjust via settings)
     const [chartHeight, setChartHeight] = useLocalStorage<number>(
         `chartHeight_${variable}`,
-        380
+        variableConfig.defaultHeight ?? 380
     );
     const [chartWidth, setChartWidth] = useLocalStorage<number>(
         `chartWidth_${variable}`,
