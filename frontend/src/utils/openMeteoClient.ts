@@ -258,13 +258,13 @@ export async function fetchOpenMeteoData(
           timestamp,
         };
 
-        // Extract each variable value
-        for (let varIdx = 0; varIdx < variables.length; varIdx++) {
+        // Extract each variable value (use expandedVariables since that's what was requested)
+        for (let varIdx = 0; varIdx < expandedVariables.length; varIdx++) {
           const varData = hourly.variables(varIdx);
           if (varData) {
             const values = varData.valuesArray();
             if (values && values[j] !== undefined) {
-              point[variables[varIdx]] = values[j];
+              point[expandedVariables[varIdx]] = values[j];
             }
           }
         }
