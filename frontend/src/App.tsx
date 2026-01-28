@@ -1,10 +1,16 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
 import { Header } from './components/Header';
 import { UtilityBar } from './components/UtilityBar';
 import { CompactUtilityBar } from './components/CompactUtilityBar';
-import { FullView, DefaultCard, CompactCard } from './components/cards';
-import { DetailedResortView } from './components/detail';
 import { CommandPalette } from './components/CommandPalette';
+
+// Lazy load card components - only one is rendered based on viewMode
+const FullView = lazy(() => import('./components/cards/FullView').then(m => ({ default: m.FullView })));
+const DefaultCard = lazy(() => import('./components/cards/DefaultCard').then(m => ({ default: m.DefaultCard })));
+const CompactCard = lazy(() => import('./components/cards/CompactCard').then(m => ({ default: m.CompactCard })));
+
+// Lazy load DetailedResortView - imports uplot (~80KB) and chart configs
+const DetailedResortView = lazy(() => import('./components/detail/DetailedResortView').then(m => ({ default: m.DetailedResortView })));
 import { FPSCounter } from './components/FPSCounter';
 import { ResortSelectionGridModal } from './components/ResortSelectionModal';
 import { useWeatherData } from './hooks/useWeatherData';
