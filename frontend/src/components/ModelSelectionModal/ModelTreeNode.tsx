@@ -188,7 +188,7 @@ export const ModelTreeNode = memo(function ModelTreeNode({
 
       {/* Arrow for providers */}
       {hasChildren && (
-        <span className="resort-tree-arrow">&gt;</span>
+        <span className="resort-tree-arrow"><Icon icon={icons.chevronRight} /></span>
       )}
 
       {/* Color picker popup for aggregations */}
