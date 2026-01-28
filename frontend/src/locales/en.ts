@@ -46,7 +46,7 @@ export const en: Translations = {
     'command.rainbowText': 'Rainbow text',
     'command.fullscreen': 'Fullscreen',
     'command.fpsCounter': 'FPS counter',
-    'command.hideEmoji': 'Hide emoji',
+    'command.hideIcons': 'Hide icons',
     'command.showBorders': 'Show borders',
     'command.showDate': 'Show date',
     'command.elevation': 'Elevation',
