@@ -5,6 +5,7 @@
 
 import type { Command, ElevationLevel, SortOption, SortDay, SortDayData, ViewMode, TemperatureMetric, SnowfallEstimateMode, UtilityBarStyle, UnitSystem } from '../types';
 import type { Language } from '../types/i18n';
+import { icons } from '../constants/icons';
 
 export interface ControlCommandParams {
   // Elevation
