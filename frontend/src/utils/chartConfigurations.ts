@@ -241,6 +241,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     formatValue: (v) => `${Math.round(v)}%`,
     yAxisDomain: [0, 100],
     description: 'Total cloud cover as an area fraction',
+    defaultHeight: 200,
   }],
   ['cloud_cover_low', {
     id: 'cloud_cover_low',
@@ -252,6 +253,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     formatValue: (v) => `${Math.round(v)}%`,
     yAxisDomain: [0, 100],
     description: 'Low level clouds and fog up to 3 km altitude',
+    defaultHeight: 200,
   }],
   ['cloud_cover_mid', {
     id: 'cloud_cover_mid',
@@ -263,6 +265,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     formatValue: (v) => `${Math.round(v)}%`,
     yAxisDomain: [0, 100],
     description: 'Mid level clouds from 3 to 8 km altitude',
+    defaultHeight: 200,
   }],
   ['cloud_cover_high', {
     id: 'cloud_cover_high',
@@ -274,6 +277,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     formatValue: (v) => `${Math.round(v)}%`,
     yAxisDomain: [0, 100],
     description: 'High level clouds from 8 km altitude',
+    defaultHeight: 200,
   }],
   ['visibility', {
     id: 'visibility',
