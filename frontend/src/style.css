@@ -1546,7 +1546,6 @@ input[type="checkbox"] {
 /* Hide aggregation members toggle button */
 .aggregation-hide-toggle {
     margin-left: auto;
-    padding: 4px 8px;
     border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
     border-radius: 6px;
     background: var(--secondary, #2c2c2e);
