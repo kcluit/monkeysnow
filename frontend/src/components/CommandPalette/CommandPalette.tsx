@@ -5,10 +5,10 @@ import type { UseCommandPaletteReturn } from '../../types';
 
 interface CommandPaletteProps {
   palette: UseCommandPaletteReturn;
-  hideEmoji?: boolean;
+  hideIcons?: boolean;
 }
 
-export function CommandPalette({ palette, hideEmoji }: CommandPaletteProps): JSX.Element | null {
+export function CommandPalette({ palette, hideIcons }: CommandPaletteProps): JSX.Element | null {
   const {
     isOpen,
     searchQuery,
