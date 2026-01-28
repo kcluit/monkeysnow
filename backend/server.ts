@@ -536,6 +536,8 @@ const updateWeatherData = async () => {
 
     for (let i = 0; i < resorts.length; i++) {
         const resortName = resorts[i];
+        const resortData = locations[resortName];
+        const [lat, lon] = resortData.loc!;
         const freezingResp = freezingResponses[i];
 
         // Indices in mainResponses
@@ -554,15 +556,15 @@ const updateWeatherData = async () => {
 
         structuredData[resortName] = {
             bot: {
-                metadata: { elevation: respBot.elevation(), lat: respBot.latitude(), lon: respBot.longitude() },
+                metadata: { elevation: resortData.bot, lat, lon },
                 forecast: forecastBot
             },
             mid: {
-                metadata: { elevation: respMid.elevation(), lat: respMid.latitude(), lon: respMid.longitude() },
+                metadata: { elevation: resortData.mid, lat, lon },
                 forecast: forecastMid
             },
             top: {
-                metadata: { elevation: respTop.elevation(), lat: respTop.latitude(), lon: respTop.longitude() },
+                metadata: { elevation: resortData.top, lat, lon },
                 forecast: forecastTop
             }
         };
