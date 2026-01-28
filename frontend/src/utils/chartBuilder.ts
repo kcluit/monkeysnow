@@ -11,7 +11,7 @@ import type { WeatherChartProps } from '../types/detailView';
 import type { WeatherModel, HourlyDataPoint, AggregationType } from '../types/openMeteo';
 import type { UnitSystem } from '../types';
 import type { ChartDisplayType } from '../types/chartSettings';
-import { getModelConfig, getVariableConfig } from './chartConfigurations';
+import { getModelConfig, getVariableConfig, getOverlayConfig, hasOverlays } from './chartConfigurations';
 import { getUPlotTheme } from '../lib/charts';
 import { aggregationOptions } from '../data/modelHierarchy';
 
