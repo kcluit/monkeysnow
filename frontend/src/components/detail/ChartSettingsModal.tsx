@@ -199,6 +199,48 @@ export function ChartSettingsModal({
                             </span>
                         </label>
                     </div>
+
+                    {/* Dimensions Section */}
+                    <div className="chart-settings-section">
+                        <h3 className="chart-settings-section-title">Dimensions</h3>
+
+                        {/* Height Slider */}
+                        <div className="chart-settings-slider">
+                            <label className="chart-settings-slider-label">
+                                <span>Height</span>
+                                <span className="chart-settings-slider-value">{localChartHeight}px</span>
+                            </label>
+                            <input
+                                type="range"
+                                min={HEIGHT_MIN}
+                                max={HEIGHT_MAX}
+                                step={20}
+                                value={localChartHeight}
+                                onChange={(e) => setLocalChartHeight(Number(e.target.value))}
+                                className="chart-settings-range"
+                            />
+                        </div>
+
+                        {/* Width Slider */}
+                        <div className="chart-settings-slider">
+                            <label className="chart-settings-slider-label">
+                                <span>Width (fullscreen)</span>
+                                <span className="chart-settings-slider-value">{localChartWidth}%</span>
+                            </label>
+                            <input
+                                type="range"
+                                min={WIDTH_MIN}
+                                max={WIDTH_MAX}
+                                step={5}
+                                value={localChartWidth}
+                                onChange={(e) => setLocalChartWidth(Number(e.target.value))}
+                                className="chart-settings-range"
+                            />
+                            <span className="chart-settings-slider-desc">
+                                Width only applies when chart is in fullscreen mode
+                            </span>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Footer */}
