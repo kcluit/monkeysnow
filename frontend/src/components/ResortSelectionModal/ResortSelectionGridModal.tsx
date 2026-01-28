@@ -97,17 +97,17 @@ const ResortItem = memo(function ResortItem({
   node,
   isSelected,
   onToggle,
-  hideEmoji,
+  hideIcons,
 }: {
   node: HierarchyNode;
   isSelected: boolean;
   onToggle: () => void;
-  hideEmoji?: boolean;
+  hideIcons?: boolean;
 }) {
   return (
     <label className="resort-grid-item" onClick={(e) => { e.preventDefault(); onToggle(); }}>
       <Checkbox state={isSelected ? 'all' : 'none'} onClick={(e) => { e.stopPropagation(); onToggle(); }} />
-      {!hideEmoji && <span className="resort-grid-item-icon">⛷️</span>}
+      {!hideIcons && <span className="resort-grid-item-icon"><Icon icon={icons.resort} /></span>}
       <span className="resort-grid-item-name">{node.name}</span>
     </label>
   );
