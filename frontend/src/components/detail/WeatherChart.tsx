@@ -89,6 +89,7 @@ export function WeatherChart({
                 unitSystem,
                 timezoneInfo,
                 isChartLocked,
+                location,
             },
             theme,
             {
@@ -109,6 +110,7 @@ export function WeatherChart({
         unitSystem,
         timezoneInfo,
         isChartLocked,
+        location,
         theme,
         chartType,
         showAccumulation,
