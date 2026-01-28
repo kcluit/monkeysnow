@@ -16,6 +16,8 @@ export function DetailChartGrid({
     selectedAggregations,
     aggregationColors,
     hideAggregationMembers,
+    showMinMaxFill,
+    showPercentileFill,
     unitSystem,
     timezoneInfo,
     isChartLocked,
@@ -32,6 +34,8 @@ export function DetailChartGrid({
                     selectedAggregations={selectedAggregations}
                     aggregationColors={aggregationColors}
                     hideAggregationMembers={hideAggregationMembers}
+                    showMinMaxFill={showMinMaxFill}
+                    showPercentileFill={showPercentileFill}
                     variable={variable}
                     unitSystem={unitSystem}
                     timezoneInfo={timezoneInfo}
