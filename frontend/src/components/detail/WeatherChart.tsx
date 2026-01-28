@@ -90,6 +90,7 @@ export function WeatherChart({
             {
                 chartTypeOverride: chartType,
                 showAccumulation,
+                customHeight: chartHeight,
             }
         );
     }, [
@@ -105,6 +106,7 @@ export function WeatherChart({
         theme,
         chartType,
         showAccumulation,
+        chartHeight,
     ]);
 
     // Handle no data
