@@ -60,6 +60,8 @@ export function ChartSettingsModal({
     onChartTypeChange,
     showAccumulation,
     onAccumulationChange,
+    showOverlays,
+    onOverlaysChange,
     zoomSyncExcluded,
     onZoomSyncExcludedChange,
     chartHeight,
@@ -70,6 +72,7 @@ export function ChartSettingsModal({
     // Local state for changes before applying
     const [localChartType, setLocalChartType] = useState(chartType);
     const [localShowAccumulation, setLocalShowAccumulation] = useState(showAccumulation);
+    const [localShowOverlays, setLocalShowOverlays] = useState(showOverlays);
     const [localZoomSyncExcluded, setLocalZoomSyncExcluded] = useState(zoomSyncExcluded);
     const [localChartHeight, setLocalChartHeight] = useState(chartHeight);
     const [localChartWidth, setLocalChartWidth] = useState(chartWidth);
@@ -79,11 +82,12 @@ export function ChartSettingsModal({
         if (isOpen) {
             setLocalChartType(chartType);
             setLocalShowAccumulation(showAccumulation);
+            setLocalShowOverlays(showOverlays);
             setLocalZoomSyncExcluded(zoomSyncExcluded);
             setLocalChartHeight(chartHeight);
             setLocalChartWidth(chartWidth);
         }
-    }, [isOpen, chartType, showAccumulation, zoomSyncExcluded, chartHeight, chartWidth]);
+    }, [isOpen, chartType, showAccumulation, showOverlays, zoomSyncExcluded, chartHeight, chartWidth]);
 
     // Prevent body scroll when open
     useEffect(() => {
