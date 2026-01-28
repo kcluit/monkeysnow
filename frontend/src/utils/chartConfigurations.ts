@@ -569,22 +569,55 @@ export const DEFAULT_VARIABLES: WeatherVariable[] = [
 
 // All available variables (in display order)
 export const ALL_VARIABLES: WeatherVariable[] = [
+  // Temperature
   'temperature_2m',
   'apparent_temperature',
+  'dew_point_2m',
+  'wet_bulb_temperature_2m',
+  // Precipitation
   'precipitation',
+  'precipitation_probability',
   'rain',
+  'showers',
   'snowfall',
   'snow_depth',
+  // Wind
   'wind_speed_10m',
   'wind_gusts_10m',
   'wind_direction_10m',
+  // Atmosphere
   'relative_humidity_2m',
   'surface_pressure',
+  'pressure_msl',
+  'vapour_pressure_deficit',
+  'boundary_layer_height',
+  // Clouds & Visibility
   'cloud_cover',
   'cloud_cover_low',
   'cloud_cover_mid',
   'cloud_cover_high',
   'visibility',
+  // Solar & Radiation
+  'shortwave_radiation',
+  'direct_radiation',
+  'diffuse_radiation',
+  'direct_normal_irradiance',
+  'global_tilted_irradiance',
+  'terrestrial_radiation',
+  // UV & Sunshine
+  'uv_index',
+  'uv_index_clear_sky',
+  'sunshine_duration',
+  'is_day',
+  // Soil
+  'soil_temperature_0cm',
+  'soil_moisture_0_to_1cm',
+  'evapotranspiration',
+  'et0_fao_evapotranspiration',
+  // Convective/Stability
+  'cape',
+  'lifted_index',
+  'convective_inhibition',
   'freezing_level_height',
   'weather_code',
 ];
