@@ -69,19 +69,52 @@ function transformToUPlotData(config: ChartConfig): uPlot.AlignedData {
 
 /**
  * Build uPlot series configuration from ChartConfig.
+ * Handles different chart types: line, area, bar, boxwhisker, heatmap.
  */
 function buildUPlotSeries(config: ChartConfig): uPlot.Series[] {
-    const { series } = config;
+    const { series, type: chartType } = config;
     const uplotSeries: uPlot.Series[] = [{}];
+
+    // Create bar paths builder if needed (reuse for all bar series)
+    const barPaths = chartType === 'bar' ? uPlot.paths.bars!({
+        size: [0.6, 100], // 60% of available space, max 100px
+        radius: 0.1,      // Slightly rounded corners
+        gap: 2,           // 2px gap between bars
+    }) : null;
 
     for (const s of series) {
         const stroke = s.color;
         const opacity = s.opacity ?? 1;
 
+        // Determine paths based on chart type
+        let paths: uPlot.Series.PathBuilder | undefined;
         let fill: string | undefined;
-        if (s.type === 'area') {
-            const fillOpacity = s.fillOpacity ?? 0.3;
-            fill = colorWithOpacity(s.color, fillOpacity * opacity);
+
+        switch (s.type) {
+            case 'bar':
+                // Use bar paths renderer
+                paths = barPaths!;
+                fill = colorWithOpacity(s.color, opacity);
+                break;
+
+            case 'boxwhisker':
+            case 'heatmap':
+                // These are rendered by plugins, hide the default series line
+                paths = () => null;
+                break;
+
+            case 'area':
+                // Area charts use default line paths with fill
+                const fillOpacity = s.fillOpacity ?? 0.3;
+                fill = colorWithOpacity(s.color, fillOpacity * opacity);
+                break;
+
+            case 'band':
+                // Band series are handled by plugin, hide default rendering
+                paths = () => null;
+                break;
+
+            // 'line' type uses default paths (undefined)
         }
 
         let dash: number[] | undefined;
@@ -91,7 +124,7 @@ function buildUPlotSeries(config: ChartConfig): uPlot.Series[] {
             dash = [2, 2];
         }
 
-        uplotSeries.push({
+        const seriesConfig: uPlot.Series = {
             label: s.name,
             stroke: colorWithOpacity(stroke, opacity),
             fill,
@@ -101,7 +134,14 @@ function buildUPlotSeries(config: ChartConfig): uPlot.Series[] {
             spanGaps: false,
             show: true,
             scale: s.yAxisIndex === 1 ? 'y2' : 'y',
-        });
+        };
+
+        // Only set paths if we have a custom renderer
+        if (paths !== undefined) {
+            seriesConfig.paths = paths;
+        }
+
+        uplotSeries.push(seriesConfig);
     }
 
     return uplotSeries;
