@@ -11,12 +11,12 @@ import type { HierarchyNode } from '../../data/resortHierarchy';
 
 interface ResortSelectionModalProps {
   hierarchy: UseResortHierarchyReturn;
-  hideEmoji?: boolean;
+  hideIcons?: boolean;
 }
 
 export const ResortSelectionModal = memo(function ResortSelectionModal({
   hierarchy,
-  hideEmoji,
+  hideIcons,
 }: ResortSelectionModalProps): JSX.Element | null {
   const {
     isOpen,
