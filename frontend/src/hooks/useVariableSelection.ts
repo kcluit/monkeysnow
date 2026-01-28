@@ -152,6 +152,65 @@ export function useVariableSelection({
     [selectedVariables, setSelectedVariables]
   );
 
+  // Reorder categories (for category drag-and-drop)
+  const reorderCategories = useCallback(
+    (activeId: string, overId: string) => {
+      const oldIndex = categoryOrder.indexOf(activeId);
+      const newIndex = categoryOrder.indexOf(overId);
+
+      if (oldIndex === -1 || newIndex === -1) {
+        return;
+      }
+
+      const reordered = [...categoryOrder];
+      const [removed] = reordered.splice(oldIndex, 1);
+      reordered.splice(newIndex, 0, removed);
+      setCategoryOrder(reordered);
+    },
+    [categoryOrder, setCategoryOrder]
+  );
+
+  // Reorder variables across categories (for variable drag-and-drop in grid mode)
+  const reorderVariableAcrossCategories = useCallback(
+    (activeId: string, overId: string) => {
+      const activeVar = activeId as WeatherVariable;
+      const overVar = overId as WeatherVariable;
+
+      // Check if both are selected
+      const activeSelected = selectedVariables.includes(activeVar);
+      const overSelected = selectedVariables.includes(overVar);
+
+      if (!activeSelected && !overSelected) {
+        // Neither selected, nothing to reorder
+        return;
+      }
+
+      if (!activeSelected && overSelected) {
+        // Dragging unselected to selected - select it at the target position
+        const targetIndex = selectedVariables.indexOf(overVar);
+        const newSelected = [...selectedVariables];
+        newSelected.splice(targetIndex, 0, activeVar);
+        setSelectedVariables(newSelected);
+        return;
+      }
+
+      if (activeSelected && !overSelected) {
+        // Dragging selected to unselected area - just keep current position
+        return;
+      }
+
+      // Both selected - reorder within selected
+      const oldIndex = selectedVariables.indexOf(activeVar);
+      const newIndex = selectedVariables.indexOf(overVar);
+
+      const reordered = [...selectedVariables];
+      const [removed] = reordered.splice(oldIndex, 1);
+      reordered.splice(newIndex, 0, removed);
+      setSelectedVariables(reordered);
+    },
+    [selectedVariables, setSelectedVariables]
+  );
+
   const filteredVariables = useMemo(() => {
     if (!searchTerm.trim()) {
       return orderedVariables;
