@@ -72,11 +72,12 @@ function transformToUPlotData(config: ChartConfig): uPlot.AlignedData {
  * Handles different chart types: line, area, bar, boxwhisker, heatmap.
  */
 function buildUPlotSeries(config: ChartConfig): uPlot.Series[] {
-    const { series, type: chartType } = config;
+    const { series } = config;
     const uplotSeries: uPlot.Series[] = [{}];
 
-    // Create bar paths builder if needed (reuse for all bar series)
-    const barPaths = chartType === 'bar' ? uPlot.paths.bars!({
+    // Create bar paths builder if any series needs it (lazy initialization)
+    const needsBarPaths = series.some(s => s.type === 'bar');
+    const barPaths = needsBarPaths && uPlot.paths.bars ? uPlot.paths.bars({
         size: [0.6, 100], // 60% of available space, max 100px
         radius: 0.1,      // Slightly rounded corners
         gap: 2,           // 2px gap between bars
@@ -86,14 +87,16 @@ function buildUPlotSeries(config: ChartConfig): uPlot.Series[] {
         const stroke = s.color;
         const opacity = s.opacity ?? 1;
 
-        // Determine paths based on chart type
+        // Determine paths based on series type
         let paths: uPlot.Series.PathBuilder | undefined;
         let fill: string | undefined;
 
         switch (s.type) {
             case 'bar':
-                // Use bar paths renderer
-                paths = barPaths!;
+                // Use bar paths renderer if available
+                if (barPaths) {
+                    paths = barPaths;
+                }
                 fill = colorWithOpacity(s.color, opacity);
                 break;
 
