@@ -67,6 +67,10 @@ export interface DetailUtilityBarProps {
     setAggregationColors: (colors: Record<AggregationType, string>) => void;
     hideAggregationMembers: boolean;
     setHideAggregationMembers: (hide: boolean) => void;
+    showMinMaxFill: boolean;
+    setShowMinMaxFill: (show: boolean) => void;
+    showPercentileFill: boolean;
+    setShowPercentileFill: (show: boolean) => void;
     elevation: number;
     setElevation: (elevation: number) => void;
     forecastDays: number;
