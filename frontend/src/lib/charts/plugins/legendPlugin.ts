@@ -107,8 +107,7 @@ export function createLegendPlugin(options: LegendPluginOptions): uPlot.Plugin {
                     legend.style.display = 'flex';
                     legend.style.flexWrap = 'wrap';
                     legend.style.gap = '4px';
-                    legend.style.padding = '4px 4px 0 4px';
-                    legend.style.borderTop = `1px solid ${config.theme.gridColor}`;
+                    legend.style.padding = '8px 4px 0 4px';
                     legend.style.marginTop = '0';
 
                     // Append to chart root (below canvas)
