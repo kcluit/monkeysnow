@@ -124,6 +124,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     chartType: 'line',
     formatValue: (v, u) => u === 'metric' ? `${Math.round(v)}C` : `${Math.round(tempToImperial(v))}F`,
     convertToImperial: tempToImperial,
+    description: 'Perceived temperature combining wind chill, humidity and solar radiation',
   }],
   ['precipitation', {
     id: 'precipitation',
