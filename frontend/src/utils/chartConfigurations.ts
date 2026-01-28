@@ -375,6 +375,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     formatValue: (v, u) => u === 'metric' ? `${v.toFixed(2)}kPa` : `${kpaToPsi(v).toFixed(3)}psi`,
     convertToImperial: kpaToPsi,
     yAxisDomain: [0, 'auto'],
+    description: 'VPD affects plant water transpiration; high >1.6, low <0.4 kPa',
   }],
   ['boundary_layer_height', {
     id: 'boundary_layer_height',
