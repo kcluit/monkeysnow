@@ -25,6 +25,11 @@ interface ChartSettingsModalProps {
     // Zoom sync exclusion
     zoomSyncExcluded: boolean;
     onZoomSyncExcludedChange: (excluded: boolean) => void;
+    // Chart dimensions
+    chartHeight: number;
+    onChartHeightChange: (height: number) => void;
+    chartWidth: number;
+    onChartWidthChange: (width: number) => void;
 }
 
 const CHART_TYPES: { type: ChartDisplayType; label: string; icon: string; requiresMultipleModels?: boolean }[] = [
