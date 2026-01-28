@@ -12,7 +12,7 @@ import { UPlotChart } from '../../lib/charts';
 import { setChartZoomSyncExclusion } from '../../lib/charts/chartRegistry';
 import { buildWeatherChartConfig } from '../../utils/chartBuilder';
 import { ChartSettingsModal } from './ChartSettingsModal';
-import { getVariableConfig } from '../../utils/chartConfigurations';
+import { getVariableConfig, hasOverlays, getOverlayConfig } from '../../utils/chartConfigurations';
 import type { WeatherChartProps } from '../../types/detailView';
 import type { ChartDisplayType } from '../../types/chartSettings';
 
