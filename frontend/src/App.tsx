@@ -602,8 +602,6 @@ function App(): JSX.Element {
                                         )}
                                     </div>
                                 ))}
-                            </Suspense>
-
                             {selectedResorts.length === 0 && (
                                 <div className="text-center py-12">
                                     <div className="text-theme-textSecondary text-lg">{t('empty.selectResorts')}</div>
