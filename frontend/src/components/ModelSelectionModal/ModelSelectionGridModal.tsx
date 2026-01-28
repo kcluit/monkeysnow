@@ -532,6 +532,10 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
                   onColorChange={setAggregationColor}
                   hideAggregationMembers={hideAggregationMembers}
                   onToggleHideMembers={onToggleHideMembers}
+                  showMinMaxFill={showMinMaxFill}
+                  onToggleMinMaxFill={onToggleMinMaxFill}
+                  showPercentileFill={showPercentileFill}
+                  onTogglePercentileFill={onTogglePercentileFill}
                 />
               ))}
             </div>
