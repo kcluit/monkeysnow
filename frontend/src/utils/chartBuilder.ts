@@ -748,35 +748,39 @@ export function buildWeatherChartConfig(
         }
         : undefined;
 
+    // For heatmaps, use dates as x-axis labels; otherwise use time labels
+    const xAxisData = chartType === 'heatmap' && heatmapSeriesList[0]?.heatmapData
+        ? heatmapSeriesList[0].heatmapData.dates
+        : timeLabels;
+
+    // For heatmaps, adjust grid to accommodate hour labels on left
+    const gridConfig = chartType === 'heatmap'
+        ? { top: 10, right: 10, bottom: 40, left: 50, containLabel: false }
+        : { top: 10, right: 0, bottom: 70, left: 0, containLabel: true };
+
     return {
         type: chartType,
         variable, // Pass variable for plugin decisions (e.g., zero axis exclusion)
         xAxis: {
             type: 'category',
-            data: timeLabels,
+            data: xAxisData,
         },
         yAxis: {
             type: 'value',
-            label: `${variableConfig.label} (${unit})`,
-            domain: variableConfig.yAxisDomain,
-            formatter: (value: number) => `${Math.round(value)}`,
+            label: chartType === 'heatmap' ? 'Hour of Day' : `${variableConfig.label} (${unit})`,
+            domain: chartType === 'heatmap' ? [0, 23] : variableConfig.yAxisDomain,
+            formatter: (value: number) => chartType === 'heatmap' ? `${Math.round(value)}:00` : `${Math.round(value)}`,
         },
         yAxisSecondary,
         series: allSeries,
-        grid: {
-            top: 10,
-            right: 0,
-            bottom: 70,
-            left: 0,
-            containLabel: true,
-        },
+        grid: gridConfig,
         dataZoom: {
-            enabled: !isChartLocked,
+            enabled: !isChartLocked && chartType !== 'heatmap', // Disable zoom for heatmaps
             type: 'both',
             range: [0, 100],
         },
         theme: chartTheme,
-        height: 380,
+        height: chartType === 'heatmap' ? 300 : 380, // Shorter height for heatmaps
         animation: false,
     };
 }
