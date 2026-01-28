@@ -5,8 +5,29 @@
  * These types are used by chartBuilder.ts and rendered by the uPlot adapter.
  */
 
-export type ChartType = 'line' | 'bar' | 'area' | 'band';
+export type ChartType = 'line' | 'bar' | 'area' | 'band' | 'boxwhisker' | 'heatmap';
 export type LineStyle = 'solid' | 'dashed' | 'dotted';
+
+/** Data for box & whisker charts (ensemble spread visualization) */
+export interface BoxWhiskerData {
+    min: (number | null)[];
+    q1: (number | null)[];
+    median: (number | null)[];
+    q3: (number | null)[];
+    max: (number | null)[];
+}
+
+/** Data for heatmap charts (hour-of-day matrix visualization) */
+export interface HeatmapData {
+    hours: number[];       // 0-23
+    dates: string[];       // Date labels
+    values: (number | null)[][]; // [hour][date]
+}
+
+/** Data for wind direction arrows overlay */
+export interface WindArrowData {
+    direction: (number | null)[]; // degrees (0-360)
+}
 
 /** Theme colors extracted from CSS variables */
 export interface ChartTheme {
