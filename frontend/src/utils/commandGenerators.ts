@@ -282,13 +282,13 @@ export function generateSnowfallEstimateCommands(
     {
       id: 'snowfall-model',
       name: 'Use Model Estimate',
-      icon: selectedMode === 'model' ? '✓' : '',
+      icon: selectedMode === 'model' ? icons.check : undefined,
       action: () => setSelectedMode('model'),
     },
     {
       id: 'snowfall-totalprecip',
       name: 'Estimate Using Total Precip',
-      icon: selectedMode === 'totalPrecip' ? '✓' : '',
+      icon: selectedMode === 'totalPrecip' ? icons.check : undefined,
       action: () => setSelectedMode('totalPrecip'),
     },
   ];
