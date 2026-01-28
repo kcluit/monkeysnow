@@ -774,6 +774,23 @@ export function buildWeatherChartConfig(
         }
     }
 
+    // Add wind direction arrows for wind speed charts
+    if (variable === 'wind_speed_10m' && chartType !== 'heatmap' && chartType !== 'boxwhisker') {
+        const windArrowData = extractWindDirectionData(data, selectedModels, timeLabels.length);
+        // Only add if we have direction data
+        if (windArrowData.direction.some(d => d !== null)) {
+            allSeries.push({
+                id: 'wind_direction_arrows',
+                name: 'Wind Direction',
+                color: '#94a3b8', // slate-400 - subtle gray that works on most themes
+                type: 'line', // Type doesn't matter for arrow overlay, but needs a valid type
+                data: [], // No line data, just arrow overlay
+                windArrowData,
+                zIndex: 200, // Draw on top
+            });
+        }
+    }
+
     // Get unit string
     const unit = unitSystem === 'imperial' ? variableConfig.unitImperial : variableConfig.unit;
 
