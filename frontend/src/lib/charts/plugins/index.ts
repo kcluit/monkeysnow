@@ -9,3 +9,4 @@ export { createBandFillPlugin, type BandFillPluginOptions } from './bandFillPlug
 export { createZeroAxisPlugin, type ZeroAxisPluginOptions } from './zeroAxisPlugin';
 export { createBoxWhiskerPlugin, type BoxWhiskerPluginOptions } from './boxWhiskerPlugin';
 export { createHeatmapPlugin, type HeatmapPluginOptions } from './heatmapPlugin';
+export { createWindArrowPlugin, type WindArrowPluginOptions } from './windArrowPlugin';
