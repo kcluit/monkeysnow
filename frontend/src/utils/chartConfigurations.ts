@@ -420,6 +420,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     chartType: 'line',
     formatValue: (v) => `${Math.round(v)}W/m²`,
     yAxisDomain: [0, 'auto'],
+    description: 'Diffuse solar radiation (scattered by atmosphere)',
   }],
   ['direct_normal_irradiance', {
     id: 'direct_normal_irradiance',
