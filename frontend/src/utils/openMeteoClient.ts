@@ -1,5 +1,6 @@
 import { fetchWeatherApi } from 'openmeteo';
 import type { WeatherModel, WeatherVariable, HourlyDataPoint, TimezoneInfo } from '../types/openMeteo';
+import { getOverlayVariablesFor, hasOverlays } from './chartConfigurations';
 
 // Import locations from backend
 import locationsData from '../../../backend/locations.json';
