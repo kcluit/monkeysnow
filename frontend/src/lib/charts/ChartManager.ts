@@ -318,6 +318,12 @@ export class ChartManager {
             return;
         }
 
+        // Validate we have data to display
+        if (config.xAxis.data.length === 0 || config.series.length === 0) {
+            console.log('[ChartManager] No data to display, skipping chart creation');
+            return;
+        }
+
         const { dataZoom, series } = config;
 
         // Build plugins
