@@ -65,15 +65,30 @@ export function VariableSelectionModal({
     })
   );
 
-  // Handle drag end
+  // Handle drag end - routes to appropriate reorder function
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event;
-      if (over && active.id !== over.id) {
-        reorderVariables(active.id as string, over.id as string);
+      if (!over || active.id === over.id) return;
+
+      const activeId = active.id as string;
+      const overId = over.id as string;
+
+      // Check if dragging categories (prefixed with "category-")
+      if (activeId.startsWith('category-') && overId.startsWith('category-')) {
+        const activeCatId = activeId.replace('category-', '');
+        const overCatId = overId.replace('category-', '');
+        reorderCategories(activeCatId, overCatId);
+      } else if (!activeId.startsWith('category-') && !overId.startsWith('category-')) {
+        // Dragging variables
+        if (isSearching) {
+          reorderVariables(activeId, overId);
+        } else {
+          reorderVariableAcrossCategories(activeId, overId);
+        }
       }
     },
-    [reorderVariables]
+    [reorderVariables, reorderCategories, reorderVariableAcrossCategories, isSearching]
   );
 
   // Toggle category expansion
