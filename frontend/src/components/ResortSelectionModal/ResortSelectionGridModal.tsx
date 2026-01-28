@@ -344,6 +344,7 @@ const ContinentColumn = memo(function ContinentColumn({
               onSelectAll={onSelectAll}
               onDeselectAll={onDeselectAll}
               getSelectionState={getSelectionState}
+              getResortsUnderNode={getResortsUnderNode}
               hideEmoji={hideEmoji}
             />
           ))}
