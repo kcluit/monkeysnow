@@ -134,6 +134,9 @@ const ModelItem = memo(function ModelItem({
         style={{ backgroundColor: color }}
       />
       <span className="resort-grid-item-name">{node.name}</span>
+      {node.resolution && (
+        <span className="model-resolution-label">({node.resolution})</span>
+      )}
     </label>
   );
 });
