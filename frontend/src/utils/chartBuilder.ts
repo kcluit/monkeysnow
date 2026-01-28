@@ -670,7 +670,8 @@ export function buildWeatherChartConfig(
         variable,
         unitSystem,
         timezoneInfo,
-        isChartLocked
+        isChartLocked,
+        location,
     } = props;
 
     // Handle empty data
