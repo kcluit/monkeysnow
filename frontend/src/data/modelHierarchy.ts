@@ -253,6 +253,7 @@ export function buildModelHierarchyTree(): ModelHierarchyNode[] {
         name: model.name,
         type: 'model' as const,
         description: model.description,
+        resolution: model.resolution,
         modelId: model.id,
       })),
     });
