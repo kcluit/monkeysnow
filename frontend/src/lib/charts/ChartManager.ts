@@ -174,7 +174,7 @@ function formatYAxisValue(value: number, scaleMin: number, scaleMax: number): st
  * Build uPlot axes configuration.
  */
 function buildUPlotAxes(config: ChartConfig): uPlot.Axis[] {
-    const { xAxis, yAxis, yAxisSecondary, theme } = config;
+    const { xAxis, yAxisSecondary, theme } = config;
 
     const axes: uPlot.Axis[] = [
         {
