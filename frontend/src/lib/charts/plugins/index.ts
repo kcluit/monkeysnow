@@ -10,3 +10,4 @@ export { createZeroAxisPlugin, type ZeroAxisPluginOptions } from './zeroAxisPlug
 export { createBoxWhiskerPlugin, type BoxWhiskerPluginOptions } from './boxWhiskerPlugin';
 export { createHeatmapPlugin, type HeatmapPluginOptions } from './heatmapPlugin';
 export { createWindArrowPlugin, type WindArrowPluginOptions } from './windArrowPlugin';
+export { createTooltipPlugin, type TooltipPluginOptions } from './tooltipPlugin';
