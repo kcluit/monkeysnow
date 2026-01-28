@@ -163,7 +163,7 @@ export const ModelTreeNode = memo(function ModelTreeNode({
         {/* Icon for providers */}
         {isProvider && (
           <span className="resort-tree-icon">
-            {node.id === 'aggregations' ? '📊' : '🌐'}
+            <Icon icon={node.id === 'aggregations' ? icons.aggregations : icons.provider} />
           </span>
         )}
 
