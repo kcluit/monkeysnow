@@ -7,7 +7,7 @@
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useHierarchy, type HierarchyNode } from '../contexts/HierarchyContext';
-import { getResortsUnderNode } from '../data/resortHierarchy';
+import { useResortCache } from './useResortCache';
 
 export interface UseResortHierarchyProps {
   selectedResorts: string[];
