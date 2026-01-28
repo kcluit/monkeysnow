@@ -83,6 +83,12 @@ export function useResortHierarchy({
   // Get hierarchy from context (fetched from backend)
   const { hierarchyTree, loading: isLoading } = useHierarchy();
 
+  // Initialize resort cache for performance (O(1) lookups instead of tree traversals)
+  const {
+    getResortsUnderNode: cachedGetResortsUnderNode,
+    getSelectionState: cachedGetSelectionState,
+  } = useResortCache({ hierarchyTree, selectedResorts });
+
   // Modal state
   const [isOpen, setIsOpen] = useState(false);
 
