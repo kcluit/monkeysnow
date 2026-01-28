@@ -174,6 +174,20 @@ export interface FetchOpenMeteoDataResult {
   timezoneInfo: TimezoneInfo | null;
 }
 
+// Expand variables to include overlay variables for any base variables that have overlays
+function expandVariablesWithOverlays(variables: WeatherVariable[]): WeatherVariable[] {
+  const expanded = new Set<WeatherVariable>(variables);
+
+  for (const variable of variables) {
+    if (hasOverlays(variable)) {
+      const overlayVars = getOverlayVariablesFor(variable);
+      overlayVars.forEach(v => expanded.add(v));
+    }
+  }
+
+  return Array.from(expanded);
+}
+
 // Fetch weather data from Open-Meteo for multiple models
 export async function fetchOpenMeteoData(
   latitude: number,
