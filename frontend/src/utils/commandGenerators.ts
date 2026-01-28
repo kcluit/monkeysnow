@@ -331,7 +331,7 @@ export function generateLanguageCommands(
     name: lang.name === lang.nativeName
       ? lang.name
       : `${lang.name} (${lang.nativeName})`,
-    icon: currentLanguageId === lang.id ? '✓' : '',
+    icon: currentLanguageId === lang.id ? icons.check : undefined,
     action: () => setLanguage(lang.id),
   }));
 }
