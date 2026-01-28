@@ -456,7 +456,7 @@ const updateWeatherData = async () => {
             ['AM', 'PM', 'NIGHT'].forEach(chunkName => {
                 const data = chunks[chunkName];
                 const hData = data.hourly;
-                const mData = data.minutely;
+                const fData = data.freezingData;
 
                 if (!hData.length) {
                     forecast[date][chunkName] = null;
