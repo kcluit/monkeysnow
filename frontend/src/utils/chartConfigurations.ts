@@ -136,6 +136,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     formatValue: (v, u) => u === 'metric' ? `${v.toFixed(1)}mm` : `${mmToInches(v).toFixed(2)}in`,
     convertToImperial: mmToInches,
     yAxisDomain: [0, 'auto'],
+    description: 'Total precipitation (rain, showers, snow) sum of the preceding hour',
   }],
   ['rain', {
     id: 'rain',
