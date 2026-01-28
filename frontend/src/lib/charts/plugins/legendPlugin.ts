@@ -80,7 +80,8 @@ export function createLegendPlugin(options: LegendPluginOptions): uPlot.Plugin {
                     u.setSeries(i, { show: !series.show });
                 }
 
-                updateLegend(u);
+                // Defer legend update to avoid recursion during batch operations
+                requestAnimationFrame(() => updateLegend(u));
             });
 
             // Hover effect
