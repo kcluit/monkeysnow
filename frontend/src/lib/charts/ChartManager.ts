@@ -413,6 +413,9 @@ export class ChartManager {
         // Zero axis plugin - draws bold line at y=0 for charts that cross zero
         plugins.push(createZeroAxisPlugin({ theme: config.theme }));
 
+        // Tooltip plugin - shows values at cursor position
+        plugins.push(createTooltipPlugin({ config }));
+
         // Build uPlot options
         const opts: uPlot.Options = {
             width,
