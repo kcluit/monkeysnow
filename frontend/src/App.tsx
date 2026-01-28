@@ -22,7 +22,7 @@ import { useFullscreen } from './hooks/useFullscreen';
 import { useFPSCounter } from './hooks/useFPSCounter';
 import { useCommandPalette } from './hooks/useCommandPalette';
 import { useRainbowText } from './hooks/useRainbowText';
-import { useHideEmoji } from './hooks/useHideEmoji';
+import { useHideIcons } from './hooks/useHideIcons';
 import { useHideBorders } from './hooks/useHideBorders';
 import { useShowDate } from './hooks/useShowDate';
 import { useResortHierarchy } from './hooks/useResortHierarchy';
