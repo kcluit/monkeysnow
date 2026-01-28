@@ -30,6 +30,7 @@ export function DetailedResortView({
     location,
     onBack,
     unitSystem,
+    showUtilityBar,
 }: DetailedResortViewPropsWithUnits): JSX.Element {
     // State for selected models
     const [selectedModels, setSelectedModels] = useLocalStorage<WeatherModel[]>(
