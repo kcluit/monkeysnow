@@ -147,7 +147,7 @@ export const ResortSelectionModal = memo(function ResortSelectionModal({
                   onNavigate={navigateTo}
                   onHover={setSelectedIndex}
                   onToggleAll={handleToggleAll}
-                  hideEmoji={hideEmoji}
+                  hideIcons={hideIcons}
                 />
               </div>
             ))
