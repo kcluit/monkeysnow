@@ -329,6 +329,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     chartType: 'line',
     formatValue: (v, u) => u === 'metric' ? `${Math.round(v)}C` : `${Math.round(tempToImperial(v))}F`,
     convertToImperial: tempToImperial,
+    description: 'Temperature accounting for evaporative cooling; indicates snow quality',
   }],
   ['precipitation_probability', {
     id: 'precipitation_probability',
