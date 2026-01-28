@@ -280,11 +280,11 @@ const ProviderSection = memo(function ProviderSection({
           aria-expanded={isExpanded}
           aria-label={isExpanded ? 'Collapse' : 'Expand'}
         >
-          ▶
+          <Icon icon={isExpanded ? icons.caretDown : icons.caretRight} />
         </button>
         <Checkbox state={selectionState} onClick={(e) => { e.stopPropagation(); handleHeaderClick(); }} />
         <span className="resort-grid-header-icon">
-          {isAggregationsSection ? '📊' : '🌐'}
+          <Icon icon={isAggregationsSection ? icons.aggregations : icons.provider} />
         </span>
         <span className="resort-grid-continent-name">{node.name}</span>
         <span className="resort-grid-count">
