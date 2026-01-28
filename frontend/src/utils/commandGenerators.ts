@@ -345,13 +345,13 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'select-resorts',
       name: 'Select resorts',
-      icon: '⛷️',
+      icon: icons.resort,
       action: params.openResortSelector,
     },
     {
       id: 'elevation',
       name: 'Elevation',
-      icon: '⛰️',
+      icon: icons.mountain,
       subCommands: generateElevationCommands(
         params.selectedElevation,
         params.setSelectedElevation
@@ -360,7 +360,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'sort-by',
       name: 'Sort by',
-      icon: '📊',
+      icon: icons.chart,
       subCommands: generateSortCommands(
         params.selectedSort,
         params.setSelectedSort
@@ -369,7 +369,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'sort-day',
       name: 'Sort day',
-      icon: '📅',
+      icon: icons.calendar,
       subCommands: generateSortDayCommands(
         params.selectedSortDay,
         params.setSelectedSortDay,
@@ -379,7 +379,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'sort-order',
       name: 'Sort order',
-      icon: '↕️',
+      icon: icons.sort,
       subCommands: generateOrderCommands(
         params.isReversed,
         params.setIsReversed
@@ -388,7 +388,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'view-mode',
       name: 'Choose view',
-      icon: '👁️',
+      icon: icons.view,
       subCommands: generateViewModeCommands(
         params.viewMode,
         params.setViewMode
@@ -397,7 +397,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'temperature-metric',
       name: 'Temperature display',
-      icon: '🌡️',
+      icon: icons.temperature,
       subCommands: generateTemperatureMetricCommands(
         params.selectedTemperatureMetric,
         params.setSelectedTemperatureMetric
@@ -406,7 +406,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'snowfall-estimate',
       name: 'Snowfall estimate',
-      icon: '❄️',
+      icon: icons.snow,
       subCommands: generateSnowfallEstimateCommands(
         params.snowfallEstimateMode,
         params.setSnowfallEstimateMode
@@ -415,7 +415,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'utility-bar',
       name: 'Utility bar',
-      icon: '🎛️',
+      icon: icons.controls,
       subCommands: generateUtilityBarCommands(
         params.showUtilityBar,
         params.setShowUtilityBar
@@ -424,7 +424,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'utility-bar-style',
       name: 'Utility bar style',
-      icon: '📐',
+      icon: icons.ruler,
       subCommands: generateUtilityBarStyleCommands(
         params.utilityBarStyle,
         params.setUtilityBarStyle
@@ -433,7 +433,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'units',
       name: 'Units',
-      icon: '📏',
+      icon: icons.units,
       subCommands: generateUnitSystemCommands(
         params.unitSystem,
         params.setUnitSystem
@@ -442,7 +442,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     {
       id: 'language',
       name: 'Language',
-      icon: '🌐',
+      icon: icons.language,
       subCommands: generateLanguageCommands(
         params.languageId,
         params.setLanguage,
