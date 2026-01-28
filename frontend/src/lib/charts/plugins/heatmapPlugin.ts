@@ -73,7 +73,7 @@ export function createHeatmapPlugin(options: HeatmapPluginOptions): uPlot.Plugin
         ctx.rect(u.bbox.left, u.bbox.top, u.bbox.width, u.bbox.height);
         ctx.clip();
 
-        const { hours, dates, values } = series.heatmapData;
+        const { dates, values } = series.heatmapData;
         const [minVal, maxVal] = valueRange;
         const range = maxVal - minVal;
 
