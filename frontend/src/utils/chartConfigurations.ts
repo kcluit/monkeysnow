@@ -318,6 +318,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     chartType: 'line',
     formatValue: (v, u) => u === 'metric' ? `${Math.round(v)}C` : `${Math.round(tempToImperial(v))}F`,
     convertToImperial: tempToImperial,
+    description: 'Dew point temperature at 2 meters above ground',
   }],
   ['wet_bulb_temperature_2m', {
     id: 'wet_bulb_temperature_2m',
