@@ -121,6 +121,7 @@ const ProvinceGroup = memo(function ProvinceGroup({
   onSelectAll,
   onDeselectAll,
   getSelectionState,
+  getResortsUnderNode,
   hideEmoji,
 }: {
   node: HierarchyNode;
@@ -131,6 +132,7 @@ const ProvinceGroup = memo(function ProvinceGroup({
   onSelectAll: (node: HierarchyNode) => void;
   onDeselectAll: (node: HierarchyNode) => void;
   getSelectionState: (node: HierarchyNode) => 'all' | 'some' | 'none';
+  getResortsUnderNode: (node: HierarchyNode) => string[];
   hideEmoji?: boolean;
 }) {
   const isExpanded = expandedNodes.has(node.id);
