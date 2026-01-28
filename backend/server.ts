@@ -383,17 +383,17 @@ const updateWeatherData = async () => {
         const rain = hourly.variables(7)!.valuesArray()!;
         const snowfall = hourly.variables(8)!.valuesArray()!;
 
-        // Extract freezing levels
+        // Extract freezing levels from hourly data
         let freezingLevels: Float32Array | number[] = [];
         let freezingTimeStart = 0;
         let freezingInterval = 0;
 
         if (freezingResp) {
-            const min15 = freezingResp.minutely15();
-            if (min15) {
-                freezingLevels = min15.variables(0)!.valuesArray()!;
-                freezingTimeStart = Number(min15.time());
-                freezingInterval = min15.interval();
+            const freezingHourly = freezingResp.hourly();
+            if (freezingHourly) {
+                freezingLevels = freezingHourly.variables(0)!.valuesArray()!;
+                freezingTimeStart = Number(freezingHourly.time());
+                freezingInterval = freezingHourly.interval();
             }
         }
 
