@@ -11,3 +11,4 @@ export { createBoxWhiskerPlugin, type BoxWhiskerPluginOptions } from './boxWhisk
 export { createHeatmapPlugin, type HeatmapPluginOptions } from './heatmapPlugin';
 export { createWindArrowPlugin, type WindArrowPluginOptions } from './windArrowPlugin';
 export { createTooltipPlugin, type TooltipPluginOptions } from './tooltipPlugin';
+export { createLegendPlugin, type LegendPluginOptions } from './legendPlugin';
