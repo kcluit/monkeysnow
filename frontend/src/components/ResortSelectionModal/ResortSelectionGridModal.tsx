@@ -86,8 +86,8 @@ const Checkbox = memo(function Checkbox({
       role="checkbox"
       aria-checked={state === 'all' ? true : state === 'some' ? 'mixed' : false}
     >
-      {state === 'all' && '✓'}
-      {state === 'some' && '−'}
+      {state === 'all' && <Icon icon={icons.check} />}
+      {state === 'some' && <Icon icon={icons.minus} />}
     </span>
   );
 });
