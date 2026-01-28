@@ -561,6 +561,7 @@ export function buildWeatherChartConfig(
 
     return {
         type: chartType,
+        variable, // Pass variable for plugin decisions (e.g., zero axis exclusion)
         xAxis: {
             type: 'category',
             data: timeLabels,
