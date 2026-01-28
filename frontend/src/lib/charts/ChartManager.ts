@@ -448,6 +448,19 @@ export class ChartManager {
         // Zero axis plugin - draws bold line at y=0 for charts that cross zero
         plugins.push(createZeroAxisPlugin({ theme: config.theme }));
 
+        // Elevation lines plugin - draws horizontal lines for base/mid/top elevations on freezing level charts
+        if (config.elevationLines) {
+            plugins.push(createElevationLinesPlugin({
+                theme: config.theme,
+                elevations: {
+                    base: config.elevationLines.base,
+                    mid: config.elevationLines.mid,
+                    top: config.elevationLines.top,
+                },
+                unit: config.elevationLines.unit,
+            }));
+        }
+
         // Tooltip plugin - shows values at cursor position
         plugins.push(createTooltipPlugin({ config }));
 
