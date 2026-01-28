@@ -198,19 +198,22 @@ export async function fetchOpenMeteoData(
   forecastDays: number = 14,
   timezone: string = 'auto'
 ): Promise<FetchOpenMeteoDataResult> {
+  // Expand variables to include overlay variables
+  const expandedVariables = expandVariablesWithOverlays(variables);
+
   // DEV MODE: Return mock data for performance testing
   if (isMockModeEnabled()) {
     console.log('[MOCK MODE] Generating mock data for', models.length, 'models');
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 100));
-    return generateMockData(models, variables, forecastDays);
+    return generateMockData(models, expandedVariables, forecastDays);
   }
 
   const params = {
     latitude,
     longitude,
     elevation,
-    hourly: variables,
+    hourly: expandedVariables,
     models,
     forecast_days: forecastDays,
     timezone,
