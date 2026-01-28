@@ -543,13 +543,18 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
         </div>
 
         {/* Footer */}
-        <div className="command-palette-footer">
-          <span className="command-hint">
-            <kbd>esc</kbd> close
-          </span>
-          <span className="resort-selection-count">
-            {getTotalCount()}
-          </span>
+        <div className="command-palette-footer model-grid-footer">
+          <div className="model-grid-footer-note">
+            Note: The default Best Match provides the best forecast for any given location worldwide. Seamless combines all models from a given provider into a seamless prediction. Click 👁️ to hide aggregation members.
+          </div>
+          <div className="model-grid-footer-actions">
+            <span className="command-hint">
+              <kbd>esc</kbd> close
+            </span>
+            <span className="resort-selection-count">
+              {getTotalCount()}
+            </span>
+          </div>
         </div>
       </div>
     </div>
