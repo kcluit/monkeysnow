@@ -120,4 +120,6 @@ export interface ChartConfig {
     animation: boolean;
     /** Optional elevation lines for freezing level charts */
     elevationLines?: ElevationLinesConfig;
+    /** Unit system for display (metric or imperial) - used for structural key */
+    unitSystem?: 'metric' | 'imperial';
 }
