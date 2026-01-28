@@ -96,6 +96,15 @@ const mToFt = (m: number): number => m * 3.28084;
 // Helper to convert hPa to inHg
 const hpaToInHg = (hpa: number): number => hpa * 0.02953;
 
+// Helper to convert kPa to psi
+const kpaToPsi = (kpa: number): number => kpa * 0.145038;
+
+// Helper to convert seconds to minutes
+const secToMin = (sec: number): number => sec / 60;
+
+// Helper to convert J/kg (CAPE) - no conversion needed for imperial
+const jkgIdentity = (v: number): number => v;
+
 // Variable configurations
 export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
   ['temperature_2m', {
