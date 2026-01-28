@@ -35,12 +35,12 @@ interface ChartSettingsModalProps {
     onChartWidthChange: (width: number) => void;
 }
 
-const CHART_TYPES: { type: ChartDisplayType; label: string; icon: string; requiresMultipleModels?: boolean }[] = [
-    { type: 'line', label: 'Line', icon: '📈' },
-    { type: 'bar', label: 'Bar', icon: '📊' },
-    { type: 'area', label: 'Area', icon: '📉' },
-    { type: 'boxwhisker', label: 'Box & Whisker', icon: '📦', requiresMultipleModels: true },
-    { type: 'heatmap', label: 'Heatmap', icon: '🗓️', requiresMultipleModels: true },
+const CHART_TYPES: { type: ChartDisplayType; label: string; icon: IconDefinition; requiresMultipleModels?: boolean }[] = [
+    { type: 'line', label: 'Line', icon: icons.lineChart },
+    { type: 'bar', label: 'Bar', icon: icons.barChart },
+    { type: 'area', label: 'Area', icon: icons.areaChart },
+    { type: 'boxwhisker', label: 'Box & Whisker', icon: icons.boxChart, requiresMultipleModels: true },
+    { type: 'heatmap', label: 'Heatmap', icon: icons.heatmap, requiresMultipleModels: true },
 ];
 
 // Dimension constraints
