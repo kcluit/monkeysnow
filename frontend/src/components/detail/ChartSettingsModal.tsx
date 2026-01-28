@@ -178,7 +178,7 @@ export function ChartSettingsModal({
                     {/* Accumulation Option (for precip variables) */}
                     {hasAccumulation && (
                         <div className="chart-settings-section">
-                            <h3 className="chart-settings-section-title">Overlay</h3>
+                            <h3 className="chart-settings-section-title">Accumulation Overlay</h3>
                             <label className="chart-settings-toggle">
                                 <input
                                     type="checkbox"
@@ -192,6 +192,39 @@ export function ChartSettingsModal({
                                     Displays cumulative total as a line graph
                                 </span>
                             </label>
+                        </div>
+                    )}
+
+                    {/* Multi-Level Overlay Option (for wind/soil variables) */}
+                    {hasOverlayLevels && overlayConfig && (
+                        <div className="chart-settings-section">
+                            <h3 className="chart-settings-section-title">Multi-Level Overlay</h3>
+                            <label className="chart-settings-toggle">
+                                <input
+                                    type="checkbox"
+                                    checked={localShowOverlays}
+                                    onChange={(e) => setLocalShowOverlays(e.target.checked)}
+                                />
+                                <span className="chart-settings-toggle-label">
+                                    Show {overlayConfig.description}
+                                </span>
+                                <span className="chart-settings-toggle-desc">
+                                    Displays {overlayConfig.overlays.length} additional {overlayConfig.description} on the chart
+                                </span>
+                            </label>
+                            {localShowOverlays && (
+                                <div className="chart-settings-overlay-levels">
+                                    {overlayConfig.overlays.map((overlay) => (
+                                        <span
+                                            key={overlay.variable}
+                                            className="chart-settings-overlay-badge"
+                                            style={{ backgroundColor: overlay.color, opacity: overlay.opacity ?? 0.7 }}
+                                        >
+                                            {overlay.label}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
 
