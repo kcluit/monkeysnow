@@ -8,10 +8,12 @@
 import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
 import { useHierarchy, type HierarchyNode } from '../../contexts/HierarchyContext';
 import type { UseResortHierarchyReturn } from '../../hooks/useResortHierarchy';
+import { Icon } from '../Icon';
+import { icons } from '../../constants/icons';
 
 interface ResortSelectionGridModalProps {
   hierarchy: UseResortHierarchyReturn;
-  hideEmoji?: boolean;
+  hideIcons?: boolean;
 }
 
 // Get all node IDs from the hierarchy tree for default expansion
