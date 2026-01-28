@@ -201,13 +201,13 @@ export function generateUtilityBarCommands(
     {
       id: 'utilitybar-show',
       name: 'Show',
-      icon: showUtilityBar ? '✓' : '',
+      icon: showUtilityBar ? icons.check : undefined,
       action: () => setShowUtilityBar(true),
     },
     {
       id: 'utilitybar-hide',
       name: 'Hide',
-      icon: !showUtilityBar ? '✓' : '',
+      icon: !showUtilityBar ? icons.check : undefined,
       action: () => setShowUtilityBar(false),
     },
   ];
