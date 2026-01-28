@@ -351,6 +351,12 @@ export class ChartManager {
             plugins.push(createZeroAxisPlugin({ theme: config.theme }));
         }
 
+        // Box & whisker plugin - draws ensemble spread visualization
+        const boxWhiskerSeries = series.filter((s) => s.type === 'boxwhisker' && s.boxWhiskerData);
+        if (boxWhiskerSeries.length > 0) {
+            plugins.push(createBoxWhiskerPlugin({ series: boxWhiskerSeries }));
+        }
+
         // Build uPlot options
         const opts: uPlot.Options = {
             width,
