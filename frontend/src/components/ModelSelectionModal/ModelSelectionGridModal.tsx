@@ -291,7 +291,7 @@ const ProviderSection = memo(function ProviderSection({
             onClick={(e) => { e.stopPropagation(); onToggleHideMembers(); }}
             title={hideAggregationMembers ? 'Show individual model lines' : 'Hide individual model lines'}
           >
-            {hideAggregationMembers ? '👁️' : '👁️‍🗨️'}
+            <FontAwesomeIcon icon={hideAggregationMembers ? faEyeSlash : faEye} />
           </button>
         )}
       </div>
