@@ -565,6 +565,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     color: '#b91c1c',
     chartType: 'line',
     formatValue: (v) => `${v.toFixed(1)}`,
+    description: 'Atmospheric stability index; negative = unstable',
   }],
   ['convective_inhibition', {
     id: 'convective_inhibition',
