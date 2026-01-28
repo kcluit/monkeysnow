@@ -867,6 +867,7 @@ export function buildWeatherChartConfig(
         height: settings?.customHeight ?? (chartType === 'heatmap' ? 300 : 380),
         animation: false,
         elevationLines,
+        unitSystem,
     };
 }
 
