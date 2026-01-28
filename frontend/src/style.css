@@ -1546,9 +1546,8 @@ input[type="checkbox"] {
 /* Hide aggregation members toggle button */
 .aggregation-hide-toggle {
     margin-left: auto;
-    border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
-    border-radius: 6px;
-    background: var(--secondary, #2c2c2e);
+    border: none;
+    background: none;
     cursor: pointer;
     font-size: 14px;
     transition: all 0.15s ease;
@@ -1556,13 +1555,10 @@ input[type="checkbox"] {
 }
 
 .aggregation-hide-toggle:hover {
-    background: var(--cardBg, #3c3c3e);
     opacity: 1;
 }
 
 .aggregation-hide-toggle.active {
-    background: var(--accent, #0a84ff);
-    border-color: var(--accent, #0a84ff);
     opacity: 1;
 }
 
