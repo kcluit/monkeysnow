@@ -25,6 +25,9 @@ interface ChartSettingsModalProps {
     // Accumulation (for precip variables)
     showAccumulation: boolean;
     onAccumulationChange: (show: boolean) => void;
+    // Multi-level overlays (for wind/soil variables)
+    showOverlays: boolean;
+    onOverlaysChange: (show: boolean) => void;
     // Zoom sync exclusion
     zoomSyncExcluded: boolean;
     onZoomSyncExcludedChange: (excluded: boolean) => void;
