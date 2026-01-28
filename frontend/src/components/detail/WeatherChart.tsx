@@ -100,6 +100,7 @@ export function WeatherChart({
             {
                 chartTypeOverride: chartType,
                 showAccumulation,
+                showOverlays,
                 customHeight: chartHeight,
             }
         );
@@ -119,6 +120,7 @@ export function WeatherChart({
         theme,
         chartType,
         showAccumulation,
+        showOverlays,
         chartHeight,
     ]);
 
