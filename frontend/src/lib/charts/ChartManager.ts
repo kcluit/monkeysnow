@@ -344,6 +344,13 @@ export class ChartManager {
             plugins.push(createBandFillPlugin({ series: bandSeries }));
         }
 
+        // Zero axis plugin - draws bold line at y=0 for variables that cross zero
+        // Excluded for wind_direction (always 0-360, zero is not meaningful)
+        const excludedVariables = ['wind_direction_10m'];
+        if (!config.variable || !excludedVariables.includes(config.variable)) {
+            plugins.push(createZeroAxisPlugin({ theme: config.theme }));
+        }
+
         // Build uPlot options
         const opts: uPlot.Options = {
             width,
