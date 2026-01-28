@@ -126,7 +126,7 @@ export const ResortTreeNode = memo(function ResortTreeNode({
 
       {/* Arrow for non-resort nodes */}
       {hasChildren && (
-        <span className="resort-tree-arrow">&gt;</span>
+        <span className="resort-tree-arrow"><Icon icon={icons.chevronRight} /></span>
       )}
     </button>
   );
