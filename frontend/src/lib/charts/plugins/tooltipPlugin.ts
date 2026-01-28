@@ -97,8 +97,9 @@ export function createTooltipPlugin(options: TooltipPluginOptions): uPlot.Plugin
                     tooltip.style.position = 'absolute';
                     tooltip.style.display = 'none';
                     tooltip.style.pointerEvents = 'none';
-                    tooltip.style.background = 'rgba(0, 0, 0, 0.8)';
-                    tooltip.style.color = '#fff';
+                    tooltip.style.background = config.theme.tooltipBg;
+                    tooltip.style.color = config.theme.textPrimary;
+                    tooltip.style.border = `1px solid ${config.theme.tooltipBorder}`;
                     tooltip.style.padding = '4px 8px';
                     tooltip.style.fontSize = '12px';
                     tooltip.style.borderRadius = '4px';
