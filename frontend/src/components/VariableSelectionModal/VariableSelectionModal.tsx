@@ -16,8 +16,7 @@ import {
 } from '@dnd-kit/sortable';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { VariableDraggableItem } from './VariableDraggableItem';
-import { VariableCategorySection } from './VariableCategorySection';
-import { VARIABLE_CATEGORIES } from '../../data/variableCategories';
+import { VariableCategorySectionDraggable } from './VariableCategorySectionDraggable';
 import type { UseVariableSelectionReturn } from '../../hooks/useVariableSelection';
 
 interface VariableSelectionModalProps {
