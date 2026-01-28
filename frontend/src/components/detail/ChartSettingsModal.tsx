@@ -158,7 +158,7 @@ export function ChartSettingsModal({
                                     className={`chart-type-option ${localChartType === type ? 'selected' : ''}`}
                                     onClick={() => setLocalChartType(type)}
                                 >
-                                    <span className="chart-type-icon">{icon}</span>
+                                    <span className="chart-type-icon"><Icon icon={icon} /></span>
                                     <span className="chart-type-label">{label}</span>
                                 </button>
                             ))}
