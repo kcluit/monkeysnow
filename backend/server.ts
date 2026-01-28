@@ -135,19 +135,27 @@ const loadLocations = (): LocationsMap => {
         const json = JSON.parse(rawData);
         const flattened: LocationsMap = {};
 
-        const traverse = (node: any) => {
-            for (const key in node) {
-                const value = node[key];
-                // Identify resort by presence of 'bot' (elevation) or 'loc'
-                if (value.bot !== undefined || value.loc) {
-                    flattened[key] = value;
-                } else if (typeof value === 'object' && value !== null) {
-                    traverse(value);
+        // Traverse the hierarchy: Continent -> Country -> Province -> Resort
+        for (const continentName in json) {
+            const continentData = json[continentName];
+            for (const countryName in continentData) {
+                const countryData = continentData[countryName];
+                for (const provinceName in countryData) {
+                    const provinceData = countryData[provinceName];
+                    for (const resortId in provinceData) {
+                        const resortData = provinceData[resortId];
+                        // Identify resort by presence of 'bot' (elevation) or 'loc'
+                        if (resortData.bot !== undefined || resortData.loc) {
+                            flattened[resortId] = {
+                                ...resortData,
+                                country: countryName
+                            };
+                        }
+                    }
                 }
             }
-        };
+        }
 
-        traverse(json);
         return flattened;
     } catch (error) {
         console.error("Error loading locations.json:", error);
