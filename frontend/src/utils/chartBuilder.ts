@@ -858,6 +858,21 @@ export function buildWeatherChartConfig(
         }
     }
 
+    // Add multi-level overlay series if enabled (e.g., wind at different altitudes)
+    if (settings?.showOverlays && hasOverlays(variable as any) && chartType !== 'heatmap' && chartType !== 'boxwhisker') {
+        const overlaySeries = buildOverlaySeries(
+            data,
+            selectedModels,
+            variable,
+            unitSystem,
+            chartType,
+            timezoneInfo?.timezone
+        );
+        if (overlaySeries.length > 0) {
+            allSeries.push(...overlaySeries);
+        }
+    }
+
     // Add wind direction arrows for wind speed charts
     if (variable === 'wind_speed_10m' && chartType !== 'heatmap' && chartType !== 'boxwhisker') {
         const windArrowData = extractWindDirectionData(data, selectedModels, timeLabels.length);
