@@ -106,6 +106,8 @@ export interface WeatherChartProps {
     selectedAggregations: AggregationType[];
     aggregationColors: Record<AggregationType, string>;
     hideAggregationMembers?: boolean;
+    showMinMaxFill?: boolean;
+    showPercentileFill?: boolean;
     variable: WeatherVariable;
     unitSystem: UnitSystem;
     timezoneInfo?: TimezoneInfo;
