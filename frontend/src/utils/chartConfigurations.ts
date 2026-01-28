@@ -295,6 +295,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     chartType: 'line',
     formatValue: (v, u) => u === 'metric' ? `${Math.round(v)}m` : `${Math.round(mToFt(v))}ft`,
     convertToImperial: mToFt,
+    description: 'Altitude above sea level of the 0°C level',
   }],
   ['weather_code', {
     id: 'weather_code',
