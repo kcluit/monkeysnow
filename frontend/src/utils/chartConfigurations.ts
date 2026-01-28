@@ -340,6 +340,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     chartType: 'line',
     formatValue: (v) => `${Math.round(v)}%`,
     yAxisDomain: [0, 100],
+    description: 'Probability of precipitation with more than 0.1 mm',
   }],
   ['showers', {
     id: 'showers',
