@@ -63,14 +63,14 @@ export const ResortTreeNode = memo(function ResortTreeNode({
   }, [isResort, node, selectionState, onNavigate, onToggleAll]);
 
   // Get icon based on node type
-  const getIcon = (): string => {
-    if (hideEmoji) return '';
+  const getIcon = (): IconDefinition | undefined => {
+    if (hideIcons) return undefined;
     switch (node.type) {
-      case 'continent': return '🌍';
-      case 'country': return '🏳️';
-      case 'province': return '📍';
-      case 'resort': return '⛷️';
-      default: return '';
+      case 'continent': return icons.continent;
+      case 'country': return icons.country;
+      case 'province': return icons.province;
+      case 'resort': return icons.resort;
+      default: return undefined;
     }
   };
 
