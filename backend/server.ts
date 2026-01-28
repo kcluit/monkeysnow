@@ -286,88 +286,113 @@ function estimateHourlySnow(tempC: number, humidity: number, precipMm: number): 
 
 // --- Core Logic ---
 
+// Country-to-model mapping
+const COUNTRY_MODELS: Record<string, string> = {
+    'Canada': 'gem_seamless',
+    'USA': 'gfs_seamless'
+};
+const DEFAULT_MODEL = 'best_match';
+
 const updateWeatherData = async () => {
-    console.log(`[${new Date().toISOString()}] Starting optimized weather update (2-Call Strategy)...`);
+    console.log(`[${new Date().toISOString()}] Starting optimized weather update (Country-Based Model Strategy)...`);
     const locations = loadLocations();
 
-    // 1. Prepare Lists
-    // We will flatten Bot, Mid, Top into a single list for the Main API call
-    const mainLats: number[] = [];
-    const mainLons: number[] = [];
-    const mainElevs: number[] = [];
+    // 1. Group resorts by country for separate API calls
+    interface CountryBatch {
+        mainLats: number[];
+        mainLons: number[];
+        mainElevs: number[];
+        freezingLats: number[];
+        freezingLons: number[];
+        resortNames: string[];
+    }
 
-    // We maintain a map to know which result belongs to which resort/level
-    const resultMap: { name: string, level: 'bot' | 'mid' | 'top' }[] = [];
-
-    // For Freezing levels, we only need 1 call per resort (using Bot coords)
-    const freezingLats: number[] = [];
-    const freezingLons: number[] = [];
+    const countryBatches: Record<string, CountryBatch> = {};
 
     for (const [name, data] of Object.entries(locations)) {
         if (!data.loc || data.loc.length < 2) continue;
         const [lat, lon] = data.loc;
+        const country = data.country || 'Unknown';
 
-        // -- Prepare Main Call (3 indices per resort) --
+        // Initialize batch for this country if needed
+        if (!countryBatches[country]) {
+            countryBatches[country] = {
+                mainLats: [],
+                mainLons: [],
+                mainElevs: [],
+                freezingLats: [],
+                freezingLons: [],
+                resortNames: []
+            };
+        }
 
-        // Bot
-        mainLats.push(lat); mainLons.push(lon); mainElevs.push(data.bot);
-        resultMap.push({ name, level: 'bot' });
+        const batch = countryBatches[country];
 
-        // Mid
-        mainLats.push(lat); mainLons.push(lon); mainElevs.push(data.mid);
-        resultMap.push({ name, level: 'mid' });
+        // Main data: 3 points per resort (Bot, Mid, Top)
+        batch.mainLats.push(lat, lat, lat);
+        batch.mainLons.push(lon, lon, lon);
+        batch.mainElevs.push(data.bot, data.mid, data.top);
 
-        // Top
-        mainLats.push(lat); mainLons.push(lon); mainElevs.push(data.top);
-        resultMap.push({ name, level: 'top' });
+        // Freezing levels: 1 point per resort
+        batch.freezingLats.push(lat);
+        batch.freezingLons.push(lon);
 
-        // -- Prepare Freezing Call (1 index per resort) --
-        freezingLats.push(lat); freezingLons.push(lon);
+        batch.resortNames.push(name);
     }
 
-    if (mainLats.length === 0) return;
+    const countries = Object.keys(countryBatches);
+    if (countries.length === 0) return;
 
     const url = "https://api.open-meteo.com/v1/forecast";
 
-    // 2. Define Parameters
+    // 2. Fetch data for each country with appropriate model
+    const countryResponses: Record<string, { main: any[], freezing: any[] }> = {};
 
-    // Call 1: Main Data (Wind, Temp, Humidity, Precip, Code, Pressure)
-    // Note: Order matches the user's snippet requirement for processing indices
-    const mainParams = {
-        latitude: mainLats,
-        longitude: mainLons,
-        elevation: mainElevs,
-        hourly: [
-            "wind_speed_10m",       // 0
-            "wind_direction_10m",   // 1
-            "temperature_2m",       // 2
-            "relative_humidity_2m", // 3
-            "precipitation",        // 4
-            "weather_code",         // 5
-            "surface_pressure",     // 6
-            "rain",                 // 7
-            "snowfall"              // 8
-        ],
-        models: "best_match",
-        forecast_days: 14,
-        timezone: "auto"
-    };
+    for (const country of countries) {
+        const batch = countryBatches[country];
+        const model = COUNTRY_MODELS[country] || DEFAULT_MODEL;
 
-    // Call 2: Freezing Levels (No elevation needed, atmospheric property)
-    const freezingParams = {
-        latitude: freezingLats,
-        longitude: freezingLons,
-        models: "best_match",
-        hourly: ["freezing_level_height"],
-        forecast_days: 14,
-        timezone: "auto"
-    };
+        console.log(`Fetching data for ${country} (${batch.resortNames.length} resorts) using model: ${model}...`);
 
-    console.log(`Fetching Main data for ${mainLats.length} points...`);
-    const mainResponses = await fetchWeatherApi(url, mainParams);
+        // Main data call
+        const mainParams = {
+            latitude: batch.mainLats,
+            longitude: batch.mainLons,
+            elevation: batch.mainElevs,
+            hourly: [
+                "wind_speed_10m",       // 0
+                "wind_direction_10m",   // 1
+                "temperature_2m",       // 2
+                "relative_humidity_2m", // 3
+                "precipitation",        // 4
+                "weather_code",         // 5
+                "surface_pressure",     // 6
+                "rain",                 // 7
+                "snowfall"              // 8
+            ],
+            models: model,
+            forecast_days: 14,
+            timezone: "auto"
+        };
 
-    console.log(`Fetching Freezing levels for ${freezingLats.length} resorts...`);
-    const freezingResponses = await fetchWeatherApi(url, freezingParams);
+        // Freezing levels call
+        const freezingParams = {
+            latitude: batch.freezingLats,
+            longitude: batch.freezingLons,
+            models: model,
+            hourly: ["freezing_level_height"],
+            forecast_days: 14,
+            timezone: "auto"
+        };
+
+        const mainResponses = await fetchWeatherApi(url, mainParams);
+        const freezingResponses = await fetchWeatherApi(url, freezingParams);
+
+        countryResponses[country] = {
+            main: mainResponses,
+            freezing: freezingResponses
+        };
+    }
 
     // 3. Processing Logic
     const structuredData: Record<string, any> = {};
