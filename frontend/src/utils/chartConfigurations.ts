@@ -387,6 +387,7 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
     formatValue: (v, u) => u === 'metric' ? `${Math.round(v)}m` : `${Math.round(mToFt(v))}ft`,
     convertToImperial: mToFt,
     yAxisDomain: [0, 'auto'],
+    description: 'Height of the atmospheric boundary layer',
   }],
   ['shortwave_radiation', {
     id: 'shortwave_radiation',
