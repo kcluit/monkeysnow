@@ -20,6 +20,10 @@ interface ModelSelectionGridModalProps {
   hierarchy: UseModelHierarchyReturn;
   hideAggregationMembers?: boolean;
   onToggleHideMembers?: () => void;
+  showMinMaxFill?: boolean;
+  onToggleMinMaxFill?: () => void;
+  showPercentileFill?: boolean;
+  onTogglePercentileFill?: () => void;
 }
 
 // Color picker presets
