@@ -256,6 +256,10 @@ export function WeatherChart({
                 onAccumulationChange={setShowAccumulation}
                 zoomSyncExcluded={zoomSyncExcluded}
                 onZoomSyncExcludedChange={setZoomSyncExcluded}
+                chartHeight={chartHeight}
+                onChartHeightChange={setChartHeight}
+                chartWidth={chartWidth}
+                onChartWidthChange={setChartWidth}
             />
         </div>
     );
