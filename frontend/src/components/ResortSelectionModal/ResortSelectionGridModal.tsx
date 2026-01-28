@@ -198,6 +198,7 @@ const CountrySection = memo(function CountrySection({
   onSelectAll,
   onDeselectAll,
   getSelectionState,
+  getResortsUnderNode,
   hideEmoji,
 }: {
   node: HierarchyNode;
@@ -208,6 +209,7 @@ const CountrySection = memo(function CountrySection({
   onSelectAll: (node: HierarchyNode) => void;
   onDeselectAll: (node: HierarchyNode) => void;
   getSelectionState: (node: HierarchyNode) => 'all' | 'some' | 'none';
+  getResortsUnderNode: (node: HierarchyNode) => string[];
   hideEmoji?: boolean;
 }) {
   const isExpanded = expandedNodes.has(node.id);
