@@ -8,7 +8,7 @@
 import type { WeatherVariable } from './openMeteo';
 
 /** Available chart types for display */
-export type ChartDisplayType = 'line' | 'bar' | 'area';
+export type ChartDisplayType = 'line' | 'bar' | 'area' | 'boxwhisker' | 'heatmap';
 
 /** Variables that support accumulation overlay */
 export const ACCUMULATION_VARIABLES: WeatherVariable[] = [
