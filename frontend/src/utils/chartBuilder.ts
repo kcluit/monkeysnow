@@ -66,6 +66,8 @@ function transformToChartData(
         return { timeLabels: [], seriesData: new Map() };
     }
 
+    const expectedLength = firstModelData.length;
+
     // Extract time labels with timezone formatting
     const timeLabels = firstModelData.map((point) => formatTimeLabel(point.time, timezone));
 
@@ -79,15 +81,26 @@ function transformToChartData(
         const values = modelData.map((point) => {
             const value = point[variable];
             // Return null for missing data (creates gaps in charts)
-            if (typeof value !== 'number') return null;
+            // Also handle NaN values (typeof NaN === 'number' is true!)
+            if (typeof value !== 'number' || !Number.isFinite(value)) return null;
 
             // Convert to imperial if needed
             if (unitSystem === 'imperial' && convertToImperial) {
-                return convertToImperial(value);
+                const converted = convertToImperial(value);
+                // Ensure converted value is also valid
+                return Number.isFinite(converted) ? converted : null;
             }
 
             return value;
         });
+
+        // Ensure all series have the same length (pad with nulls if needed)
+        if (values.length < expectedLength) {
+            const padding = new Array(expectedLength - values.length).fill(null);
+            values.push(...padding);
+        } else if (values.length > expectedLength) {
+            values.length = expectedLength;
+        }
 
         seriesData.set(model, values);
     }
