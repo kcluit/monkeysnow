@@ -33,6 +33,7 @@ export interface UseResortHierarchyReturn {
   selectAllInNode: (node: HierarchyNode) => void;
   deselectAllInNode: (node: HierarchyNode) => void;
   getSelectionState: (node: HierarchyNode) => 'all' | 'some' | 'none';
+  getResortsUnderNode: (node: HierarchyNode) => string[];
 
   // Keyboard navigation
   selectedIndex: number;
