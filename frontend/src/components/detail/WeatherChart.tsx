@@ -127,7 +127,14 @@ export function WeatherChart({
                             className="weather-chart-color-indicator"
                             style={{ backgroundColor: variableConfig.color }}
                         />
-                        <span>{variableConfig.label}</span>
+                        <span>
+                            {variableConfig.label}
+                            {(unitSystem === 'metric' ? variableConfig.unit : variableConfig.unitImperial) && (
+                                <span className="weather-chart-unit">
+                                    {' '}({unitSystem === 'metric' ? variableConfig.unit : variableConfig.unitImperial})
+                                </span>
+                            )}
+                        </span>
                     </div>
                 </div>
                 <div className="weather-chart-no-data">
