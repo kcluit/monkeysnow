@@ -245,20 +245,31 @@ export function VariableSelectionModal({
               </SortableContext>
             </DndContext>
           ) : (
-            // Normal mode: categorized grid
-            <div className="variable-categories">
-              {filteredCategories.map(category => (
-                <VariableCategorySection
-                  key={category.id}
-                  category={category}
-                  variables={category.variables}
-                  isSelected={isSelected}
-                  onToggle={toggleVariable}
-                  isExpanded={expandedCategories.has(category.id)}
-                  onToggleExpand={() => toggleCategoryExpand(category.id)}
-                />
-              ))}
-            </div>
+            // Normal mode: categorized grid with drag-and-drop
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={filteredCategories.map(c => `category-${c.id}`)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="variable-categories">
+                  {filteredCategories.map(category => (
+                    <VariableCategorySectionDraggable
+                      key={category.id}
+                      category={category}
+                      variables={category.variables}
+                      isSelected={isSelected}
+                      onToggle={toggleVariable}
+                      isExpanded={expandedCategories.has(category.id)}
+                      onToggleExpand={() => toggleCategoryExpand(category.id)}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           )}
         </div>
 
