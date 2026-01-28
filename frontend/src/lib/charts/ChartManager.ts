@@ -145,7 +145,22 @@ function buildUPlotScales(config: ChartConfig): uPlot.Scales {
 
     const scales: uPlot.Scales = {
         x: { time: false },
-        y: { auto: true },
+        y: {
+            auto: true,
+            // Ensure valid range even when data is empty or all nulls
+            range: (_u: uPlot, dataMin: number, dataMax: number) => {
+                // Handle invalid data ranges (Infinity occurs when no valid data)
+                if (!Number.isFinite(dataMin) || !Number.isFinite(dataMax)) {
+                    return [0, 100]; // Fallback range
+                }
+                // Ensure min < max (add padding if equal)
+                if (dataMin === dataMax) {
+                    const padding = Math.abs(dataMin) * 0.1 || 1;
+                    return [dataMin - padding, dataMax + padding];
+                }
+                return [dataMin, dataMax];
+            },
+        },
     };
 
     if (yAxis.domain) {
@@ -155,18 +170,40 @@ function buildUPlotScales(config: ChartConfig): uPlot.Scales {
         } else if (min !== 'auto') {
             scales.y = {
                 auto: true,
-                range: (_u: uPlot, _dataMin: number, dataMax: number) => [min, dataMax],
+                range: (_u: uPlot, _dataMin: number, dataMax: number) => {
+                    // Handle invalid dataMax
+                    const validMax = Number.isFinite(dataMax) ? dataMax : min + 100;
+                    // Ensure min < max
+                    return [min, Math.max(validMax, min + 1)];
+                },
             };
         } else if (max !== 'auto') {
             scales.y = {
                 auto: true,
-                range: (_u: uPlot, dataMin: number, _dataMax: number) => [dataMin, max],
+                range: (_u: uPlot, dataMin: number, _dataMax: number) => {
+                    // Handle invalid dataMin
+                    const validMin = Number.isFinite(dataMin) ? dataMin : max - 100;
+                    // Ensure min < max
+                    return [Math.min(validMin, max - 1), max];
+                },
             };
         }
     }
 
     if (yAxisSecondary) {
-        scales.y2 = { auto: true };
+        scales.y2 = {
+            auto: true,
+            range: (_u: uPlot, dataMin: number, dataMax: number) => {
+                if (!Number.isFinite(dataMin) || !Number.isFinite(dataMax)) {
+                    return [0, 100];
+                }
+                if (dataMin === dataMax) {
+                    const padding = Math.abs(dataMin) * 0.1 || 1;
+                    return [dataMin - padding, dataMax + padding];
+                }
+                return [dataMin, dataMax];
+            },
+        };
     }
 
     return scales;
