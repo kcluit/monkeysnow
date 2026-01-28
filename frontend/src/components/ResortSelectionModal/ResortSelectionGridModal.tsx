@@ -124,7 +124,7 @@ const ProvinceGroup = memo(function ProvinceGroup({
   onDeselectAll,
   getSelectionState,
   getResortsUnderNode,
-  hideEmoji,
+  hideIcons,
 }: {
   node: HierarchyNode;
   expandedNodes: Set<string>;
@@ -135,7 +135,7 @@ const ProvinceGroup = memo(function ProvinceGroup({
   onDeselectAll: (node: HierarchyNode) => void;
   getSelectionState: (node: HierarchyNode) => 'all' | 'some' | 'none';
   getResortsUnderNode: (node: HierarchyNode) => string[];
-  hideEmoji?: boolean;
+  hideIcons?: boolean;
 }) {
   const isExpanded = expandedNodes.has(node.id);
   const selectionState = getSelectionState(node);
@@ -164,10 +164,10 @@ const ProvinceGroup = memo(function ProvinceGroup({
           aria-expanded={isExpanded}
           aria-label={isExpanded ? 'Collapse' : 'Expand'}
         >
-          ▶
+          <Icon icon={isExpanded ? icons.caretDown : icons.caretRight} />
         </button>
         <Checkbox state={selectionState} onClick={(e) => { e.stopPropagation(); handleHeaderClick(); }} />
-        {!hideEmoji && <span className="resort-grid-header-icon">📍</span>}
+        {!hideIcons && <span className="resort-grid-header-icon"><Icon icon={icons.province} /></span>}
         <span className="resort-grid-province-name">{node.name}</span>
         <span className="resort-grid-count">
           {selectedCount}/{resortsUnder.length}
@@ -181,7 +181,7 @@ const ProvinceGroup = memo(function ProvinceGroup({
               node={resort}
               isSelected={resort.resortId ? selectedResorts.includes(resort.resortId) : false}
               onToggle={() => resort.resortId && onToggleResort(resort.resortId)}
-              hideEmoji={hideEmoji}
+              hideIcons={hideIcons}
             />
           ))}
         </div>
