@@ -159,8 +159,9 @@ export function DetailedResortView({
                         setShowMinMaxFill={setShowMinMaxFill}
                         showPercentileFill={showPercentileFill}
                         setShowPercentileFill={setShowPercentileFill}
-                        elevation={elevation}
-                        setElevation={setElevation}
+                        elevationSelection={elevationSelection}
+                        setElevationSelection={setElevationSelection}
+                        resolvedElevation={resolvedElevation}
                         forecastDays={forecastDays}
                         setForecastDays={setForecastDays}
                         location={location}
