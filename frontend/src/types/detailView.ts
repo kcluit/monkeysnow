@@ -76,8 +76,9 @@ export interface DetailUtilityBarProps {
     setShowMinMaxFill: (show: boolean) => void;
     showPercentileFill: boolean;
     setShowPercentileFill: (show: boolean) => void;
-    elevation: number;
-    setElevation: (elevation: number) => void;
+    elevationSelection: ElevationSelection;
+    setElevationSelection: (selection: ElevationSelection) => void;
+    resolvedElevation: number;
     forecastDays: number;
     setForecastDays: (days: number) => void;
     location: {
