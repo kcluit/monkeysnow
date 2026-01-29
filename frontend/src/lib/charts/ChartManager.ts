@@ -179,7 +179,7 @@ function formatYAxisValue(value: number, scaleMin: number, scaleMax: number): st
  * This allows uPlot to auto-select tick intervals while guaranteeing midnight ticks appear.
  */
 function createMidnightSplitsFunction(midnightIndices: number[], dataLength: number) {
-    return (u: uPlot, axisIdx: number, scaleMin: number, scaleMax: number, foundIncr: number, foundSpace: number) => {
+    return (_u: uPlot, _axisIdx: number, scaleMin: number, scaleMax: number, foundIncr: number, _foundSpace: number) => {
         // Generate default evenly-spaced splits based on uPlot's calculated increment
         const splits: number[] = [];
         const incr = Math.max(1, Math.round(foundIncr));
