@@ -1,4 +1,4 @@
-import type { ElevationLevel, SortOption, TemperatureMetric } from '../types';
+import type { ElevationLevel, SortOption, SortDay, TemperatureMetric } from '../types';
 
 // Webcam URLs (static data, not from backend)
 export const webcamUrls: Record<string, string> = {
