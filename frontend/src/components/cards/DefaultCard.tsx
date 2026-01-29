@@ -100,7 +100,7 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
                                                     {formatSnow(dayStats.snow, unitSystem)} snow
                                                 </div>
                                             ) : dayStats.rain > 0 ? (
-                                                <div className="text-sm font-bold text-theme-accent">
+                                                <div className="text-sm font-bold text-theme-textSecondary">
                                                     {formatRain(dayStats.rain, unitSystem)} rain
                                                 </div>
                                             ) : null}
