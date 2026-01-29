@@ -175,10 +175,44 @@ function formatYAxisValue(value: number, scaleMin: number, scaleMax: number): st
 }
 
 /**
+ * Create a custom splits function that ensures midnight indices are always included.
+ * This allows uPlot to auto-select tick intervals while guaranteeing midnight ticks appear.
+ */
+function createMidnightSplitsFunction(midnightIndices: number[], dataLength: number) {
+    return (u: uPlot, axisIdx: number, scaleMin: number, scaleMax: number, foundIncr: number, foundSpace: number) => {
+        // Generate default evenly-spaced splits based on uPlot's calculated increment
+        const splits: number[] = [];
+        const incr = Math.max(1, Math.round(foundIncr));
+
+        // Start from the first tick position that's >= scaleMin
+        let start = Math.ceil(scaleMin / incr) * incr;
+        for (let i = start; i <= scaleMax && i < dataLength; i += incr) {
+            splits.push(i);
+        }
+
+        // Add midnight indices that are within the visible range
+        const midnightsInRange = midnightIndices.filter(
+            idx => idx >= scaleMin && idx <= scaleMax && idx < dataLength
+        );
+
+        // Merge midnight indices with existing splits, avoiding duplicates
+        const allSplits = new Set([...splits, ...midnightsInRange]);
+
+        // Sort and return
+        return Array.from(allSplits).sort((a, b) => a - b);
+    };
+}
+
+/**
  * Build uPlot axes configuration.
  */
 function buildUPlotAxes(config: ChartConfig): uPlot.Axis[] {
     const { xAxis, yAxisSecondary, theme } = config;
+
+    // Create custom splits function if midnight indices are provided
+    const xAxisSplits = xAxis.midnightIndices && xAxis.midnightIndices.length > 0
+        ? createMidnightSplitsFunction(xAxis.midnightIndices, xAxis.data.length)
+        : undefined;
 
     const axes: uPlot.Axis[] = [
         {
@@ -187,6 +221,7 @@ function buildUPlotAxes(config: ChartConfig): uPlot.Axis[] {
             grid: { show: true, stroke: theme.gridColor, width: 1 },
             ticks: { show: true, stroke: theme.gridColor, size: 5 },
             border: { show: true, stroke: theme.textSecondary, width: 2 },
+            splits: xAxisSplits,
             values: (_u, vals) =>
                 vals.map((v) => {
                     const idx = Math.round(v);
