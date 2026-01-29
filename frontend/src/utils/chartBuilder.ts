@@ -93,6 +93,29 @@ function formatTimeLabel(date: Date, timezone?: string): string {
 }
 
 /**
+ * Format a date for tooltip display with full date and time.
+ * Format: "Tue Feb 3, 4 AM"
+ * @param date - The date to format
+ * @param timezone - Optional IANA timezone string (e.g., "America/Vancouver")
+ */
+function formatTooltipLabel(date: Date, timezone?: string): string {
+    const options: Intl.DateTimeFormatOptions = {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+    };
+    if (timezone) options.timeZone = timezone;
+
+    try {
+        return date.toLocaleString('en-US', options);
+    } catch {
+        delete options.timeZone;
+        return date.toLocaleString('en-US', options);
+    }
+}
+
+/**
  * Transform weather data into chart series format.
  * Returns time labels, midnight indices, and series data for each selected model.
  * Uses null for missing values to create gaps in charts.
