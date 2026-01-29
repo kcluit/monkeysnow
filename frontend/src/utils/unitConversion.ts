@@ -98,29 +98,9 @@ export function formatFreezingLevel(meters: number | null, system: UnitSystem): 
 }
 
 /**
- * Detect user's preferred unit system based on locale.
- * Returns 'imperial' for US users, 'metric' for others.
+ * Returns the default unit system.
+ * Always returns 'metric' as the site default.
  */
 export function detectDefaultUnitSystem(): UnitSystem {
-  try {
-    const locale = navigator.language || 'en-US';
-    // US, Liberia, and Myanmar use imperial
-    const imperialLocales = ['en-US', 'en-LR', 'my-MM'];
-
-    for (const imperial of imperialLocales) {
-      if (locale.toLowerCase().startsWith(imperial.toLowerCase())) {
-        return 'imperial';
-      }
-    }
-
-    // Also check just the country code
-    const countryCode = locale.split('-')[1]?.toUpperCase();
-    if (countryCode === 'US' || countryCode === 'LR' || countryCode === 'MM') {
-      return 'imperial';
-    }
-
-    return 'metric';
-  } catch {
-    return 'metric';
-  }
+  return 'metric';
 }
