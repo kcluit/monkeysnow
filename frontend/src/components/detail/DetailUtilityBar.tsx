@@ -68,7 +68,7 @@ export function DetailUtilityBar({
     const handleCustomElevationSubmit = () => {
         const value = parseInt(customElevationValue, 10);
         if (!isNaN(value) && value >= 0 && value <= 9000) {
-            setElevation(value);
+            setElevationSelection(value);
             setShowElevationDropdown(false);
             setShowCustomElevationInput(false);
             setCustomElevationValue('');
