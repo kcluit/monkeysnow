@@ -39,7 +39,10 @@ function getHourInTimezone(date: Date, timezone?: string): number {
                 hour: 'numeric',
                 hour12: false,
             });
-            return parseInt(timeStr);
+            let hour = parseInt(timeStr.trim());
+            // Handle edge case where midnight might be formatted as 24
+            if (hour === 24) hour = 0;
+            return hour;
         }
     } catch {
         // Fall through to default
