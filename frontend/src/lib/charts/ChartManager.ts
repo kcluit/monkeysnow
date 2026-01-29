@@ -230,7 +230,7 @@ function buildUPlotAxes(config: ChartConfig): uPlot.Axis[] {
 
     // Create custom splits function if midnight indices are provided
     const xAxisSplits = xAxis.midnightIndices && xAxis.midnightIndices.length > 0
-        ? createMidnightSplitsFunction(xAxis.midnightIndices, xAxis.data.length)
+        ? createMidnightAlignedSplitsFunction(xAxis.midnightIndices, xAxis.data.length)
         : undefined;
 
     const axes: uPlot.Axis[] = [
