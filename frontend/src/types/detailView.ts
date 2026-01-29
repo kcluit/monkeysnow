@@ -1,6 +1,9 @@
 import type { WeatherModel, WeatherVariable, TimezoneInfo, AggregationType } from './openMeteo';
 import type { UnitSystem } from '../utils/unitConversion';
 
+// Elevation selection can be a preset type or a custom number
+export type ElevationSelection = 'base' | 'mid' | 'top' | number;
+
 // Detail view navigation state
 export interface DetailViewState {
     isDetailView: boolean;
