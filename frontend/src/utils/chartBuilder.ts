@@ -184,7 +184,7 @@ function transformToChartData(
         seriesData.set(model, values);
     }
 
-    return { timeLabels, midnightIndices, seriesData };
+    return { timeLabels, tooltipLabels, midnightIndices, seriesData };
 }
 
 /**
