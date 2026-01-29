@@ -828,7 +828,7 @@ export function buildWeatherChartConfig(
     const chartType = (settings?.chartTypeOverride ?? variableConfig.chartType) as ChartType;
 
     // Transform data with timezone
-    const { timeLabels, midnightIndices, seriesData } = transformToChartData(
+    const { timeLabels, tooltipLabels, midnightIndices, seriesData } = transformToChartData(
         data,
         selectedModels,
         variable,
