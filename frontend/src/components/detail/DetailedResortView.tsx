@@ -73,11 +73,25 @@ export function DetailedResortView({
         false
     );
 
-    // State for elevation - default to mid elevation
-    const [elevation, setElevation] = useLocalStorage<number>(
-        'detailElevation',
-        location.midElevation
+    // State for elevation selection - can be 'base', 'mid', 'top', or a custom number
+    // Default to 'mid' so it dynamically uses each resort's mid elevation
+    const [elevationSelection, setElevationSelection] = useLocalStorage<ElevationSelection>(
+        'detailElevationSelection',
+        'mid'
     );
+
+    // Resolve the elevation selection to an actual number based on current resort
+    const resolvedElevation = useMemo(() => {
+        if (typeof elevationSelection === 'number') {
+            return elevationSelection;
+        }
+        switch (elevationSelection) {
+            case 'base': return location.baseElevation;
+            case 'mid': return location.midElevation;
+            case 'top': return location.topElevation;
+            default: return location.midElevation;
+        }
+    }, [elevationSelection, location.baseElevation, location.midElevation, location.topElevation]);
 
     // State for forecast days - default to 14
     const [forecastDays, setForecastDays] = useLocalStorage<number>(
