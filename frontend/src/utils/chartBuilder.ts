@@ -26,28 +26,66 @@ export interface ChartBuildSettings {
 }
 
 /**
+ * Get the hour of a date in the specified timezone.
+ * @param date - The date to get the hour from
+ * @param timezone - Optional IANA timezone string
+ * @returns The hour (0-23) in the specified timezone
+ */
+function getHourInTimezone(date: Date, timezone?: string): number {
+    try {
+        if (timezone) {
+            const timeStr = date.toLocaleString('en-US', {
+                timeZone: timezone,
+                hour: 'numeric',
+                hour12: false,
+            });
+            return parseInt(timeStr);
+        }
+    } catch {
+        // Fall through to default
+    }
+    return date.getHours();
+}
+
+/**
  * Format a date for display on the X-axis.
+ * - At midnight (12 AM): "Wed Jan 29" (day of week + date)
+ * - Other hours: "5 PM" (hour only)
  * @param date - The date to format
  * @param timezone - Optional IANA timezone string (e.g., "America/Vancouver")
  */
 function formatTimeLabel(date: Date, timezone?: string): string {
-    const options: Intl.DateTimeFormatOptions = {
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-    };
+    const hour = getHourInTimezone(date, timezone);
+    const isMidnight = hour === 0;
 
-    // Add timezone if provided
-    if (timezone) {
-        options.timeZone = timezone;
-    }
+    if (isMidnight) {
+        // Format as "Wed Jan 29"
+        const options: Intl.DateTimeFormatOptions = {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+        };
+        if (timezone) options.timeZone = timezone;
 
-    try {
-        return date.toLocaleString('en-US', options);
-    } catch {
-        // Fallback to browser timezone if provided timezone is invalid
-        delete options.timeZone;
-        return date.toLocaleString('en-US', options);
+        try {
+            return date.toLocaleString('en-US', options);
+        } catch {
+            delete options.timeZone;
+            return date.toLocaleString('en-US', options);
+        }
+    } else {
+        // Format as "5 PM" (hour only)
+        const options: Intl.DateTimeFormatOptions = {
+            hour: 'numeric',
+        };
+        if (timezone) options.timeZone = timezone;
+
+        try {
+            return date.toLocaleString('en-US', options);
+        } catch {
+            delete options.timeZone;
+            return date.toLocaleString('en-US', options);
+        }
     }
 }
 
