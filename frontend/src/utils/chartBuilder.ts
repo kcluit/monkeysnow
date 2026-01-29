@@ -156,7 +156,7 @@ function transformToChartData(
         seriesData.set(model, values);
     }
 
-    return { timeLabels, seriesData };
+    return { timeLabels, midnightIndices, seriesData };
 }
 
 /**
