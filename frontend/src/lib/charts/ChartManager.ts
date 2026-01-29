@@ -565,7 +565,7 @@ export class ChartManager {
             // Just resize existing chart
             this.chart.setSize({
                 width,
-                height: this.currentConfig?.height ?? 380,
+                height: this.currentConfig?.height ?? 300,
             });
         } else if (this.currentConfig && width > 0) {
             // Chart hasn't been created yet (container wasn't ready), create now
