@@ -71,6 +71,8 @@ export interface XAxisConfig {
     data: string[];
     /** Indices that represent midnight (12 AM) - used to ensure these ticks are always shown */
     midnightIndices?: number[];
+    /** Full date+time labels for tooltip display (e.g., "Tue Feb 3, 4 AM") */
+    tooltipLabels?: string[];
 }
 
 /** Y-axis configuration */
