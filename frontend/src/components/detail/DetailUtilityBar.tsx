@@ -169,7 +169,11 @@ export function DetailUtilityBar({
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         setShowCustomElevationInput(true);
-                                        setCustomElevationValue(resolvedElevation.toString());
+                                        setCustomElevationValue(
+                                            typeof elevationSelection === 'number'
+                                                ? elevationSelection.toString()
+                                                : resolvedElevation.toString()
+                                        );
                                     }}
                                     className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm ${typeof elevationSelection === 'number'
                                             ? 'bg-theme-secondary text-theme-textPrimary'
