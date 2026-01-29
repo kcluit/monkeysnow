@@ -41,8 +41,8 @@ export function createTooltipPlugin(options: TooltipPluginOptions): uPlot.Plugin
             return;
         }
 
-        // Get x-axis label
-        const xLabel = config.xAxis.data[idx] || '';
+        // Get x-axis label (prefer tooltipLabels for full date+time display)
+        const xLabel = config.xAxis.tooltipLabels?.[idx] || config.xAxis.data[idx] || '';
 
         // Build tooltip content
         let content = `<div><strong>${xLabel}</strong></div>`;
