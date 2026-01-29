@@ -21,7 +21,7 @@ export interface ChartBuildSettings {
     showAccumulation?: boolean;
     /** Show multi-level overlays (e.g., wind at different altitudes) */
     showOverlays?: boolean;
-    /** Custom chart height in pixels (default: 380, or 300 for heatmaps) */
+    /** Custom chart height in pixels (default: 300, or 300 for heatmaps) */
     customHeight?: number;
 }
 
