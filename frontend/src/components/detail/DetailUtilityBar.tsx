@@ -131,10 +131,10 @@ export function DetailUtilityBar({
                 >
                     <span className="text-sm text-theme-textSecondary">Elevation:</span>
                     <span className="text-sm text-theme-textPrimary font-medium">
-                        {elevation === location.baseElevation ? 'Base' :
-                            elevation === location.midElevation ? 'Mid' :
-                                elevation === location.topElevation ? 'Top' :
-                                    `${elevation}m`}
+                        {elevationSelection === 'base' ? 'Base' :
+                            elevationSelection === 'mid' ? 'Mid' :
+                                elevationSelection === 'top' ? 'Top' :
+                                    `${elevationSelection}m`}
                     </span>
                     <svg className="w-4 h-4 text-theme-textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -143,24 +143,24 @@ export function DetailUtilityBar({
                 {showElevationDropdown && (
                     <div className="absolute left-0 z-20 mt-1 w-48 bg-theme-background rounded-lg shadow-lg border border-theme-border p-1">
                         {[
-                            { label: 'Base', value: location.baseElevation },
-                            { label: 'Mid', value: location.midElevation },
-                            { label: 'Top', value: location.topElevation },
+                            { label: 'Base', selectionType: 'base' as const, displayValue: location.baseElevation },
+                            { label: 'Mid', selectionType: 'mid' as const, displayValue: location.midElevation },
+                            { label: 'Top', selectionType: 'top' as const, displayValue: location.topElevation },
                         ].map((option) => (
                             <button
                                 key={option.label}
                                 onClick={() => {
-                                    setElevation(option.value);
+                                    setElevationSelection(option.selectionType);
                                     setShowElevationDropdown(false);
                                     setShowCustomElevationInput(false);
                                 }}
-                                className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm ${elevation === option.value
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm ${elevationSelection === option.selectionType
                                         ? 'bg-theme-secondary text-theme-textPrimary'
                                         : 'text-theme-textSecondary hover:bg-theme-secondary hover:text-theme-textPrimary'
                                     }`}
                             >
                                 <span>{option.label}</span>
-                                <span className="text-xs text-theme-textSecondary opacity-70">{option.value}m</span>
+                                <span className="text-xs text-theme-textSecondary opacity-70">{option.displayValue}m</span>
                             </button>
                         ))}
                         <div className="border-t border-theme-border mt-1 pt-1">
@@ -169,11 +169,17 @@ export function DetailUtilityBar({
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         setShowCustomElevationInput(true);
-                                        setCustomElevationValue(elevation.toString());
+                                        setCustomElevationValue(resolvedElevation.toString());
                                     }}
-                                    className="w-full flex items-center justify-between px-3 py-2 rounded-md text-sm text-theme-textSecondary hover:bg-theme-secondary hover:text-theme-textPrimary"
+                                    className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm ${typeof elevationSelection === 'number'
+                                            ? 'bg-theme-secondary text-theme-textPrimary'
+                                            : 'text-theme-textSecondary hover:bg-theme-secondary hover:text-theme-textPrimary'
+                                        }`}
                                 >
                                     <span>Custom...</span>
+                                    {typeof elevationSelection === 'number' && (
+                                        <span className="text-xs text-theme-textSecondary opacity-70">{elevationSelection}m</span>
+                                    )}
                                 </button>
                             ) : (
                                 <div className="px-2 py-2">
