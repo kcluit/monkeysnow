@@ -117,7 +117,7 @@ function formatTooltipLabel(date: Date, timezone?: string): string {
 
 /**
  * Transform weather data into chart series format.
- * Returns time labels, midnight indices, and series data for each selected model.
+ * Returns time labels, tooltip labels, midnight indices, and series data for each selected model.
  * Uses null for missing values to create gaps in charts.
  */
 function transformToChartData(
@@ -127,17 +127,18 @@ function transformToChartData(
     unitSystem: UnitSystem,
     convertToImperial?: (value: number) => number,
     timezone?: string
-): { timeLabels: string[]; midnightIndices: number[]; seriesData: Map<WeatherModel, (number | null)[]> } {
+): { timeLabels: string[]; tooltipLabels: string[]; midnightIndices: number[]; seriesData: Map<WeatherModel, (number | null)[]> } {
     // Get time points from first available model
     const firstModelData = data.values().next().value as HourlyDataPoint[] | undefined;
     if (!firstModelData || firstModelData.length === 0) {
-        return { timeLabels: [], midnightIndices: [], seriesData: new Map() };
+        return { timeLabels: [], tooltipLabels: [], midnightIndices: [], seriesData: new Map() };
     }
 
     const expectedLength = firstModelData.length;
 
     // Extract time labels with timezone formatting and track midnight indices
     const timeLabels: string[] = [];
+    const tooltipLabels: string[] = [];
     const midnightIndices: number[] = [];
 
     firstModelData.forEach((point, index) => {
@@ -146,6 +147,7 @@ function transformToChartData(
             midnightIndices.push(index);
         }
         timeLabels.push(formatTimeLabel(point.time, timezone));
+        tooltipLabels.push(formatTooltipLabel(point.time, timezone));
     });
 
     // Extract series data for each model
