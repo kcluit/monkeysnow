@@ -117,7 +117,7 @@ export function DetailedResortView({
     const { data, timezoneInfo, loading, error, refetch } = useDetailedWeatherData({
         latitude: location.lat,
         longitude: location.lon,
-        elevation,
+        elevation: resolvedElevation,
         models: selectedModels,
         variables: selectedVariables,
         forecastDays,
