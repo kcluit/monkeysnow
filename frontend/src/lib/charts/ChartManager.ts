@@ -175,31 +175,50 @@ function formatYAxisValue(value: number, scaleMin: number, scaleMax: number): st
 }
 
 /**
- * Create a custom splits function that ensures midnight indices are always included.
- * This allows uPlot to auto-select tick intervals while guaranteeing midnight ticks appear.
+ * Create a custom splits function that generates evenly-spaced ticks aligned to midnight.
+ * This ensures ticks are at consistent intervals (e.g., 12am, 6am, 12pm, 6pm) starting from midnight.
  */
-function createMidnightSplitsFunction(midnightIndices: number[], dataLength: number) {
+function createMidnightAlignedSplitsFunction(midnightIndices: number[], dataLength: number) {
     return (_u: uPlot, _axisIdx: number, scaleMin: number, scaleMax: number, foundIncr: number, _foundSpace: number) => {
-        // Generate default evenly-spaced splits based on uPlot's calculated increment
-        const splits: number[] = [];
-        const incr = Math.max(1, Math.round(foundIncr));
+        // Snap the increment to a "nice" hour interval that divides 24 evenly
+        // Valid intervals: 1, 2, 3, 4, 6, 8, 12, 24 hours
+        const niceIntervals = [1, 2, 3, 4, 6, 8, 12, 24];
+        let incr = Math.max(1, Math.round(foundIncr));
 
-        // Start from the first tick position that's >= scaleMin
-        let start = Math.ceil(scaleMin / incr) * incr;
-        for (let i = start; i <= scaleMax && i < dataLength; i += incr) {
-            splits.push(i);
+        // Find the smallest "nice" interval that's >= the calculated increment
+        for (const nice of niceIntervals) {
+            if (nice >= incr) {
+                incr = nice;
+                break;
+            }
+        }
+        // If increment is larger than 24, use 24 (one tick per day at midnight)
+        if (incr > 24) incr = 24;
+
+        const splits: number[] = [];
+
+        // Find the first midnight at or before scaleMin
+        let firstMidnight = 0;
+        for (const midnightIdx of midnightIndices) {
+            if (midnightIdx <= scaleMin) {
+                firstMidnight = midnightIdx;
+            } else {
+                break;
+            }
         }
 
-        // Add midnight indices that are within the visible range
-        const midnightsInRange = midnightIndices.filter(
-            idx => idx >= scaleMin && idx <= scaleMax && idx < dataLength
-        );
+        // Generate ticks starting from the first midnight, aligned to the interval
+        // Calculate the offset from firstMidnight to the first tick >= scaleMin
+        const offsetFromMidnight = Math.ceil((scaleMin - firstMidnight) / incr) * incr;
+        let start = firstMidnight + offsetFromMidnight;
 
-        // Merge midnight indices with existing splits, avoiding duplicates
-        const allSplits = new Set([...splits, ...midnightsInRange]);
+        for (let i = start; i <= scaleMax && i < dataLength; i += incr) {
+            if (i >= scaleMin) {
+                splits.push(i);
+            }
+        }
 
-        // Sort and return
-        return Array.from(allSplits).sort((a, b) => a - b);
+        return splits;
     };
 }
 
