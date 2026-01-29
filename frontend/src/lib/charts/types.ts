@@ -69,6 +69,8 @@ export interface SeriesConfig {
 export interface XAxisConfig {
     type: 'category' | 'time';
     data: string[];
+    /** Indices that represent midnight (12 AM) - used to ensure these ticks are always shown */
+    midnightIndices?: number[];
 }
 
 /** Y-axis configuration */
