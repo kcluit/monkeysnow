@@ -217,6 +217,7 @@ function calculateWetBulb(tempC: number, rh: number): number {
  * - Cold (< -2.0C WB): 100% Snow
  */
 function calculateSnowFraction(wetBulbC: number): number {
+
     // Warm Zone: Pure Rain
     if (wetBulbC >= 0.5) return 0.0;
     // Slush Zone: Mostly rain, very little sticking
@@ -272,7 +273,7 @@ function estimateHourlySnow(tempC: number, humidity: number, precipMm: number): 
     const ratio = getKucheraRatio(wetBulb);
 
     // Only multiply the "snow fraction" of precip by the ratio
-    const effectiveSnowPrecipMm = precipMm * snowFraction;
+    const effectiveSnowPrecipMm = precipMm; //* snowFraction;
     const snowMm = effectiveSnowPrecipMm * ratio;
     const snowCm = snowMm / 10;
 
