@@ -977,6 +977,8 @@ export function buildWeatherChartConfig(
         xAxis: {
             type: 'category',
             data: xAxisData,
+            // Pass midnight indices for non-heatmap charts to ensure midnight ticks are always shown
+            midnightIndices: chartType !== 'heatmap' ? midnightIndices : undefined,
         },
         yAxis: {
             type: 'value',
