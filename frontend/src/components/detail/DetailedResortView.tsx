@@ -1,11 +1,11 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useDetailedWeatherData } from '../../hooks/useDetailedWeatherData';
 import { DetailUtilityBar } from './DetailUtilityBar';
 import { DetailChartGrid } from './DetailChartGrid';
 import { DEFAULT_VARIABLES, DEFAULT_MODELS } from '../../utils/chartConfigurations';
 import { aggregationOptions } from '../../data/modelHierarchy';
-import type { DetailedResortViewProps } from '../../types/detailView';
+import type { DetailedResortViewProps, ElevationSelection } from '../../types/detailView';
 import type { WeatherModel, WeatherVariable, AggregationType } from '../../types/openMeteo';
 import type { UnitSystem } from '../../types';
 
