@@ -101,7 +101,7 @@ export function Header({ font, hideIcons }: HeaderProps): JSX.Element {
                 <Link to="/">
                     <h1 className="logo-text apple-rainbow-text">
                         <div className="subtitle">monkey do</div>
-                        <img src="/2744.webp" alt="" className="logo-snowflake" />
+                        <img src="/monkeysnow.svg" alt="MonkeySnow logo" className="logo-snowflake" />
                         monkeysnow
                     </h1>
                 </Link>
