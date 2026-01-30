@@ -59,13 +59,11 @@ export interface DetailedResortViewProps {
         midElevation: number;
         topElevation: number;
     };
-    onBack: () => void;
 }
 
 export interface DetailViewHeaderProps {
     resortName: string;
     elevation: number;
-    onBack: () => void;
 }
 
 export interface DetailUtilityBarProps {
