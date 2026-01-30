@@ -115,6 +115,198 @@ h1.apple-rainbow-text,
     color: var(--accent);
 }
 
+/* Settings Page Styles */
+.settings-page {
+    max-width: 800px;
+}
+
+.settings-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--textPrimary);
+    margin-bottom: 0.25rem;
+}
+
+.settings-subtitle {
+    color: var(--textSecondary);
+    margin-bottom: 2rem;
+}
+
+.settings-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.settings-section {
+    background: var(--cardBg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+}
+
+.settings-section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--textPrimary);
+    margin-bottom: 1rem;
+}
+
+.settings-section-icon {
+    color: var(--accent);
+}
+
+.settings-section-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.settings-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.5rem;
+}
+
+.settings-options-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.settings-option-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: var(--textSecondary);
+    background: transparent;
+    border: 1px solid var(--border);
+    transition: all 0.15s ease;
+    cursor: pointer;
+}
+
+.settings-option-btn:hover {
+    color: var(--textPrimary);
+    background: var(--secondary);
+    border-color: var(--accent);
+}
+
+.settings-option-btn.selected {
+    color: var(--accent);
+    background: var(--secondary);
+    border-color: var(--accent);
+}
+
+.settings-option-icon {
+    font-size: 0.75rem;
+}
+
+.settings-check-icon {
+    margin-left: auto;
+    font-size: 0.75rem;
+}
+
+.settings-toggles {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.settings-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.settings-toggle:hover {
+    background: var(--secondary);
+}
+
+.settings-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--textPrimary);
+    font-size: 0.875rem;
+}
+
+.settings-toggle-icon {
+    color: var(--textSecondary);
+}
+
+.settings-toggle-switch {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    border-radius: 11px;
+    background: var(--border);
+    transition: all 0.2s ease;
+}
+
+.settings-toggle-switch.on {
+    background: var(--accent);
+}
+
+.settings-toggle-knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: white;
+    transition: all 0.2s ease;
+}
+
+.settings-toggle-switch.on .settings-toggle-knob {
+    left: 20px;
+}
+
+.settings-subsection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.settings-subsection-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--textSecondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.settings-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: var(--textPrimary);
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    width: fit-content;
+}
+
+.settings-action-btn:hover {
+    opacity: 0.9;
+}
+
 .rainbow-text {
     background: var(--specialColor);
     -webkit-background-clip: text;
