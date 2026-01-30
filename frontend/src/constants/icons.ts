@@ -47,6 +47,10 @@ import {
   faEarthAmericas,
   faFlag,
   faLocationDot,
+  // Navigation icons
+  faHouse,
+  faCircleInfo,
+  faGear,
 } from '@fortawesome/free-solid-svg-icons';
 
 // Re-export for direct usage
