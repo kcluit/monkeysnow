@@ -91,7 +91,6 @@ export interface DetailUtilityBarProps {
         midElevation: number;
         topElevation: number;
     };
-    onBack: () => void;
     isChartLocked: boolean;
     setIsChartLocked: (locked: boolean) => void;
     // Custom location state (temporary, not persisted)
