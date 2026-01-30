@@ -1,7 +1,7 @@
 import { calculateSnowTotals } from '../../utils/weather';
 import { formatSnow } from '../../utils/unitConversion';
+import { getTemperatureStyle } from './cardUtils';
 import type { CardProps } from '../../types';
-import type { CSSProperties } from 'react';
 
 function getWeatherEmoji(condition: string): string {
     if (!condition) return '⛅';
