@@ -671,7 +671,7 @@ function App(): JSX.Element {
                 href="https://github.com/open-meteo/open-meteo"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="fixed top-2 left-2 text-xs text-theme-textSecondary hover:text-theme-textPrimary transition-colors z-10"
+                className="fixed top-2 right-2 text-xs text-theme-textSecondary hover:text-theme-textPrimary underline transition-colors z-10"
             >
                 Weather data by Open-Meteo.com
             </a>
