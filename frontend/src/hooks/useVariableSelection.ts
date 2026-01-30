@@ -113,36 +113,39 @@ export function useVariableSelection({
   }, [localVariables, setSelectedVariables]);
 
   const isSelected = useCallback(
-    (varId: WeatherVariable) => selectedVariables.includes(varId),
-    [selectedVariables]
+    (varId: WeatherVariable) => localVariables.includes(varId),
+    [localVariables]
   );
 
   const toggleVariable = useCallback(
     (varId: WeatherVariable) => {
-      if (selectedVariables.includes(varId)) {
+      hasChangesRef.current = true;
+      if (localVariables.includes(varId)) {
         // Don't allow removing the last variable
-        if (selectedVariables.length > 1) {
-          setSelectedVariables(selectedVariables.filter((v) => v !== varId));
+        if (localVariables.length > 1) {
+          setLocalVariables(localVariables.filter((v) => v !== varId));
         }
       } else {
         // Add variable at the end
-        setSelectedVariables([...selectedVariables, varId]);
+        setLocalVariables([...localVariables, varId]);
       }
     },
-    [selectedVariables, setSelectedVariables]
+    [localVariables]
   );
 
   const selectAll = useCallback(() => {
     // Select all in the current order
-    setSelectedVariables([...orderedVariables]);
-  }, [orderedVariables, setSelectedVariables]);
+    hasChangesRef.current = true;
+    setLocalVariables([...orderedVariables]);
+  }, [orderedVariables]);
 
   const deselectAll = useCallback(() => {
     // Keep only the first selected variable
-    if (selectedVariables.length > 0) {
-      setSelectedVariables([selectedVariables[0]]);
+    hasChangesRef.current = true;
+    if (localVariables.length > 0) {
+      setLocalVariables([localVariables[0]]);
     }
-  }, [selectedVariables, setSelectedVariables]);
+  }, [localVariables]);
 
   const reorderVariables = useCallback(
     (activeId: string, overId: string) => {
@@ -150,20 +153,21 @@ export function useVariableSelection({
       const overVar = overId as WeatherVariable;
 
       // Only reorder within selected variables
-      const oldIndex = selectedVariables.indexOf(activeVar);
-      const newIndex = selectedVariables.indexOf(overVar);
+      const oldIndex = localVariables.indexOf(activeVar);
+      const newIndex = localVariables.indexOf(overVar);
 
       if (oldIndex === -1 || newIndex === -1) {
         // One of the variables is not selected, ignore
         return;
       }
 
-      const reordered = [...selectedVariables];
+      hasChangesRef.current = true;
+      const reordered = [...localVariables];
       const [removed] = reordered.splice(oldIndex, 1);
       reordered.splice(newIndex, 0, removed);
-      setSelectedVariables(reordered);
+      setLocalVariables(reordered);
     },
-    [selectedVariables, setSelectedVariables]
+    [localVariables]
   );
 
   // Reorder categories (for category drag-and-drop)
