@@ -96,6 +96,10 @@ export interface DetailUtilityBarProps {
     onBack: () => void;
     isChartLocked: boolean;
     setIsChartLocked: (locked: boolean) => void;
+    // Custom location state (temporary, not persisted)
+    customLocation: import('./detailView').CustomLocation | null;
+    onResetCustomLocation: () => void;
+    isLoadingElevation: boolean;
 }
 
 export interface DetailChartGridProps {
