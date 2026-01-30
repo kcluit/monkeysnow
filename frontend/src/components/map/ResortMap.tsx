@@ -113,13 +113,6 @@ export function ResortMap({
                     </Marker>
                 )}
             </MapContainer>
-
-            {/* Hint text when no custom location */}
-            {onMapClick && !hasCustomLocation && (
-                <div className="absolute bottom-3 left-3 z-[1000] bg-black/60 text-white text-xs px-2 py-1 rounded pointer-events-none">
-                    Click anywhere on the map to view forecast for that location
-                </div>
-            )}
         </div>
     );
 }
