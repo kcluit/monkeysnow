@@ -694,7 +694,6 @@ function App(): JSX.Element {
                             unitSystem={unitSystem}
                             showUtilityBar={showUtilityBar}
                             getDisplayName={getDisplayName}
-                            onBack={handleBackFromDetail}
                         />
                     </>
                 } />
