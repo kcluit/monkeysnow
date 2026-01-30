@@ -146,17 +146,6 @@ export function getTemperatureStyle(temp: number): { className?: string; style?:
 }
 
 /**
- * Gets temperature color class based on value (legacy, for backwards compatibility)
- * @deprecated Use getTemperatureStyle instead for gradient support
- */
-export function getTemperatureClass(temp: number): string {
-    if (temp <= 0) return 'text-theme-accent font-semibold';
-    if (temp <= 5) return 'text-green-600 font-semibold';
-    if (temp <= 10) return 'text-orange-500 font-semibold';
-    return 'text-red-500 font-semibold';
-}
-
-/**
  * Gets snow amount color class (rainbow for significant amounts).
  * Thresholds are based on cm values: 20cm+ rainbow, 10cm+ apple-rainbow.
  * When in imperial mode, converts inches back to cm for threshold comparison.
