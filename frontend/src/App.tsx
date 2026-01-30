@@ -486,24 +486,15 @@ function App(): JSX.Element {
         setIsReversed(newReversed);
     }, [setIsReversed]);
 
-    // Handle resort card click to enter detail view
+    // Handle resort card click to navigate to detail view
     const handleResortClick = useCallback((resortId: string): void => {
-        enterDetailView(resortId);
-    }, [enterDetailView]);
+        navigate(`/resort/${resortId}`);
+    }, [navigate]);
 
-    // Get resort location for detail view
-    const selectedResortLocation = useMemo(() => {
-        if (!selectedResortId) return null;
-        const location = getResortLocation(selectedResortId);
-        if (!location) return null;
-        return {
-            lat: location.loc[0],
-            lon: location.loc[1],
-            baseElevation: location.bot,
-            midElevation: location.mid,
-            topElevation: location.top,
-        };
-    }, [selectedResortId]);
+    // Handle back from detail view
+    const handleBackFromDetail = useCallback((): void => {
+        navigate('/');
+    }, [navigate]);
 
     // Get sorted resort data for display
     const displayResorts = useMemo((): ProcessedResortData[] => {
