@@ -182,7 +182,6 @@ export function DetailedResortView({
             {/* Resort Map */}
             <div className="mb-6 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
                 <ResortMap
-                    key={`${location.lat}-${location.lon}`}
                     lat={location.lat}
                     lon={location.lon}
                     resortName={resortName}
