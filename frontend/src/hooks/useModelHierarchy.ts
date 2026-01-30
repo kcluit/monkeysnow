@@ -195,22 +195,24 @@ export function useModelHierarchy({
 
   const canGoBack = navigationStack.length > 0 || isSearchMode;
 
-  // Toggle functions
+  // Toggle functions - operate on local state
   const toggleModel = useCallback((modelId: WeatherModel) => {
-    onModelsChange((prev) =>
+    hasChangesRef.current = true;
+    setLocalModels((prev) =>
       prev.includes(modelId)
         ? prev.filter((id) => id !== modelId)
         : [...prev, modelId]
     );
-  }, [onModelsChange]);
+  }, []);
 
   const toggleAggregation = useCallback((aggType: AggregationType) => {
-    onAggregationsChange((prev) =>
+    hasChangesRef.current = true;
+    setLocalAggregations((prev) =>
       prev.includes(aggType)
         ? prev.filter((id) => id !== aggType)
         : [...prev, aggType]
     );
-  }, [onAggregationsChange]);
+  }, []);
 
   // Bulk selection
   const selectAllInNode = useCallback((node: ModelHierarchyNode) => {
