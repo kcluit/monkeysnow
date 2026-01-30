@@ -600,7 +600,7 @@ function App(): JSX.Element {
                     {displayResorts.map((resort, index) => (
                         <div key={`${resort.name}-${index}`}>
                             {viewMode === 'full' ? (
-                                <FullView resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} unitSystem={unitSystem} onResortClick={handleResortClick} />
+                                <FullView resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} unitSystem={unitSystem} onResortClick={handleResortClick} selectedElevation={selectedElevation} />
                             ) : viewMode === 'compact' ? (
                                 <CompactCard resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} unitSystem={unitSystem} onResortClick={handleResortClick} />
                             ) : (
