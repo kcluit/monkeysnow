@@ -94,7 +94,17 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
                                     </div>
                                     <div className="rounded-xl p-3 backdrop-blur-sm" style={{ backgroundColor: 'var(--secondary)' }}>
                                         <div className="flex items-center gap-2">
-                                            <div className={`text-2xl font-bold ${getTemperatureClass(dayStats.maxTemp)}`}>{formatTemp(dayStats.maxTemp, unitSystem)}</div>
+                                            {(() => {
+                                                const tempStyle = getTemperatureStyle(dayStats.maxTemp);
+                                                return (
+                                                    <div
+                                                        className={`text-2xl font-bold ${tempStyle.className || ''}`}
+                                                        style={tempStyle.style}
+                                                    >
+                                                        {formatTemp(dayStats.maxTemp, unitSystem)}
+                                                    </div>
+                                                );
+                                            })()}
                                             {dayStats.snow > 0 ? (
                                                 <div className={`text-sm font-bold ${getSnowClass(dayStats.snow, unitSystem)}`}>
                                                     {formatSnow(dayStats.snow, unitSystem)} snow
