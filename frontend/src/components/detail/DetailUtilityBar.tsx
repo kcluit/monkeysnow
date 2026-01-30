@@ -98,17 +98,6 @@ export function DetailUtilityBar({
 
     return (
         <div className="mb-6 flex flex-wrap gap-4 items-center">
-            {/* Back button */}
-            <button
-                onClick={onBack}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-secondary hover:bg-theme-cardBg transition-colors text-theme-accent"
-            >
-                <img src="/2744.webp" alt="" className="w-5 h-5" />
-                <span className="text-sm font-medium">Back</span>
-            </button>
-
-            <div className="h-6 w-px bg-theme-border" />
-
             {/* Model Selection Button - Opens Modal */}
             <button
                 onClick={modelHierarchy.openModal}
