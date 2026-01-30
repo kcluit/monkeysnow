@@ -91,7 +91,6 @@ function ResortDetailRoute({
                 resortId={resortId}
                 resortName={getDisplayName(resortId)}
                 location={resortLocation}
-                onBack={onBack}
                 unitSystem={unitSystem}
                 showUtilityBar={showUtilityBar}
             />
