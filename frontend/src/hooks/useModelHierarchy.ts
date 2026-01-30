@@ -259,7 +259,7 @@ export function useModelHierarchy({
     }
   }, []);
 
-  // Get selection state for a node
+  // Get selection state for a node - use local state
   const getSelectionState = useCallback((node: ModelHierarchyNode): 'all' | 'some' | 'none' => {
     const modelIds = getModelsUnderNode(node);
     const aggIds = getAggregationsUnderNode(node);
@@ -267,22 +267,23 @@ export function useModelHierarchy({
     const totalItems = modelIds.length + aggIds.length;
     if (totalItems === 0) return 'none';
 
-    const selectedModelCount = modelIds.filter((id) => selectedModels.includes(id)).length;
-    const selectedAggCount = aggIds.filter((id) => selectedAggregations.includes(id)).length;
+    const selectedModelCount = modelIds.filter((id) => localModels.includes(id)).length;
+    const selectedAggCount = aggIds.filter((id) => localAggregations.includes(id)).length;
     const totalSelected = selectedModelCount + selectedAggCount;
 
     if (totalSelected === 0) return 'none';
     if (totalSelected === totalItems) return 'all';
     return 'some';
-  }, [selectedModels, selectedAggregations]);
+  }, [localModels, localAggregations]);
 
-  // Color management
+  // Color management - operate on local state
   const setAggregationColor = useCallback((aggType: AggregationType, color: string) => {
-    onAggregationColorsChange({
-      ...aggregationColors,
+    hasChangesRef.current = true;
+    setLocalColors((prev) => ({
+      ...prev,
       [aggType]: color,
-    });
-  }, [aggregationColors, onAggregationColorsChange]);
+    }));
+  }, []);
 
   // Keyboard navigation
   const navigateUp = useCallback(() => {
