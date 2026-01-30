@@ -30,7 +30,6 @@ export function DetailedResortView({
     resortId: _resortId,
     resortName,
     location,
-    onBack,
     unitSystem,
     showUtilityBar,
 }: DetailedResortViewPropsWithUnits): JSX.Element {
