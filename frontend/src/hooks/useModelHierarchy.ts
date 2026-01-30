@@ -214,13 +214,14 @@ export function useModelHierarchy({
     );
   }, []);
 
-  // Bulk selection
+  // Bulk selection - operate on local state
   const selectAllInNode = useCallback((node: ModelHierarchyNode) => {
     const modelIds = getModelsUnderNode(node);
     const aggIds = getAggregationsUnderNode(node);
 
     if (modelIds.length > 0) {
-      onModelsChange((prev) => {
+      hasChangesRef.current = true;
+      setLocalModels((prev) => {
         const newSet = new Set(prev);
         for (const id of modelIds) {
           newSet.add(id);
@@ -230,7 +231,8 @@ export function useModelHierarchy({
     }
 
     if (aggIds.length > 0) {
-      onAggregationsChange((prev) => {
+      hasChangesRef.current = true;
+      setLocalAggregations((prev) => {
         const newSet = new Set(prev);
         for (const id of aggIds) {
           newSet.add(id);
@@ -238,22 +240,24 @@ export function useModelHierarchy({
         return Array.from(newSet);
       });
     }
-  }, [onModelsChange, onAggregationsChange]);
+  }, []);
 
   const deselectAllInNode = useCallback((node: ModelHierarchyNode) => {
     const modelIds = getModelsUnderNode(node);
     const aggIds = getAggregationsUnderNode(node);
 
     if (modelIds.length > 0) {
+      hasChangesRef.current = true;
       const modelIdSet = new Set(modelIds);
-      onModelsChange((prev) => prev.filter((id) => !modelIdSet.has(id)));
+      setLocalModels((prev) => prev.filter((id) => !modelIdSet.has(id)));
     }
 
     if (aggIds.length > 0) {
+      hasChangesRef.current = true;
       const aggIdSet = new Set(aggIds);
-      onAggregationsChange((prev) => prev.filter((id) => !aggIdSet.has(id)));
+      setLocalAggregations((prev) => prev.filter((id) => !aggIdSet.has(id)));
     }
-  }, [onModelsChange, onAggregationsChange]);
+  }, []);
 
   // Get selection state for a node
   const getSelectionState = useCallback((node: ModelHierarchyNode): 'all' | 'some' | 'none' => {
