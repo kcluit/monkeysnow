@@ -123,110 +123,133 @@ export function DetailUtilityBar({
                 </svg>
             </button>
 
-            {/* Elevation Dropdown */}
-            <div className="relative" data-dropdown>
-                <button
-                    onClick={() => {
-                        setShowElevationDropdown(!showElevationDropdown);
-                        setShowForecastDropdown(false);
-                    }}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-background border border-theme-border hover:bg-theme-secondary transition-colors"
-                >
-                    <span className="text-sm text-theme-textSecondary">Elevation:</span>
-                    <span className="text-sm text-theme-textPrimary font-medium">
-                        {elevationSelection === 'base' ? 'Base' :
-                            elevationSelection === 'mid' ? 'Mid' :
-                                elevationSelection === 'top' ? 'Top' :
-                                    `${elevationSelection}m`}
-                    </span>
-                    <svg className="w-4 h-4 text-theme-textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                </button>
-                {showElevationDropdown && (
-                    <div className="absolute left-0 z-20 mt-1 w-48 bg-theme-background rounded-lg shadow-lg border border-theme-border p-1">
-                        {[
-                            { label: 'Base', selectionType: 'base' as const, displayValue: location.baseElevation },
-                            { label: 'Mid', selectionType: 'mid' as const, displayValue: location.midElevation },
-                            { label: 'Top', selectionType: 'top' as const, displayValue: location.topElevation },
-                        ].map((option) => (
-                            <button
-                                key={option.label}
-                                onClick={() => {
-                                    setElevationSelection(option.selectionType);
-                                    setShowElevationDropdown(false);
-                                    setShowCustomElevationInput(false);
-                                }}
-                                className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm ${elevationSelection === option.selectionType
-                                        ? 'bg-theme-secondary text-theme-textPrimary'
-                                        : 'text-theme-textSecondary hover:bg-theme-secondary hover:text-theme-textPrimary'
-                                    }`}
-                            >
-                                <span>{option.label}</span>
-                                <span className="text-xs text-theme-textSecondary opacity-70">{option.displayValue}m</span>
-                            </button>
-                        ))}
-                        <div className="border-t border-theme-border mt-1 pt-1">
-                            {!showCustomElevationInput ? (
+            {/* Elevation Dropdown - hidden when custom location is active */}
+            {!customLocation ? (
+                <div className="relative" data-dropdown>
+                    <button
+                        onClick={() => {
+                            setShowElevationDropdown(!showElevationDropdown);
+                            setShowForecastDropdown(false);
+                        }}
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-background border border-theme-border hover:bg-theme-secondary transition-colors"
+                    >
+                        <span className="text-sm text-theme-textSecondary">Elevation:</span>
+                        <span className="text-sm text-theme-textPrimary font-medium">
+                            {elevationSelection === 'base' ? 'Base' :
+                                elevationSelection === 'mid' ? 'Mid' :
+                                    elevationSelection === 'top' ? 'Top' :
+                                        `${elevationSelection}m`}
+                        </span>
+                        <svg className="w-4 h-4 text-theme-textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    {showElevationDropdown && (
+                        <div className="absolute left-0 z-20 mt-1 w-48 bg-theme-background rounded-lg shadow-lg border border-theme-border p-1">
+                            {[
+                                { label: 'Base', selectionType: 'base' as const, displayValue: location.baseElevation },
+                                { label: 'Mid', selectionType: 'mid' as const, displayValue: location.midElevation },
+                                { label: 'Top', selectionType: 'top' as const, displayValue: location.topElevation },
+                            ].map((option) => (
                                 <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setShowCustomElevationInput(true);
-                                        setCustomElevationValue(
-                                            typeof elevationSelection === 'number'
-                                                ? elevationSelection.toString()
-                                                : resolvedElevation.toString()
-                                        );
+                                    key={option.label}
+                                    onClick={() => {
+                                        setElevationSelection(option.selectionType);
+                                        setShowElevationDropdown(false);
+                                        setShowCustomElevationInput(false);
                                     }}
-                                    className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm ${typeof elevationSelection === 'number'
+                                    className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm ${elevationSelection === option.selectionType
                                             ? 'bg-theme-secondary text-theme-textPrimary'
                                             : 'text-theme-textSecondary hover:bg-theme-secondary hover:text-theme-textPrimary'
                                         }`}
                                 >
-                                    <span>Custom...</span>
-                                    {typeof elevationSelection === 'number' && (
-                                        <span className="text-xs text-theme-textSecondary opacity-70">{elevationSelection}m</span>
-                                    )}
+                                    <span>{option.label}</span>
+                                    <span className="text-xs text-theme-textSecondary opacity-70">{option.displayValue}m</span>
                                 </button>
-                            ) : (
-                                <div className="px-2 py-2">
-                                    <div className="flex items-center gap-2">
-                                        <input
-                                            type="number"
-                                            value={customElevationValue}
-                                            onChange={(e) => setCustomElevationValue(e.target.value)}
-                                            onKeyDown={handleCustomElevationKeyDown}
-                                            placeholder="Elevation"
-                                            min="0"
-                                            max="9000"
-                                            autoFocus
-                                            className="w-full px-2 py-1 text-sm rounded border border-theme-border bg-theme-cardBg text-theme-textPrimary placeholder-theme-textSecondary focus:outline-none focus:border-theme-accent"
-                                        />
-                                        <span className="text-sm text-theme-textSecondary">m</span>
+                            ))}
+                            <div className="border-t border-theme-border mt-1 pt-1">
+                                {!showCustomElevationInput ? (
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setShowCustomElevationInput(true);
+                                            setCustomElevationValue(
+                                                typeof elevationSelection === 'number'
+                                                    ? elevationSelection.toString()
+                                                    : resolvedElevation.toString()
+                                            );
+                                        }}
+                                        className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm ${typeof elevationSelection === 'number'
+                                                ? 'bg-theme-secondary text-theme-textPrimary'
+                                                : 'text-theme-textSecondary hover:bg-theme-secondary hover:text-theme-textPrimary'
+                                            }`}
+                                    >
+                                        <span>Custom...</span>
+                                        {typeof elevationSelection === 'number' && (
+                                            <span className="text-xs text-theme-textSecondary opacity-70">{elevationSelection}m</span>
+                                        )}
+                                    </button>
+                                ) : (
+                                    <div className="px-2 py-2">
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                type="number"
+                                                value={customElevationValue}
+                                                onChange={(e) => setCustomElevationValue(e.target.value)}
+                                                onKeyDown={handleCustomElevationKeyDown}
+                                                placeholder="Elevation"
+                                                min="0"
+                                                max="9000"
+                                                autoFocus
+                                                className="w-full px-2 py-1 text-sm rounded border border-theme-border bg-theme-cardBg text-theme-textPrimary placeholder-theme-textSecondary focus:outline-none focus:border-theme-accent"
+                                            />
+                                            <span className="text-sm text-theme-textSecondary">m</span>
+                                        </div>
+                                        <div className="flex gap-1 mt-2">
+                                            <button
+                                                onClick={handleCustomElevationSubmit}
+                                                className="flex-1 px-2 py-1 text-xs rounded bg-theme-accent text-white hover:opacity-90"
+                                            >
+                                                Apply
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setShowCustomElevationInput(false);
+                                                    setCustomElevationValue('');
+                                                }}
+                                                className="flex-1 px-2 py-1 text-xs rounded bg-theme-secondary text-theme-textSecondary hover:bg-theme-cardBg"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div className="flex gap-1 mt-2">
-                                        <button
-                                            onClick={handleCustomElevationSubmit}
-                                            className="flex-1 px-2 py-1 text-xs rounded bg-theme-accent text-white hover:opacity-90"
-                                        >
-                                            Apply
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                setShowCustomElevationInput(false);
-                                                setCustomElevationValue('');
-                                            }}
-                                            className="flex-1 px-2 py-1 text-xs rounded bg-theme-secondary text-theme-textSecondary hover:bg-theme-cardBg"
-                                        >
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </div>
+                    )}
+                </div>
+            ) : (
+                /* Custom location elevation display + reset button */
+                <>
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-secondary border border-theme-border">
+                        <span className="text-sm text-theme-textSecondary">Elevation:</span>
+                        {isLoadingElevation ? (
+                            <span className="text-sm text-theme-textPrimary font-medium animate-pulse">Loading...</span>
+                        ) : (
+                            <span className="text-sm text-theme-textPrimary font-medium">{customLocation.elevation}m</span>
+                        )}
                     </div>
-                )}
-            </div>
+                    <button
+                        onClick={onResetCustomLocation}
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 transition-colors text-red-500"
+                    >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        <span className="text-sm font-medium">Reset Location</span>
+                    </button>
+                </>
+            )}
 
             <div className="h-6 w-px bg-theme-border" />
 
