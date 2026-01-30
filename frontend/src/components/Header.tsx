@@ -98,11 +98,13 @@ export function Header({ font, hideIcons }: HeaderProps): JSX.Element {
     return (
         <header className="mb-8 pt-4">
             <div className="header-content">
-                <h1 className="logo-text apple-rainbow-text">
-                    <div className="subtitle">monkey do</div>
-                    <img src="/2744.webp" alt="" className="logo-snowflake" />
-                    monkeysnow
-                </h1>
+                <Link to="/">
+                    <h1 className="logo-text apple-rainbow-text">
+                        <div className="subtitle">monkey do</div>
+                        <img src="/2744.webp" alt="" className="logo-snowflake" />
+                        monkeysnow
+                    </h1>
+                </Link>
                 {!hideIcons && (
                     <nav className="header-nav">
                         <NavIconLink
