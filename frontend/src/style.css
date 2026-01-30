@@ -108,12 +108,8 @@ h1.apple-rainbow-text,
 }
 
 .nav-icon-btn:hover {
-    color: var(--textPrimary);
-    background: var(--cardBg);
-}
-
-.nav-icon-btn.active {
     color: var(--accent);
+    background: var(--cardBg);
 }
 
 /* Settings Page Styles */
