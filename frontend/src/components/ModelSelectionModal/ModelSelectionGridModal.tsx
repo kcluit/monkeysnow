@@ -366,7 +366,7 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
 }: ModelSelectionGridModalProps): JSX.Element | null {
   const {
     isOpen,
-    closeModal,
+    closeModal: hierarchyCloseModal,
     selectedModels,
     selectedAggregations,
     aggregationColors,
@@ -382,6 +382,12 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
 
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Local state for fill toggles (deferred until close)
+  const [localHideMembers, setLocalHideMembers] = useState(hideAggregationMembers ?? false);
+  const [localMinMaxFill, setLocalMinMaxFill] = useState(showMinMaxFill ?? false);
+  const [localPercentileFill, setLocalPercentileFill] = useState(showPercentileFill ?? false);
+  const hasLocalChangesRef = useRef(false);
+
   // Build hierarchy tree once
   const hierarchyTree = useMemo(() => buildModelHierarchyTree(), []);
 
@@ -391,12 +397,56 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
   // Initialize expanded nodes with all node IDs (default expanded)
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(() => new Set(allNodeIds));
 
-  // Reset expansion state when modal opens
+  // Reset state when modal opens
   useEffect(() => {
     if (isOpen) {
       setExpandedNodes(new Set(allNodeIds));
+      // Initialize local fill toggles from props
+      setLocalHideMembers(hideAggregationMembers ?? false);
+      setLocalMinMaxFill(showMinMaxFill ?? false);
+      setLocalPercentileFill(showPercentileFill ?? false);
+      hasLocalChangesRef.current = false;
     }
-  }, [isOpen, allNodeIds]);
+  }, [isOpen, allNodeIds, hideAggregationMembers, showMinMaxFill, showPercentileFill]);
+
+  // Wrapper to apply local changes on close
+  const closeModal = useCallback(() => {
+    // Apply local fill toggle changes
+    if (hasLocalChangesRef.current) {
+      if (localHideMembers !== hideAggregationMembers && onToggleHideMembers) {
+        onToggleHideMembers();
+      }
+      if (localMinMaxFill !== showMinMaxFill && onToggleMinMaxFill) {
+        onToggleMinMaxFill();
+      }
+      if (localPercentileFill !== showPercentileFill && onTogglePercentileFill) {
+        onTogglePercentileFill();
+      }
+    }
+    hasLocalChangesRef.current = false;
+    hierarchyCloseModal();
+  }, [
+    localHideMembers, hideAggregationMembers, onToggleHideMembers,
+    localMinMaxFill, showMinMaxFill, onToggleMinMaxFill,
+    localPercentileFill, showPercentileFill, onTogglePercentileFill,
+    hierarchyCloseModal,
+  ]);
+
+  // Local toggle handlers
+  const handleToggleHideMembers = useCallback(() => {
+    hasLocalChangesRef.current = true;
+    setLocalHideMembers(prev => !prev);
+  }, []);
+
+  const handleToggleMinMaxFill = useCallback(() => {
+    hasLocalChangesRef.current = true;
+    setLocalMinMaxFill(prev => !prev);
+  }, []);
+
+  const handleTogglePercentileFill = useCallback(() => {
+    hasLocalChangesRef.current = true;
+    setLocalPercentileFill(prev => !prev);
+  }, []);
 
   // Filter hierarchy based on search
   const filteredHierarchy = useMemo(
