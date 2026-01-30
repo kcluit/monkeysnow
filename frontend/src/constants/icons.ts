@@ -126,6 +126,11 @@ export const icons = {
   // Provider icons (model selection)
   aggregations: faChartColumn,
   provider: faGlobe,
+
+  // Navigation icons
+  home: faHouse,
+  info: faCircleInfo,
+  settings: faGear,
 } as const;
 
 export type IconKey = keyof typeof icons;
