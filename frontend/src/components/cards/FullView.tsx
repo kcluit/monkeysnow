@@ -70,8 +70,7 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
                                         <div className="space-y-2">
                                             <div className="grid grid-cols-3 gap-4">
                                                 {day.periods.map((period, index) => {
-                                                    const temp = parseInt(period.temp);
-                                                    const tempStyleResult = getTemperatureStyle(temp);
+                                                    const tempStyleResult = getTemperatureStyle(period.tempMax);
                                                     const snowAmount = parseFloat(period.snow) || 0;
                                                     const windSpeed = parseFloat(period.wind) || 0;
 
