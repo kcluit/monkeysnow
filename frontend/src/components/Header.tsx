@@ -108,7 +108,7 @@ export function Header({ font, hideIcons }: HeaderProps): JSX.Element {
                         <NavIconLink
                             to="/"
                             icon={icons.home}
-                            isActive={location.pathname === '/'}
+                            isActive={location.pathname === '/' || location.pathname.startsWith('/resort/')}
                             title="Home"
                         />
                         <NavIconLink
