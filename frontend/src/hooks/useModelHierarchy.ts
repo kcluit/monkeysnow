@@ -1,9 +1,12 @@
 /**
  * Hook for managing weather model hierarchy state and navigation.
  * Provides tree navigation, selection tracking, and search filtering.
+ *
+ * Uses deferred state: changes are buffered locally while the modal is open
+ * and only applied to the parent state when the modal closes.
  */
 
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import type { WeatherModel, AggregationType } from '../types/openMeteo';
 import {
   buildModelHierarchyTree,
