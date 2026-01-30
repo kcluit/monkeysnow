@@ -130,18 +130,30 @@ export function useModelHierarchy({
 
   // Open/close modal
   const openModal = useCallback(() => {
+    // Initialize local state from parent state when opening
+    setLocalModels(selectedModels);
+    setLocalAggregations(selectedAggregations);
+    setLocalColors(aggregationColors);
+    hasChangesRef.current = false;
     setIsOpen(true);
     setNavigationStack([]);
     setSearchTerm('');
     setSelectedIndex(0);
-  }, []);
+  }, [selectedModels, selectedAggregations, aggregationColors]);
 
   const closeModal = useCallback(() => {
+    // Apply deferred changes to parent state on close
+    if (hasChangesRef.current) {
+      onModelsChange(localModels);
+      onAggregationsChange(localAggregations);
+      onAggregationColorsChange(localColors);
+    }
+    hasChangesRef.current = false;
     setIsOpen(false);
     setNavigationStack([]);
     setSearchTerm('');
     setSelectedIndex(0);
-  }, []);
+  }, [localModels, localAggregations, localColors, onModelsChange, onAggregationsChange, onAggregationColorsChange]);
 
   // Navigation
   const navigateTo = useCallback((node: ModelHierarchyNode) => {
