@@ -100,9 +100,17 @@ export function CompactCard({ resort, temperatureMetric = 'max', showDate = fals
                                     <div className="rounded-lg p-2 backdrop-blur-sm" style={{ backgroundColor: 'var(--secondary)' }}>
                                         {/* Temperature + Snow in row */}
                                         <div className="flex items-baseline justify-between">
-                                            <span className={`text-lg font-bold ${getTemperatureClass(dayStats.maxTemp)}`}>
-                                                {formatTemp(dayStats.maxTemp, unitSystem)}
-                                            </span>
+                                            {(() => {
+                                                const tempStyle = getTemperatureStyle(dayStats.maxTemp);
+                                                return (
+                                                    <span
+                                                        className={`text-lg font-bold ${tempStyle.className || ''}`}
+                                                        style={tempStyle.style}
+                                                    >
+                                                        {formatTemp(dayStats.maxTemp, unitSystem)}
+                                                    </span>
+                                                );
+                                            })()}
                                             {dayStats.snow > 0 ? (
                                                 <span className={`text-xs font-bold ${getSnowClass(dayStats.snow, unitSystem)}`}>
                                                     {formatSnow(dayStats.snow, unitSystem)}
