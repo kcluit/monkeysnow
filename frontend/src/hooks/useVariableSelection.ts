@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import type { WeatherVariable } from '../types/openMeteo';
 import { ALL_VARIABLES, VARIABLE_CONFIGS } from '../utils/chartConfigurations';
 import { VARIABLE_CATEGORIES, type VariableCategory } from '../data/variableCategories';
