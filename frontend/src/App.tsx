@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
+import { Routes, Route, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { Header } from './components/Header';
 import { UtilityBar } from './components/UtilityBar';
 import { CompactUtilityBar } from './components/CompactUtilityBar';
 import { CommandPalette } from './components/CommandPalette';
+import { AboutPage, SettingsPage } from './pages';
 
 // Lazy load card components - only one is rendered based on viewMode
 const FullView = lazy(() => import('./components/cards/FullView').then(m => ({ default: m.FullView })));
@@ -27,7 +29,6 @@ import { useHideBorders } from './hooks/useHideBorders';
 import { useShowDate } from './hooks/useShowDate';
 import { useResortHierarchy } from './hooks/useResortHierarchy';
 import { useUnitSystem } from './hooks/useUnitSystem';
-import { useDetailViewState } from './hooks/useDetailViewState';
 import { useLanguage } from './hooks/useLanguage';
 import { useHierarchy } from './contexts/HierarchyContext';
 import { processResortData } from './utils/weather';
