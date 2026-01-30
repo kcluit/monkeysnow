@@ -14,8 +14,9 @@ function getWeatherEmoji(condition: string): string {
     return '⛅';
 }
 
-export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max', showDate = false, unitSystem = 'metric', onResortClick }: CardProps): JSX.Element {
+export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max', showDate = false, unitSystem = 'metric', onResortClick, selectedElevation = 'bot' }: CardProps): JSX.Element {
     const totals = calculateSnowTotals(resort);
+    const elevationLabel = selectedElevation === 'bot' ? 'Base' : selectedElevation === 'mid' ? 'Mid' : 'Peak';
 
     return (
         <div className="resort-card rounded-3xl p-5 shadow-lg mb-6 transition-all duration-300">
@@ -25,7 +26,7 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
                     onClick={() => onResortClick?.(resort.id)}
                 >
                     <h2 className="text-2xl font-bold text-theme-textPrimary">{resort.name}</h2>
-                    <p className="text-sm font-medium text-theme-accent">Base Elevation: {resort.elevation}</p>
+                    <p className="text-sm font-medium text-theme-accent">{elevationLabel} Elevation: {resort.elevation}</p>
                 </div>
                 <div className="text-xs font-medium text-theme-textSecondary">
                     Last updated: {new Date().toLocaleTimeString()}
