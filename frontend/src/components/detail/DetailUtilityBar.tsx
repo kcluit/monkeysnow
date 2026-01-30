@@ -233,7 +233,7 @@ export function DetailUtilityBar({
                 <>
                     <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-secondary border border-theme-border">
                         <span className="text-sm text-theme-textSecondary">Elevation:</span>
-                        {isLoadingElevation ? (
+                        {isLoadingElevation || customLocation.elevation === null ? (
                             <span className="text-sm text-theme-textPrimary font-medium animate-pulse">Loading...</span>
                         ) : (
                             <span className="text-sm text-theme-textPrimary font-medium">{customLocation.elevation}m</span>
