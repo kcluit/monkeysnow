@@ -127,6 +127,15 @@ export function DetailedResortView({
 
     return (
         <div>
+            {/* Resort Map */}
+            <div className="mb-6 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
+                <ResortMap
+                    lat={location.lat}
+                    lon={location.lon}
+                    resortName={resortName}
+                />
+            </div>
+
             {/* Header */}
             <div className="mb-6 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
                 <h1 className="text-2xl font-bold text-theme-textPrimary">{resortName}</h1>
