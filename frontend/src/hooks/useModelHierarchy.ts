@@ -77,6 +77,14 @@ export function useModelHierarchy({
   // Modal state
   const [isOpen, setIsOpen] = useState(false);
 
+  // Local (deferred) state - changes are buffered here while modal is open
+  const [localModels, setLocalModels] = useState<WeatherModel[]>(selectedModels);
+  const [localAggregations, setLocalAggregations] = useState<AggregationType[]>(selectedAggregations);
+  const [localColors, setLocalColors] = useState<Record<AggregationType, string>>(aggregationColors);
+
+  // Track if we need to apply changes on close
+  const hasChangesRef = useRef(false);
+
   // Navigation state - stack of parent nodes
   const [navigationStack, setNavigationStack] = useState<ModelHierarchyNode[]>([]);
 
