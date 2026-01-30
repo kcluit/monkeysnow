@@ -1,11 +1,36 @@
 import { useEffect, useRef } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Icon } from './Icon';
+import { icons } from '../constants/icons';
 import type { Font } from '../types/fonts';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
 interface HeaderProps {
     font?: Font;
+    hideIcons?: boolean;
 }
 
-export function Header({ font }: HeaderProps): JSX.Element {
+interface NavIconLinkProps {
+    to: string;
+    icon: IconDefinition;
+    isActive: boolean;
+    title: string;
+}
+
+function NavIconLink({ to, icon, isActive, title }: NavIconLinkProps): JSX.Element {
+    return (
+        <Link
+            to={to}
+            title={title}
+            className={`nav-icon-btn ${isActive ? 'active' : ''}`}
+        >
+            <Icon icon={icon} size="sm" />
+        </Link>
+    );
+}
+
+export function Header({ font, hideIcons }: HeaderProps): JSX.Element {
+    const location = useLocation();
     // Track font links to properly clean them up
     const fontLinksRef = useRef<HTMLLinkElement[]>([]);
 
@@ -72,11 +97,35 @@ export function Header({ font }: HeaderProps): JSX.Element {
 
     return (
         <header className="mb-8 pt-4">
-            <h1 className="logo-text apple-rainbow-text">
-                <div className="subtitle">monkey do</div>
-                <img src="/2744.webp" alt="" className="logo-snowflake" />
-                monkeysnow
-            </h1>
+            <div className="header-content">
+                <h1 className="logo-text apple-rainbow-text">
+                    <div className="subtitle">monkey do</div>
+                    <img src="/2744.webp" alt="" className="logo-snowflake" />
+                    monkeysnow
+                </h1>
+                {!hideIcons && (
+                    <nav className="header-nav">
+                        <NavIconLink
+                            to="/"
+                            icon={icons.home}
+                            isActive={location.pathname === '/'}
+                            title="Home"
+                        />
+                        <NavIconLink
+                            to="/about"
+                            icon={icons.info}
+                            isActive={location.pathname === '/about'}
+                            title="About"
+                        />
+                        <NavIconLink
+                            to="/settings"
+                            icon={icons.settings}
+                            isActive={location.pathname === '/settings'}
+                            title="Settings"
+                        />
+                    </nav>
+                )}
+            </div>
         </header>
     );
 }
