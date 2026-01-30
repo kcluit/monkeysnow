@@ -195,8 +195,8 @@ export function useVariableSelection({
       const overVar = overId as WeatherVariable;
 
       // Check if both are selected
-      const activeSelected = selectedVariables.includes(activeVar);
-      const overSelected = selectedVariables.includes(overVar);
+      const activeSelected = localVariables.includes(activeVar);
+      const overSelected = localVariables.includes(overVar);
 
       if (!activeSelected && !overSelected) {
         // Neither selected, nothing to reorder
@@ -205,10 +205,11 @@ export function useVariableSelection({
 
       if (!activeSelected && overSelected) {
         // Dragging unselected to selected - select it at the target position
-        const targetIndex = selectedVariables.indexOf(overVar);
-        const newSelected = [...selectedVariables];
+        hasChangesRef.current = true;
+        const targetIndex = localVariables.indexOf(overVar);
+        const newSelected = [...localVariables];
         newSelected.splice(targetIndex, 0, activeVar);
-        setSelectedVariables(newSelected);
+        setLocalVariables(newSelected);
         return;
       }
 
@@ -218,15 +219,16 @@ export function useVariableSelection({
       }
 
       // Both selected - reorder within selected
-      const oldIndex = selectedVariables.indexOf(activeVar);
-      const newIndex = selectedVariables.indexOf(overVar);
+      hasChangesRef.current = true;
+      const oldIndex = localVariables.indexOf(activeVar);
+      const newIndex = localVariables.indexOf(overVar);
 
-      const reordered = [...selectedVariables];
+      const reordered = [...localVariables];
       const [removed] = reordered.splice(oldIndex, 1);
       reordered.splice(newIndex, 0, removed);
-      setSelectedVariables(reordered);
+      setLocalVariables(reordered);
     },
-    [selectedVariables, setSelectedVariables]
+    [localVariables]
   );
 
   const filteredVariables = useMemo(() => {
