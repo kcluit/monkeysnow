@@ -609,23 +609,123 @@ function App(): JSX.Element {
                         <div key={`${resort.name}-${index}`}>
                             {viewMode === 'full' ? (
                                 <FullView resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} unitSystem={unitSystem} onResortClick={handleResortClick} />
-                                        ) : viewMode === 'compact' ? (
-                                            <CompactCard resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} unitSystem={unitSystem} onResortClick={handleResortClick} />
-                                        ) : (
-                                            <DefaultCard resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} unitSystem={unitSystem} onResortClick={handleResortClick} />
-                                        )}
-                                    </div>
-                                ))}
-                            </Suspense>
-
-                            {selectedResorts.length === 0 && (
-                                <div className="text-center py-12">
-                                    <div className="text-theme-textSecondary text-lg">{t('empty.selectResorts')}</div>
-                                </div>
+                            ) : viewMode === 'compact' ? (
+                                <CompactCard resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} unitSystem={unitSystem} onResortClick={handleResortClick} />
+                            ) : (
+                                <DefaultCard resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} unitSystem={unitSystem} onResortClick={handleResortClick} />
                             )}
                         </div>
+                    ))}
+                </Suspense>
+
+                {selectedResorts.length === 0 && (
+                    <div className="text-center py-12">
+                        <div className="text-theme-textSecondary text-lg">{t('empty.selectResorts')}</div>
                     </div>
                 )}
+            </div>
+        </>
+    );
+
+    // Settings page props
+    const settingsProps = {
+        availableThemes,
+        setTheme,
+        currentThemeId: theme?.id || 'dark',
+        availableFonts,
+        setFont,
+        currentFontId: font?.id || 'system',
+        isRainbowEnabled,
+        setRainbowEnabled,
+        isHideIconsEnabled,
+        setHideIconsEnabled,
+        isHideBordersEnabled,
+        setHideBordersEnabled,
+        isShowDateEnabled,
+        setShowDateEnabled,
+        isFullscreen,
+        enterFullscreen,
+        exitFullscreen,
+        isFPSEnabled,
+        setFPSEnabled,
+        chartZoomSyncEnabled,
+        setChartZoomSyncEnabled,
+        selectedElevation,
+        setSelectedElevation,
+        selectedSort,
+        setSelectedSort,
+        viewMode,
+        setViewMode,
+        selectedTemperatureMetric,
+        setSelectedTemperatureMetric,
+        snowfallEstimateMode,
+        setSnowfallEstimateMode,
+        showUtilityBar,
+        setShowUtilityBar,
+        utilityBarStyle,
+        setUtilityBarStyle,
+        unitSystem,
+        setUnitSystem,
+        language,
+        setLanguage,
+        availableLanguages,
+        openResortSelector: resortHierarchy.openModal,
+    };
+
+    return (
+        <div className="min-h-screen bg-theme-background transition-colors duration-300 overflow-x-hidden">
+            {/* Command Palette */}
+            <CommandPalette palette={commandPalette} hideIcons={isHideIconsEnabled} />
+
+            {/* Resort Selection Grid Modal */}
+            <ResortSelectionGridModal hierarchy={resortHierarchy} hideIcons={isHideIconsEnabled} />
+
+            {/* FPS Counter */}
+            <FPSCounter fps={fps} isVisible={isFPSEnabled} />
+
+            <Routes>
+                {/* Home route - resort list */}
+                <Route path="/" element={
+                    <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
+                        <Header font={font} hideIcons={isHideIconsEnabled} />
+                        {homeContent}
+                    </div>
+                } />
+
+                {/* Resort detail route */}
+                <Route path="/resort/:resortId" element={
+                    <>
+                        <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
+                            <Header font={font} hideIcons={isHideIconsEnabled} />
+                        </div>
+                        <ResortDetailRoute
+                            unitSystem={unitSystem}
+                            showUtilityBar={showUtilityBar}
+                            getDisplayName={getDisplayName}
+                            onBack={handleBackFromDetail}
+                        />
+                    </>
+                } />
+
+                {/* About route */}
+                <Route path="/about" element={
+                    <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
+                        <Header font={font} hideIcons={isHideIconsEnabled} />
+                        <AboutPage />
+                    </div>
+                } />
+
+                {/* Settings route */}
+                <Route path="/settings" element={
+                    <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
+                        <Header font={font} hideIcons={isHideIconsEnabled} />
+                        <SettingsPage {...settingsProps} />
+                    </div>
+                } />
+
+                {/* Catch-all redirect to home */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
         </div>
     );
 }
