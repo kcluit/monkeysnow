@@ -158,15 +158,17 @@ export function useModelHierarchy({
   // Navigation
   const navigateTo = useCallback((node: ModelHierarchyNode) => {
     if (node.type === 'model' && node.modelId) {
-      // Toggle model selection
-      onModelsChange((prev) =>
+      // Toggle model selection in local state
+      hasChangesRef.current = true;
+      setLocalModels((prev) =>
         prev.includes(node.modelId!)
           ? prev.filter((id) => id !== node.modelId)
           : [...prev, node.modelId!]
       );
     } else if (node.type === 'aggregation' && node.aggregationType) {
-      // Toggle aggregation selection
-      onAggregationsChange((prev) =>
+      // Toggle aggregation selection in local state
+      hasChangesRef.current = true;
+      setLocalAggregations((prev) =>
         prev.includes(node.aggregationType!)
           ? prev.filter((id) => id !== node.aggregationType)
           : [...prev, node.aggregationType!]
@@ -177,7 +179,7 @@ export function useModelHierarchy({
       setSearchTerm('');
       setSelectedIndex(0);
     }
-  }, [onModelsChange, onAggregationsChange]);
+  }, []);
 
   const goBack = useCallback(() => {
     if (isSearchMode) {
