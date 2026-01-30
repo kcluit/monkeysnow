@@ -353,10 +353,10 @@ export function useModelHierarchy({
     goBack,
     canGoBack,
 
-    // Selection
-    selectedModels,
-    selectedAggregations,
-    aggregationColors,
+    // Selection - expose local state while modal is open
+    selectedModels: localModels,
+    selectedAggregations: localAggregations,
+    aggregationColors: localColors,
     toggleModel,
     toggleAggregation,
     selectAllInNode,
