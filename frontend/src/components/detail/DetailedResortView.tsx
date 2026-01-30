@@ -123,15 +123,16 @@ export function DetailedResortView({
         try {
             const elevation = await fetchElevation(lat, lon);
             setCustomLocation({ lat, lon, elevation });
+            setIsLoadingElevation(false);
         } catch (error) {
             if ((error as Error).name === 'AbortError') {
-                // Request was cancelled (user clicked again), ignore
+                // Request was cancelled (user clicked again), don't update state
+                // The next click will manage loading state
                 return;
             }
             console.error('Failed to fetch elevation:', error);
             // Fall back to 0m elevation on error
             setCustomLocation({ lat, lon, elevation: 0 });
-        } finally {
             setIsLoadingElevation(false);
         }
     }, [fetchElevation]);
