@@ -4,6 +4,13 @@ import type { UnitSystem } from '../utils/unitConversion';
 // Elevation selection can be a preset type or a custom number
 export type ElevationSelection = 'base' | 'mid' | 'top' | number;
 
+// Custom location when user clicks on map (temporary, not persisted)
+export interface CustomLocation {
+    lat: number;
+    lon: number;
+    elevation: number | null;  // null while loading
+}
+
 // Detail view navigation state
 export interface DetailViewState {
     isDetailView: boolean;
