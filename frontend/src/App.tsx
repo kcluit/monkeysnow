@@ -666,6 +666,16 @@ function App(): JSX.Element {
 
     return (
         <div className="min-h-screen bg-theme-background transition-colors duration-300 overflow-x-hidden">
+            {/* Open-Meteo Attribution */}
+            <a
+                href="https://github.com/open-meteo/open-meteo"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="fixed top-2 left-2 text-xs text-theme-textSecondary hover:text-theme-textPrimary transition-colors z-10"
+            >
+                Weather data by Open-Meteo.com
+            </a>
+
             {/* Command Palette */}
             <CommandPalette palette={commandPalette} hideIcons={isHideIconsEnabled} />
 
