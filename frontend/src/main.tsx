@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { HierarchyProvider } from './contexts/HierarchyContext'
 import './style.css'
@@ -7,9 +8,11 @@ import './style.css'
 // Main app wrapper
 function Root(): JSX.Element {
     return (
-        <HierarchyProvider>
-            <App />
-        </HierarchyProvider>
+        <BrowserRouter>
+            <HierarchyProvider>
+                <App />
+            </HierarchyProvider>
+        </BrowserRouter>
     );
 }
 
