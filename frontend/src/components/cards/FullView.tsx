@@ -71,29 +71,15 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
                                             <div className="grid grid-cols-3 gap-4">
                                                 {day.periods.map((period, index) => {
                                                     const temp = parseInt(period.temp);
-                                                    const tempStyle = getTemperatureStyle(temp);
+                                                    const tempStyleResult = getTemperatureStyle(temp);
                                                     const snowAmount = parseFloat(period.snow) || 0;
-                                                    const snowStyle = snowAmount > 0 ? (
-                                                        snowAmount >= 5 ?
-                                                            'background: var(--specialColor); -webkit-background-clip: text; background-clip: text; color: transparent;' :
-                                                            'color: var(--accent)'
-                                                    ) : '';
                                                     const windSpeed = parseFloat(period.wind) || 0;
 
-                                                    const tempStyleObj: CSSProperties = tempStyle.includes('background') ? {
-                                                        background: 'var(--specialColor)',
-                                                        WebkitBackgroundClip: 'text',
-                                                        backgroundClip: 'text',
-                                                        color: 'transparent'
-                                                    } : {
-                                                        color: tempStyle.split('color: ')[1]
-                                                    };
-
-                                                    const snowStyleObj: CSSProperties = snowStyle && snowAmount > 0 ? (
+                                                    const snowStyleObj = snowAmount > 0 ? (
                                                         snowAmount >= 5 ? {
                                                             background: 'var(--specialColor)',
-                                                            WebkitBackgroundClip: 'text',
-                                                            backgroundClip: 'text',
+                                                            WebkitBackgroundClip: 'text' as const,
+                                                            backgroundClip: 'text' as const,
                                                             color: 'transparent'
                                                         } : {
                                                             color: 'var(--accent)'
@@ -109,8 +95,8 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
                                                         >
                                                             <div className="text-sm font-bold text-theme-textPrimary mb-1">{period.time}</div>
                                                             <div
-                                                                className="text-lg font-bold mb-4"
-                                                                style={tempStyleObj}
+                                                                className={`text-lg font-bold mb-4 ${tempStyleResult.className || ''}`}
+                                                                style={tempStyleResult.style}
                                                             >
                                                                 {period.temp}
                                                             </div>
