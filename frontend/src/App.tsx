@@ -61,12 +61,10 @@ function ResortDetailRoute({
     unitSystem,
     showUtilityBar,
     getDisplayName,
-    onBack,
 }: {
     unitSystem: 'metric' | 'imperial';
     showUtilityBar: boolean;
     getDisplayName: (id: string) => string;
-    onBack: () => void;
 }): JSX.Element | null {
     const { resortId } = useParams<{ resortId: string }>();
 
