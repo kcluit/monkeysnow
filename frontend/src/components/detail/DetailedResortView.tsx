@@ -3,6 +3,7 @@ import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useDetailedWeatherData } from '../../hooks/useDetailedWeatherData';
 import { DetailUtilityBar } from './DetailUtilityBar';
 import { DetailChartGrid } from './DetailChartGrid';
+import { ResortMap } from '../map/ResortMap';
 import { DEFAULT_VARIABLES, DEFAULT_MODELS } from '../../utils/chartConfigurations';
 import { aggregationOptions } from '../../data/modelHierarchy';
 import type { DetailedResortViewProps, ElevationSelection } from '../../types/detailView';
