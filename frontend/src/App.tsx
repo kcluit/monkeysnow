@@ -488,11 +488,6 @@ function App(): JSX.Element {
         navigate(`/resort/${resortId}`);
     }, [navigate]);
 
-    // Handle back from detail view
-    const handleBackFromDetail = useCallback((): void => {
-        navigate('/');
-    }, [navigate]);
-
     // Get sorted resort data for display
     const displayResorts = useMemo((): ProcessedResortData[] => {
         if (!allWeatherData || selectedResorts.length === 0) return [];
