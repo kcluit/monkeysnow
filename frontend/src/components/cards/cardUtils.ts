@@ -98,10 +98,59 @@ export function calculateDayStats(day: DayForecast, temperatureMetric: Temperatu
 }
 
 /**
- * Gets temperature color class based on value
+ * Linear interpolation helper
+ */
+function lerp(start: number, end: number, t: number): number {
+    return start * (1 - t) + end * t;
+}
+
+/**
+ * Gets temperature color style based on value.
+ * Returns an object with either a className (for ≤0°C) or inline style (for >0°C gradient).
+ */
+export function getTemperatureStyle(temp: number): { className?: string; style?: { color: string } } {
+    if (temp <= 0) {
+        // For freezing/below zero temperatures, use accent color
+        return { className: 'text-theme-accent font-semibold' };
+    } else {
+        // For above zero temperatures, use an exponential color transition
+        // Colors: Blue (#007AFF) -> Yellow (#FFD60A) -> Orange (#FF9F0A) -> Red (#FF3B30)
+        const t = Math.pow(temp / 10, 2); // Exponential curve
+        let color: { r: number; g: number; b: number };
+
+        if (t <= 0.09) { // 0-3°C: Blue to Yellow
+            const normalizedT = t / 0.09;
+            color = {
+                r: Math.round(lerp(0, 255, normalizedT)),
+                g: Math.round(lerp(122, 214, normalizedT)),
+                b: Math.round(lerp(255, 10, normalizedT))
+            };
+        } else if (t <= 0.25) { // 3-5°C: Yellow to Orange
+            const normalizedT = (t - 0.09) / 0.16;
+            color = {
+                r: 255,
+                g: Math.round(lerp(214, 159, normalizedT)),
+                b: 10
+            };
+        } else { // 5-10°C: Orange to Red
+            const normalizedT = (t - 0.25) / 0.75;
+            color = {
+                r: 255,
+                g: Math.round(lerp(159, 59, normalizedT)),
+                b: Math.round(lerp(10, 48, normalizedT))
+            };
+        }
+
+        return { style: { color: `rgb(${color.r}, ${color.g}, ${color.b})` } };
+    }
+}
+
+/**
+ * Gets temperature color class based on value (legacy, for backwards compatibility)
+ * @deprecated Use getTemperatureStyle instead for gradient support
  */
 export function getTemperatureClass(temp: number): string {
-    if (temp <= 0) return 'text-blue-600 font-semibold';
+    if (temp <= 0) return 'text-theme-accent font-semibold';
     if (temp <= 5) return 'text-green-600 font-semibold';
     if (temp <= 10) return 'text-orange-500 font-semibold';
     return 'text-red-500 font-semibold';
