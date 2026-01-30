@@ -248,7 +248,7 @@ export function useVariableSelection({
     openModal,
     closeModal,
     orderedVariables,
-    selectedVariables,
+    selectedVariables: localVariables,  // Expose local state while modal is open
     isSelected,
     toggleVariable,
     selectAll,
