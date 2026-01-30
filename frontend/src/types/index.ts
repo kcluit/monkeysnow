@@ -207,6 +207,7 @@ export interface CardProps {
     showDate?: boolean;
     unitSystem?: UnitSystem;
     onResortClick?: (resortId: string) => void;
+    selectedElevation?: ElevationLevel;
 }
 
 export interface ThemeToggleProps {
