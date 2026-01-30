@@ -61,11 +61,12 @@ h1.apple-rainbow-text,
 
 .logo-snowflake {
     position: absolute;
-    left: -1.2em;
+    left: -1.95em;
     top: 50%;
-    transform: translateY(-50%);
-    height: 0.8em;
+    transform: translateY(-44%);
+    height: 1.4em;
     width: auto;
+    color: var(--textSecondary);
 }
 
 .logo-text .subtitle {

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Icon } from './Icon';
 import { icons } from '../constants/icons';
+import { LogoSnowflake } from './LogoSnowflake';
 import type { Font } from '../types/fonts';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
@@ -101,7 +102,7 @@ export function Header({ font, hideIcons }: HeaderProps): JSX.Element {
                 <Link to="/">
                     <h1 className="logo-text apple-rainbow-text">
                         <div className="subtitle">monkey do</div>
-                        <img src="/monkeysnow.svg" alt="MonkeySnow logo" className="logo-snowflake" />
+                        <LogoSnowflake className="logo-snowflake" />
                         monkeysnow
                     </h1>
                 </Link>
