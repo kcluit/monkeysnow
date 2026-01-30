@@ -50,7 +50,8 @@ export function useElevationFetch(): UseElevationFetchReturn {
             return elevation;
         } catch (err) {
             if ((err as Error).name === 'AbortError') {
-                // Request was cancelled, don't update state
+                // Request was cancelled, reset loading state
+                setIsLoading(false);
                 throw err;
             }
             const error = err instanceof Error ? err : new Error('Failed to fetch elevation');
