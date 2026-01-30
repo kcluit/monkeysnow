@@ -102,7 +102,7 @@ export function DetailedResortView({
     // State for chart lock - prevents scroll zoom and hides range slider
     const [isChartLocked, setIsChartLocked] = useLocalStorage<boolean>(
         'detailChartLocked',
-        true
+        false
     );
 
     // Toggle variable visibility (for the eye icon on each chart)
