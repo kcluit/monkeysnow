@@ -261,7 +261,6 @@ export function DetailedResortView({
                         forecastDays={forecastDays}
                         setForecastDays={setForecastDays}
                         location={location}
-                        onBack={onBack}
                         isChartLocked={isChartLocked}
                         setIsChartLocked={setIsChartLocked}
                         customLocation={customLocation}
