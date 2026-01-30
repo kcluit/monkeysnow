@@ -26,7 +26,6 @@ export function DetailUtilityBar({
     forecastDays,
     setForecastDays,
     location,
-    onBack,
     isChartLocked,
     setIsChartLocked,
     customLocation,
