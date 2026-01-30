@@ -56,9 +56,56 @@ import type {
     UtilityBarStyle
 } from './types';
 
+// Resort Detail Page wrapper component
+function ResortDetailRoute({
+    unitSystem,
+    showUtilityBar,
+    getDisplayName,
+    onBack,
+}: {
+    unitSystem: 'metric' | 'imperial';
+    showUtilityBar: boolean;
+    getDisplayName: (id: string) => string;
+    onBack: () => void;
+}): JSX.Element | null {
+    const { resortId } = useParams<{ resortId: string }>();
+
+    if (!resortId) {
+        return <Navigate to="/" replace />;
+    }
+
+    const location = getResortLocation(resortId);
+    if (!location) {
+        return <Navigate to="/" replace />;
+    }
+
+    const resortLocation = {
+        lat: location.loc[0],
+        lon: location.loc[1],
+        baseElevation: location.bot,
+        midElevation: location.mid,
+        topElevation: location.top,
+    };
+
+    return (
+        <Suspense fallback={<div className="text-center py-12 text-theme-textSecondary">Loading charts...</div>}>
+            <DetailedResortView
+                resortId={resortId}
+                resortName={getDisplayName(resortId)}
+                location={resortLocation}
+                onBack={onBack}
+                unitSystem={unitSystem}
+                showUtilityBar={showUtilityBar}
+            />
+        </Suspense>
+    );
+}
+
 function App(): JSX.Element {
+    const navigate = useNavigate();
+
     // Theme, font, fullscreen, FPS, rainbow, hide emoji, and language hooks
-    const { setTheme, availableThemes } = useTheme();
+    const { theme, setTheme, availableThemes } = useTheme();
     const { font, setFont, availableFonts } = useFont();
     const { isFullscreen, enterFullscreen, exitFullscreen } = useFullscreen();
     const { fps, isEnabled: isFPSEnabled, setEnabled: setFPSEnabled } = useFPSCounter();
@@ -70,9 +117,6 @@ function App(): JSX.Element {
 
     // Hierarchy data from backend (resort list, display names)
     const { skiResorts, getDisplayName, loading: hierarchyLoading } = useHierarchy();
-
-    // Detail view state hook
-    const { isDetailView, selectedResortId, enterDetailView, exitDetailView } = useDetailViewState();
 
     // Weather data hook
     const { allWeatherData, loading: weatherLoading, error, createLoadingController, cancelLoading } = useWeatherData();
