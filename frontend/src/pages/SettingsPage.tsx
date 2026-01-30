@@ -158,7 +158,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
     return (
         <div className="settings-page">
             <h2 className="settings-title">Settings</h2>
-            <p className="settings-subtitle">Configure your MonkeySnow experience</p>
+            <p className="settings-subtitle">Tip: You can also change all these settings quickly using the commmand palette (Esc or Tab or Ctrl+Shift+P)</p>
 
             <div className="settings-grid">
                 {/* Appearance Section */}
