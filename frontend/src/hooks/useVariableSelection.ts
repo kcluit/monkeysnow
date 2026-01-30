@@ -80,11 +80,11 @@ export function useVariableSelection({
     return ordered;
   }, [categoryOrder]);
 
-  // The order of selectedVariables determines chart display order
+  // The order of localVariables determines chart display order (while modal is open)
   // We maintain a separate ordered list that includes unselected variables for the modal
   const orderedVariables = useMemo(() => {
-    // Start with selected variables in their current order
-    const ordered = [...selectedVariables];
+    // Start with local variables in their current order
+    const ordered = [...localVariables];
     // Add unselected variables at the end (maintaining their relative order from ALL_VARIABLES)
     ALL_VARIABLES.forEach((varId) => {
       if (!ordered.includes(varId)) {
@@ -92,17 +92,25 @@ export function useVariableSelection({
       }
     });
     return ordered;
-  }, [selectedVariables]);
+  }, [localVariables]);
 
   const openModal = useCallback(() => {
+    // Initialize local state from parent state when opening
+    setLocalVariables(selectedVariables);
+    hasChangesRef.current = false;
     setIsOpen(true);
     setSearchTerm('');
-  }, []);
+  }, [selectedVariables]);
 
   const closeModal = useCallback(() => {
+    // Apply deferred changes to parent state on close
+    if (hasChangesRef.current) {
+      setSelectedVariables(localVariables);
+    }
+    hasChangesRef.current = false;
     setIsOpen(false);
     setSearchTerm('');
-  }, []);
+  }, [localVariables, setSelectedVariables]);
 
   const isSelected = useCallback(
     (varId: WeatherVariable) => selectedVariables.includes(varId),
