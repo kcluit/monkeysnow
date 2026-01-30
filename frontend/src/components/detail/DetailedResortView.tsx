@@ -1,12 +1,13 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useDetailedWeatherData } from '../../hooks/useDetailedWeatherData';
+import { useElevationFetch } from '../../hooks/useElevationFetch';
 import { DetailUtilityBar } from './DetailUtilityBar';
 import { DetailChartGrid } from './DetailChartGrid';
 import { ResortMap } from '../map/ResortMap';
 import { DEFAULT_VARIABLES, DEFAULT_MODELS } from '../../utils/chartConfigurations';
 import { aggregationOptions } from '../../data/modelHierarchy';
-import type { DetailedResortViewProps, ElevationSelection } from '../../types/detailView';
+import type { DetailedResortViewProps, ElevationSelection, CustomLocation } from '../../types/detailView';
 import type { WeatherModel, WeatherVariable, AggregationType } from '../../types/openMeteo';
 import type { UnitSystem } from '../../types';
 
@@ -106,6 +107,57 @@ export function DetailedResortView({
         false
     );
 
+    // Custom location state (temporary - NOT persisted to localStorage)
+    const [customLocation, setCustomLocation] = useState<CustomLocation | null>(null);
+    const [isLoadingElevation, setIsLoadingElevation] = useState(false);
+
+    // Elevation fetch hook
+    const { fetchElevation } = useElevationFetch();
+
+    // Handle map click - set custom location and fetch elevation
+    const handleMapClick = useCallback(async (lat: number, lon: number) => {
+        // Set custom location immediately with null elevation
+        setCustomLocation({ lat, lon, elevation: null });
+        setIsLoadingElevation(true);
+
+        try {
+            const elevation = await fetchElevation(lat, lon);
+            setCustomLocation({ lat, lon, elevation });
+        } catch (error) {
+            if ((error as Error).name === 'AbortError') {
+                // Request was cancelled (user clicked again), ignore
+                return;
+            }
+            console.error('Failed to fetch elevation:', error);
+            // Fall back to 0m elevation on error
+            setCustomLocation({ lat, lon, elevation: 0 });
+        } finally {
+            setIsLoadingElevation(false);
+        }
+    }, [fetchElevation]);
+
+    // Reset custom location to return to original resort
+    const handleResetCustomLocation = useCallback(() => {
+        setCustomLocation(null);
+    }, []);
+
+    // Compute effective coordinates for weather data
+    const effectiveCoords = useMemo(() => {
+        if (customLocation) {
+            return { lat: customLocation.lat, lon: customLocation.lon };
+        }
+        return { lat: location.lat, lon: location.lon };
+    }, [customLocation, location.lat, location.lon]);
+
+    // Compute effective elevation for weather data
+    const effectiveElevation = useMemo(() => {
+        if (customLocation?.elevation !== null && customLocation?.elevation !== undefined) {
+            return customLocation.elevation;
+        }
+        // While loading custom elevation, use resolved resort elevation
+        return resolvedElevation;
+    }, [customLocation, resolvedElevation]);
+
     // Toggle variable visibility (for the eye icon on each chart)
     const toggleVariable = useCallback((variable: WeatherVariable) => {
         // Don't allow removing the last variable
@@ -114,11 +166,11 @@ export function DetailedResortView({
         }
     }, [selectedVariables, setSelectedVariables]);
 
-    // Fetch weather data
+    // Fetch weather data using effective coordinates
     const { data, timezoneInfo, loading, error, refetch } = useDetailedWeatherData({
-        latitude: location.lat,
-        longitude: location.lon,
-        elevation: resolvedElevation,
+        latitude: effectiveCoords.lat,
+        longitude: effectiveCoords.lon,
+        elevation: effectiveElevation,
         models: selectedModels,
         variables: selectedVariables,
         forecastDays,
@@ -134,18 +186,51 @@ export function DetailedResortView({
                     lat={location.lat}
                     lon={location.lon}
                     resortName={resortName}
+                    onMapClick={handleMapClick}
+                    customLocation={customLocation}
+                    customElevation={customLocation?.elevation}
+                    isLoadingElevation={isLoadingElevation}
                 />
             </div>
 
             {/* Header */}
             <div className="mb-6 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
-                <h1 className="text-2xl font-bold text-theme-textPrimary">{resortName}</h1>
+                <div className="flex items-center gap-3 flex-wrap">
+                    <h1 className="text-2xl font-bold text-theme-textPrimary">
+                        {customLocation ? 'Custom Location' : resortName}
+                    </h1>
+                    {customLocation && (
+                        <button
+                            onClick={handleResetCustomLocation}
+                            className="px-3 py-1 text-sm rounded-lg bg-theme-secondary hover:bg-theme-cardBg transition-colors text-theme-accent flex items-center gap-2"
+                        >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            <span>Reset to {resortName}</span>
+                        </button>
+                    )}
+                </div>
                 <div className="flex items-center gap-4 text-sm text-theme-textSecondary flex-wrap">
-                    <span>Lat: {location.lat.toFixed(4)}</span>
-                    <span>Lon: {location.lon.toFixed(4)}</span>
-                    <span>Base: {location.baseElevation}m</span>
-                    <span>Mid: {location.midElevation}m</span>
-                    <span>Top: {location.topElevation}m</span>
+                    {customLocation ? (
+                        <>
+                            <span>Lat: {customLocation.lat.toFixed(4)}</span>
+                            <span>Lon: {customLocation.lon.toFixed(4)}</span>
+                            {isLoadingElevation ? (
+                                <span className="animate-pulse">Fetching elevation...</span>
+                            ) : (
+                                <span>Elevation: {customLocation.elevation}m</span>
+                            )}
+                        </>
+                    ) : (
+                        <>
+                            <span>Lat: {location.lat.toFixed(4)}</span>
+                            <span>Lon: {location.lon.toFixed(4)}</span>
+                            <span>Base: {location.baseElevation}m</span>
+                            <span>Mid: {location.midElevation}m</span>
+                            <span>Top: {location.topElevation}m</span>
+                        </>
+                    )}
                     {timezoneInfo && (
                         <span>Timezone: {timezoneInfo.timezoneAbbreviation} ({timezoneInfo.timezone})</span>
                     )}
@@ -179,6 +264,9 @@ export function DetailedResortView({
                         onBack={onBack}
                         isChartLocked={isChartLocked}
                         setIsChartLocked={setIsChartLocked}
+                        customLocation={customLocation}
+                        onResetCustomLocation={handleResetCustomLocation}
+                        isLoadingElevation={isLoadingElevation}
                     />
                 </div>
             )}
