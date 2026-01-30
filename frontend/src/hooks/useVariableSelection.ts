@@ -46,6 +46,12 @@ export function useVariableSelection({
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Local (deferred) state - changes are buffered here while modal is open
+  const [localVariables, setLocalVariables] = useState<WeatherVariable[]>(selectedVariables);
+
+  // Track if we need to apply changes on close
+  const hasChangesRef = useRef(false);
+
   // Category order persisted to localStorage (only affects modal display)
   const [categoryOrder, setCategoryOrder] = useLocalStorage<string[]>(
     'detailCategoryOrder',
