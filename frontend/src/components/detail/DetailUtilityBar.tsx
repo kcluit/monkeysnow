@@ -29,6 +29,9 @@ export function DetailUtilityBar({
     onBack,
     isChartLocked,
     setIsChartLocked,
+    customLocation,
+    onResetCustomLocation,
+    isLoadingElevation,
 }: DetailUtilityBarProps): JSX.Element {
     const [showElevationDropdown, setShowElevationDropdown] = useState(false);
     const [showForecastDropdown, setShowForecastDropdown] = useState(false);
