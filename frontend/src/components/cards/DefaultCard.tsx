@@ -1,7 +1,7 @@
 import { useRef, useState, MouseEvent } from 'react';
 import { webcamUrls } from '../../utils/constants';
 import { calculateSnowTotals } from '../../utils/weather';
-import { calculateDayStats, formatWeatherText, getTemperatureClass, getSnowClass, getWindClass } from './cardUtils';
+import { calculateDayStats, formatWeatherText, getTemperatureStyle, getSnowClass, getWindClass } from './cardUtils';
 import { formatTemp, formatSnow, formatRain, formatWind } from '../../utils/unitConversion';
 import type { CardProps } from '../../types';
 
