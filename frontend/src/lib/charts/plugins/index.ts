@@ -13,3 +13,4 @@ export { createWindArrowPlugin, type WindArrowPluginOptions } from './windArrowP
 export { createTooltipPlugin, type TooltipPluginOptions } from './tooltipPlugin';
 export { createLegendPlugin, type LegendPluginOptions } from './legendPlugin';
 export { createElevationLinesPlugin, type ElevationLinesPluginOptions } from './elevationLinesPlugin';
+export { createSeriesFocusPlugin, type SeriesFocusPluginOptions } from './seriesFocusPlugin';
