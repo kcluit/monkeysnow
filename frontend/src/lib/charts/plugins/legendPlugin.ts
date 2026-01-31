@@ -12,6 +12,8 @@ import type { ChartConfig } from '../types';
 export interface LegendPluginOptions {
     /** Chart configuration for accessing series metadata */
     config: ChartConfig;
+    /** Callback when hovering over legend items for series focus */
+    onSeriesHover?: (seriesIdx: number | null) => void;
 }
 
 export function createLegendPlugin(options: LegendPluginOptions): uPlot.Plugin {
