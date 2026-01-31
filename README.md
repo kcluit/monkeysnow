@@ -1,6 +1,6 @@
 # monkeysnow
 
-The most customizable snow forecast website with a minimalistic design and tons of settings. It features resort sorting, weather model selection, resort selection, chart customization, viewing modes, and more!
+The most customizable ski resort/snow forecast website with a minimalistic design and tons of settings. It features resort sorting, weather model selection, resort selection, chart customization, viewing modes, and more!
 
 # Features
 - Minimalistic design with no ads
