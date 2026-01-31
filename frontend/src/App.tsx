@@ -5,6 +5,7 @@ import { UtilityBar } from './components/UtilityBar';
 import { CompactUtilityBar } from './components/CompactUtilityBar';
 import { CommandPalette } from './components/CommandPalette';
 import { AboutPage, SettingsPage } from './pages';
+import Konami from 'konami';
 
 // Lazy load card components - only one is rendered based on viewMode
 const FullView = lazy(() => import('./components/cards/FullView').then(m => ({ default: m.FullView })));
@@ -148,6 +149,10 @@ function App(): JSX.Element {
         selectedResorts,
         onResortsChange: setSelectedResorts,
     });
+
+    useEffect(() => {
+        const konamicode = new Konami("https://monkeytype.com/");
+    }, [])
 
     // Resort filtering hook
     const { searchTerm, setSearchTerm, filteredResorts, sortResorts } = useResortFiltering(skiResorts, allWeatherData);
@@ -376,7 +381,7 @@ function App(): JSX.Element {
         });
 
         return [...baseCommands, ...controlCommands];
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, commandDeps);
 
     // Command palette hook with lazy generation
