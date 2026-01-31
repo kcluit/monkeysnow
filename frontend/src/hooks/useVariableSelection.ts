@@ -1,0 +1,264 @@
+import { useState, useCallback, useMemo, useRef } from 'react';
+import type { WeatherVariable } from '../types/openMeteo';
+import { ALL_VARIABLES, VARIABLE_CONFIGS } from '../utils/chartConfigurations';
+import { VARIABLE_CATEGORIES, type VariableCategory } from '../data/variableCategories';
+import { useLocalStorage } from './useLocalStorage';
+
+export interface UseVariableSelectionProps {
+  selectedVariables: WeatherVariable[];
+  setSelectedVariables: (variables: WeatherVariable[]) => void;
+}
+
+export interface UseVariableSelectionReturn {
+  // Modal state
+  isOpen: boolean;
+  openModal: () => void;
+  closeModal: () => void;
+
+  // Variables in display order (includes both selected and unselected)
+  orderedVariables: WeatherVariable[];
+
+  // Selection state
+  selectedVariables: WeatherVariable[];
+  isSelected: (varId: WeatherVariable) => boolean;
+
+  // Actions
+  toggleVariable: (varId: WeatherVariable) => void;
+  selectAll: () => void;
+  deselectAll: () => void;
+  reorderVariables: (activeId: string, overId: string) => void;
+
+  // Search
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
+  filteredVariables: WeatherVariable[];
+
+  // Category ordering (for drag-and-drop in modal)
+  orderedCategories: VariableCategory[];
+  reorderCategories: (activeId: string, overId: string) => void;
+  reorderVariableAcrossCategories: (activeId: string, overId: string) => void;
+}
+
+export function useVariableSelection({
+  selectedVariables,
+  setSelectedVariables,
+}: UseVariableSelectionProps): UseVariableSelectionReturn {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Local (deferred) state - changes are buffered here while modal is open
+  const [localVariables, setLocalVariables] = useState<WeatherVariable[]>(selectedVariables);
+
+  // Track if we need to apply changes on close
+  const hasChangesRef = useRef(false);
+
+  // Category order persisted to localStorage (only affects modal display)
+  const [categoryOrder, setCategoryOrder] = useLocalStorage<string[]>(
+    'detailCategoryOrder',
+    VARIABLE_CATEGORIES.map(c => c.id)
+  );
+
+  // Compute ordered categories based on custom order
+  const orderedCategories = useMemo(() => {
+    const categoryMap = new Map(VARIABLE_CATEGORIES.map(c => [c.id, c]));
+    const ordered: VariableCategory[] = [];
+
+    // Add categories in custom order
+    for (const id of categoryOrder) {
+      const cat = categoryMap.get(id);
+      if (cat) {
+        ordered.push(cat);
+        categoryMap.delete(id);
+      }
+    }
+
+    // Add any remaining categories (new ones not in custom order)
+    for (const cat of categoryMap.values()) {
+      ordered.push(cat);
+    }
+
+    return ordered;
+  }, [categoryOrder]);
+
+  // The order of localVariables determines chart display order (while modal is open)
+  // We maintain a separate ordered list that includes unselected variables for the modal
+  const orderedVariables = useMemo(() => {
+    // Start with local variables in their current order
+    const ordered = [...localVariables];
+    // Add unselected variables at the end (maintaining their relative order from ALL_VARIABLES)
+    ALL_VARIABLES.forEach((varId) => {
+      if (!ordered.includes(varId)) {
+        ordered.push(varId);
+      }
+    });
+    return ordered;
+  }, [localVariables]);
+
+  const openModal = useCallback(() => {
+    // Initialize local state from parent state when opening
+    setLocalVariables(selectedVariables);
+    hasChangesRef.current = false;
+    setIsOpen(true);
+    setSearchTerm('');
+  }, [selectedVariables]);
+
+  const closeModal = useCallback(() => {
+    // Apply deferred changes to parent state on close
+    if (hasChangesRef.current) {
+      setSelectedVariables(localVariables);
+    }
+    hasChangesRef.current = false;
+    setIsOpen(false);
+    setSearchTerm('');
+  }, [localVariables, setSelectedVariables]);
+
+  const isSelected = useCallback(
+    (varId: WeatherVariable) => localVariables.includes(varId),
+    [localVariables]
+  );
+
+  const toggleVariable = useCallback(
+    (varId: WeatherVariable) => {
+      hasChangesRef.current = true;
+      if (localVariables.includes(varId)) {
+        // Don't allow removing the last variable
+        if (localVariables.length > 1) {
+          setLocalVariables(localVariables.filter((v) => v !== varId));
+        }
+      } else {
+        // Add variable at the end
+        setLocalVariables([...localVariables, varId]);
+      }
+    },
+    [localVariables]
+  );
+
+  const selectAll = useCallback(() => {
+    // Select all in the current order
+    hasChangesRef.current = true;
+    setLocalVariables([...orderedVariables]);
+  }, [orderedVariables]);
+
+  const deselectAll = useCallback(() => {
+    // Keep only the first selected variable
+    hasChangesRef.current = true;
+    if (localVariables.length > 0) {
+      setLocalVariables([localVariables[0]]);
+    }
+  }, [localVariables]);
+
+  const reorderVariables = useCallback(
+    (activeId: string, overId: string) => {
+      const activeVar = activeId as WeatherVariable;
+      const overVar = overId as WeatherVariable;
+
+      // Only reorder within selected variables
+      const oldIndex = localVariables.indexOf(activeVar);
+      const newIndex = localVariables.indexOf(overVar);
+
+      if (oldIndex === -1 || newIndex === -1) {
+        // One of the variables is not selected, ignore
+        return;
+      }
+
+      hasChangesRef.current = true;
+      const reordered = [...localVariables];
+      const [removed] = reordered.splice(oldIndex, 1);
+      reordered.splice(newIndex, 0, removed);
+      setLocalVariables(reordered);
+    },
+    [localVariables]
+  );
+
+  // Reorder categories (for category drag-and-drop)
+  const reorderCategories = useCallback(
+    (activeId: string, overId: string) => {
+      const oldIndex = categoryOrder.indexOf(activeId);
+      const newIndex = categoryOrder.indexOf(overId);
+
+      if (oldIndex === -1 || newIndex === -1) {
+        return;
+      }
+
+      const reordered = [...categoryOrder];
+      const [removed] = reordered.splice(oldIndex, 1);
+      reordered.splice(newIndex, 0, removed);
+      setCategoryOrder(reordered);
+    },
+    [categoryOrder, setCategoryOrder]
+  );
+
+  // Reorder variables across categories (for variable drag-and-drop in grid mode)
+  const reorderVariableAcrossCategories = useCallback(
+    (activeId: string, overId: string) => {
+      const activeVar = activeId as WeatherVariable;
+      const overVar = overId as WeatherVariable;
+
+      // Check if both are selected
+      const activeSelected = localVariables.includes(activeVar);
+      const overSelected = localVariables.includes(overVar);
+
+      if (!activeSelected && !overSelected) {
+        // Neither selected, nothing to reorder
+        return;
+      }
+
+      if (!activeSelected && overSelected) {
+        // Dragging unselected to selected - select it at the target position
+        hasChangesRef.current = true;
+        const targetIndex = localVariables.indexOf(overVar);
+        const newSelected = [...localVariables];
+        newSelected.splice(targetIndex, 0, activeVar);
+        setLocalVariables(newSelected);
+        return;
+      }
+
+      if (activeSelected && !overSelected) {
+        // Dragging selected to unselected area - just keep current position
+        return;
+      }
+
+      // Both selected - reorder within selected
+      hasChangesRef.current = true;
+      const oldIndex = localVariables.indexOf(activeVar);
+      const newIndex = localVariables.indexOf(overVar);
+
+      const reordered = [...localVariables];
+      const [removed] = reordered.splice(oldIndex, 1);
+      reordered.splice(newIndex, 0, removed);
+      setLocalVariables(reordered);
+    },
+    [localVariables]
+  );
+
+  const filteredVariables = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return orderedVariables;
+    }
+    const query = searchTerm.toLowerCase();
+    return orderedVariables.filter((varId) => {
+      const config = VARIABLE_CONFIGS.get(varId);
+      const label = config?.label?.toLowerCase() || '';
+      return varId.toLowerCase().includes(query) || label.includes(query);
+    });
+  }, [orderedVariables, searchTerm]);
+
+  return {
+    isOpen,
+    openModal,
+    closeModal,
+    orderedVariables,
+    selectedVariables: localVariables,  // Expose local state while modal is open
+    isSelected,
+    toggleVariable,
+    selectAll,
+    deselectAll,
+    reorderVariables,
+    searchTerm,
+    setSearchTerm,
+    filteredVariables,
+    orderedCategories,
+    reorderCategories,
+    reorderVariableAcrossCategories,
+  };
+}
