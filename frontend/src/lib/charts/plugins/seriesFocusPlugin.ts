@@ -15,13 +15,19 @@ export interface SeriesFocusPluginOptions {
     // Future extensibility - callbacks, custom opacity, etc.
 }
 
-export function createSeriesFocusPlugin(_options?: SeriesFocusPluginOptions): uPlot.Plugin {
+/** Plugin return type with exposed handler for legend integration */
+export interface SeriesFocusPluginResult {
+    plugin: uPlot.Plugin;
+    handleLegendHover: (seriesIdx: number | null) => void;
+}
+
+export function createSeriesFocusPlugin(_options?: SeriesFocusPluginOptions): SeriesFocusPluginResult {
     let uplotInstance: uPlot | null = null;
     let focusedSeriesIdx: number | null = null;
     let isLegendHover: boolean = false;
 
     /**
-     * Apply focus effect: dim all series except the focused one.
+     * Apply focus effect: dim all visible series except the focused one.
      */
     function applyFocus(u: uPlot, seriesIdx: number | null) {
         if (seriesIdx === focusedSeriesIdx) return; // No change
@@ -30,16 +36,11 @@ export function createSeriesFocusPlugin(_options?: SeriesFocusPluginOptions): uP
 
         u.batch(() => {
             for (let i = 1; i < u.series.length; i++) {
-                if (seriesIdx === null) {
-                    // Clear focus - restore full opacity
-                    u.setSeries(i, { alpha: FOCUSED_ALPHA });
-                } else if (i === seriesIdx) {
-                    // Focused series - full opacity
-                    u.setSeries(i, { alpha: FOCUSED_ALPHA });
-                } else {
-                    // Non-focused series - dim
-                    u.setSeries(i, { alpha: DIMMED_ALPHA });
-                }
+                // Skip hidden series to prevent state inconsistency when toggling visibility
+                if (!u.series[i].show) continue;
+
+                const alpha = (seriesIdx === null || i === seriesIdx) ? FOCUSED_ALPHA : DIMMED_ALPHA;
+                u.setSeries(i, { alpha });
             }
         });
     }
@@ -51,9 +52,9 @@ export function createSeriesFocusPlugin(_options?: SeriesFocusPluginOptions): uP
     function findFocusedSeries(u: uPlot): number | null {
         if (!u.cursor.idxs) return null;
 
-        // Find first series that has a valid cursor index (within proximity)
+        // Find first visible series that has a valid cursor index (within proximity)
         for (let i = 1; i < u.cursor.idxs.length; i++) {
-            if (u.cursor.idxs[i] !== null && u.cursor.idxs[i] !== undefined) {
+            if (u.cursor.idxs[i] !== null && u.cursor.idxs[i] !== undefined && u.series[i].show) {
                 return i;
             }
         }
@@ -70,16 +71,11 @@ export function createSeriesFocusPlugin(_options?: SeriesFocusPluginOptions): uP
         applyFocus(uplotInstance, seriesIdx);
     }
 
-    return {
+    const plugin: uPlot.Plugin = {
         hooks: {
             init: [
                 (u: uPlot) => {
                     uplotInstance = u;
-
-                    // Expose legend hover handler on the uPlot instance for external access
-                    (u as any)._seriesFocusPlugin = {
-                        handleLegendHover,
-                    };
                 },
             ],
             setCursor: [
@@ -94,9 +90,6 @@ export function createSeriesFocusPlugin(_options?: SeriesFocusPluginOptions): uP
             ],
             destroy: [
                 () => {
-                    if (uplotInstance) {
-                        delete (uplotInstance as any)._seriesFocusPlugin;
-                    }
                     uplotInstance = null;
                     focusedSeriesIdx = null;
                     isLegendHover = false;
@@ -104,4 +97,6 @@ export function createSeriesFocusPlugin(_options?: SeriesFocusPluginOptions): uP
             ],
         },
     };
+
+    return { plugin, handleLegendHover };
 }
