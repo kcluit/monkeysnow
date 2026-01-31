@@ -1981,6 +1981,7 @@ input[type="checkbox"] {
     font-size: 14px;
     transition: all 0.15s ease;
     opacity: 0.7;
+    color: var(--accent, #0a84ff);
 }
 
 .aggregation-hide-toggle:hover {
