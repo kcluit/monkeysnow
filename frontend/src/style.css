@@ -2050,6 +2050,10 @@ input[type="checkbox"] {
     opacity: 0.8;
 }
 
+.model-grid-footer-note svg {
+    color: var(--accent, #0a84ff);
+}
+
 .model-grid-footer-actions {
     display: flex;
     justify-content: space-between;
