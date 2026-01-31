@@ -2672,6 +2672,7 @@ input[type="checkbox"] {
 .about-note {
     font-size: 0.8125rem;
     font-style: italic;
+    font-weight: 600;
     opacity: 0.8;
     margin-top: 1rem;
     padding: 0.75rem;
