@@ -203,7 +203,7 @@ export function AboutPage(): JSX.Element {
             </Section>
 
             {/* Contact Section */}
-            <Section title="contact" icon={faGithub}>
+            <Section title="contact" icon={faEnvelope}>
                 <p>
                     Found a bug? Have a feature request? Want to contribute?
                 </p>
@@ -214,7 +214,7 @@ export function AboutPage(): JSX.Element {
                         rel="noopener noreferrer"
                         className="about-contact-btn"
                     >
-                        <Icon icon={faGithub} />
+                        <Icon icon={faCode} />
                         <span>GitHub</span>
                     </a>
                 </div>
