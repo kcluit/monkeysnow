@@ -1,5 +1,4 @@
 import { Icon } from '../components/Icon';
-import { icons } from '../constants/icons';
 import {
     faInfoCircle,
     faKeyboard,
@@ -55,37 +54,27 @@ function Subsection({ title, icon, children }: SubsectionProps): JSX.Element {
 export function AboutPage(): JSX.Element {
     return (
         <div className="about-page">
-            {/* Hero Section */}
-            <section className="about-hero">
-                <p className="about-hero-text">
-                    A ski resort weather forecast app for powder chasers.
-                </p>
-                <p className="about-hero-subtext">
-                    Built with <Icon icon={icons.snow} className="text-theme-accent" /> by a passionate skier.
-                </p>
-            </section>
+  
 
             {/* About Section */}
             <Section title="about" icon={faInfoCircle}>
                 <p>
-                    MonkeySnow is a minimalistic and customizable ski resort weather forecast application.
+                    monkeysnow is a minimalistic and customizable ski resort/snow forecast app.
                     It displays weather data from multiple weather models for ski resorts around the world,
                     with snow accumulation estimates based on wet bulb temperature and precipitation.
                 </p>
                 <p>
-                    The app features multiple view modes, customizable themes, multi-model comparison charts,
-                    and smart snow quality estimation using meteorological algorithms.
+                    The app features multiple view modes, customizable themes, and multi-model comparison charts.
                 </p>
                 <p>
-                    Track conditions at your favorite resorts, compare forecasts across weather models,
-                    and plan your next powder day with confidence.
+                    Track conditions at your favorite resorts and compare forecasts across weather models.
                 </p>
             </Section>
 
             {/* Snow Estimation Section */}
             <Section title="snow estimation" icon={faSnowflake}>
                 <p>
-                    MonkeySnow uses the Kuchera snow-to-liquid ratio method to estimate snow accumulation
+                    monkeysnow uses the Kuchera snow-to-liquid ratio method to estimate snow accumulation
                     from precipitation data. This algorithm considers wet bulb temperature to determine
                     snow density and quality.
                 </p>
@@ -209,7 +198,7 @@ export function AboutPage(): JSX.Element {
                 </p>
                 <div className="about-contact-links">
                     <a
-                        href="https://github.com/monkeysnow/monkeysnow"
+                        href="https://github.com/kcluit/monkeysnow"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="about-contact-btn"
@@ -219,6 +208,16 @@ export function AboutPage(): JSX.Element {
                     </a>
                 </div>
             </Section>
+
+                      {/* Hero Section */}
+            <section className="about-hero">
+
+                <p className="about-hero-subtext">
+                    Made with love in Burnaby.<br />
+                    
+                    Launched on 30th Jan 2026.
+                </p>
+            </section>
         </div>
     );
 }
