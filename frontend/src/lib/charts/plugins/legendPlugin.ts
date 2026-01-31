@@ -86,12 +86,14 @@ export function createLegendPlugin(options: LegendPluginOptions): uPlot.Plugin {
                 requestAnimationFrame(() => updateLegend(u));
             });
 
-            // Hover effect
+            // Hover effect - trigger series focus
             item.addEventListener('mouseenter', () => {
                 item.style.backgroundColor = config.theme.tooltipBg;
+                options.onSeriesHover?.(i);
             });
             item.addEventListener('mouseleave', () => {
                 item.style.backgroundColor = 'transparent';
+                options.onSeriesHover?.(null);
             });
 
             legend.appendChild(item);
