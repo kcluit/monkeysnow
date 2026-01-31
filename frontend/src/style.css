@@ -2617,6 +2617,7 @@ input[type="checkbox"] {
     margin: 0;
     color: var(--textSecondary);
     line-height: 1.7;
+    font-weight: 600;
 }
 
 /* Subsection Styles */
