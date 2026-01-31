@@ -515,11 +515,20 @@ export class ChartManager {
             }));
         }
 
+        // Series focus plugin - highlights series on cursor proximity or legend hover
+        plugins.push(createSeriesFocusPlugin());
+
         // Tooltip plugin - shows values at cursor position
         plugins.push(createTooltipPlugin({ config }));
 
-        // Legend plugin - interactive series toggle
-        plugins.push(createLegendPlugin({ config }));
+        // Legend plugin - interactive series toggle with focus integration
+        plugins.push(createLegendPlugin({
+            config,
+            onSeriesHover: (seriesIdx) => {
+                // Bridge to focus plugin via exposed API on uPlot instance
+                (this.chart as any)?._seriesFocusPlugin?.handleLegendHover(seriesIdx);
+            },
+        }));
 
         // Build uPlot options
         const opts: uPlot.Options = {
