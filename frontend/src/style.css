@@ -2574,12 +2574,14 @@ input[type="checkbox"] {
     font-size: 1.125rem;
     color: var(--textSecondary, #a1a1a6);
     margin: 0;
+    font-weight: 600;
 }
 
 .about-hero-subtext {
     font-size: 0.875rem;
     color: var(--textSecondary, #a1a1a6);
     margin: 0.5rem 0 0;
+    font-weight: 600;
 }
 
 /* Section Styles */
