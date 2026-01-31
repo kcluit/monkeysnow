@@ -75,10 +75,10 @@ export function DetailedResortView({
     );
 
     // State for elevation selection - can be 'base', 'mid', 'top', or a custom number
-    // Default to 'mid' so it dynamically uses each resort's mid elevation
+    // Default to 'base' so it dynamically uses each resort's base elevation
     const [elevationSelection, setElevationSelection] = useLocalStorage<ElevationSelection>(
         'detailElevationSelection',
-        'mid'
+        'base'
     );
 
     // Resolve the elevation selection to an actual number based on current resort
