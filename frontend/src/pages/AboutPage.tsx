@@ -7,8 +7,9 @@ import {
     faDatabase,
     faCodeBranch,
     faListOl,
+    faCode,
+    faEnvelope,
 } from '@fortawesome/free-solid-svg-icons';
-import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
 interface SectionProps {
