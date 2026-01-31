@@ -2552,3 +2552,209 @@ input[type="checkbox"] {
 .uplot-tooltip {
     font-family: inherit;
 }
+
+/* ========================================
+   About Page Styles - Monkeytype-inspired
+   ======================================== */
+
+.about-page {
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* Hero Section */
+.about-hero {
+    text-align: center;
+    padding: 1rem 0 2rem;
+}
+
+.about-hero-text {
+    font-size: 1.125rem;
+    color: var(--textSecondary, #a1a1a6);
+    margin: 0;
+}
+
+.about-hero-subtext {
+    font-size: 0.875rem;
+    color: var(--textSecondary, #a1a1a6);
+    margin: 0.5rem 0 0;
+}
+
+/* Section Styles */
+.about-section {
+    background: var(--cardBg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.about-section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--textPrimary);
+    margin: 0 0 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.about-section-icon {
+    color: var(--accent);
+    font-size: 1.25rem;
+}
+
+.about-section-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.about-section-content p {
+    margin: 0;
+    color: var(--textSecondary);
+    line-height: 1.7;
+}
+
+/* Subsection Styles */
+.about-subsection {
+    margin-top: 0.5rem;
+}
+
+.about-subsection-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--textPrimary);
+    margin: 0 0 0.75rem;
+}
+
+.about-subsection-icon {
+    color: var(--textSecondary);
+    font-size: 0.875rem;
+}
+
+.about-subsection-content {
+    padding-left: 0.5rem;
+}
+
+/* Stats/Definition List */
+.about-stats-list {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+}
+
+.about-stats-list dt {
+    color: var(--textPrimary);
+    font-weight: 600;
+    font-size: 0.9375rem;
+}
+
+.about-stats-list dd {
+    color: var(--textSecondary);
+    margin: 0 0 0.75rem;
+    padding-left: 0.5rem;
+    line-height: 1.6;
+}
+
+/* Note styling */
+.about-note {
+    font-size: 0.8125rem;
+    font-style: italic;
+    opacity: 0.8;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: var(--secondary, rgba(255, 255, 255, 0.05));
+    border-radius: 8px;
+}
+
+/* Keyboard shortcut styling */
+.about-section kbd {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.8125rem;
+    font-family: inherit;
+    background: var(--cardBg, rgba(255, 255, 255, 0.1));
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--textPrimary);
+    margin: 0 0.125rem;
+}
+
+/* Link styling */
+.about-link {
+    color: var(--accent);
+    text-decoration: none;
+    transition: opacity 0.15s ease;
+}
+
+.about-link:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+/* Contact button */
+.about-contact-links {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.about-contact-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--accent);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.about-contact-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* Rainbow mode for about page */
+.rainbow-mode .about-section-title,
+.rainbow-mode .about-subsection-title {
+    background: var(--rainbow-gradient);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: rainbow 8s linear infinite;
+}
+
+.rainbow-mode .about-contact-btn {
+    background: linear-gradient(90deg, #5E5CE6, #BF5AF2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .about-page {
+        gap: 1.5rem;
+    }
+
+    .about-section {
+        padding: 1.25rem;
+    }
+
+    .about-section-title {
+        font-size: 1.25rem;
+    }
+}
