@@ -516,7 +516,8 @@ export class ChartManager {
         }
 
         // Series focus plugin - highlights series on cursor proximity or legend hover
-        plugins.push(createSeriesFocusPlugin());
+        const seriesFocus = createSeriesFocusPlugin();
+        plugins.push(seriesFocus.plugin);
 
         // Tooltip plugin - shows values at cursor position
         plugins.push(createTooltipPlugin({ config }));
@@ -524,10 +525,7 @@ export class ChartManager {
         // Legend plugin - interactive series toggle with focus integration
         plugins.push(createLegendPlugin({
             config,
-            onSeriesHover: (seriesIdx) => {
-                // Bridge to focus plugin via exposed API on uPlot instance
-                (this.chart as any)?._seriesFocusPlugin?.handleLegendHover(seriesIdx);
-            },
+            onSeriesHover: seriesFocus.handleLegendHover,
         }));
 
         // Build uPlot options
