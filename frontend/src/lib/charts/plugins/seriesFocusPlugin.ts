@@ -40,7 +40,8 @@ export function createSeriesFocusPlugin(_options?: SeriesFocusPluginOptions): Se
                 if (!u.series[i].show) continue;
 
                 const alpha = (seriesIdx === null || i === seriesIdx) ? FOCUSED_ALPHA : DIMMED_ALPHA;
-                u.setSeries(i, { alpha });
+                // uPlot supports alpha in setSeries but TypeScript types don't include it
+                u.setSeries(i, { alpha } as any);
             }
         });
     }
