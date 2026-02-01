@@ -317,35 +317,6 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                     </div>
                 </SettingSection>
 
-                {/* Units & Language */}
-                <SettingSection title="Units" icon={icons.units}>
-                    <div className="settings-options-row">
-                        <OptionButton
-                            label="Metric (°C, cm, km/h)"
-                            isSelected={unitSystem === 'metric'}
-                            onClick={() => { setUnitSystem('metric'); window.location.reload(); }}
-                        />
-                        <OptionButton
-                            label="Imperial (°F, in, mph)"
-                            isSelected={unitSystem === 'imperial'}
-                            onClick={() => { setUnitSystem('imperial'); window.location.reload(); }}
-                        />
-                    </div>
-                </SettingSection>
-
-                <SettingSection title="Language" icon={icons.language}>
-                    <div className="settings-options-grid">
-                        {availableLanguages.map(lang => (
-                            <OptionButton
-                                key={lang.id}
-                                label={lang.name === lang.nativeName ? lang.name : `${lang.name} (${lang.nativeName})`}
-                                isSelected={language.id === lang.id}
-                                onClick={() => setLanguage(lang.id)}
-                            />
-                        ))}
-                    </div>
-                </SettingSection>
-
                 {/* Advanced */}
                 <SettingSection title="Advanced" icon={icons.fps}>
                     <div className="settings-toggles">
