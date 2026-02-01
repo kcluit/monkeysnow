@@ -46,13 +46,6 @@ export function CompactUtilityBar({
         setViewMode(modes[nextIndex]);
     };
 
-    const cycleSort = (): void => {
-        const sorts: SortOption[] = ['temperature', 'snowfall', 'wind'];
-        const currentIndex = sorts.indexOf(selectedSort);
-        const nextIndex = (currentIndex + 1) % sorts.length;
-        setSelectedSort(sorts[nextIndex]);
-    };
-
     const getViewModeText = (): string => {
         switch (viewMode) {
             case 'default': return 'Default';
