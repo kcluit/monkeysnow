@@ -258,7 +258,7 @@ export function UtilityBar({
           onClick={() => setIsReversed(!isReversed)}
           className="text-sm font-medium text-theme-textPrimary hover:text-theme-accent transition-colors duration-200"
         >
-          {isReversed ? '↑ Reverse' : '↓ Normal'}
+          {isReversed ? '↑ Ascending' : '↓ Descending'}
         </button>
       </div>
     </div>
