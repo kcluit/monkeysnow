@@ -54,7 +54,7 @@ function Subsection({ title, icon, children }: SubsectionProps): JSX.Element {
 export function AboutPage(): JSX.Element {
     return (
         <div className="about-page">
-  
+
 
             {/* About Section */}
             <Section title="about" icon={faInfoCircle}>
@@ -209,12 +209,12 @@ export function AboutPage(): JSX.Element {
                 </div>
             </Section>
 
-                      {/* Hero Section */}
+            {/* Hero Section */}
             <section className="about-hero">
 
                 <p className="about-hero-subtext">
-                    Made with love in Burnaby.<br />
-                    
+                    Made in Burnaby with love.<br />
+
                     Launched on 30th Jan 2026.
                 </p>
             </section>
