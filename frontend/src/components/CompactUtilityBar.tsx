@@ -110,25 +110,21 @@ export function CompactUtilityBar({
 
                 <span className="compact-bar-separator">|</span>
 
-                {/* Sort Group */}
+                {/* Sort Group: Sort: Snow · 3 Days · Ascending */}
                 <div className="inline-flex items-center gap-2">
-                    {/* Sort: label + inline options */}
                     <span className="compact-bar-text text-theme-textSecondary">Sort:</span>
-                    {(['temperature', 'snowfall', 'wind'] as SortOption[]).map((sort) => (
-                        <button
-                            key={sort}
-                            onClick={() => setSelectedSort(sort)}
-                            className={`compact-bar-text transition-colors ${selectedSort === sort
-                                ? 'text-theme-accent'
-                                : 'text-theme-textSecondary hover:text-theme-textPrimary hover:font-bold'
-                            }`}
-                        >
-                            {sort === 'temperature' ? 'Temp' : sort === 'snowfall' ? 'Snow' : 'Wind'}
-                        </button>
-                    ))}
 
-                    {/* Within: label + dropdown */}
-                    <span className="compact-bar-text text-theme-textSecondary ml-1">Within:</span>
+                    {/* Sort type - cycle button */}
+                    <button
+                        onClick={cycleSort}
+                        className="compact-bar-text text-theme-textSecondary hover:text-theme-accent transition-colors"
+                    >
+                        {getSortText()}
+                    </button>
+
+                    <span className="compact-bar-text text-theme-textSecondary">·</span>
+
+                    {/* Days dropdown */}
                     <div className="relative inline-block" data-dropdown>
                         <button
                             onClick={() => setShowSortDayMenu(!showSortDayMenu)}
@@ -185,12 +181,14 @@ export function CompactUtilityBar({
                         )}
                     </div>
 
+                    <span className="compact-bar-text text-theme-textSecondary">·</span>
+
                     {/* Order Toggle */}
                     <button
                         onClick={() => setIsReversed(!isReversed)}
                         className="compact-bar-text text-theme-textSecondary hover:text-theme-accent transition-colors"
                     >
-                        {isReversed ? '↑' : '↓'}
+                        {isReversed ? 'Descending' : 'Ascending'}
                     </button>
                 </div>
             </div>
