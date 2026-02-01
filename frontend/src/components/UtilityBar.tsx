@@ -70,55 +70,21 @@ export function UtilityBar({
           </svg>
         </button>
 
-        {/* Elevation Dropdown */}
-        <div className="relative" data-dropdown>
-          <button
-            onClick={() => {
-              setShowElevationMenu(!showElevationMenu);
-              setShowSortMenu(false);
-              setShowSortDayMenu(false);
-              setShowViewModeMenu(false);
-            }}
-            className="w-full md:w-48 bg-theme-background border border-theme-border rounded-lg px-4 py-2 text-left flex items-center justify-between shadow-sm hover:bg-theme-secondary transition-colors duration-200"
-          >
-            <span className="block truncate capitalize text-theme-textPrimary">{elevationText}</span>
-            <svg className="h-5 w-5 text-theme-textSecondary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-          </button>
-          {showElevationMenu && (
-            <div className="absolute right-0 z-10 mt-1 w-48 bg-theme-background rounded-lg shadow-lg border border-theme-border">
-              <div className="p-2 space-y-1">
-                <button
-                  onClick={() => {
-                    setSelectedElevation('bot');
-                    setShowElevationMenu(false);
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-theme-secondary rounded-lg text-theme-textPrimary transition-colors duration-200"
-                >
-                  Base Forecast
-                </button>
-                <button
-                  onClick={() => {
-                    setSelectedElevation('mid');
-                    setShowElevationMenu(false);
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-theme-secondary rounded-lg text-theme-textPrimary transition-colors duration-200"
-                >
-                  Mid Forecast
-                </button>
-                <button
-                  onClick={() => {
-                    setSelectedElevation('top');
-                    setShowElevationMenu(false);
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-theme-secondary rounded-lg text-theme-textPrimary transition-colors duration-200"
-                >
-                  Peak Forecast
-                </button>
-              </div>
-            </div>
-          )}
+        {/* Elevation Selection - Inline buttons */}
+        <div className="inline-flex items-center gap-1 bg-theme-background border border-theme-border rounded-lg px-3 py-2 shadow-sm">
+          {(['bot', 'mid', 'top'] as const).map((level) => (
+            <button
+              key={level}
+              onClick={() => setSelectedElevation(level)}
+              className={`px-2 py-0.5 text-sm rounded transition-colors duration-200 ${
+                selectedElevation === level
+                  ? 'text-theme-accent font-medium'
+                  : 'text-theme-textSecondary hover:text-theme-textPrimary'
+              }`}
+            >
+              {level === 'bot' ? 'Base' : level === 'mid' ? 'Mid' : 'Peak'}
+            </button>
+          ))}
         </div>
 
         {/* View Mode Dropdown */}
