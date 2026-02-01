@@ -65,7 +65,7 @@ export function CompactCard({ resort, temperatureMetric = 'max', showDate = fals
             {/* Compact Scroll Container */}
             <div className="relative">
                 <button
-                    onClick={scrollLeft}
+                    onClick={(e) => { e.stopPropagation(); scrollLeft(); }}
                     className="absolute left-0.5 top-1/2 -translate-y-1/2 z-10 bg-theme-cardBg rounded-full p-1 shadow-md hover:bg-theme-secondary transition-all text-theme-textPrimary opacity-70 hover:opacity-100"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-3 h-3">
