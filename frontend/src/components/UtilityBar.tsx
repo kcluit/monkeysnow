@@ -63,7 +63,7 @@ export function UtilityBar({
 
         {/* Elevation Selection - Inline buttons */}
         <div className="inline-flex items-center gap-1 bg-theme-background border border-theme-border rounded-lg px-3 py-2 shadow-sm">
-          <span className="text-sm text-theme-textSecondary mr-1.5">Elevation:</span>
+          <span className="text-sm text-theme-textPrimary mr-1.5">Elevation:</span>
           {(['bot', 'mid', 'top'] as const).map((level) => (
             <button
               key={level}
