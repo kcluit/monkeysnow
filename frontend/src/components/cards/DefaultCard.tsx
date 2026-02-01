@@ -64,7 +64,7 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
             </div>
             <div className="relative">
                 <button
-                    onClick={scrollLeft}
+                    onClick={(e) => { e.stopPropagation(); scrollLeft(); }}
                     className="absolute left-1 top-1/2 -translate-y-1/2 z-10 bg-theme-cardBg rounded-full p-2 shadow-lg hover:bg-theme-secondary transition-all text-theme-textPrimary"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
