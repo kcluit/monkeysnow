@@ -8,6 +8,7 @@ import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
 
 export function DetailUtilityBar({
+    onBack,
     selectedModels,
     setSelectedModels,
     selectedVariables,
