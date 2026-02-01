@@ -161,6 +161,35 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
             <p className="settings-subtitle">Tip: You can also change all these settings quickly using the commmand palette (Esc or Tab or Ctrl+Shift+P)</p>
 
             <div className="settings-grid">
+                {/* Units & Language */}
+                <SettingSection title="Units" icon={icons.units}>
+                    <div className="settings-options-row">
+                        <OptionButton
+                            label="Metric (°C, cm, km/h)"
+                            isSelected={unitSystem === 'metric'}
+                            onClick={() => { setUnitSystem('metric'); window.location.reload(); }}
+                        />
+                        <OptionButton
+                            label="Imperial (°F, in, mph)"
+                            isSelected={unitSystem === 'imperial'}
+                            onClick={() => { setUnitSystem('imperial'); window.location.reload(); }}
+                        />
+                    </div>
+                </SettingSection>
+
+                <SettingSection title="Language" icon={icons.language}>
+                    <div className="settings-options-grid">
+                        {availableLanguages.map(lang => (
+                            <OptionButton
+                                key={lang.id}
+                                label={lang.name === lang.nativeName ? lang.name : `${lang.name} (${lang.nativeName})`}
+                                isSelected={language.id === lang.id}
+                                onClick={() => setLanguage(lang.id)}
+                            />
+                        ))}
+                    </div>
+                </SettingSection>
+
                 {/* Appearance Section */}
                 <SettingSection title="Theme" icon={icons.theme}>
                     <div className="settings-options-grid">
