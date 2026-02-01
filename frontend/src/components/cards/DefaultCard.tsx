@@ -72,7 +72,7 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
                     </svg>
                 </button>
                 <button
-                    onClick={scrollRight}
+                    onClick={(e) => { e.stopPropagation(); scrollRight(); }}
                     className="absolute right-1 top-1/2 -translate-y-1/2 z-10 bg-theme-cardBg rounded-full p-2 shadow-lg hover:bg-theme-secondary transition-all text-theme-textPrimary"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
