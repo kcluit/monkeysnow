@@ -51,6 +51,8 @@ import {
   faHouse,
   faCircleInfo,
   faGear,
+  // Modal controls
+  faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 
 // Re-export for direct usage
