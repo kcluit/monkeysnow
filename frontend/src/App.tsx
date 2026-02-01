@@ -68,6 +68,7 @@ function ResortDetailRoute({
     getDisplayName: (id: string) => string;
 }): JSX.Element | null {
     const { resortId } = useParams<{ resortId: string }>();
+    const navigate = useNavigate();
 
     if (!resortId) {
         return <Navigate to="/" replace />;
@@ -86,6 +87,8 @@ function ResortDetailRoute({
         topElevation: location.top,
     };
 
+    const handleBack = () => navigate('/');
+
     return (
         <Suspense fallback={<div className="text-center py-12 text-theme-textSecondary">Loading charts...</div>}>
             <DetailedResortView
@@ -94,6 +97,7 @@ function ResortDetailRoute({
                 location={resortLocation}
                 unitSystem={unitSystem}
                 showUtilityBar={showUtilityBar}
+                onBack={handleBack}
             />
         </Suspense>
     );
