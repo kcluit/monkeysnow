@@ -112,14 +112,19 @@ export function CompactUtilityBar({
 
                 {/* Sort Group - No separators between items */}
                 <div className="inline-flex items-center gap-2">
-                    {/* Sort - Cycle button with prefix */}
-                    <span className="text-theme-textSecondary">Sort:</span>
-                    <button
-                        onClick={cycleSort}
-                        className="compact-bar-text text-theme-textSecondary hover:text-theme-accent transition-colors"
-                    >
-                        {getSortText()}
-                    </button>
+                    {/* Sort - Inline options like elevation */}
+                    {(['temperature', 'snowfall', 'wind'] as SortOption[]).map((sort) => (
+                        <button
+                            key={sort}
+                            onClick={() => setSelectedSort(sort)}
+                            className={`compact-bar-text transition-colors ${selectedSort === sort
+                                ? 'text-theme-accent'
+                                : 'text-theme-textSecondary hover:text-theme-textPrimary hover:font-bold'
+                            }`}
+                        >
+                            {sort === 'temperature' ? 'Temp' : sort === 'snowfall' ? 'Snow' : 'Wind'}
+                        </button>
+                    ))}
 
                     {/* Sort Day - Dropdown (the only dropdown) */}
                     <div className="relative inline-block" data-dropdown>
