@@ -101,17 +101,24 @@ export function DetailUtilityBar({
 
     return (
         <div className="mb-6 flex flex-wrap gap-4 items-center">
+            {/* Back Button */}
+            <button
+                onClick={onBack}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-background border border-theme-border hover:bg-theme-secondary transition-colors"
+            >
+                <Icon icon={icons.chevronLeft} className="text-theme-textSecondary" />
+                <span className="text-sm text-theme-textPrimary">Back</span>
+            </button>
+
             {/* Model Selection Button - Opens Modal */}
             <button
                 onClick={modelHierarchy.openModal}
                 className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-background border border-theme-border hover:bg-theme-secondary transition-colors"
             >
+                <Icon icon={icons.controls} className="text-theme-textSecondary" />
                 <span className="text-sm text-theme-textPrimary">
                     {getModelButtonText()}
                 </span>
-                <svg className="w-4 h-4 text-theme-textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
             </button>
 
             {/* Elevation Dropdown - hidden when custom location is active */}
