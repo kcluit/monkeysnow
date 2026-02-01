@@ -4,6 +4,8 @@ import { useModelHierarchy } from '../../hooks/useModelHierarchy';
 import { useVariableSelection } from '../../hooks/useVariableSelection';
 import { ModelSelectionGridModal } from '../ModelSelectionModal';
 import { VariableSelectionModal } from '../VariableSelectionModal';
+import { Icon } from '../Icon';
+import { icons } from '../../constants/icons';
 
 export function DetailUtilityBar({
     selectedModels,
