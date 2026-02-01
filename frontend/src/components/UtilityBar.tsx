@@ -30,7 +30,6 @@ export function UtilityBar({
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent): void => {
       if (!(e.target as HTMLElement).closest('[data-dropdown]')) {
-        setShowElevationMenu(false);
         setShowSortMenu(false);
         setShowSortDayMenu(false);
         setShowViewModeMenu(false);
