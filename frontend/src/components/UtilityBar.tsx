@@ -178,17 +178,11 @@ export function UtilityBar({
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
-        {/* Reverse Order Button */}
-        <button
-          onClick={() => setIsReversed(!isReversed)}
-          className="px-4 py-2 bg-theme-background border border-theme-border rounded-lg shadow-sm hover:bg-theme-secondary text-sm font-medium text-theme-textPrimary transition-colors duration-200"
-        >
-          {isReversed ? '↑ Reverse Order' : '↓ Normal Order'}
-        </button>
-
+      {/* Compact Filter Group */}
+      <div className="inline-flex items-center gap-3 bg-theme-background border border-theme-border rounded-lg px-4 py-2 shadow-sm">
         {/* Sort Dropdown */}
-        <div className="relative" data-dropdown>
+        <div className="relative inline-flex items-center" data-dropdown>
+          <span className="text-sm text-theme-textSecondary mr-1.5">Sort:</span>
           <button
             onClick={() => {
               setShowSortMenu(!showSortMenu);
@@ -196,50 +190,56 @@ export function UtilityBar({
               setShowSortDayMenu(false);
               setShowViewModeMenu(false);
             }}
-            className="w-full md:w-48 bg-theme-background border border-theme-border rounded-lg px-4 py-2 text-left flex items-center justify-between shadow-sm hover:bg-theme-secondary transition-colors duration-200"
+            className="inline-flex items-center gap-1 text-sm font-medium text-theme-textPrimary hover:text-theme-accent transition-colors duration-200"
           >
-            <span className="block truncate capitalize text-theme-textPrimary">{sortText}</span>
-            <svg className="h-5 w-5 text-theme-textSecondary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <span className="capitalize">
+              {selectedSort === 'temperature' ? 'Temperature' :
+               selectedSort === 'snowfall' ? 'Snowfall' : 'Wind'}
+            </span>
+            <svg className="h-3.5 w-3.5 text-theme-textSecondary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
           </button>
           {showSortMenu && (
-            <div className="absolute right-0 z-10 mt-1 w-48 bg-theme-background rounded-lg shadow-lg border border-theme-border">
+            <div className="absolute top-full left-0 z-10 mt-2 w-36 bg-theme-background rounded-lg shadow-lg border border-theme-border">
               <div className="p-2 space-y-1">
                 <button
                   onClick={() => {
                     setSelectedSort('temperature');
                     setShowSortMenu(false);
                   }}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-theme-secondary rounded-lg text-theme-textPrimary transition-colors duration-200"
+                  className={`w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors duration-200 ${selectedSort === 'temperature' ? 'text-theme-accent font-medium' : 'hover:bg-theme-secondary text-theme-textPrimary'}`}
                 >
-                  Sort by Temperature
+                  Temperature
                 </button>
                 <button
                   onClick={() => {
                     setSelectedSort('snowfall');
                     setShowSortMenu(false);
                   }}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-theme-secondary rounded-lg text-theme-textPrimary transition-colors duration-200"
+                  className={`w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors duration-200 ${selectedSort === 'snowfall' ? 'text-theme-accent font-medium' : 'hover:bg-theme-secondary text-theme-textPrimary'}`}
                 >
-                  Sort by Snowfall
+                  Snowfall
                 </button>
                 <button
                   onClick={() => {
                     setSelectedSort('wind');
                     setShowSortMenu(false);
                   }}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-theme-secondary rounded-lg text-theme-textPrimary transition-colors duration-200"
+                  className={`w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors duration-200 ${selectedSort === 'wind' ? 'text-theme-accent font-medium' : 'hover:bg-theme-secondary text-theme-textPrimary'}`}
                 >
-                  Sort by Wind
+                  Wind
                 </button>
               </div>
             </div>
           )}
         </div>
 
+        <span className="text-theme-textSecondary opacity-50">|</span>
+
         {/* Sort Day Dropdown */}
-        <div className="relative" data-dropdown>
+        <div className="relative inline-flex items-center" data-dropdown>
+          <span className="text-sm text-theme-textSecondary mr-1.5">Within:</span>
           <button
             onClick={() => {
               setShowSortDayMenu(!showSortDayMenu);
@@ -247,15 +247,15 @@ export function UtilityBar({
               setShowSortMenu(false);
               setShowViewModeMenu(false);
             }}
-            className="w-full md:w-40 bg-theme-background border border-theme-border rounded-lg px-4 py-2 text-left flex items-center justify-between shadow-sm hover:bg-theme-secondary transition-colors duration-200"
+            className="inline-flex items-center gap-1 text-sm font-medium text-theme-textPrimary hover:text-theme-accent transition-colors duration-200"
           >
-            <span className="block truncate capitalize text-theme-textPrimary">{sortDayText}</span>
-            <svg className="h-5 w-5 text-theme-textSecondary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <span>{sortDayText}</span>
+            <svg className="h-3.5 w-3.5 text-theme-textSecondary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
           </button>
           {showSortDayMenu && (
-            <div className="absolute right-0 z-10 mt-1 w-40 bg-theme-background rounded-lg shadow-lg border border-theme-border">
+            <div className="absolute top-full left-0 z-10 mt-2 w-36 bg-theme-background rounded-lg shadow-lg border border-theme-border">
               <div className="p-2 space-y-1">
                 {/* Special aggregate options */}
                 {sortDayData.specialOptions.map((option) => (
@@ -265,7 +265,7 @@ export function UtilityBar({
                       setSelectedSortDay(option.value as SortDay);
                       setShowSortDayMenu(false);
                     }}
-                    className="w-full text-left px-4 py-2 text-sm hover:bg-theme-secondary rounded-lg font-medium text-theme-accent transition-colors duration-200"
+                    className={`w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors duration-200 ${selectedSortDay === option.value ? 'text-theme-accent font-medium' : 'hover:bg-theme-secondary text-theme-textPrimary'}`}
                   >
                     {option.name}
                   </button>
@@ -273,7 +273,7 @@ export function UtilityBar({
 
                 {/* Separator */}
                 {sortDayData.regularDays.length > 0 && (
-                  <div className="border-t border-theme-border my-2"></div>
+                  <div className="border-t border-theme-border my-1"></div>
                 )}
 
                 {/* Regular day options */}
@@ -285,19 +285,29 @@ export function UtilityBar({
                         setSelectedSortDay(index);
                         setShowSortDayMenu(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm hover:bg-theme-secondary rounded-lg text-theme-textPrimary transition-colors duration-200"
+                      className={`w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors duration-200 ${selectedSortDay === index ? 'text-theme-accent font-medium' : 'hover:bg-theme-secondary text-theme-textPrimary'}`}
                     >
                       {day.name}
                     </button>
                   )) :
                   !sortDayData.specialOptions.length && (
-                    <div className="text-sm text-theme-textSecondary px-4 py-2">Loading...</div>
+                    <div className="text-sm text-theme-textSecondary px-3 py-1.5">Loading...</div>
                   )
                 }
               </div>
             </div>
           )}
         </div>
+
+        <span className="text-theme-textSecondary opacity-50">|</span>
+
+        {/* Order Toggle */}
+        <button
+          onClick={() => setIsReversed(!isReversed)}
+          className="text-sm font-medium text-theme-textPrimary hover:text-theme-accent transition-colors duration-200"
+        >
+          {isReversed ? '↑ Reverse' : '↓ Normal'}
+        </button>
       </div>
     </div>
   );
