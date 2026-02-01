@@ -45,9 +45,6 @@ export function UtilityBar({
   const elevationText = selectedElevation === 'bot' ? 'Base Forecast' :
                        selectedElevation === 'mid' ? 'Mid Forecast' : 'Peak Forecast';
 
-  const sortText = selectedSort === 'temperature' ? 'Sort by Temperature' :
-                   selectedSort === 'snowfall' ? 'Sort by Snowfall' : 'Sort by Wind';
-
   const sortDayData = getSortDayData(selectedResorts, allWeatherData, processResortData, selectedElevation);
   const sortDayText = getSortDayText(selectedSortDay, sortDayData);
 
