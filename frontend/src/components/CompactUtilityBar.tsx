@@ -95,9 +95,10 @@ export function CompactUtilityBar({
 
                 <span className="compact-bar-separator">|</span>
 
-                {/* Sort Group - No separators between items */}
+                {/* Sort Group */}
                 <div className="inline-flex items-center gap-2">
-                    {/* Sort - Inline options like elevation */}
+                    {/* Sort: label + inline options */}
+                    <span className="compact-bar-text text-theme-textSecondary">Sort:</span>
                     {(['temperature', 'snowfall', 'wind'] as SortOption[]).map((sort) => (
                         <button
                             key={sort}
@@ -111,7 +112,8 @@ export function CompactUtilityBar({
                         </button>
                     ))}
 
-                    {/* Sort Day - Dropdown (the only dropdown) */}
+                    {/* Within: label + dropdown */}
+                    <span className="compact-bar-text text-theme-textSecondary ml-1">Within:</span>
                     <div className="relative inline-block" data-dropdown>
                         <button
                             onClick={() => setShowSortDayMenu(!showSortDayMenu)}
@@ -173,7 +175,7 @@ export function CompactUtilityBar({
                         onClick={() => setIsReversed(!isReversed)}
                         className="compact-bar-text text-theme-textSecondary hover:text-theme-accent transition-colors"
                     >
-                        {isReversed ? '↑ Descending' : '↓ Ascending'}
+                        {isReversed ? '↑' : '↓'}
                     </button>
                 </div>
             </div>
