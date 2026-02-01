@@ -411,16 +411,6 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
     });
   }, []);
 
-  // Expand all nodes
-  const handleExpandAll = useCallback(() => {
-    setExpandedNodes(new Set(allNodeIds));
-  }, [allNodeIds]);
-
-  // Collapse all nodes
-  const handleCollapseAll = useCallback(() => {
-    setExpandedNodes(new Set());
-  }, []);
-
   // Auto-focus input on open
   useEffect(() => {
     if (isOpen && inputRef.current) {
