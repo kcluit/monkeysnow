@@ -110,27 +110,21 @@ export function CompactUtilityBar({
 
                 <span className="compact-bar-separator">|</span>
 
-                {/* Reverse Order - Toggle */}
-                <button
-                    onClick={() => setIsReversed(!isReversed)}
-                    className="compact-bar-text text-theme-textSecondary hover:text-theme-accent transition-colors"
-                >
-                    {isReversed ? '↑ Reverse' : '↓ Normal'}
-                </button>
+                {/* Sort Group - No separators between items */}
+                <div className="inline-flex items-center gap-2">
+                    {/* Sort - Cycle button with prefix */}
+                    <span className="text-theme-textSecondary">Sort:</span>
+                    <button
+                        onClick={cycleSort}
+                        className="compact-bar-text text-theme-textSecondary hover:text-theme-accent transition-colors inline-flex items-center gap-1"
+                    >
+                        {getSortText()}
+                        <svg className="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                    </button>
 
-                <span className="compact-bar-separator">|</span>
-
-                {/* Sort - Cycle button */}
-                <button
-                    onClick={cycleSort}
-                    className="compact-bar-text text-theme-textSecondary hover:text-theme-accent transition-colors"
-                >
-                    {getSortText()}
-                </button>
-
-                <span className="compact-bar-separator">|</span>
-
-                {/* Sort Day - Dropdown (the only dropdown) */}
+                    {/* Sort Day - Dropdown (the only dropdown) */}
                 <div className="relative inline-block" data-dropdown>
                     <button
                         onClick={() => setShowSortDayMenu(!showSortDayMenu)}
