@@ -14,6 +14,7 @@ import type { UnitSystem } from '../../types';
 interface DetailedResortViewPropsWithUnits extends DetailedResortViewProps {
     unitSystem: UnitSystem;
     showUtilityBar: boolean;
+    onBack: () => void;
 }
 
 // Default aggregation colors
