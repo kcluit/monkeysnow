@@ -115,6 +115,21 @@ export const themes: Theme[] = [
             specialColor: '#bd93f9',
         },
     },
+    {
+        id: 'macroblank',
+        name: 'Macroblank',
+        isDark: true,
+        colors: {
+            background: '#b2d2c8',
+            cardBg: '#b2d2c8',
+            textPrimary: '#490909',
+            textSecondary: '#717977',
+            accent: '#c13117',
+            secondary: 'rgba(197, 221, 210, 1)',
+            titleColor: '#490909',
+            specialColor: 'linear-gradient(90deg, #c13117, #61706b)',
+        },
+    }
 ];
 
 export function getThemeById(id: string): Theme | undefined {
