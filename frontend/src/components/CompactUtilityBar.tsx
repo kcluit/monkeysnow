@@ -54,14 +54,6 @@ export function CompactUtilityBar({
         }
     };
 
-    const getSortText = (): string => {
-        switch (selectedSort) {
-            case 'temperature': return 'Temperature';
-            case 'snowfall': return 'Snowfall';
-            case 'wind': return 'Wind';
-        }
-    };
-
     return (
         <div className="compact-utility-bar mb-8 flex justify-center">
             <div className="compact-utility-bar-inner inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-theme-secondary">
