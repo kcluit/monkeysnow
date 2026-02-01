@@ -143,7 +143,7 @@ export function UtilityBar({
               setShowSortDayMenu(false);
               setShowViewModeMenu(false);
             }}
-            className="inline-flex items-center gap-1 text-sm font-medium text-theme-textPrimary hover:text-theme-accent transition-colors duration-200"
+            className="inline-flex items-center gap-1 text-sm text-theme-textSecondary hover:text-theme-accent transition-colors duration-200"
           >
             <span className="capitalize">
               {selectedSort === 'temperature' ? 'Temperature' :
