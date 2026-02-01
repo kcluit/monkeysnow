@@ -50,7 +50,6 @@ export function UtilityBar({
         <button
           onClick={() => {
             openResortModal();
-            setShowElevationMenu(false);
             setShowSortMenu(false);
             setShowSortDayMenu(false);
             setShowViewModeMenu(false);
