@@ -149,7 +149,7 @@ export function UtilityBar({
                   }}
                   className={`w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors duration-200 ${viewMode === 'default' ? 'bg-theme-secondary text-theme-accent font-medium' : 'hover:bg-theme-secondary text-theme-textPrimary'}`}
                 >
-                  Default
+                  Default View
                 </button>
                 <button
                   onClick={() => {
