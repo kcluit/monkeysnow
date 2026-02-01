@@ -133,6 +133,9 @@ export const icons = {
   home: faHouse,
   info: faCircleInfo,
   settings: faGear,
+
+  // Modal controls
+  close: faXmark,
 } as const;
 
 export type IconKey = keyof typeof icons;
