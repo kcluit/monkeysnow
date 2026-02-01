@@ -20,7 +20,7 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
 
     return (
         <div
-            className={`resort-card rounded-3xl p-5 shadow-lg mb-6 ${onResortClick ? "cursor-pointer" : ""}`}
+            className={`resort-card rounded-3xl p-5 shadow-lg mb-6 transition-all duration-300 ${onResortClick ? "cursor-pointer" : ""}`}
             onClick={() => onResortClick?.(resort.id)}
         >
             <div className="flex justify-between items-center mb-4">
