@@ -8,6 +8,7 @@ import {
   faMinus,
   faChevronRight,
   faChevronDown,
+  faChevronLeft,
   faCaretRight,
   faCaretDown,
   // Command palette - main menu
