@@ -136,14 +136,14 @@ export function UtilityBar({
       <div className="inline-flex items-center gap-3 bg-theme-background border border-theme-border rounded-lg px-4 py-2 shadow-sm">
         {/* Sort Dropdown */}
         <div className="relative inline-flex items-center" data-dropdown>
-          <span className="text-sm text-theme-textPrimary mr-1.5">Sort:</span>
+          <span className="text-sm text-theme-textSecondary mr-1.5">Sort:</span>
           <button
             onClick={() => {
               setShowSortMenu(!showSortMenu);
               setShowSortDayMenu(false);
               setShowViewModeMenu(false);
             }}
-            className="inline-flex items-center gap-1 text-sm text-theme-textSecondary hover:text-theme-accent transition-colors duration-200"
+            className="inline-flex items-center gap-1 text-sm text-theme-textPrimary hover:text-theme-accent transition-colors duration-200"
           >
             <span className="capitalize">
               {selectedSort === 'temperature' ? 'Temperature' :
