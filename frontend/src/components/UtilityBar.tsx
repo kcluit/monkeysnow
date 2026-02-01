@@ -142,7 +142,6 @@ export function UtilityBar({
           <button
             onClick={() => {
               setShowSortMenu(!showSortMenu);
-              setShowElevationMenu(false);
               setShowSortDayMenu(false);
               setShowViewModeMenu(false);
             }}
