@@ -554,14 +554,13 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
               spellCheck={false}
             />
           </div>
-          <div className="resort-grid-actions">
-            <button
-              className="resort-grid-action-btn"
-              onClick={allExpanded ? handleCollapseAll : handleExpandAll}
-            >
-              {allExpanded ? 'Collapse All' : 'Expand All'}
-            </button>
-          </div>
+          <button
+            className="resort-grid-close-btn"
+            onClick={closeModal}
+            aria-label="Close"
+          >
+            <Icon icon={icons.close} />
+          </button>
         </div>
 
         {/* Grid content */}
