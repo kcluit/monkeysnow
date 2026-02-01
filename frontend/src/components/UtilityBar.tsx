@@ -192,7 +192,7 @@ export function UtilityBar({
 
         {/* Sort Day Dropdown */}
         <div className="relative inline-flex items-center" data-dropdown>
-          <span className="text-sm text-theme-textSecondary mr-1.5">Within:</span>
+          <span className="text-sm text-theme-textPrimary mr-1.5">Within:</span>
           <button
             onClick={() => {
               setShowSortDayMenu(!showSortDayMenu);
