@@ -19,12 +19,12 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
     const elevationLabel = selectedElevation === 'bot' ? 'Base' : selectedElevation === 'mid' ? 'Mid' : 'Peak';
 
     return (
-        <div className="resort-card rounded-3xl p-5 shadow-lg mb-6 transition-all duration-300">
+        <div
+            className={`resort-card rounded-3xl p-5 shadow-lg mb-6 ${onResortClick ? "cursor-pointer" : ""}`}
+            onClick={() => onResortClick?.(resort.id)}
+        >
             <div className="flex justify-between items-center mb-4">
-                <div
-                    className={onResortClick ? "cursor-pointer hover:opacity-80 transition-opacity" : ""}
-                    onClick={() => onResortClick?.(resort.id)}
-                >
+                <div>
                     <h2 className="text-2xl font-bold text-theme-textPrimary">{resort.name}</h2>
                     <p className="text-sm font-medium text-theme-accent">{elevationLabel} Elevation: {resort.elevation}</p>
                 </div>
