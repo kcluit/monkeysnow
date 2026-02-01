@@ -77,6 +77,7 @@ export const icons = {
   // Navigation
   chevronRight: faChevronRight,
   chevronDown: faChevronDown,
+  chevronLeft: faChevronLeft,
   caretRight: faCaretRight,
   caretDown: faCaretDown,
 
