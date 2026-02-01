@@ -192,14 +192,14 @@ export function UtilityBar({
 
         {/* Sort Day Dropdown */}
         <div className="relative inline-flex items-center" data-dropdown>
-          <span className="text-sm text-theme-textPrimary mr-1.5">Within:</span>
+          <span className="text-sm text-theme-textSecondary mr-1.5">Within:</span>
           <button
             onClick={() => {
               setShowSortDayMenu(!showSortDayMenu);
               setShowSortMenu(false);
               setShowViewModeMenu(false);
             }}
-            className="inline-flex items-center gap-1 text-sm text-theme-textSecondary hover:text-theme-accent transition-colors duration-200"
+            className="inline-flex items-center gap-1 text-sm text-theme-textPrimary hover:text-theme-accent transition-colors duration-200"
           >
             <span>{sortDayText}</span>
             <svg className="h-3.5 w-3.5 text-theme-textSecondary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
