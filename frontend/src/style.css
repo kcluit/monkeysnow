@@ -1577,9 +1577,9 @@ input[type="checkbox"] {
     border-color: transparent;
 }
 
-.rainbow-mode .resort-grid-action-btn:hover {
+.rainbow-mode .resort-grid-close-btn:hover {
     background: linear-gradient(90deg, #5E5CE6, #BF5AF2);
-    border-color: transparent;
+    color: #ffffff;
 }
 
 /* Compact Utility Bar - MonkeyType style */
