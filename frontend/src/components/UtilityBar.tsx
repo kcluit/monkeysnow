@@ -40,9 +40,6 @@ export function UtilityBar({
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  const elevationText = selectedElevation === 'bot' ? 'Base Forecast' :
-                       selectedElevation === 'mid' ? 'Mid Forecast' : 'Peak Forecast';
-
   const sortDayData = getSortDayData(selectedResorts, allWeatherData, processResortData, selectedElevation);
   const sortDayText = getSortDayText(selectedSortDay, sortDayData);
 
