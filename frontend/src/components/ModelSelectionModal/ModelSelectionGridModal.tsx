@@ -514,9 +514,6 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
     }
   };
 
-  // Check if all nodes are expanded
-  const allExpanded = expandedNodes.size === allNodeIds.size;
-
   // Get total selection count
   const getTotalCount = (): string => {
     const modelCount = selectedModels.length;
