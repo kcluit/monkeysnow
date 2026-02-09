@@ -34,6 +34,7 @@ import {
   faSquare,
   faCalendarDays,
   faLink,
+  faCloud,
   // Theme icons
   faMoon,
   faSun,
