@@ -2927,6 +2927,13 @@ input[type="checkbox"] {
     transform: translateY(-1px);
 }
 
+/* Contributors grid */
+.about-contributors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(13em, 1fr));
+    gap: 0.25rem 1rem;
+}
+
 /* Rainbow mode for about page */
 .rainbow-mode .about-section-title,
 .rainbow-mode .about-subsection-title {
