@@ -46,15 +46,11 @@ interface ResortMapProps {
 // Inner component to invalidate map size after resize
 function MapResizeHandler({ isExpanded }: { isExpanded: boolean }): null {
     const map = useMap();
-    // Invalidate size after CSS transition completes
-    useState(() => {
+    useEffect(() => {
+        // Invalidate size after CSS transition completes
         const timeout = setTimeout(() => map.invalidateSize(), 350);
         return () => clearTimeout(timeout);
-    });
-    // Re-run on isExpanded change
-    useState(() => {
-        void isExpanded;
-    });
+    }, [map, isExpanded]);
     return null;
 }
 
