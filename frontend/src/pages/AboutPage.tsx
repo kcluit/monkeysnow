@@ -53,6 +53,8 @@ function Subsection({ title, icon, children }: SubsectionProps): JSX.Element {
 }
 
 export function AboutPage(): JSX.Element {
+    const { contributors, loading, error } = useGitHubContributors();
+
     return (
         <div className="about-page">
 
