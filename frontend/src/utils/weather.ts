@@ -180,13 +180,7 @@ function createPeriodFromData(data: PeriodData, label: string, temperatureMetric
     } else if (snowQuality === 'rain') {
         // It's rain - show rain, zero snow
         snowValue = 0;
-        if (snowfallEstimateMode === 'totalPrecip') {
-            // In totalPrecip mode, convert estimate cm back to mm
-            rainValue = (data.snowfall_estimate ?? 0) * 10;
-        } else {
-            // Model mode - use backend's rain_total
-            rainValue = data.rain_total ?? 0;
-        }
+        rainValue = data.rain_total ?? 0;
     } else {
         // It's snow - show snow, zero rain
         rainValue = 0;
