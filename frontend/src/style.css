@@ -2615,6 +2615,10 @@ input[type="checkbox"] {
     transition: height 0.3s ease;
 }
 
+.resort-map-container .leaflet-container {
+    height: 100% !important;
+}
+
 .resort-map-expanded {
     height: 500px;
 }
