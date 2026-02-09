@@ -272,7 +272,7 @@ function estimateHourlySnow(tempC: number, humidity: number, snowfallCm: number)
     const snowFraction = calculateSnowFraction(wetBulb);
     const ratio = getKucheraRatio(wetBulb);
 
-    // Convert Open-Meteo snowfall (cm) to snowfall water equivalent (mm) using density factor 0.7
+    // Convert Open-Meteo snowfall (cm) to snowfall water equivalent (mm) using open-meteo's 0.7 factor
     const sweMm = snowfallCm / 0.7;
     const snowMm = sweMm * ratio;
     const snowCm = snowMm / 10;
