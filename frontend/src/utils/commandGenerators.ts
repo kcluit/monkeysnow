@@ -30,6 +30,9 @@ export interface ControlCommandParams {
   // Snowfall Estimate Mode
   snowfallEstimateMode: SnowfallEstimateMode;
   setSnowfallEstimateMode: (m: SnowfallEstimateMode) => void;
+  // Weather Model
+  weatherModel: WeatherModelSetting;
+  setWeatherModel: (m: WeatherModelSetting) => void;
   // Utility Bar visibility
   showUtilityBar: boolean;
   setShowUtilityBar: (show: boolean) => void;
