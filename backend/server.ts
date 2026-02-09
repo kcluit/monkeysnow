@@ -403,6 +403,10 @@ const updateWeatherData = async () => {
         mainResp: any,
         freezingResp: any
     ) => {
+        if (!mainResp || !mainResp.hourly()) {
+            console.warn('Skipping location: missing response or hourly data');
+            return null;
+        }
         const utcOffset = mainResp.utcOffsetSeconds();
         const hourly = mainResp.hourly()!;
 
