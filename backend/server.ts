@@ -267,14 +267,14 @@ function getSnowQuality(wetBulbC: number, snowFraction: number): SnowQuality {
     return 'dry_snow'; // -4 to -12 and < -18
 }
 
-function estimateHourlySnow(tempC: number, humidity: number, precipMm: number): HourlySnowEstimate {
+function estimateHourlySnow(tempC: number, humidity: number, snowfallCm: number): HourlySnowEstimate {
     const wetBulb = calculateWetBulb(tempC, humidity);
     const snowFraction = calculateSnowFraction(wetBulb);
     const ratio = getKucheraRatio(wetBulb);
 
-    // Only multiply the "snow fraction" of precip by the ratio
-    const effectiveSnowPrecipMm = precipMm; //* snowFraction;
-    const snowMm = effectiveSnowPrecipMm * ratio;
+    // Convert Open-Meteo snowfall (cm) to snowfall water equivalent (mm) using density factor 0.7
+    const sweMm = snowfallCm / 0.7;
+    const snowMm = sweMm * ratio;
     const snowCm = snowMm / 10;
 
     return {
