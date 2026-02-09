@@ -82,12 +82,12 @@ export function ResortMap({
     }, []);
 
     return (
-        <div className="relative">
+        <div className={`relative resort-map-container ${isExpanded ? 'resort-map-expanded' : ''}`}>
             <MapContainer
                 center={[lat, lon]}
                 zoom={11}
                 scrollWheelZoom={true}
-                className={`rounded-xl shadow-lg resort-map-container ${isExpanded ? 'resort-map-expanded' : ''} ${className}`}
+                className={`h-full rounded-xl shadow-lg ${className}`}
                 style={{ zIndex: 0 }}
             >
                 <TileLayer
