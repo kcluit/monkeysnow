@@ -43,6 +43,21 @@ interface ResortMapProps {
     isLoadingElevation?: boolean;
 }
 
+// Inner component to invalidate map size after resize
+function MapResizeHandler({ isExpanded }: { isExpanded: boolean }): null {
+    const map = useMap();
+    // Invalidate size after CSS transition completes
+    useState(() => {
+        const timeout = setTimeout(() => map.invalidateSize(), 350);
+        return () => clearTimeout(timeout);
+    });
+    // Re-run on isExpanded change
+    useState(() => {
+        void isExpanded;
+    });
+    return null;
+}
+
 // Inner component to handle map click events
 function MapClickHandler({ onClick }: { onClick: (lat: number, lon: number) => void }): null {
     useMapEvents({
