@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { UtilityBarProps, SortDay, ElevationLevel, SortOption, ViewMode } from '../types';
 import { getSortDayData, getSortDayText } from '../utils/sortDayHelpers';
+import { MobileSortModal } from './MobileSortModal';
 
 interface ExtendedCompactUtilityBarProps extends UtilityBarProps {
     openResortModal: () => void;
