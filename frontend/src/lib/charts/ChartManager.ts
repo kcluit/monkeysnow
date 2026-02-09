@@ -463,13 +463,13 @@ export class ChartManager {
         const plugins: uPlot.Plugin[] = [];
 
         if (dataZoom?.enabled) {
-            plugins.push(createZoomPlugin({
-                onZoom: (min, max) => {
-                    if (isChartZoomSyncEnabled(this.chartId)) {
-                        broadcastZoomChange(min, max, this.chartId);
-                    }
+            const onZoomChange = (min: number, max: number) => {
+                if (isChartZoomSyncEnabled(this.chartId)) {
+                    broadcastZoomChange(min, max, this.chartId);
                 }
-            }));
+            };
+            plugins.push(createZoomPlugin({ onZoom: onZoomChange }));
+            plugins.push(createTouchPlugin({ onZoom: onZoomChange }));
         }
 
         const bandSeries = series.filter((s) => s.type === 'band' && s.bandData);
