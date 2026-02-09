@@ -75,6 +75,11 @@ export function ResortMap({
     isLoadingElevation,
 }: ResortMapProps): JSX.Element {
     const hasCustomLocation = customLocation !== null && customLocation !== undefined;
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    const toggleExpanded = useCallback(() => {
+        setIsExpanded(prev => !prev);
+    }, []);
 
     return (
         <div className="relative">
@@ -82,13 +87,16 @@ export function ResortMap({
                 center={[lat, lon]}
                 zoom={11}
                 scrollWheelZoom={true}
-                className={`h-[200px] rounded-xl shadow-lg ${className}`}
+                className={`rounded-xl shadow-lg resort-map-container ${isExpanded ? 'resort-map-expanded' : ''} ${className}`}
                 style={{ zIndex: 0 }}
             >
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
+
+                {/* Resize handler to invalidate map on expand/collapse */}
+                <MapResizeHandler isExpanded={isExpanded} />
 
                 {/* Click handler */}
                 {onMapClick && <MapClickHandler onClick={onMapClick} />}
@@ -125,6 +133,22 @@ export function ResortMap({
                     </Marker>
                 )}
             </MapContainer>
+
+            {/* Expand/collapse button */}
+            <button
+                type="button"
+                onClick={toggleExpanded}
+                className="resort-map-expand-btn"
+                title={isExpanded ? 'Collapse map' : 'Expand map'}
+            >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    {isExpanded ? (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    ) : (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                    )}
+                </svg>
+            </button>
         </div>
     );
 }
