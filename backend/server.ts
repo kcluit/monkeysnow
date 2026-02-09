@@ -379,11 +379,12 @@ const updateWeatherData = async () => {
             const indices = resortChunks[chunkIdx];
             const chunkSize = indices.length;
 
-            // Wait between chunks to respect Open-Meteo's per-minute rate limit
-            if (chunkIdx > 0) {
+            // Wait between API calls to respect Open-Meteo's per-minute rate limit
+            if (!isFirstBatch) {
                 console.log(`  Waiting ${BATCH_DELAY_MS / 1000}s before next chunk...`);
                 await new Promise(resolve => setTimeout(resolve, BATCH_DELAY_MS));
             }
+            isFirstBatch = false;
 
             console.log(`  Fetching ${country} chunk ${chunkIdx + 1}/${totalChunks} (${chunkSize} resorts)...`);
 
