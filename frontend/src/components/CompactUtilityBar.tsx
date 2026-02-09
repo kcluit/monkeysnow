@@ -205,6 +205,20 @@ export function CompactUtilityBar({
                     Sort
                 </button>
             </div>
+
+            {/* Mobile Sort & Filter Modal */}
+            <MobileSortModal
+                isOpen={showMobileSortModal}
+                onClose={() => setShowMobileSortModal(false)}
+                selectedSort={selectedSort}
+                setSelectedSort={setSelectedSort}
+                selectedSortDay={selectedSortDay}
+                setSelectedSortDay={setSelectedSortDay}
+                sortDayData={sortDayData}
+                sortDayText={sortDayText}
+                isReversed={isReversed}
+                setIsReversed={setIsReversed}
+            />
         </div>
     );
 }
