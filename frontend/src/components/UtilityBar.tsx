@@ -321,7 +321,10 @@ export function UtilityBar({
 
         {/* Sort & Filter Button - Opens Modal */}
         <button
-          onClick={() => setShowMobileSortModal(true)}
+          onClick={() => {
+            setShowMobileSortModal(true);
+            setShowViewModeMenu(false);
+          }}
           className="flex-1 bg-theme-background border border-theme-border rounded-lg px-4 py-2 text-sm font-medium text-theme-textPrimary shadow-sm hover:bg-theme-secondary transition-colors duration-200 flex items-center justify-center gap-2"
         >
           <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
