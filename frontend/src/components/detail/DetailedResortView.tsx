@@ -14,6 +14,7 @@ import type { UnitSystem } from '../../types';
 interface DetailedResortViewPropsWithUnits extends DetailedResortViewProps {
     unitSystem: UnitSystem;
     showUtilityBar: boolean;
+    utilityBarStyle: import('../../types').UtilityBarStyle;
     onBack: () => void;
 }
 
