@@ -99,6 +99,7 @@ function ResortDetailRoute({
                 location={resortLocation}
                 unitSystem={unitSystem}
                 showUtilityBar={showUtilityBar}
+                utilityBarStyle={utilityBarStyle}
                 onBack={handleBack}
             />
         </Suspense>
