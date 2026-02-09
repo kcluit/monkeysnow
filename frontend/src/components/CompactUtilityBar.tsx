@@ -196,7 +196,10 @@ export function CompactUtilityBar({
                 {/* Mobile: Sort & Filter button */}
                 <span className="compact-bar-separator inline md:hidden">|</span>
                 <button
-                    onClick={() => setShowMobileSortModal(true)}
+                    onClick={() => {
+                        setShowSortDayMenu(false);
+                        setShowMobileSortModal(true);
+                    }}
                     className="compact-bar-text text-theme-textSecondary hover:text-theme-accent transition-colors inline-flex md:hidden items-center gap-1"
                 >
                     <svg className="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
