@@ -298,6 +298,23 @@ export function generateSnowfallEstimateCommands(
 }
 
 /**
+ * Generate weather model submenu commands with checkmarks.
+ */
+export function generateWeatherModelCommands(
+  weatherModel: WeatherModelSetting,
+  setWeatherModel: (m: WeatherModelSetting) => void
+): Command[] {
+  return [
+    {
+      id: 'weathermodel-auto',
+      name: 'Auto',
+      icon: weatherModel === 'auto' ? icons.check : undefined,
+      action: () => setWeatherModel('auto'),
+    },
+  ];
+}
+
+/**
  * Generate unit system submenu commands with checkmarks.
  */
 export function generateUnitSystemCommands(
