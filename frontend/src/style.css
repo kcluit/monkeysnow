@@ -453,6 +453,14 @@ input[type="checkbox"] {
         opacity: 0;
         pointer-events: none;
     }
+
+    .logo-text {
+        padding-left: 2em;
+    }
+
+    .header-content {
+        gap: 0.25rem;
+    }
 }
 
 /* Command Palette Styles */
