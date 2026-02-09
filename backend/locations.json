@@ -28,8 +28,8 @@
                     "mid": 1905,
                     "top": 2286,
                     "loc": [
-                        49.72680,
-                        -118.93630
+                        49.7268,
+                        -118.9363
                     ]
                 },
                 "Cypress-Mountain": {
@@ -39,7 +39,7 @@
                     "top": 1439,
                     "loc": [
                         49.397121,
-                        -123.203750
+                        -123.20375
                     ]
                 },
                 "Fairmont-Hot-Springs": {
@@ -118,7 +118,7 @@
                     "mid": 1572,
                     "top": 1788,
                     "loc": [
-                        49.07410,
+                        49.0741,
                         -120.91295
                     ]
                 },
@@ -168,7 +168,7 @@
                     "mid": 876,
                     "top": 1141,
                     "loc": [
-                        54.52450,
+                        54.5245,
                         -124.20145
                     ]
                 },
@@ -179,7 +179,7 @@
                     "top": 2400,
                     "loc": [
                         50.44394,
-                        -116.23010
+                        -116.2301
                     ]
                 },
                 "PowderKing": {
@@ -268,7 +268,7 @@
                     "mid": 1382,
                     "top": 1645,
                     "loc": [
-                        53.07630,
+                        53.0763,
                         -121.94197
                     ]
                 },
@@ -288,7 +288,7 @@
                     "mid": 1580,
                     "top": 2284,
                     "loc": [
-                        50.09630,
+                        50.0963,
                         -122.90164
                     ]
                 },
@@ -320,18 +320,18 @@
                     "mid": 2194,
                     "top": 2729,
                     "loc": [
-                        51.07890,
+                        51.0789,
                         -115.78182
                     ]
                 },
                 "Banff-Norquay": {
-                    "displayName": "Mt Norquay",
+                    "displayName": "Banff Mt Norquay",
                     "bot": 1539,
                     "mid": 1790,
                     "top": 2042,
                     "loc": [
-                        51.20254,
-                        -115.60481
+                        51.20387,
+                        -115.60686
                     ]
                 },
                 "Marmot-Basin": {
@@ -373,6 +373,710 @@
                         49.602808,
                         -114.450629
                     ]
+                },
+                "Calgary-Canada-Olympic-Park": {
+                    "displayName": "Canada Olympic Park",
+                    "bot": 1130,
+                    "mid": 1188,
+                    "top": 1246,
+                    "loc": [
+                        51.07906,
+                        -114.21558
+                    ]
+                },
+                "Eastlink-Park": {
+                    "displayName": "Eastlink Park",
+                    "bot": 277,
+                    "mid": 291,
+                    "top": 305,
+                    "loc": [
+                        54.13354,
+                        -115.65391
+                    ]
+                },
+                "Fortress-Mountain": {
+                    "displayName": "Fortress Mountain",
+                    "bot": 1800,
+                    "mid": 2150,
+                    "top": 2499,
+                    "loc": [
+                        50.82787,
+                        -115.20199
+                    ]
+                },
+                "Vista-Ridge": {
+                    "displayName": "Vista Ridge",
+                    "bot": 256,
+                    "mid": 313,
+                    "top": 370,
+                    "loc": [
+                        56.66517,
+                        -111.13257
+                    ]
+                }
+            },
+            "Manitoba": {
+                "Asessippi": {
+                    "displayName": "Asessippi Ski Area",
+                    "bot": 153,
+                    "mid": 229,
+                    "top": 305,
+                    "loc": [
+                        50.94775,
+                        -101.3342
+                    ]
+                },
+                "FalconRidge": {
+                    "displayName": "Falcon Ridge",
+                    "bot": 323,
+                    "mid": 346,
+                    "top": 369,
+                    "loc": [
+                        49.70388,
+                        -95.18872
+                    ]
+                },
+                "StonyMountain": {
+                    "displayName": "Stony Mountain",
+                    "bot": 232,
+                    "mid": 247,
+                    "top": 262,
+                    "loc": [
+                        50.09424,
+                        -97.2053
+                    ]
+                }
+            },
+            "New Brunswick": {
+                "CrabbeMountain": {
+                    "displayName": "Crabbe Mountain",
+                    "bot": 143,
+                    "mid": 272,
+                    "top": 402,
+                    "loc": [
+                        46.12444,
+                        -67.10684
+                    ]
+                }
+            },
+            "Newfoundland": {
+                "MarbleMountain": {
+                    "displayName": "Marble Mountain",
+                    "bot": 28,
+                    "mid": 287,
+                    "top": 546,
+                    "loc": [
+                        48.94316,
+                        -57.82948
+                    ]
+                }
+            },
+            "NS": {
+                "Ben-Eoin": {
+                    "displayName": "Ben Eoin",
+                    "bot": 7,
+                    "mid": 84,
+                    "top": 160,
+                    "loc": [
+                        45.97184,
+                        -60.43354
+                    ]
+                },
+                "CapeSmokey": {
+                    "displayName": "Ski Cape Smokey",
+                    "bot": 15,
+                    "mid": 168,
+                    "top": 320,
+                    "loc": [
+                        46.62542,
+                        -60.42652
+                    ]
+                },
+                "Ski-Martock": {
+                    "displayName": "Ski Martock",
+                    "bot": 29,
+                    "mid": 120,
+                    "top": 212,
+                    "loc": [
+                        44.93265,
+                        -64.16749
+                    ]
+                },
+                "Ski-Wentworth": {
+                    "displayName": "Ski Wentworth",
+                    "bot": 64,
+                    "mid": 183,
+                    "top": 302,
+                    "loc": [
+                        45.60773,
+                        -63.55456
+                    ]
+                }
+            },
+            "Ontario": {
+                "Mount-Antoine": {
+                    "displayName": "Antoine Mountain",
+                    "bot": 158,
+                    "mid": 254,
+                    "top": 351,
+                    "loc": [
+                        46.36443,
+                        -78.7394
+                    ]
+                },
+                "Batawa-Ski-Hill": {
+                    "displayName": "Batawa Ski Hill",
+                    "bot": 102,
+                    "mid": 120,
+                    "top": 137,
+                    "loc": [
+                        44.16514,
+                        -77.59592
+                    ]
+                },
+                "Blue-Mountain": {
+                    "displayName": "Blue Mountain",
+                    "bot": 230,
+                    "mid": 340,
+                    "top": 450,
+                    "loc": [
+                        44.45777,
+                        -80.28401
+                    ]
+                },
+                "Boler-Mountain-London-Ski-Club": {
+                    "displayName": "Boler Mountain",
+                    "bot": 267,
+                    "mid": 298,
+                    "top": 328,
+                    "loc": [
+                        42.94323,
+                        -81.34018
+                    ]
+                },
+                "Brimacombe": {
+                    "displayName": "Brimacombe",
+                    "bot": 220,
+                    "mid": 266,
+                    "top": 311,
+                    "loc": [
+                        44.02485,
+                        -78.57872
+                    ]
+                },
+                "Calabogie": {
+                    "displayName": "Calabogie",
+                    "bot": 154,
+                    "mid": 270,
+                    "top": 386,
+                    "loc": [
+                        45.26993,
+                        -76.78504
+                    ]
+                },
+                "Centennial-Park-Ski-Hill": {
+                    "displayName": "Centennial Park",
+                    "bot": 122,
+                    "mid": 137,
+                    "top": 152,
+                    "loc": [
+                        43.65531,
+                        -79.58965
+                    ]
+                },
+                "Chicopee": {
+                    "displayName": "Chicopee",
+                    "bot": 244,
+                    "mid": 274,
+                    "top": 305,
+                    "loc": [
+                        43.43462,
+                        -80.42016
+                    ]
+                },
+                "Dagmar-Ski-Resort": {
+                    "displayName": "Dagmar Ski Resort",
+                    "bot": 15,
+                    "mid": 53,
+                    "top": 91,
+                    "loc": [
+                        44.01055,
+                        -79.0588
+                    ]
+                },
+                "Earl-Bales-Ski-and-Snowboard-Centre": {
+                    "displayName": "Earl Bales Centre",
+                    "bot": 134,
+                    "mid": 144,
+                    "top": 155,
+                    "loc": [
+                        43.75304,
+                        -79.43014
+                    ]
+                },
+                "Glen-Eden-Ski-Area": {
+                    "displayName": "Glen Eden Ski Area",
+                    "bot": 303,
+                    "mid": 340,
+                    "top": 376,
+                    "loc": [
+                        43.50397,
+                        -79.9427
+                    ]
+                },
+                "Hidden-Valley-Highlands-Ski-Area": {
+                    "displayName": "Hidden Valley Highlands",
+                    "bot": 287,
+                    "mid": 338,
+                    "top": 389,
+                    "loc": [
+                        45.35404,
+                        -79.12985
+                    ]
+                },
+                "Hockley-Valley": {
+                    "displayName": "Hockley Valley Ski Resort",
+                    "bot": 312,
+                    "mid": 370,
+                    "top": 427,
+                    "loc": [
+                        43.97531,
+                        -80.04825
+                    ]
+                },
+                "Horseshoe-Resort": {
+                    "displayName": "Horseshoe Resort",
+                    "bot": 312,
+                    "mid": 359,
+                    "top": 406,
+                    "loc": [
+                        44.54584,
+                        -79.67316
+                    ]
+                },
+                "Lakeridge-Ski-Resort": {
+                    "displayName": "Lakeridge Ski Resort",
+                    "bot": 269,
+                    "mid": 314,
+                    "top": 360,
+                    "loc": [
+                        44.02903,
+                        -79.06073
+                    ]
+                },
+                "Loch-Lomond-Ski-Area": {
+                    "displayName": "Loch Lomond Ski Area",
+                    "bot": 213,
+                    "mid": 328,
+                    "top": 442,
+                    "loc": [
+                        48.294,
+                        -89.34597
+                    ]
+                },
+                "Mountain-View-Ski-Area": {
+                    "displayName": "Mountain View Ski Area",
+                    "bot": 233,
+                    "mid": 264,
+                    "top": 294,
+                    "loc": [
+                        44.74076,
+                        -79.91843
+                    ]
+                },
+                "Mt-St-Louis-Moonstone": {
+                    "displayName": "Mt St Louis Moonstone",
+                    "bot": 244,
+                    "mid": 320,
+                    "top": 396,
+                    "loc": [
+                        44.62673,
+                        -79.66792
+                    ]
+                },
+                "Pakenham": {
+                    "displayName": "Mount Pakenham",
+                    "bot": 137,
+                    "mid": 180,
+                    "top": 222,
+                    "loc": [
+                        45.32139,
+                        -76.33337
+                    ]
+                },
+                "Searchmont-Resort": {
+                    "displayName": "Searchmont Resort",
+                    "bot": 274,
+                    "mid": 381,
+                    "top": 488,
+                    "loc": [
+                        46.76794,
+                        -84.0405
+                    ]
+                },
+                "Sir-Sams-Ski-and-Snowboard": {
+                    "displayName": "Sir Sam's Ski & Snowboard",
+                    "bot": 265,
+                    "mid": 316,
+                    "top": 366,
+                    "loc": [
+                        45.12771,
+                        -78.48499
+                    ]
+                },
+                "Osler-Ski-Club": {
+                    "displayName": "Osler Bluff Ski Club",
+                    "bot": 303,
+                    "mid": 349,
+                    "top": 395,
+                    "loc": [
+                        44.45817,
+                        -80.28354
+                    ]
+                },
+                "Snow Valley Ski Resort": {
+                    "displayName": "Snow Valley Ski Resort",
+                    "bot": 232,
+                    "mid": 272,
+                    "top": 313,
+                    "loc": [
+                        44.41046,
+                        -79.79053
+                    ]
+                },
+                "Uplands-Ski-Centre": {
+                    "displayName": "Uplands Golf & Ski",
+                    "bot": 167,
+                    "mid": 182,
+                    "top": 197,
+                    "loc": [
+                        43.82462,
+                        -79.43962
+                    ]
+                }
+            },
+            "Quebec": {
+                "Camp-Fortune": {
+                    "displayName": "Camp Fortune",
+                    "bot": 110,
+                    "mid": 145,
+                    "top": 180,
+                    "loc": [
+                        45.50841,
+                        -75.85332
+                    ]
+                },
+                "Edelweiss": {
+                    "displayName": "Edelweiss Valley",
+                    "bot": 150,
+                    "mid": 250,
+                    "top": 350,
+                    "loc": [
+                        45.64211,
+                        -75.85047
+                    ]
+                },
+                "Le-Massif-Ski-Area": {
+                    "displayName": "Le Massif de Charlevoix",
+                    "bot": 36,
+                    "mid": 421,
+                    "top": 806,
+                    "loc": [
+                        47.27879,
+                        -70.60879
+                    ]
+                },
+                "Le-Massif-du-Sud": {
+                    "displayName": "Le Massif du Sud",
+                    "bot": 514,
+                    "mid": 714,
+                    "top": 914,
+                    "loc": [
+                        46.61316,
+                        -70.49004
+                    ]
+                },
+                "Mont-Adstock": {
+                    "displayName": "Mont Adstock",
+                    "bot": 377,
+                    "mid": 544,
+                    "top": 712,
+                    "loc": [
+                        46.03018,
+                        -71.19272
+                    ]
+                },
+                "Mont-Avila": {
+                    "displayName": "Mont Avila Ski Resort",
+                    "bot": 264,
+                    "mid": 358,
+                    "top": 452,
+                    "loc": [
+                        45.88182,
+                        -74.13643
+                    ]
+                },
+                "Mont-Belu": {
+                    "displayName": "Mont Belu",
+                    "bot": 130,
+                    "mid": 156,
+                    "top": 183,
+                    "loc": [
+                        48.32176,
+                        -70.83431
+                    ]
+                },
+                "Mont-Cascades": {
+                    "displayName": "Mont Cascades",
+                    "bot": 556,
+                    "mid": 636,
+                    "top": 716,
+                    "loc": [
+                        45.58871,
+                        -75.84995
+                    ]
+                },
+                "Mont-Edouard": {
+                    "displayName": "Mont Edouard",
+                    "bot": 183,
+                    "mid": 408,
+                    "top": 633,
+                    "loc": [
+                        48.16113,
+                        -70.28697
+                    ]
+                },
+                "Mont-Gabriel": {
+                    "displayName": "Mont Gabriel",
+                    "bot": 162,
+                    "mid": 262,
+                    "top": 362,
+                    "loc": [
+                        45.92024,
+                        -74.15578
+                    ]
+                },
+                "Mont-Grand-Fonds": {
+                    "displayName": "Mont Grand Fonds",
+                    "bot": 396,
+                    "mid": 565,
+                    "top": 734,
+                    "loc": [
+                        47.77045,
+                        -70.09213
+                    ]
+                },
+                "Mont-Habitant": {
+                    "displayName": "Mont Habitant",
+                    "bot": 178,
+                    "mid": 270,
+                    "top": 361,
+                    "loc": [
+                        45.87795,
+                        -74.17291
+                    ]
+                },
+                "Mont-Miller": {
+                    "displayName": "Mont Miller",
+                    "bot": 542,
+                    "mid": 682,
+                    "top": 822,
+                    "loc": [
+                        48.96337,
+                        -65.48588
+                    ]
+                },
+                "Mont-Olympia": {
+                    "displayName": "Ski Sommet Olympia",
+                    "bot": 185,
+                    "mid": 285,
+                    "top": 385,
+                    "loc": [
+                        45.91506,
+                        -74.11707
+                    ]
+                },
+                "MontOrford": {
+                    "displayName": "Mont Orford",
+                    "bot": 313,
+                    "mid": 583,
+                    "top": 853,
+                    "loc": [
+                        45.31603,
+                        -72.22931
+                    ]
+                },
+                "Mont-Rigaud": {
+                    "displayName": "Ski Mont Rigaud",
+                    "bot": 16,
+                    "mid": 34,
+                    "top": 53,
+                    "loc": [
+                        45.46591,
+                        -74.33573
+                    ]
+                },
+                "Mont-Saint-Sauveur": {
+                    "displayName": "Mont Saint Sauveur",
+                    "bot": 203,
+                    "mid": 310,
+                    "top": 416,
+                    "loc": [
+                        45.88164,
+                        -74.14759
+                    ]
+                },
+                "Mont-Sainte-Anne": {
+                    "displayName": "Mont Sainte-Anne",
+                    "bot": 175,
+                    "mid": 488,
+                    "top": 800,
+                    "loc": [
+                        47.08739,
+                        -70.93177
+                    ]
+                },
+                "Mont-Ste-Marie": {
+                    "displayName": "Mont Ste-Marie",
+                    "bot": 201,
+                    "mid": 392,
+                    "top": 582,
+                    "loc": [
+                        45.93933,
+                        -75.86708
+                    ]
+                },
+                "Mont-Sutton": {
+                    "displayName": "Mont Sutton",
+                    "bot": 511,
+                    "mid": 740,
+                    "top": 968,
+                    "loc": [
+                        45.09634,
+                        -72.55856
+                    ]
+                },
+                "Tremblant": {
+                    "displayName": "Mont Tremblant",
+                    "bot": 230,
+                    "mid": 552,
+                    "top": 875,
+                    "loc": [
+                        46.22048,
+                        -74.5529
+                    ]
+                },
+                "Owls-Head": {
+                    "displayName": "Owls Head",
+                    "bot": 207,
+                    "mid": 477,
+                    "top": 747,
+                    "loc": [
+                        45.07,
+                        -72.29467
+                    ]
+                },
+                "Ski-Bromont": {
+                    "displayName": "Ski Bromont",
+                    "bot": 168,
+                    "mid": 370,
+                    "top": 573,
+                    "loc": [
+                        45.28905,
+                        -72.63765
+                    ]
+                },
+                "Ski-La-Reserve": {
+                    "displayName": "Ski La Reserve",
+                    "bot": 315,
+                    "mid": 468,
+                    "top": 620,
+                    "loc": [
+                        46.28287,
+                        -74.18634
+                    ]
+                },
+                "Mont-Blanc---Faustin": {
+                    "displayName": "Ski Mont Blanc",
+                    "bot": 157,
+                    "mid": 307,
+                    "top": 457,
+                    "loc": [
+                        46.10418,
+                        -74.48662
+                    ]
+                },
+                "Ski-Morin-Heights": {
+                    "displayName": "Ski Morin Heights",
+                    "bot": 68,
+                    "mid": 168,
+                    "top": 268,
+                    "loc": [
+                        45.89933,
+                        -74.27063
+                    ]
+                },
+                "Station-du-Mont-Gleason": {
+                    "displayName": "Station Mont Gleason",
+                    "bot": 126,
+                    "mid": 216,
+                    "top": 306,
+                    "loc": [
+                        45.92868,
+                        -71.95642
+                    ]
+                },
+                "Stoneham-Mountain-Resort": {
+                    "displayName": "Stoneham Mountain Resort",
+                    "bot": 213,
+                    "mid": 423,
+                    "top": 633,
+                    "loc": [
+                        47.02638,
+                        -71.39204
+                    ]
+                },
+                "ValdIrene": {
+                    "displayName": "Val d'Irène",
+                    "bot": 430,
+                    "mid": 564,
+                    "top": 699,
+                    "loc": [
+                        48.4756,
+                        -67.57766
+                    ]
+                },
+                "Valinouet": {
+                    "displayName": "Station De Ski Valinouet",
+                    "bot": 460,
+                    "mid": 635,
+                    "top": 810,
+                    "loc": [
+                        48.64859,
+                        -70.89533
+                    ]
+                },
+                "Vorlage": {
+                    "displayName": "Centre Vorlage",
+                    "bot": 34,
+                    "mid": 103,
+                    "top": 172,
+                    "loc": [
+                        45.64588,
+                        -75.93611
+                    ]
+                }
+            },
+            "Saskatchewan": {
+                "DuckMountainSkiArea": {
+                    "displayName": "Duck Mountain",
+                    "bot": 206,
+                    "mid": 256,
+                    "top": 305,
+                    "loc": [
+                        51.56105,
+                        -101.61186
+                    ]
                 }
             }
         },
@@ -404,8 +1108,1182 @@
                     "mid": 1506,
                     "top": 1781,
                     "loc": [
-                        47.74050,
+                        47.7405,
                         -121.09404
+                    ]
+                }
+            },
+            "Alabama": {
+                "Cloudmont": {
+                    "displayName": "Cloudmont Ski Resort",
+                    "bot": 460,
+                    "mid": 481,
+                    "top": 502,
+                    "loc": [
+                        34.5343,
+                        -85.60156
+                    ]
+                }
+            },
+            "Alaska": {
+                "ArcticValley": {
+                    "displayName": "Arctic Valley Ski Area",
+                    "bot": 762,
+                    "mid": 976,
+                    "top": 1189,
+                    "loc": [
+                        61.24625,
+                        -149.52667
+                    ]
+                },
+                "Alyeska-Resort": {
+                    "displayName": "Alyeska Resort",
+                    "bot": 76,
+                    "mid": 457,
+                    "top": 838,
+                    "loc": [
+                        60.95911,
+                        -149.08748
+                    ]
+                },
+                "Eaglecrest-Ski-Area": {
+                    "displayName": "Eaglecrest Ski Area",
+                    "bot": 366,
+                    "mid": 579,
+                    "top": 792,
+                    "loc": [
+                        58.2692,
+                        -134.51094
+                    ]
+                },
+                "Hilltop-Ski-Area": {
+                    "displayName": "Hilltop Ski Area",
+                    "bot": 50,
+                    "mid": 95,
+                    "top": 140,
+                    "loc": [
+                        61.14076,
+                        -149.73816
+                    ]
+                }
+            },
+            "Arizona": {
+                "Arizona-Snowbowl": {
+                    "displayName": "Arizona Snowbowl",
+                    "bot": 2805,
+                    "mid": 3156,
+                    "top": 3506,
+                    "loc": [
+                        35.32931,
+                        -111.69821
+                    ]
+                },
+                "MtLemmonSkiValley": {
+                    "displayName": "Mount Lemmon Ski Valley",
+                    "bot": 2514,
+                    "mid": 2652,
+                    "top": 2791,
+                    "loc": [
+                        32.44476,
+                        -110.78092
+                    ]
+                },
+                "Sunrise-Park-Resort": {
+                    "displayName": "Sunrise Park Resort",
+                    "bot": 2835,
+                    "mid": 3094,
+                    "top": 3353,
+                    "loc": [
+                        33.95824,
+                        -109.56159
+                    ]
+                }
+            },
+            "California": {
+                "Shirley-Meadows": {
+                    "displayName": "Alta Sierra at Shirley Meadows",
+                    "bot": 1981,
+                    "mid": 2072,
+                    "top": 2164,
+                    "loc": [
+                        35.71012,
+                        -118.55944
+                    ]
+                },
+                "Bear-Mountain": {
+                    "displayName": "Bear Mountain",
+                    "bot": 2177,
+                    "mid": 2430,
+                    "top": 2684,
+                    "loc": [
+                        34.22064,
+                        -116.85921
+                    ]
+                },
+                "Bear-Valley": {
+                    "displayName": "Bear Valley",
+                    "bot": 2012,
+                    "mid": 2302,
+                    "top": 2593,
+                    "loc": [
+                        38.49085,
+                        -120.05083
+                    ]
+                },
+                "Big-Bear-Mountain": {
+                    "displayName": "Big Bear Mountain",
+                    "bot": 2179,
+                    "mid": 2432,
+                    "top": 2684,
+                    "loc": [
+                        34.22845,
+                        -116.89093
+                    ]
+                },
+                "Boreal-Mountain": {
+                    "displayName": "Boreal Mountain",
+                    "bot": 2195,
+                    "mid": 2286,
+                    "top": 2378,
+                    "loc": [
+                        39.32806,
+                        -120.3501
+                    ]
+                },
+                "China-Peak": {
+                    "displayName": "China Peak Ski",
+                    "bot": 2133,
+                    "mid": 2392,
+                    "top": 2652,
+                    "loc": [
+                        37.22824,
+                        -119.15821
+                    ]
+                },
+                "Sierra-Summit-Mountain-Resort": {
+                    "displayName": "Sierra Summit Resort",
+                    "bot": 2143,
+                    "mid": 2399,
+                    "top": 2655,
+                    "loc": [
+                        37.22575,
+                        -119.15995
+                    ]
+                },
+                "Dodge-Ridge": {
+                    "displayName": "Dodge Ridge Ski Resort",
+                    "bot": 2012,
+                    "mid": 2256,
+                    "top": 2499,
+                    "loc": [
+                        38.18758,
+                        -119.94304
+                    ]
+                },
+                "Donner-Ski-Ranch": {
+                    "displayName": "Donner Ski Ranch",
+                    "bot": 2143,
+                    "mid": 2252,
+                    "top": 2362,
+                    "loc": [
+                        39.32147,
+                        -120.33598
+                    ]
+                },
+                "Granlibakken": {
+                    "displayName": "Granlibakken Ski",
+                    "bot": 1923,
+                    "mid": 1969,
+                    "top": 2015,
+                    "loc": [
+                        39.15398,
+                        -120.15417
+                    ]
+                },
+                "Heavenly-Ski": {
+                    "displayName": "Heavenly Ski Resort",
+                    "bot": 2002,
+                    "mid": 2535,
+                    "top": 3068,
+                    "loc": [
+                        38.92977,
+                        -119.9035
+                    ]
+                },
+                "Homewood-Mountain-Resort": {
+                    "displayName": "Homewood Mountain Resort",
+                    "bot": 1899,
+                    "mid": 2150,
+                    "top": 2402,
+                    "loc": [
+                        39.07584,
+                        -120.17846
+                    ]
+                },
+                "June-Mountain": {
+                    "displayName": "June Mountain",
+                    "bot": 2300,
+                    "mid": 2694,
+                    "top": 3089,
+                    "loc": [
+                        37.75239,
+                        -119.0727
+                    ]
+                },
+                "Kirkwood-Mountain": {
+                    "displayName": "Kirkwood Ski Resort",
+                    "bot": 2377,
+                    "mid": 2682,
+                    "top": 2987,
+                    "loc": [
+                        38.67492,
+                        -120.06417
+                    ]
+                },
+                "Mammoth-Mountain": {
+                    "displayName": "Mammoth Mountain",
+                    "bot": 2424,
+                    "mid": 2896,
+                    "top": 3369,
+                    "loc": [
+                        37.6349,
+                        -119.0315
+                    ]
+                },
+                "Mountain-High-Resort": {
+                    "displayName": "Mountain High",
+                    "bot": 2012,
+                    "mid": 2256,
+                    "top": 2499,
+                    "loc": [
+                        34.37174,
+                        -117.69473
+                    ]
+                },
+                "Mt-Baldy": {
+                    "displayName": "Mt Baldy (California)",
+                    "bot": 1981,
+                    "mid": 2301,
+                    "top": 2621,
+                    "loc": [
+                        34.27264,
+                        -117.61087
+                    ]
+                },
+                "Mt-Shasta": {
+                    "displayName": "Mt Shasta",
+                    "bot": 1676,
+                    "mid": 1890,
+                    "top": 2103,
+                    "loc": [
+                        41.33384,
+                        -122.19483
+                    ]
+                },
+                "Northstar-at-Tahoe": {
+                    "displayName": "Northstar at Tahoe",
+                    "bot": 1941,
+                    "mid": 2282,
+                    "top": 2624,
+                    "loc": [
+                        39.25432,
+                        -120.13927
+                    ]
+                },
+                "Squaw-Valley-USA": {
+                    "displayName": "Palisades Tahoe",
+                    "bot": 1874,
+                    "mid": 2308,
+                    "top": 2743,
+                    "loc": [
+                        39.1875,
+                        -120.2524
+                    ]
+                },
+                "Alpine-Meadows": {
+                    "displayName": "Palisades Tahoe - Alpine Meadows",
+                    "bot": 2083,
+                    "mid": 2358,
+                    "top": 2632,
+                    "loc": [
+                        39.15799,
+                        -120.23824
+                    ]
+                },
+                "Royal-Gorge": {
+                    "displayName": "Royal Gorge",
+                    "bot": 1768,
+                    "mid": 2012,
+                    "top": 2255,
+                    "loc": [
+                        39.31943,
+                        -120.38398
+                    ]
+                },
+                "Sierra-at-Tahoe": {
+                    "displayName": "Sierra at Tahoe",
+                    "bot": 2023,
+                    "mid": 2360,
+                    "top": 2697,
+                    "loc": [
+                        38.79386,
+                        -120.08027
+                    ]
+                },
+                "Snow-Summit": {
+                    "displayName": "Snow Summit",
+                    "bot": 2133,
+                    "mid": 2316,
+                    "top": 2498,
+                    "loc": [
+                        34.22543,
+                        -116.89118
+                    ]
+                },
+                "Snow-Valley": {
+                    "displayName": "Snow Valley",
+                    "bot": 2041,
+                    "mid": 2215,
+                    "top": 2389,
+                    "loc": [
+                        34.21145,
+                        -117.03813
+                    ]
+                },
+                "Soda-Springs": {
+                    "displayName": "Soda Springs",
+                    "bot": 2057,
+                    "mid": 2156,
+                    "top": 2255,
+                    "loc": [
+                        39.31929,
+                        -120.38338
+                    ]
+                },
+                "StoverMountainSkiArea": {
+                    "displayName": "Stover Mountain",
+                    "bot": 1554,
+                    "mid": 1630,
+                    "top": 1707,
+                    "loc": [
+                        40.29,
+                        -121.29
+                    ]
+                },
+                "Sugar-Bowl": {
+                    "displayName": "Sugar Bowl",
+                    "bot": 2098,
+                    "mid": 2326,
+                    "top": 2555,
+                    "loc": [
+                        39.2992,
+                        -120.3339
+                    ]
+                },
+                "Tahoe-Donner": {
+                    "displayName": "Tahoe Donner",
+                    "bot": 2057,
+                    "mid": 2148,
+                    "top": 2240,
+                    "loc": [
+                        39.35179,
+                        -120.26085
+                    ]
+                },
+                "BadgerPassSkiArea": {
+                    "displayName": "Yosemite-Badger Pass",
+                    "bot": 2194,
+                    "mid": 2316,
+                    "top": 2438,
+                    "loc": [
+                        37.65909,
+                        -119.66311
+                    ]
+                }
+            },
+            "Colorado": {
+                "Arapahoe-Basin": {
+                    "displayName": "Arapahoe Basin",
+                    "bot": 3286,
+                    "mid": 3544,
+                    "top": 3801,
+                    "loc": [
+                        39.63161,
+                        -105.87164
+                    ]
+                },
+                "Aspen-Mountain": {
+                    "displayName": "Aspen Ski Resort",
+                    "bot": 2421,
+                    "mid": 2919,
+                    "top": 3417,
+                    "loc": [
+                        39.16261,
+                        -106.81955
+                    ]
+                },
+                "Aspen-Highlands": {
+                    "displayName": "Aspen Highlands",
+                    "bot": 2450,
+                    "mid": 3004,
+                    "top": 3558,
+                    "loc": [
+                        39.15782,
+                        -106.86625
+                    ]
+                },
+                "Beaver-Creek": {
+                    "displayName": "Beaver Creek",
+                    "bot": 2255,
+                    "mid": 2871,
+                    "top": 3487,
+                    "loc": [
+                        39.59669,
+                        -106.537
+                    ]
+                },
+                "Breckenridge": {
+                    "displayName": "Breckenridge",
+                    "bot": 2925,
+                    "mid": 3419,
+                    "top": 3913,
+                    "loc": [
+                        39.47582,
+                        -106.07429
+                    ]
+                },
+                "Buttermilk": {
+                    "displayName": "Buttermilk Ski Resort",
+                    "bot": 2399,
+                    "mid": 2708,
+                    "top": 3018,
+                    "loc": [
+                        39.19029,
+                        -106.87054
+                    ]
+                },
+                "Copper-Mountain": {
+                    "displayName": "Copper Mountain",
+                    "bot": 2959,
+                    "mid": 3356,
+                    "top": 3752,
+                    "loc": [
+                        39.48338,
+                        -106.16406
+                    ]
+                },
+                "Crested-Butte-Mountain": {
+                    "displayName": "Crested Butte",
+                    "bot": 2685,
+                    "mid": 3152,
+                    "top": 3618,
+                    "loc": [
+                        38.89771,
+                        -106.94538
+                    ]
+                },
+                "Cuchara-Mountain": {
+                    "displayName": "Cuchara Mountain",
+                    "bot": 2818,
+                    "mid": 3056,
+                    "top": 3294,
+                    "loc": [
+                        37.34386,
+                        -105.12908
+                    ]
+                },
+                "Durango-Mountain-Resort": {
+                    "displayName": "Durango Mountain Resort",
+                    "bot": 2679,
+                    "mid": 2988,
+                    "top": 3297,
+                    "loc": [
+                        37.62739,
+                        -107.83218
+                    ]
+                },
+                "EchoMountain": {
+                    "displayName": "Echo Mountain",
+                    "bot": 3139,
+                    "mid": 3246,
+                    "top": 3353,
+                    "loc": [
+                        39.68594,
+                        -105.5205
+                    ]
+                },
+                "Eldora-Mountain-Resort": {
+                    "displayName": "Eldora Mountain Resort",
+                    "bot": 2804,
+                    "mid": 3018,
+                    "top": 3231,
+                    "loc": [
+                        39.94067,
+                        -105.59458
+                    ]
+                },
+                "Hesperus": {
+                    "displayName": "Hesperus Ski Area",
+                    "bot": 2493,
+                    "mid": 2600,
+                    "top": 2706,
+                    "loc": [
+                        37.29744,
+                        -108.05736
+                    ]
+                },
+                "HowelsenHill": {
+                    "displayName": "Howelsen Hill Ski",
+                    "bot": 2041,
+                    "mid": 2108,
+                    "top": 2175,
+                    "loc": [
+                        40.48099,
+                        -106.83885
+                    ]
+                },
+                "KendallMountain": {
+                    "displayName": "Kendall Mountain",
+                    "bot": 2926,
+                    "mid": 2987,
+                    "top": 3048,
+                    "loc": [
+                        37.81138,
+                        -107.65463
+                    ]
+                },
+                "Keystone-Resort": {
+                    "displayName": "Keystone",
+                    "bot": 2764,
+                    "mid": 3240,
+                    "top": 3717,
+                    "loc": [
+                        39.57983,
+                        -105.9409
+                    ]
+                },
+                "Loveland": {
+                    "displayName": "Loveland Ski",
+                    "bot": 3231,
+                    "mid": 3551,
+                    "top": 3871,
+                    "loc": [
+                        39.67899,
+                        -105.90258
+                    ]
+                },
+                "Monarch-Ski-Area": {
+                    "displayName": "Monarch Ski Area",
+                    "bot": 3289,
+                    "mid": 3467,
+                    "top": 3645,
+                    "loc": [
+                        38.51194,
+                        -106.33723
+                    ]
+                },
+                "Powderhorn": {
+                    "displayName": "Powderhorn",
+                    "bot": 2499,
+                    "mid": 2750,
+                    "top": 3002,
+                    "loc": [
+                        39.06228,
+                        -108.15019
+                    ]
+                },
+                "Purgatory-Resort": {
+                    "displayName": "Purgatory Ski Resort",
+                    "bot": 2679,
+                    "mid": 2988,
+                    "top": 3297,
+                    "loc": [
+                        37.62474,
+                        -107.82635
+                    ]
+                },
+                "Silverton-Mountain": {
+                    "displayName": "Silverton Mountain",
+                    "bot": 3170,
+                    "mid": 3612,
+                    "top": 4054,
+                    "loc": [
+                        37.87899,
+                        -107.6631
+                    ]
+                },
+                "Ski-Cooper": {
+                    "displayName": "Ski Cooper",
+                    "bot": 3200,
+                    "mid": 3384,
+                    "top": 3567,
+                    "loc": [
+                        39.35756,
+                        -106.29092
+                    ]
+                },
+                "Snowmass": {
+                    "displayName": "Snowmass",
+                    "bot": 2469,
+                    "mid": 3140,
+                    "top": 3812,
+                    "loc": [
+                        39.18463,
+                        -106.94478
+                    ]
+                },
+                "Sol-Vista-Golf-and-Ski-Ranch-Silver-Creek": {
+                    "displayName": "SolVista Golf and Ski Ranch (Silver Creek)",
+                    "bot": 2500,
+                    "mid": 2652,
+                    "top": 2805,
+                    "loc": [
+                        40.04378,
+                        -105.90597
+                    ]
+                },
+                "Steamboat-Ski": {
+                    "displayName": "Steamboat Ski Resort",
+                    "bot": 2102,
+                    "mid": 2661,
+                    "top": 3220,
+                    "loc": [
+                        40.45831,
+                        -106.76754
+                    ]
+                },
+                "Sunlight-Mountain-Resort": {
+                    "displayName": "Sunlight Mountain Resort",
+                    "bot": 2403,
+                    "mid": 2709,
+                    "top": 3015,
+                    "loc": [
+                        39.39279,
+                        -107.33956
+                    ]
+                },
+                "Telluride": {
+                    "displayName": "Telluride",
+                    "bot": 2659,
+                    "mid": 3245,
+                    "top": 3831,
+                    "loc": [
+                        37.91934,
+                        -107.83154
+                    ]
+                },
+                "Vail": {
+                    "displayName": "Vail",
+                    "bot": 2474,
+                    "mid": 2986,
+                    "top": 3498,
+                    "loc": [
+                        39.60569,
+                        -106.3559
+                    ]
+                },
+                "Winter-Park": {
+                    "displayName": "Winter Park",
+                    "bot": 2742,
+                    "mid": 3208,
+                    "top": 3674,
+                    "loc": [
+                        39.87105,
+                        -105.77577
+                    ]
+                },
+                "Wolf-Creek-Ski-Area": {
+                    "displayName": "Wolf Creek Ski Area",
+                    "bot": 3140,
+                    "mid": 3384,
+                    "top": 3628,
+                    "loc": [
+                        37.46723,
+                        -106.79192
+                    ]
+                }
+            },
+            "Connecticut": {
+                "Mohawk-Mountain": {
+                    "displayName": "Mohawk Mountain",
+                    "bot": 293,
+                    "mid": 390,
+                    "top": 488,
+                    "loc": [
+                        41.83469,
+                        -73.30979
+                    ]
+                },
+                "Mount-Southington-Ski-Area": {
+                    "displayName": "Mount Southington Ski Area",
+                    "bot": 30,
+                    "mid": 95,
+                    "top": 160,
+                    "loc": [
+                        41.58156,
+                        -72.92839
+                    ]
+                },
+                "Powder-Ridge": {
+                    "displayName": "Powder Ridge",
+                    "bot": 76,
+                    "mid": 152,
+                    "top": 229,
+                    "loc": [
+                        41.5009,
+                        -72.74164
+                    ]
+                },
+                "Ski-Sundown": {
+                    "displayName": "Ski Sundown",
+                    "bot": 137,
+                    "mid": 232,
+                    "top": 328,
+                    "loc": [
+                        41.88329,
+                        -72.94456
+                    ]
+                }
+            },
+            "Hawaii": {
+                "Mauna-Kea": {
+                    "displayName": "Mauna Kea",
+                    "bot": 2,
+                    "mid": 2104,
+                    "top": 4205,
+                    "loc": [
+                        19.82097,
+                        -155.4695
+                    ]
+                }
+            },
+            "Idaho": {
+                "BaldMountain": {
+                    "displayName": "Bald Mountain",
+                    "bot": 1254,
+                    "mid": 1358,
+                    "top": 1463,
+                    "loc": [
+                        46.57081,
+                        -115.87152
+                    ]
+                },
+                "Bogus-Basin": {
+                    "displayName": "Bogus Basin",
+                    "bot": 1768,
+                    "mid": 2042,
+                    "top": 2316,
+                    "loc": [
+                        43.76465,
+                        -116.10043
+                    ]
+                },
+                "Brundage-Mountain-Resort": {
+                    "displayName": "Brundage Mountain Resort",
+                    "bot": 1780,
+                    "mid": 2054,
+                    "top": 2329,
+                    "loc": [
+                        45.00195,
+                        -116.14364
+                    ]
+                },
+                "CottonwoodButte": {
+                    "displayName": "Cottonwood Butte",
+                    "bot": 1439,
+                    "mid": 1568,
+                    "top": 1696,
+                    "loc": [
+                        46.07287,
+                        -116.45671
+                    ]
+                },
+                "Kelly-Canyon-Ski-Area": {
+                    "displayName": "Kelly Canyon Ski Area",
+                    "bot": 1707,
+                    "mid": 1860,
+                    "top": 2012,
+                    "loc": [
+                        43.64179,
+                        -111.62663
+                    ]
+                },
+                "LittleSkiHill": {
+                    "displayName": "Little Ski Hill",
+                    "bot": 1583,
+                    "mid": 1645,
+                    "top": 1707,
+                    "loc": [
+                        44.92814,
+                        -116.16107
+                    ]
+                },
+                "LookoutPass": {
+                    "displayName": "Lookout Pass",
+                    "bot": 1372,
+                    "mid": 1547,
+                    "top": 1722,
+                    "loc": [
+                        47.45363,
+                        -115.70621
+                    ]
+                },
+                "Magic-Mountain": {
+                    "displayName": "Magic Mountain (Idaho)",
+                    "bot": 1981,
+                    "mid": 2094,
+                    "top": 2207,
+                    "loc": [
+                        42.18583,
+                        -114.28998
+                    ]
+                },
+                "Pebble-Creek-Ski-Area": {
+                    "displayName": "Pebble Creek Ski Area",
+                    "bot": 1938,
+                    "mid": 2274,
+                    "top": 2609,
+                    "loc": [
+                        42.776,
+                        -112.15513
+                    ]
+                },
+                "Pomerelle-Mountain-Resort": {
+                    "displayName": "Pomerelle Mountain Resort",
+                    "bot": 2438,
+                    "mid": 2590,
+                    "top": 2743,
+                    "loc": [
+                        42.31512,
+                        -113.61155
+                    ]
+                },
+                "Schweitzer": {
+                    "displayName": "Schweitzer Mountain",
+                    "bot": 1219,
+                    "mid": 1584,
+                    "top": 1950,
+                    "loc": [
+                        48.37911,
+                        -116.63155
+                    ]
+                },
+                "Silver-Mountain": {
+                    "displayName": "Silver Mountain",
+                    "bot": 1250,
+                    "mid": 1586,
+                    "top": 1921,
+                    "loc": [
+                        47.4943,
+                        -116.12583
+                    ]
+                },
+                "Snowhaven": {
+                    "displayName": "Snowhaven",
+                    "bot": 1585,
+                    "mid": 1646,
+                    "top": 1707,
+                    "loc": [
+                        45.86797,
+                        -116.09266
+                    ]
+                },
+                "Soldier-Mountain": {
+                    "displayName": "Soldier Mountain",
+                    "bot": 1749,
+                    "mid": 1964,
+                    "top": 2179,
+                    "loc": [
+                        43.48388,
+                        -114.84095
+                    ]
+                },
+                "Sun-Valley": {
+                    "displayName": "Sun Valley",
+                    "bot": 1744,
+                    "mid": 2262,
+                    "top": 2780,
+                    "loc": [
+                        43.66247,
+                        -114.38939
+                    ]
+                },
+                "Tamarack": {
+                    "displayName": "Tamarack Ski Resort",
+                    "bot": 1493,
+                    "mid": 1920,
+                    "top": 2347,
+                    "loc": [
+                        44.67888,
+                        -116.13832
+                    ]
+                }
+            },
+            "Illinois": {
+                "Chestnut-Mountain": {
+                    "displayName": "Chestnut Mountain",
+                    "bot": 172,
+                    "mid": 244,
+                    "top": 317,
+                    "loc": [
+                        42.3183,
+                        -90.39848
+                    ]
+                },
+                "Four-Lakes": {
+                    "displayName": "Four Lakes",
+                    "bot": 122,
+                    "mid": 137,
+                    "top": 152,
+                    "loc": [
+                        41.7807,
+                        -88.08381
+                    ]
+                },
+                "Ski-Snowstar": {
+                    "displayName": "Ski Snowstar",
+                    "bot": 171,
+                    "mid": 206,
+                    "top": 241,
+                    "loc": [
+                        41.42505,
+                        -90.74831
+                    ]
+                },
+                "Villa-Olivia": {
+                    "displayName": "Villa Olivia",
+                    "bot": 158,
+                    "mid": 186,
+                    "top": 213,
+                    "loc": [
+                        42.01287,
+                        -88.222
+                    ]
+                }
+            },
+            "Indiana": {
+                "Paoli-Peaks": {
+                    "displayName": "Paoli Peaks",
+                    "bot": 183,
+                    "mid": 228,
+                    "top": 274,
+                    "loc": [
+                        38.55758,
+                        -86.51113
+                    ]
+                },
+                "Perfect-North-Slope": {
+                    "displayName": "Perfect North Slope",
+                    "bot": 122,
+                    "mid": 183,
+                    "top": 244,
+                    "loc": [
+                        39.14476,
+                        -84.88698
+                    ]
+                }
+            },
+            "Iowa": {
+                "MtCrescent": {
+                    "displayName": "Mount Crescent",
+                    "bot": 366,
+                    "mid": 412,
+                    "top": 457,
+                    "loc": [
+                        41.39392,
+                        -95.86314
+                    ]
+                },
+                "Seven-Oaks": {
+                    "displayName": "Seven Oaks Recreation",
+                    "bot": 213,
+                    "mid": 255,
+                    "top": 297,
+                    "loc": [
+                        42.02983,
+                        -93.9546
+                    ]
+                },
+                "Sundown-Mountain": {
+                    "displayName": "Sundown Mountain",
+                    "bot": 215,
+                    "mid": 287,
+                    "top": 359,
+                    "loc": [
+                        42.51632,
+                        -90.82264
+                    ]
+                }
+            },
+            "Maine": {
+                "Baker-Mountain": {
+                    "displayName": "Baker Mountain",
+                    "bot": 165,
+                    "mid": 200,
+                    "top": 234,
+                    "loc": [
+                        45.08714,
+                        -69.90888
+                    ]
+                },
+                "Bigrock-Ski-Area": {
+                    "displayName": "Bigrock Ski Area",
+                    "bot": 213,
+                    "mid": 362,
+                    "top": 512,
+                    "loc": [
+                        46.52471,
+                        -67.82023
+                    ]
+                },
+                "Black-Mountain-of-Maine": {
+                    "displayName": "Black Mountain of Maine",
+                    "bot": 289,
+                    "mid": 364,
+                    "top": 438,
+                    "loc": [
+                        44.57806,
+                        -70.62168
+                    ]
+                },
+                "Camden-Snow-Bowl": {
+                    "displayName": "Camden Snow Bowl",
+                    "bot": 44,
+                    "mid": 188,
+                    "top": 333,
+                    "loc": [
+                        44.2144,
+                        -69.14181
+                    ]
+                },
+                "EatonMountain": {
+                    "displayName": "Eaton Mountain",
+                    "bot": 24,
+                    "mid": 118,
+                    "top": 213,
+                    "loc": [
+                        44.7663,
+                        -69.62199
+                    ]
+                },
+                "Hermon-Mountain": {
+                    "displayName": "Hermon Mountain",
+                    "bot": 50,
+                    "mid": 92,
+                    "top": 133,
+                    "loc": [
+                        44.77915,
+                        -68.95886
+                    ]
+                },
+                "Lost-Valley": {
+                    "displayName": "Lost Valley",
+                    "bot": 0,
+                    "mid": 36,
+                    "top": 73,
+                    "loc": [
+                        44.13618,
+                        -70.2825
+                    ]
+                },
+                "Mount-Jefferson": {
+                    "displayName": "Mount Jefferson",
+                    "bot": 87,
+                    "mid": 152,
+                    "top": 218,
+                    "loc": [
+                        45.3548,
+                        -68.28269
+                    ]
+                },
+                "Mt-Abram-Ski-Resort": {
+                    "displayName": "Mt Abram",
+                    "bot": 296,
+                    "mid": 453,
+                    "top": 610,
+                    "loc": [
+                        44.37497,
+                        -70.70985
+                    ]
+                },
+                "New-Hermon-Mountain": {
+                    "displayName": "New Hermon Mountain",
+                    "bot": 0,
+                    "mid": 54,
+                    "top": 107,
+                    "loc": [
+                        44.77955,
+                        -68.95904
+                    ]
+                },
+                "Shawnee-Peak": {
+                    "displayName": "Pleasant Mountain",
+                    "bot": 274,
+                    "mid": 335,
+                    "top": 396,
+                    "loc": [
+                        44.05385,
+                        -70.81736
+                    ]
+                },
+                "Powderhouse-Hill": {
+                    "displayName": "Powderhouse Hill",
+                    "bot": 14,
+                    "mid": 40,
+                    "top": 67,
+                    "loc": [
+                        43.23534,
+                        -70.80244
+                    ]
+                },
+                "Saddleback-Inc": {
+                    "displayName": "Saddleback Ski",
+                    "bot": 661,
+                    "mid": 940,
+                    "top": 1219,
+                    "loc": [
+                        44.94442,
+                        -70.52467
+                    ]
+                },
+                "Spruce-Mountain-Ski-Slope": {
+                    "displayName": "Spruce Mountain Ski Slope",
+                    "bot": 94,
+                    "mid": 140,
+                    "top": 185,
+                    "loc": [
+                        44.47682,
+                        -70.20534
+                    ]
+                },
+                "Sugarloaf": {
+                    "displayName": "Sugarloaf",
+                    "bot": 436,
+                    "mid": 866,
+                    "top": 1296,
+                    "loc": [
+                        45.04587,
+                        -70.31559
+                    ]
+                },
+                "Sunday-River": {
+                    "displayName": "Sunday River",
+                    "bot": 245,
+                    "mid": 602,
+                    "top": 960,
+                    "loc": [
+                        44.46601,
+                        -70.86847
+                    ]
+                },
+                "TitcombMountain": {
+                    "displayName": "Titcomb Mountain",
+                    "bot": 122,
+                    "mid": 176,
+                    "top": 229,
+                    "loc": [
+                        44.64841,
+                        -70.17191
                     ]
                 }
             }
