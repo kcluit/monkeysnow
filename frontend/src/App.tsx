@@ -61,10 +61,12 @@ import type {
 function ResortDetailRoute({
     unitSystem,
     showUtilityBar,
+    utilityBarStyle,
     getDisplayName,
 }: {
     unitSystem: 'metric' | 'imperial';
     showUtilityBar: boolean;
+    utilityBarStyle: UtilityBarStyle;
     getDisplayName: (id: string) => string;
 }): JSX.Element | null {
     const { resortId } = useParams<{ resortId: string }>();
