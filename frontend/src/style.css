@@ -2609,6 +2609,41 @@ input[type="checkbox"] {
     min-height: 0;
 }
 
+/* Resort map expand/collapse */
+.resort-map-container {
+    height: 200px;
+    transition: height 0.3s ease;
+}
+
+.resort-map-expanded {
+    height: 500px;
+}
+
+.resort-map-expand-btn {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    z-index: 1000;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    border: none;
+    background: var(--cardBg, rgba(30, 30, 30, 0.85));
+    color: var(--textSecondary, #999);
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    transition: background 0.2s, color 0.2s;
+}
+
+.resort-map-expand-btn:hover {
+    background: var(--secondary, rgba(50, 50, 50, 0.9));
+    color: var(--textPrimary, #fff);
+}
+
 /* Chart settings slider controls */
 .chart-settings-slider {
     margin: 0.75rem 0;
