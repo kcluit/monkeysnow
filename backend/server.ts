@@ -243,15 +243,15 @@ function calculateSnowFraction(wetBulbC: number): number {
  */
 function getKucheraRatio(wetBulbC: number): number {
     // Warm/Rain Zone
-    if (wetBulbC > 0) return 3;
+    if (wetBulbC > 0) return 1;
     // Thin Plates / Dendritic fragments (0 to -4)
     if (wetBulbC > -4) return 3;
     // Needles / Columns (-4 to -10)
     if (wetBulbC > -10) return 7;
     // Transition Zone (-10 to -12)
-    if (wetBulbC > -12) return 10;
+    if (wetBulbC > -12) return 12;
     // Dendritic Growth Zone / Stellar Dendrites (-12 to -18)
-    if (wetBulbC > -18) return 15;
+    if (wetBulbC > -18) return 20;
     // Cold / Plates & Columns (< -18)
     return 12;
 }
