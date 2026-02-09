@@ -211,6 +211,7 @@ function App(): JSX.Element {
         viewMode, setViewMode,
         selectedTemperatureMetric, setSelectedTemperatureMetric,
         snowfallEstimateMode, setSnowfallEstimateMode,
+        weatherModel, setWeatherModel,
         showUtilityBar, setShowUtilityBar,
         utilityBarStyle, setUtilityBarStyle,
         unitSystem, setUnitSystem,
