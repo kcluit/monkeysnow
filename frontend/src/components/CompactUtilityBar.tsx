@@ -39,6 +39,7 @@ export function CompactUtilityBar({
     }, []);
 
     const sortDayData = getSortDayData(selectedResorts, allWeatherData, processResortData, selectedElevation);
+    const sortDayText = getSortDayText(selectedSortDay, sortDayData);
 
     // Cycle functions
     const cycleViewMode = (): void => {
