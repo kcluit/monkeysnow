@@ -294,7 +294,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                         <span className="settings-subsection-label">Snowfall estimate</span>
                         <div className="settings-options-row">
                             <OptionButton label="Model estimate" isSelected={snowfallEstimateMode === 'model'} onClick={() => setSnowfallEstimateMode('model')} />
-                            <OptionButton label="Total precip" isSelected={snowfallEstimateMode === 'totalPrecip'} onClick={() => setSnowfallEstimateMode('totalPrecip')} />
+                            <OptionButton label="MonkeySnow estimate" isSelected={snowfallEstimateMode === 'totalPrecip'} onClick={() => setSnowfallEstimateMode('totalPrecip')} />
                         </div>
                     </div>
                 </SettingSection>
