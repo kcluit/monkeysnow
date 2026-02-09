@@ -24,6 +24,7 @@ export function CompactUtilityBar({
     openResortModal
 }: ExtendedCompactUtilityBarProps): JSX.Element {
     const [showSortDayMenu, setShowSortDayMenu] = useState(false);
+    const [showMobileSortModal, setShowMobileSortModal] = useState(false);
 
     // Close dropdown when clicking outside
     useEffect(() => {
