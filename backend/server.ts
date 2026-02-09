@@ -359,6 +359,7 @@ const updateWeatherData = async () => {
     // 2. Fetch data for each country with appropriate model, batched to avoid API limits
     const countryResponses: Record<string, { main: any[], freezing: any[] }> = {};
 
+    let isFirstBatch = true;
     for (const country of countries) {
         const batch = countryBatches[country];
         const model = COUNTRY_MODELS[country] || DEFAULT_MODEL;
