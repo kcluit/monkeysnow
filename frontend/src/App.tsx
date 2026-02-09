@@ -624,6 +624,22 @@ function App(): JSX.Element {
                 )
             )}
 
+            {/* First-visit discovery banner */}
+            {!bannerDismissed && skiResorts.length > 0 && selectedResorts.length > 0 && (
+                <div className="flex items-center justify-between gap-3 px-4 py-2.5 mb-6 rounded-xl bg-theme-secondary border border-theme-border text-sm text-theme-textSecondary">
+                    <span>
+                        Showing {selectedResorts.length} of {skiResorts.length} resorts — click <button onClick={openResortModalAndDismissBanner} className="underline text-theme-textPrimary hover:text-theme-accent transition-colors">Select Resorts</button> to add more
+                    </span>
+                    <button
+                        onClick={() => setBannerDismissed(true)}
+                        className="shrink-0 p-1 rounded-md hover:bg-theme-border transition-colors text-theme-textSecondary hover:text-theme-textPrimary"
+                        aria-label="Dismiss banner"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+            )}
+
             <div className={viewMode === 'compact' ? "compact-grid" : "space-y-8"}>
                 <Suspense fallback={<div className="text-center py-4 text-theme-textSecondary">Loading...</div>}>
                     {displayResorts.map((resort, index) => (
@@ -638,6 +654,17 @@ function App(): JSX.Element {
                         </div>
                     ))}
                 </Suspense>
+
+                {/* Ghost "Add more resorts" card */}
+                {selectedResorts.length > 0 && (
+                    <button
+                        onClick={openResortModalAndDismissBanner}
+                        className={`w-full border-2 border-dashed border-theme-border rounded-${viewMode === 'compact' ? 'xl' : '2xl'} ${viewMode === 'compact' ? 'p-6' : 'p-8'} flex flex-col items-center justify-center gap-2 text-theme-textSecondary hover:text-theme-textPrimary hover:border-theme-textSecondary hover:bg-theme-secondary transition-all duration-200 cursor-pointer group`}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width={viewMode === 'compact' ? 24 : 32} height={viewMode === 'compact' ? 24 : 32} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-50 group-hover:opacity-100 transition-opacity"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        <span className={`${viewMode === 'compact' ? 'text-sm' : 'text-base'} font-medium`}>Add more resorts</span>
+                    </button>
+                )}
 
                 {selectedResorts.length === 0 && (
                     <div className="text-center py-12">
