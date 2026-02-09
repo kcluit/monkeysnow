@@ -507,7 +507,7 @@ const updateWeatherData = async () => {
                     const estimate = estimateHourlySnow(
                         hourData.temperature,
                         hourData.humidity,
-                        hourData.precipitation
+                        hourData.snowfall
                     );
                     totalSnowEstimateCm += estimate.snowCm;
                     if (estimate.ratio > 0) {
