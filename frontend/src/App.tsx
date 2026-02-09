@@ -787,6 +787,18 @@ function App(): JSX.Element {
                 {/* Catch-all redirect to home */}
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
+
+            {/* Footer */}
+            <footer className="py-6 text-center text-xs text-theme-textSecondary opacity-50 hover:opacity-100 transition-opacity">
+                <a
+                    href="https://github.com/kcluit/monkeysnow"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-theme-textPrimary transition-colors"
+                >
+                    github
+                </a>
+            </footer>
         </div>
     );
 }
