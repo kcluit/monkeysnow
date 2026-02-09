@@ -38,7 +38,7 @@ export const webcamUrls: Record<string, string> = {
 };
 
 // Default settings
-export const defaultSelectedResorts: string[] = ["Cypress-Mountain", "Mount-Seymour", "Grouse-Mountain"];
+export const defaultSelectedResorts: string[] = [];
 export const defaultElevation: ElevationLevel = "bot";
 export const defaultSort: SortOption = "temperature";
 export const defaultSortDay: SortDay = 'next3days';
