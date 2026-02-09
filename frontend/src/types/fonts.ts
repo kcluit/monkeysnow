@@ -62,6 +62,13 @@ export const fonts: Font[] = [
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap',
     isMonospace: true,
   },
+  {
+    id: 'roboto-mono',
+    name: 'Roboto Mono',
+    family: "'Roboto Mono', monospace",
+    googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&display=swap',
+    isMonospace: true,
+  },
 ];
 
 export function getFontById(id: string): Font | undefined {
