@@ -10,6 +10,7 @@ import {
     faEnvelope,
 } from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { useGitHubContributors } from '../hooks/useGitHubContributors';
 
 interface SectionProps {
     title: string;
