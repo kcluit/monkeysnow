@@ -593,6 +593,11 @@ const updateWeatherData = async () => {
             const forecastMid = processLocation(respMid, freezingResp);
             const forecastTop = processLocation(respTop, freezingResp);
 
+            if (!forecastBot || !forecastMid || !forecastTop) {
+                console.warn(`Incomplete data for ${resortName}, skipping resort`);
+                continue;
+            }
+
             structuredData[resortName] = {
                 bot: {
                     metadata: { elevation: resortData.bot, lat, lon },
