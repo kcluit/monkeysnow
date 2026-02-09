@@ -94,7 +94,7 @@ export const en: Translations = {
 
     // Snowfall estimate
     'snowfall.model': 'Model estimate',
-    'snowfall.totalPrecip': 'MonkeySnow estimate',
+    'snowfall.totalPrecip': 'monkeysnow estimate',
 
     // Utility bar style
     'utilityBarStyle.compact': 'Compact',
