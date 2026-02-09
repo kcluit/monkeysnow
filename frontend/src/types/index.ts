@@ -56,6 +56,7 @@ export type ViewMode = 'default' | 'full' | 'compact';
 export type UtilityBarStyle = 'compact' | 'large';
 export type TemperatureMetric = 'max' | 'min' | 'avg' | 'median';
 export type SnowfallEstimateMode = 'model' | 'totalPrecip';
+export type WeatherModelSetting = 'auto';
 export type SnowQuality = 'rain' | 'sleet/mix' | 'wet_snow' | 'powder' | 'dry_snow';
 
 // Weather data structures from new API format
