@@ -398,6 +398,8 @@ function App(): JSX.Element {
             setSelectedTemperatureMetric,
             snowfallEstimateMode,
             setSnowfallEstimateMode,
+            weatherModel,
+            setWeatherModel,
             showUtilityBar,
             setShowUtilityBar,
             utilityBarStyle,
