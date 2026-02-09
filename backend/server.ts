@@ -625,51 +625,64 @@ const updateWeatherData = async () => {
 
         for (let i = 0; i < batch.resortNames.length; i++) {
             const resortName = batch.resortNames[i];
-            const resortData = locations[resortName];
-            const [lat, lon] = resortData.loc!;
+            try {
+                const resortData = locations[resortName];
+                const [lat, lon] = resortData.loc!;
 
-            // Freezing response: 1 per resort
-            const freezingResp = responses.freezing[i];
+                // Freezing response: 1 per resort
+                const freezingResp = responses.freezing[i];
 
-            // Main responses: 3 per resort (Bot, Mid, Top)
-            const idxBot = i * 3;
-            const idxMid = i * 3 + 1;
-            const idxTop = i * 3 + 2;
+                // Main responses: 3 per resort (Bot, Mid, Top)
+                const idxBot = i * 3;
+                const idxMid = i * 3 + 1;
+                const idxTop = i * 3 + 2;
 
-            const respBot = responses.main[idxBot];
-            const respMid = responses.main[idxMid];
-            const respTop = responses.main[idxTop];
+                const respBot = responses.main[idxBot];
+                const respMid = responses.main[idxMid];
+                const respTop = responses.main[idxTop];
 
-            // Process each level
-            const forecastBot = processLocation(respBot, freezingResp);
-            const forecastMid = processLocation(respMid, freezingResp);
-            const forecastTop = processLocation(respTop, freezingResp);
+                // Process each level
+                const forecastBot = processLocation(respBot, freezingResp);
+                const forecastMid = processLocation(respMid, freezingResp);
+                const forecastTop = processLocation(respTop, freezingResp);
 
-            if (!forecastBot || !forecastMid || !forecastTop) {
-                console.warn(`Incomplete data for ${resortName}, skipping resort`);
+                if (!forecastBot || !forecastMid || !forecastTop) {
+                    console.warn(`Incomplete data for ${resortName}, skipping resort`);
+                    continue;
+                }
+
+                structuredData[resortName] = {
+                    bot: {
+                        metadata: { elevation: resortData.bot, lat, lon },
+                        forecast: forecastBot
+                    },
+                    mid: {
+                        metadata: { elevation: resortData.mid, lat, lon },
+                        forecast: forecastMid
+                    },
+                    top: {
+                        metadata: { elevation: resortData.top, lat, lon },
+                        forecast: forecastTop
+                    }
+                };
+            } catch (error) {
+                console.error(`Error processing ${resortName}:`, error);
                 continue;
             }
-
-            structuredData[resortName] = {
-                bot: {
-                    metadata: { elevation: resortData.bot, lat, lon },
-                    forecast: forecastBot
-                },
-                mid: {
-                    metadata: { elevation: resortData.mid, lat, lon },
-                    forecast: forecastMid
-                },
-                top: {
-                    metadata: { elevation: resortData.top, lat, lon },
-                    forecast: forecastTop
-                }
-            };
         }
     }
 
-    weatherCache = structuredData;
+    // Merge new data into existing cache (preserve data from previous successful updates)
+    if (weatherCache && Object.keys(structuredData).length > 0) {
+        weatherCache = { ...weatherCache, ...structuredData };
+    } else if (Object.keys(structuredData).length > 0) {
+        weatherCache = structuredData;
+    }
+    // If structuredData is empty, keep the existing cache as-is
+
     lastSuccessfulUpdate = new Date();
-    console.log(`[${lastSuccessfulUpdate.toISOString()}] Weather update complete.`);
+    const resortCount = Object.keys(structuredData).length;
+    console.log(`[${lastSuccessfulUpdate.toISOString()}] Weather update complete. Updated ${resortCount} resorts.`);
 };
 
 // --- Routes/Start ---
