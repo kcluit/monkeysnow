@@ -372,7 +372,7 @@ const updateWeatherData = async () => {
                 "snowfall"              // 8
             ],
             models: model,
-            forecast_days: 14,
+            forecast_days: 10,
             timezone: "auto"
         };
 
@@ -382,7 +382,7 @@ const updateWeatherData = async () => {
             longitude: batch.freezingLons,
             models: 'gfs_seamless',
             hourly: ["freezing_level_height"],
-            forecast_days: 14,
+            forecast_days: 10,
             timezone: "auto"
         };
 
