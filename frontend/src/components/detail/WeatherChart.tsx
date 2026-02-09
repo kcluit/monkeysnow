@@ -44,7 +44,7 @@ export function WeatherChart({
     );
     const [showAccumulation, setShowAccumulation] = useLocalStorage<boolean>(
         `chartAccumulation_${variable}`,
-        true
+        supportsAccumulation(variable)
     );
     // Multi-level overlay setting (enabled by default for variables that support it)
     const [showOverlays, setShowOverlays] = useLocalStorage<boolean>(
