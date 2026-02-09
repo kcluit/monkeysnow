@@ -99,7 +99,7 @@ export interface DetailUtilityBarProps {
     customLocation: import('./detailView').CustomLocation | null;
     onResetCustomLocation: () => void;
     isLoadingElevation: boolean;
-    utilityBarStyle?: UtilityBarStyle;
+    utilityBarStyle: UtilityBarStyle;
 }
 
 export interface DetailChartGridProps {
