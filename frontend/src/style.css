@@ -2290,6 +2290,151 @@ input[type="checkbox"] {
     opacity: 0.9;
 }
 
+/* Mobile Sort & Filter Modal Styles */
+.sort-filter-modal {
+    width: 100%;
+    max-width: 100vw;
+    background: var(--background, #000);
+    border-top: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.sort-filter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 12px 20px;
+    border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+}
+
+.sort-filter-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--textPrimary, #f5f5f7);
+}
+
+.sort-filter-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: var(--textSecondary, #a1a1a6);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.sort-filter-close:hover {
+    background: var(--cardBg, rgba(255, 255, 255, 0.1));
+    color: var(--textPrimary, #f5f5f7);
+}
+
+.sort-filter-content {
+    padding: 16px 20px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.sort-filter-section {
+    margin-bottom: 20px;
+}
+
+.sort-filter-section:last-child {
+    margin-bottom: 0;
+}
+
+.sort-filter-section-title {
+    margin: 0 0 10px 0;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--textSecondary, #a1a1a6);
+}
+
+.sort-filter-options-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.sort-filter-options-2col {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.sort-filter-option {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+    background: var(--cardBg, rgba(255, 255, 255, 0.05));
+    color: var(--textPrimary, #f5f5f7);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: center;
+}
+
+.sort-filter-option:hover {
+    background: var(--secondary, #2c2c2e);
+}
+
+.sort-filter-option.selected {
+    border-color: var(--accent, #0a84ff);
+    background: color-mix(in srgb, var(--accent, #0a84ff) 15%, transparent);
+    color: var(--accent, #0a84ff);
+}
+
+.sort-filter-day-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.sort-filter-day-option {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+    background: var(--cardBg, rgba(255, 255, 255, 0.05));
+    color: var(--textPrimary, #f5f5f7);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.sort-filter-day-option:hover {
+    background: var(--secondary, #2c2c2e);
+}
+
+.sort-filter-day-option.selected {
+    border-color: var(--accent, #0a84ff);
+    background: color-mix(in srgb, var(--accent, #0a84ff) 15%, transparent);
+    color: var(--accent, #0a84ff);
+}
+
+.sort-filter-separator {
+    width: 100%;
+    height: 1px;
+    background: var(--border, rgba(255, 255, 255, 0.1));
+}
+
+.sort-filter-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+}
+
 /* Chart Control Buttons (visibility toggle & settings) */
 .chart-controls {
     display: flex;
