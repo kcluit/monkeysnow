@@ -168,6 +168,12 @@ function App(): JSX.Element {
         onResortsChange: setSelectedResorts,
     });
 
+    // Open resort modal and auto-dismiss the banner
+    const openResortModalAndDismissBanner = useCallback(() => {
+        resortHierarchy.openModal();
+        setBannerDismissed(true);
+    }, [resortHierarchy.openModal, setBannerDismissed]);
+
     useEffect(() => {
         new Konami("https://monkeytype.com/");
     }, [])
