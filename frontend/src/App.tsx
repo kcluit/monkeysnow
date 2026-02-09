@@ -54,6 +54,7 @@ import type {
     ViewMode,
     TemperatureMetric,
     SnowfallEstimateMode,
+    WeatherModelSetting,
     UtilityBarStyle
 } from './types';
 
