@@ -14,6 +14,7 @@ import type { UnitSystem } from '../../types';
 interface DetailedResortViewPropsWithUnits extends DetailedResortViewProps {
     unitSystem: UnitSystem;
     showUtilityBar: boolean;
+    utilityBarStyle: import('../../types').UtilityBarStyle;
     onBack: () => void;
 }
 
@@ -33,6 +34,7 @@ export function DetailedResortView({
     location,
     unitSystem,
     showUtilityBar,
+    utilityBarStyle,
     onBack,
 }: DetailedResortViewPropsWithUnits): JSX.Element {
     // State for selected models
@@ -269,6 +271,7 @@ export function DetailedResortView({
                         customLocation={customLocation}
                         onResetCustomLocation={handleResetCustomLocation}
                         isLoadingElevation={isLoadingElevation}
+                        utilityBarStyle={utilityBarStyle}
                     />
                 </div>
             )}

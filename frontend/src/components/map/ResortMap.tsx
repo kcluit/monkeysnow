@@ -1,4 +1,5 @@
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import { useState, useCallback, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
@@ -42,6 +43,17 @@ interface ResortMapProps {
     isLoadingElevation?: boolean;
 }
 
+// Inner component to invalidate map size after resize
+function MapResizeHandler({ isExpanded }: { isExpanded: boolean }): null {
+    const map = useMap();
+    useEffect(() => {
+        // Invalidate size after CSS transition completes
+        const timeout = setTimeout(() => map.invalidateSize(), 350);
+        return () => clearTimeout(timeout);
+    }, [map, isExpanded]);
+    return null;
+}
+
 // Inner component to handle map click events
 function MapClickHandler({ onClick }: { onClick: (lat: number, lon: number) => void }): null {
     useMapEvents({
@@ -63,20 +75,28 @@ export function ResortMap({
     isLoadingElevation,
 }: ResortMapProps): JSX.Element {
     const hasCustomLocation = customLocation !== null && customLocation !== undefined;
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    const toggleExpanded = useCallback(() => {
+        setIsExpanded(prev => !prev);
+    }, []);
 
     return (
-        <div className="relative">
+        <div className={`relative resort-map-container ${isExpanded ? 'resort-map-expanded' : ''}`}>
             <MapContainer
                 center={[lat, lon]}
                 zoom={11}
                 scrollWheelZoom={true}
-                className={`h-[200px] rounded-xl shadow-lg ${className}`}
+                className={`h-full rounded-xl shadow-lg ${className}`}
                 style={{ zIndex: 0 }}
             >
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
+
+                {/* Resize handler to invalidate map on expand/collapse */}
+                <MapResizeHandler isExpanded={isExpanded} />
 
                 {/* Click handler */}
                 {onMapClick && <MapClickHandler onClick={onMapClick} />}
@@ -113,6 +133,24 @@ export function ResortMap({
                     </Marker>
                 )}
             </MapContainer>
+
+            {/* Expand/collapse button */}
+            <button
+                type="button"
+                onClick={toggleExpanded}
+                className="resort-map-expand-btn"
+                title={isExpanded ? 'Collapse map' : 'Expand map'}
+            >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    {isExpanded ? (
+                        // Minimize icon
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25" />
+                    ) : (
+                        // Maximize icon
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+                    )}
+                </svg>
+            </button>
         </div>
     );
 }

@@ -10,6 +10,7 @@ import type { ChartConfig, ChartType, SeriesConfig, ChartTheme, BoxWhiskerData, 
 import type { WeatherChartProps } from '../types/detailView';
 import type { WeatherModel, HourlyDataPoint, AggregationType } from '../types/openMeteo';
 import type { UnitSystem } from '../types';
+import { supportsAccumulation } from '../types/chartSettings';
 import type { ChartDisplayType } from '../types/chartSettings';
 import { getModelConfig, getVariableConfig, getOverlayConfig, hasOverlays } from './chartConfigurations';
 import { getUPlotTheme } from '../lib/charts';
@@ -924,8 +925,8 @@ export function buildWeatherChartConfig(
     // Track if we need a secondary Y-axis for accumulation
     let hasAccumulation = false;
 
-    // Add accumulation series if enabled
-    if (settings?.showAccumulation) {
+    // Add accumulation series if enabled and variable supports it
+    if (settings?.showAccumulation && supportsAccumulation(variable as any)) {
         const accSeries = buildAccumulationSeries(seriesData, selectedModels);
         if (accSeries.length > 0) {
             allSeries.push(...accSeries);

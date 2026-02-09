@@ -14,6 +14,7 @@ import { buildWeatherChartConfig } from '../../utils/chartBuilder';
 import { ChartSettingsModal } from './ChartSettingsModal';
 import { getVariableConfig, hasOverlays } from '../../utils/chartConfigurations';
 import type { WeatherChartProps } from '../../types/detailView';
+import { supportsAccumulation } from '../../types/chartSettings';
 import type { ChartDisplayType } from '../../types/chartSettings';
 
 interface WeatherChartComponentProps extends WeatherChartProps {
@@ -43,7 +44,7 @@ export function WeatherChart({
     );
     const [showAccumulation, setShowAccumulation] = useLocalStorage<boolean>(
         `chartAccumulation_${variable}`,
-        false
+        supportsAccumulation(variable)
     );
     // Multi-level overlay setting (enabled by default for variables that support it)
     const [showOverlays, setShowOverlays] = useLocalStorage<boolean>(

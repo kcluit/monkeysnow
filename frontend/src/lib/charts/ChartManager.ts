@@ -8,7 +8,7 @@
 import uPlot from 'uplot';
 import 'uplot/dist/uPlot.min.css';
 import type { ChartConfig } from './types';
-import { createZoomPlugin, createBandFillPlugin, createBoxWhiskerPlugin, createHeatmapPlugin, createWindArrowPlugin, createZeroAxisPlugin, createElevationLinesPlugin, createTooltipPlugin, createLegendPlugin, createSeriesFocusPlugin } from './plugins';
+import { createZoomPlugin, createTouchPlugin, createBandFillPlugin, createBoxWhiskerPlugin, createHeatmapPlugin, createWindArrowPlugin, createZeroAxisPlugin, createElevationLinesPlugin, createTooltipPlugin, createLegendPlugin, createSeriesFocusPlugin } from './plugins';
 import { colorWithOpacity } from './utils/colorUtils';
 import {
     subscribeToZoomChanges,
@@ -463,13 +463,13 @@ export class ChartManager {
         const plugins: uPlot.Plugin[] = [];
 
         if (dataZoom?.enabled) {
-            plugins.push(createZoomPlugin({
-                onZoom: (min, max) => {
-                    if (isChartZoomSyncEnabled(this.chartId)) {
-                        broadcastZoomChange(min, max, this.chartId);
-                    }
+            const onZoomChange = (min: number, max: number) => {
+                if (isChartZoomSyncEnabled(this.chartId)) {
+                    broadcastZoomChange(min, max, this.chartId);
                 }
-            }));
+            };
+            plugins.push(createZoomPlugin({ onZoom: onZoomChange }));
+            plugins.push(createTouchPlugin({ onZoom: onZoomChange }));
         }
 
         const bandSeries = series.filter((s) => s.type === 'band' && s.bandData);

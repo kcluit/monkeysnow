@@ -4,10 +4,19 @@ import { useModelHierarchy } from '../../hooks/useModelHierarchy';
 import { useVariableSelection } from '../../hooks/useVariableSelection';
 import { ModelSelectionGridModal } from '../ModelSelectionModal';
 import { VariableSelectionModal } from '../VariableSelectionModal';
+import { CompactDetailUtilityBar } from './CompactDetailUtilityBar';
 import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
 
-export function DetailUtilityBar({
+export function DetailUtilityBar(props: DetailUtilityBarProps): JSX.Element {
+    if (props.utilityBarStyle === 'compact') {
+        return <CompactDetailUtilityBar {...props} />;
+    }
+
+    return <LargeDetailUtilityBar {...props} />;
+}
+
+function LargeDetailUtilityBar({
     onBack,
     selectedModels,
     setSelectedModels,

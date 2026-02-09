@@ -243,15 +243,15 @@ function calculateSnowFraction(wetBulbC: number): number {
  */
 function getKucheraRatio(wetBulbC: number): number {
     // Warm/Rain Zone
-    if (wetBulbC > 0) return 3;
+    if (wetBulbC > 0) return 1;
     // Thin Plates / Dendritic fragments (0 to -4)
     if (wetBulbC > -4) return 3;
     // Needles / Columns (-4 to -10)
     if (wetBulbC > -10) return 7;
     // Transition Zone (-10 to -12)
-    if (wetBulbC > -12) return 10;
+    if (wetBulbC > -12) return 12;
     // Dendritic Growth Zone / Stellar Dendrites (-12 to -18)
-    if (wetBulbC > -18) return 15;
+    if (wetBulbC > -18) return 20;
     // Cold / Plates & Columns (< -18)
     return 12;
 }
@@ -267,14 +267,14 @@ function getSnowQuality(wetBulbC: number, snowFraction: number): SnowQuality {
     return 'dry_snow'; // -4 to -12 and < -18
 }
 
-function estimateHourlySnow(tempC: number, humidity: number, precipMm: number): HourlySnowEstimate {
+function estimateHourlySnow(tempC: number, humidity: number, snowfallCm: number): HourlySnowEstimate {
     const wetBulb = calculateWetBulb(tempC, humidity);
     const snowFraction = calculateSnowFraction(wetBulb);
     const ratio = getKucheraRatio(wetBulb);
 
-    // Only multiply the "snow fraction" of precip by the ratio
-    const effectiveSnowPrecipMm = precipMm; //* snowFraction;
-    const snowMm = effectiveSnowPrecipMm * ratio;
+    // Convert Open-Meteo snowfall (cm) to snowfall water equivalent (mm) using open-meteo's 0.7 factor
+    const sweMm = snowfallCm / 0.7;
+    const snowMm = sweMm * ratio;
     const snowCm = snowMm / 10;
 
     return {
@@ -372,7 +372,7 @@ const updateWeatherData = async () => {
                 "snowfall"              // 8
             ],
             models: model,
-            forecast_days: 14,
+            forecast_days: 10,
             timezone: "auto"
         };
 
@@ -382,7 +382,7 @@ const updateWeatherData = async () => {
             longitude: batch.freezingLons,
             models: 'gfs_seamless',
             hourly: ["freezing_level_height"],
-            forecast_days: 14,
+            forecast_days: 10,
             timezone: "auto"
         };
 
@@ -507,7 +507,7 @@ const updateWeatherData = async () => {
                     const estimate = estimateHourlySnow(
                         hourData.temperature,
                         hourData.humidity,
-                        hourData.precipitation
+                        hourData.snowfall
                     );
                     totalSnowEstimateCm += estimate.snowCm;
                     if (estimate.ratio > 0) {

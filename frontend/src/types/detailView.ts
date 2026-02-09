@@ -1,5 +1,6 @@
 import type { WeatherModel, WeatherVariable, TimezoneInfo, AggregationType } from './openMeteo';
 import type { UnitSystem } from '../utils/unitConversion';
+import type { UtilityBarStyle } from './index';
 
 // Elevation selection can be a preset type or a custom number
 export type ElevationSelection = 'base' | 'mid' | 'top' | number;
@@ -98,6 +99,7 @@ export interface DetailUtilityBarProps {
     customLocation: import('./detailView').CustomLocation | null;
     onResetCustomLocation: () => void;
     isLoadingElevation: boolean;
+    utilityBarStyle: UtilityBarStyle;
 }
 
 export interface DetailChartGridProps {
