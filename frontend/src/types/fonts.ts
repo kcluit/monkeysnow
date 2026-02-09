@@ -176,6 +176,14 @@ export const fonts: Font[] = [
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap',
     isMonospace: false,
   },
+  // --- Accessibility ---
+  {
+    id: 'open-dyslexic',
+    name: 'OpenDyslexic',
+    family: "'OpenDyslexic', sans-serif",
+    googleFontsUrl: 'https://fonts.cdnfonts.com/css/open-dyslexic',
+    isMonospace: false,
+  },
 ];
 
 export function getFontById(id: string): Font | undefined {
