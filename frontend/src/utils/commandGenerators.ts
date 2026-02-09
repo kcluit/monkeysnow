@@ -433,6 +433,15 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
       ),
     },
     {
+      id: 'weather-model',
+      name: 'Weather model',
+      icon: icons.weatherModel,
+      subCommands: generateWeatherModelCommands(
+        params.weatherModel,
+        params.setWeatherModel
+      ),
+    },
+    {
       id: 'utility-bar',
       name: 'Utility bar',
       icon: icons.controls,
