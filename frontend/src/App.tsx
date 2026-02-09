@@ -148,6 +148,20 @@ function App(): JSX.Element {
     }, [chartZoomSyncEnabled]);
     const [resortData, setResortData] = useState<Map<string, ProcessedResortData>>(new Map());
 
+    // First-visit initialization: pick a random resort when hierarchy loads
+    const [hasInitialized, setHasInitialized] = useLocalStorage<boolean>('hasInitializedResorts', false);
+
+    useEffect(() => {
+        if (!hierarchyLoading && skiResorts.length > 0 && !hasInitialized) {
+            const randomIndex = Math.floor(Math.random() * skiResorts.length);
+            setSelectedResorts([skiResorts[randomIndex]]);
+            setHasInitialized(true);
+        }
+    }, [hierarchyLoading, skiResorts, hasInitialized, setSelectedResorts, setHasInitialized]);
+
+    // Banner dismissal state
+    const [bannerDismissed, setBannerDismissed] = useLocalStorage<boolean>('bannerDismissed', false);
+
     // Resort hierarchy hook for modal
     const resortHierarchy = useResortHierarchy({
         selectedResorts,
