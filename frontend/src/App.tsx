@@ -789,7 +789,7 @@ function App(): JSX.Element {
             </Routes>
 
             {/* Footer */}
-            <footer className="fixed bottom-2 left-1/2 -translate-x-1/2 text-xs text-theme-textSecondary opacity-40 hover:opacity-100 transition-opacity z-10">
+            <footer className="fixed bottom-2 left-4 text-xs text-theme-textSecondary opacity-40 hover:opacity-100 transition-opacity z-10">
                 <a
                     href="https://github.com/kcluit/monkeysnow"
                     target="_blank"
