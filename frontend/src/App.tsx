@@ -762,6 +762,7 @@ function App(): JSX.Element {
                         <ResortDetailRoute
                             unitSystem={unitSystem}
                             showUtilityBar={showUtilityBar}
+                            utilityBarStyle={utilityBarStyle}
                             getDisplayName={getDisplayName}
                         />
                     </>
