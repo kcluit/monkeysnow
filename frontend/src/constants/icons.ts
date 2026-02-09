@@ -107,6 +107,8 @@ export const icons = {
   date: faCalendarDays,
   link: faLink,
 
+  weatherModel: faCloud,
+
   // Theme sub-icons
   dark: faMoon,
   light: faSun,
