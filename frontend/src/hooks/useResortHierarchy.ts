@@ -288,8 +288,8 @@ export function useResortHierarchy({
     goBack,
     canGoBack,
 
-    // Selection
-    selectedResorts,
+    // Selection (draft state when modal is open, committed state when closed)
+    selectedResorts: activeSelectedResorts,
     toggleResort,
     selectAllInNode,
     deselectAllInNode,
