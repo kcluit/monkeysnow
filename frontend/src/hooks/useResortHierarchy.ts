@@ -300,6 +300,7 @@ export function useResortHierarchy({
     toggleResort,
     selectAllInNode,
     deselectAllInNode,
+    clearAllResorts,
     getSelectionState,
     getResortsUnderNode: cachedGetResortsUnderNode,
 
