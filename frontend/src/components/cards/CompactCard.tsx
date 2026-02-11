@@ -7,6 +7,28 @@ import type { CardProps } from '../../types';
 export function CompactCard({ resort, temperatureMetric = 'max', showDate = false, unitSystem = 'metric', onResortClick }: CardProps): JSX.Element {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [seymourClicks, setSeymourClicks] = useState(0);
+    const [canScrollLeft, setCanScrollLeft] = useState(false);
+    const [canScrollRight, setCanScrollRight] = useState(true);
+
+    const updateScrollState = useCallback(() => {
+        const el = scrollContainerRef.current;
+        if (!el) return;
+        setCanScrollLeft(el.scrollLeft > 0);
+        setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+    }, []);
+
+    useEffect(() => {
+        const el = scrollContainerRef.current;
+        if (!el) return;
+        updateScrollState();
+        el.addEventListener('scroll', updateScrollState);
+        const observer = new ResizeObserver(updateScrollState);
+        observer.observe(el);
+        return () => {
+            el.removeEventListener('scroll', updateScrollState);
+            observer.disconnect();
+        };
+    }, [updateScrollState]);
 
     const webcamUrl = webcamUrls[resort.name];
 
