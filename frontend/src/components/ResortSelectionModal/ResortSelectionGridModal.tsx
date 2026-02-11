@@ -368,6 +368,7 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
     toggleResort,
     selectAllInNode,
     deselectAllInNode,
+    clearAllResorts,
     getSelectionState,
     getResortsUnderNode,
     searchTerm,
