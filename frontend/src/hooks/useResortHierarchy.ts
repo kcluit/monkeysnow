@@ -220,6 +220,10 @@ export function useResortHierarchy({
     setDraftSelectedResorts((prev) => prev.filter((id) => !resortIdSet.has(id)));
   }, [cachedGetResortsUnderNode]);
 
+  const clearAllResorts = useCallback(() => {
+    setDraftSelectedResorts([]);
+  }, []);
+
   // Use cached version for O(1) lookups
   const getSelectionState = cachedGetSelectionState;
 
