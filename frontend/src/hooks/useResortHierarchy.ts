@@ -191,31 +191,31 @@ export function useResortHierarchy({
 
   const canGoBack = navigationStack.length > 0 || isSearchMode;
 
-  // Selection helpers
+  // Selection helpers - operate on draft state only
   const toggleResort = useCallback((resortId: string) => {
-    onResortsChange((prev) =>
+    setDraftSelectedResorts((prev) =>
       prev.includes(resortId)
         ? prev.filter((id) => id !== resortId)
         : [...prev, resortId]
     );
-  }, [onResortsChange]);
+  }, []);
 
   const selectAllInNode = useCallback((node: HierarchyNode) => {
     const resortIds = cachedGetResortsUnderNode(node);
-    onResortsChange((prev) => {
+    setDraftSelectedResorts((prev) => {
       const newSet = new Set(prev);
       for (const id of resortIds) {
         newSet.add(id);
       }
       return Array.from(newSet);
     });
-  }, [onResortsChange, cachedGetResortsUnderNode]);
+  }, [cachedGetResortsUnderNode]);
 
   const deselectAllInNode = useCallback((node: HierarchyNode) => {
     const resortIds = cachedGetResortsUnderNode(node);
     const resortIdSet = new Set(resortIds);
-    onResortsChange((prev) => prev.filter((id) => !resortIdSet.has(id)));
-  }, [onResortsChange, cachedGetResortsUnderNode]);
+    setDraftSelectedResorts((prev) => prev.filter((id) => !resortIdSet.has(id)));
+  }, [cachedGetResortsUnderNode]);
 
   // Use cached version for O(1) lookups
   const getSelectionState = cachedGetSelectionState;
