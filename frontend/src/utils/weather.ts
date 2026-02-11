@@ -197,6 +197,11 @@ function createPeriodFromData(data: PeriodData, label: string, temperatureMetric
         snowValue = data.snowfall_estimate ?? 0;
     }
 
+    // In model mode, if quality is 'rain' but model reports snowfall, show sleet/mix
+    const effectiveQuality = (snowfallEstimateMode === 'model' && snowQuality === 'rain' && snowValue > 0)
+        ? 'sleet/mix' as SnowQuality
+        : snowQuality;
+
     return {
         time: label,
         temp: formatTempWithRounding(displayTemp, unitSystem, roundingMode),
@@ -208,7 +213,7 @@ function createPeriodFromData(data: PeriodData, label: string, temperatureMetric
         rain: formatRain(rainValue, unitSystem),
         wind: formatWind(data.wind_speed ?? 0, unitSystem),
         condition: getWeatherDescription(data.weather_code ?? 0),
-        snowQuality,
+        snowQuality: effectiveQuality,
         snowToLiquidRatio: data.snow_to_liquid_ratio ?? 0
     };
 }
