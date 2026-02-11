@@ -88,7 +88,7 @@ export function CompactCard({ resort, temperatureMetric = 'max', showDate = fals
             <div className="relative">
                 <button
                     onClick={(e) => { e.stopPropagation(); scrollLeft(); }}
-                    className="absolute left-0.5 top-1/2 -translate-y-1/2 z-10 bg-theme-cardBg rounded-full p-1 shadow-md hover:bg-theme-secondary transition-all text-theme-textPrimary opacity-70 hover:opacity-100"
+                    className={`absolute left-0.5 top-1/2 -translate-y-1/2 z-10 bg-theme-cardBg rounded-full p-1 shadow-md hover:bg-theme-secondary transition-all duration-300 text-theme-textPrimary ${canScrollLeft ? 'opacity-70 hover:opacity-100' : 'opacity-0 pointer-events-none'}`}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-3 h-3">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -96,7 +96,7 @@ export function CompactCard({ resort, temperatureMetric = 'max', showDate = fals
                 </button>
                 <button
                     onClick={(e) => { e.stopPropagation(); scrollRight(); }}
-                    className="absolute right-0.5 top-1/2 -translate-y-1/2 z-10 bg-theme-cardBg rounded-full p-1 shadow-md hover:bg-theme-secondary transition-all text-theme-textPrimary opacity-70 hover:opacity-100"
+                    className={`absolute right-0.5 top-1/2 -translate-y-1/2 z-10 bg-theme-cardBg rounded-full p-1 shadow-md hover:bg-theme-secondary transition-all duration-300 text-theme-textPrimary ${canScrollRight ? 'opacity-70 hover:opacity-100' : 'opacity-0 pointer-events-none'}`}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-3 h-3">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
