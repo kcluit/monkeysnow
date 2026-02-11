@@ -1268,12 +1268,22 @@
                 },
                 "Hilltop-Ski-Area": {
                     "displayName": "Hilltop Ski Area",
-                    "bot": 50,
-                    "mid": 95,
-                    "top": 140,
+                    "bot": 149,
+                    "mid": 194,
+                    "top": 239,
                     "loc": [
                         61.14076,
                         -149.73816
+                    ]
+                },
+                "Skeetawk": {
+                    "displayName": "Skeetawk Ski Area",
+                    "bot": 441,
+                    "mid": 340,
+                    "top": 239,
+                    "loc": [
+                        61.743028,
+                        -149.233722
                     ]
                 }
             },
