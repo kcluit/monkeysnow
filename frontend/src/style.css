@@ -1342,6 +1342,28 @@ input[type="checkbox"] {
     color: var(--text, #ffffff);
 }
 
+.resort-grid-clear-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    padding: 0 12px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.resort-grid-clear-btn:hover {
+    background: var(--cardBg, rgba(255, 255, 255, 0.1));
+    color: var(--text, #ffffff);
+}
+
 .resort-grid-content {
     flex: 1;
     overflow-y: auto;
