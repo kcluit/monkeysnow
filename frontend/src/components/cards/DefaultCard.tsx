@@ -9,13 +9,14 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [seymourClicks, setSeymourClicks] = useState(0);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
-    const [canScrollRight, setCanScrollRight] = useState(true);
+    const [canScrollRight, setCanScrollRight] = useState(false);
 
     const updateScrollState = useCallback(() => {
         const el = scrollContainerRef.current;
         if (!el) return;
-        setCanScrollLeft(el.scrollLeft > 0);
-        setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+        const tolerance = 1;
+        setCanScrollLeft(el.scrollLeft > tolerance);
+        setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - tolerance);
     }, []);
 
     useEffect(() => {
