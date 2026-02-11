@@ -5277,63 +5277,100 @@
                     "bot": 260,
                     "mid": 730,
                     "top": 1200,
-                    "loc": [42.86346, 140.69806]
+                    "loc": [
+                        42.86346,
+                        140.69806
+                    ]
                 },
                 "Rusutsu": {
                     "displayName": "Rusutsu Resort",
                     "bot": 400,
                     "mid": 697,
                     "top": 994,
-                    "loc": [42.74969, 140.54218]
+                    "loc": [
+                        42.74969,
+                        140.54218
+                    ]
                 },
                 "Furano": {
                     "displayName": "Furano Ski Resort",
                     "bot": 235,
                     "mid": 655,
                     "top": 1074,
-                    "loc": [43.31667, 142.37500]
+                    "loc": [
+                        43.31667,
+                        142.37500
+                    ]
                 },
                 "Tomamu": {
                     "displayName": "Hoshino Resorts Tomamu",
                     "bot": 586,
                     "mid": 879,
                     "top": 1171,
-                    "loc": [43.07861, 142.59611]
+                    "loc": [
+                        43.07861,
+                        142.59611
+                    ]
                 },
                 "Kiroro": {
                     "displayName": "Kiroro Snow World",
                     "bot": 520,
                     "mid": 850,
                     "top": 1180,
-                    "loc": [43.07013, 140.98914]
+                    "loc": [
+                        43.07013,
+                        140.98914
+                    ]
                 },
                 "Sahoro": {
                     "displayName": "Sahoro Resort",
                     "bot": 420,
                     "mid": 725,
                     "top": 1030,
-                    "loc": [43.17334, 142.78136]
+                    "loc": [
+                        43.17334,
+                        142.78136
+                    ]
                 },
                 "Asahidake": {
                     "displayName": "Asahidake",
                     "bot": 1100,
                     "mid": 1350,
                     "top": 1600,
-                    "loc": [43.65300, 142.79864]
+                    "loc": [
+                        43.65300,
+                        142.79864
+                    ]
                 },
                 "Kamui-Ski-Links": {
                     "displayName": "Kamui Ski Links",
                     "bot": 150,
                     "mid": 451,
                     "top": 751,
-                    "loc": [43.70510, 142.18723]
+                    "loc": [
+                        43.70510,
+                        142.18723
+                    ]
                 },
                 "Sapporo-Teine": {
                     "displayName": "Sapporo Teine",
                     "bot": 340,
                     "mid": 682,
                     "top": 1023,
-                    "loc": [43.08400, 141.20500]
+                    "loc": [
+                        43.08400,
+                        141.20500
+                    ]
+                },
+                "Sapporo-Kokusai": {
+                    "displayName": "Sapporo Kokusai",
+                    "bot": 630,
+                    "mid": 865,
+                    "top": 1100,
+                    "loc": [
+                        43.072888,
+                        141.069645
+                    ]
                 }
             },
             "Nagano": {
@@ -5342,56 +5379,80 @@
                     "bot": 760,
                     "mid": 1296,
                     "top": 1831,
-                    "loc": [36.70208, 137.83713]
+                    "loc": [
+                        36.70208,
+                        137.83713
+                    ]
                 },
                 "Hakuba-Goryu-47": {
                     "displayName": "Hakuba Goryu / Hakuba 47",
                     "bot": 750,
                     "mid": 1213,
                     "top": 1676,
-                    "loc": [36.68950, 137.83450]
+                    "loc": [
+                        36.68950,
+                        137.83450
+                    ]
                 },
                 "Hakuba-Cortina": {
                     "displayName": "Hakuba Cortina",
                     "bot": 872,
                     "mid": 1137,
                     "top": 1402,
-                    "loc": [36.80250, 137.88800]
+                    "loc": [
+                        36.80250,
+                        137.88800
+                    ]
                 },
                 "Tsugaike-Kogen": {
                     "displayName": "Tsugaike Kogen",
                     "bot": 800,
                     "mid": 1252,
                     "top": 1704,
-                    "loc": [36.78330, 137.87000]
+                    "loc": [
+                        36.78330,
+                        137.87000
+                    ]
                 },
                 "Shiga-Kogen": {
                     "displayName": "Shiga Kogen",
                     "bot": 1340,
                     "mid": 1824,
                     "top": 2307,
-                    "loc": [36.70573, 138.50790]
+                    "loc": [
+                        36.70573,
+                        138.50790
+                    ]
                 },
                 "Nozawa-Onsen": {
                     "displayName": "Nozawa Onsen",
                     "bot": 565,
                     "mid": 1108,
                     "top": 1650,
-                    "loc": [36.92003, 138.45198]
+                    "loc": [
+                        36.92003,
+                        138.45198
+                    ]
                 },
                 "Madarao-Kogen": {
                     "displayName": "Madarao Kogen",
                     "bot": 910,
                     "mid": 1130,
                     "top": 1350,
-                    "loc": [36.86700, 138.32300]
+                    "loc": [
+                        36.86700,
+                        138.32300
+                    ]
                 },
                 "Tangram-Ski-Circus": {
                     "displayName": "Tangram Ski Circus",
                     "bot": 800,
                     "mid": 1060,
                     "top": 1320,
-                    "loc": [36.85400, 138.30700]
+                    "loc": [
+                        36.85400,
+                        138.30700
+                    ]
                 }
             },
             "Niigata": {
@@ -5400,49 +5461,70 @@
                     "bot": 650,
                     "mid": 1075,
                     "top": 1500,
-                    "loc": [36.88250, 138.18950]
+                    "loc": [
+                        36.88250,
+                        138.18950
+                    ]
                 },
                 "Myoko-Suginohara": {
                     "displayName": "Myoko Suginohara",
                     "bot": 731,
                     "mid": 1293,
                     "top": 1855,
-                    "loc": [36.86500, 138.17850]
+                    "loc": [
+                        36.86500,
+                        138.17850
+                    ]
                 },
                 "Lotte-Arai": {
                     "displayName": "Lotte Arai Resort",
                     "bot": 329,
                     "mid": 805,
                     "top": 1280,
-                    "loc": [36.99176, 138.18478]
+                    "loc": [
+                        36.99176,
+                        138.18478
+                    ]
                 },
                 "Naeba": {
                     "displayName": "Naeba",
                     "bot": 900,
                     "mid": 1345,
                     "top": 1789,
-                    "loc": [36.79100, 138.78500]
+                    "loc": [
+                        36.79100,
+                        138.78500
+                    ]
                 },
                 "Kagura": {
                     "displayName": "Kagura",
                     "bot": 620,
                     "mid": 1233,
                     "top": 1845,
-                    "loc": [36.89373, 138.77524]
+                    "loc": [
+                        36.89373,
+                        138.77524
+                    ]
                 },
                 "GALA-Yuzawa": {
                     "displayName": "GALA Yuzawa",
                     "bot": 358,
                     "mid": 770,
                     "top": 1181,
-                    "loc": [36.94976, 138.78441]
+                    "loc": [
+                        36.94976,
+                        138.78441
+                    ]
                 },
                 "Joetsu-Kokusai": {
                     "displayName": "Joetsu Kokusai",
                     "bot": 200,
                     "mid": 609,
                     "top": 1017,
-                    "loc": [37.00180, 138.92830]
+                    "loc": [
+                        37.00180,
+                        138.92830
+                    ]
                 }
             },
             "Yamagata": {
@@ -5451,14 +5533,20 @@
                     "bot": 780,
                     "mid": 1221,
                     "top": 1661,
-                    "loc": [38.16920, 140.39750]
+                    "loc": [
+                        38.16920,
+                        140.39750
+                    ]
                 },
                 "Gassan": {
                     "displayName": "Gassan",
                     "bot": 1235,
                     "mid": 1453,
                     "top": 1670,
-                    "loc": [38.30250, 139.98350]
+                    "loc": [
+                        38.30250,
+                        139.98350
+                    ]
                 }
             },
             "Gifu": {
@@ -5467,7 +5555,10 @@
                     "bot": 950,
                     "mid": 1250,
                     "top": 1550,
-                    "loc": [35.99804, 136.87731]
+                    "loc": [
+                        35.99804,
+                        136.87731
+                    ]
                 }
             }
         }
