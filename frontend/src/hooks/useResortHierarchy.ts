@@ -5,7 +5,7 @@
  * This hook now gets hierarchy data from the HierarchyContext (fetched from backend).
  */
 
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useHierarchy, type HierarchyNode } from '../contexts/HierarchyContext';
 import { useResortCache } from './useResortCache';
 
