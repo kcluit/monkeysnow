@@ -1607,7 +1607,8 @@ input[type="checkbox"] {
     border-color: transparent;
 }
 
-.rainbow-mode .resort-grid-close-btn:hover {
+.rainbow-mode .resort-grid-close-btn:hover,
+.rainbow-mode .resort-grid-clear-btn:hover {
     background: linear-gradient(90deg, #5E5CE6, #BF5AF2);
     color: #ffffff;
 }
