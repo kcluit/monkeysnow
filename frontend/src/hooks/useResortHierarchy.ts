@@ -88,6 +88,8 @@ export function useResortHierarchy({
 
   // Draft selection state - only committed on modal close to avoid lag
   const [draftSelectedResorts, setDraftSelectedResorts] = useState<string[]>(selectedResorts);
+  const draftRef = useRef(draftSelectedResorts);
+  draftRef.current = draftSelectedResorts;
 
   // Use draft state when modal is open, committed state when closed
   const activeSelectedResorts = isOpen ? draftSelectedResorts : selectedResorts;
