@@ -153,12 +153,12 @@ export function useResortHierarchy({
 
   const closeModal = useCallback(() => {
     // Commit draft selection to parent state on close
-    onResortsChange(draftSelectedResorts);
+    onResortsChange(draftRef.current);
     setIsOpen(false);
     setNavigationStack([]);
     setSearchTerm('');
     setSelectedIndex(0);
-  }, [draftSelectedResorts, onResortsChange]);
+  }, [onResortsChange]);
 
   // Navigation
   const navigateTo = useCallback((node: HierarchyNode) => {
