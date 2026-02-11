@@ -300,7 +300,8 @@ function estimateHourlySnow(tempC: number, humidity: number, snowfallCm: number)
 // Country-to-model mapping
 const COUNTRY_MODELS: Record<string, string> = {
     'Canada': 'gem_seamless',
-    'USA': 'gfs_seamless'
+    'USA': 'gfs_seamless',
+    'Japan': 'jma_seamless'
 };
 const DEFAULT_MODEL = 'best_match';
 
