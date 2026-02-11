@@ -3067,105 +3067,148 @@
                     ]
                 }
             },
-            "Montana" : {
+            "Montana": {
                 "Bear Paw": {
                     "displayName": "Bear Paw Ski Bowl",
                     "bot": 1372,
                     "mid": 1500,
                     "top": 1676,
-                    "loc": [48.483, -109.833]
+                    "loc": [
+                        48.483,
+                        -109.833
+                    ]
                 },
                 "Big Sky": {
                     "displayName": "Big Sky Resort",
                     "bot": 2073,
                     "mid": 2800,
                     "top": 3403,
-                    "loc": [45.284, -111.401]
+                    "loc": [
+                        45.284,
+                        -111.401
+                    ]
                 },
                 "Blacktail": {
                     "displayName": "Blacktail Mountain Ski Area",
                     "bot": 1596,
                     "mid": 1800,
                     "top": 2035,
-                    "loc": [48.023, -114.325]
+                    "loc": [
+                        48.023,
+                        -114.325
+                    ]
                 },
                 "Bridger Bowl": {
                     "displayName": "Bridger Bowl",
                     "bot": 1860,
                     "mid": 2200,
                     "top": 2652,
-                    "loc": [45.818, -111.117]
+                    "loc": [
+                        45.818,
+                        -111.117
+                    ]
                 },
                 "Discovery": {
                     "displayName": "Discovery Ski Area",
                     "bot": 6400,
                     "mid": 2200,
                     "top": 2700,
-                    "loc": [46.200, -113.000]
+                    "loc": [
+                        46.200,
+                        -113.000
+                    ]
                 },
                 "Great Divide": {
                     "displayName": "Great Divide",
                     "bot": 1941,
                     "mid": 2100,
                     "top": 2316,
-                    "loc": [46.753, -112.317]
+                    "loc": [
+                        46.753,
+                        -112.317
+                    ]
                 },
                 "Lost Trail": {
                     "displayName": "Lost Trail Powder Mountain",
                     "bot": 1950,
                     "mid": 2200,
                     "top": 2499,
-                    "loc": [45.693, -113.917]
+                    "loc": [
+                        45.693,
+                        -113.917
+                    ]
                 },
                 "Maverick": {
                     "displayName": "Maverick Mountain",
                     "bot": 1524,
                     "mid": 1800,
                     "top": 2316,
-                    "loc": [45.467, -113.933]
+                    "loc": [
+                        45.467,
+                        -113.933
+                    ]
                 },
                 "Red Lodge": {
                     "displayName": "Red Lodge Mountain",
                     "bot": 1859,
                     "mid": 2200,
                     "top": 2870,
-                    "loc": [45.166, -109.333]
+                    "loc": [
+                        45.166,
+                        -109.333
+                    ]
                 },
                 "Showdown": {
                     "displayName": "Showdown Montana",
                     "bot": 1707,
                     "mid": 2000,
                     "top": 2347,
-                    "loc": [46.850, -110.717]
+                    "loc": [
+                        46.850,
+                        -110.717
+                    ]
                 },
                 "Snowbowl": {
                     "displayName": "Montana Snowbowl",
                     "bot": 1524,
                     "mid": 2000,
                     "top": 2316,
-                    "loc": [47.014, -114.100]
+                    "loc": [
+                        47.014,
+                        -114.100
+                    ]
                 },
                 "Teton Pass": {
                     "displayName": "Teton Pass Ski Area",
                     "bot": 2134,
                     "mid": 2300,
                     "top": 2438,
-                    "loc": [45.550, -111.917]
+                    "loc": [
+                        45.550,
+                        -111.917
+                    ]
                 },
                 "Turner": {
                     "displayName": "Turner Mountain",
                     "bot": 1372,
                     "mid": 1600,
                     "top": 1890,
-                    "loc": [48.600, -115.833]
+                    "loc": [
+                        48.600,
+                        -115.833
+                    ]
                 },
                 "Whitefish": {
                     "displayName": "Whitefish Mountain Resort",
                     "bot": 1361,
                     "mid": 1800,
                     "top": 2078,
-                    "loc": [48.512, -114.352]
+                    "loc": [
+                        48.512,
+                        -114.352
+                    ]
                 }
+            },
             "Nevada": {
                 "Diamond-Peak": {
                     "displayName": "Diamond Peak",
