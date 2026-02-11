@@ -142,18 +142,21 @@ export function useResortHierarchy({
 
   // Open/close modal
   const openModal = useCallback(() => {
+    setDraftSelectedResorts(selectedResorts);
     setIsOpen(true);
     setNavigationStack([]);
     setSearchTerm('');
     setSelectedIndex(0);
-  }, []);
+  }, [selectedResorts]);
 
   const closeModal = useCallback(() => {
+    // Commit draft selection to parent state on close
+    onResortsChange(draftSelectedResorts);
     setIsOpen(false);
     setNavigationStack([]);
     setSearchTerm('');
     setSelectedIndex(0);
-  }, []);
+  }, [draftSelectedResorts, onResortsChange]);
 
   // Navigation
   const navigateTo = useCallback((node: HierarchyNode) => {
