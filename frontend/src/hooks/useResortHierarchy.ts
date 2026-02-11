@@ -32,6 +32,7 @@ export interface UseResortHierarchyReturn {
   toggleResort: (resortId: string) => void;
   selectAllInNode: (node: HierarchyNode) => void;
   deselectAllInNode: (node: HierarchyNode) => void;
+  clearAllResorts: () => void;
   getSelectionState: (node: HierarchyNode) => 'all' | 'some' | 'none';
   getResortsUnderNode: (node: HierarchyNode) => string[];
 
