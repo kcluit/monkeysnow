@@ -161,9 +161,9 @@ export function useResortHierarchy({
   // Navigation
   const navigateTo = useCallback((node: HierarchyNode) => {
     if (node.type === 'resort') {
-      // Toggle selection for resorts
+      // Toggle selection for resorts (draft state only)
       if (node.resortId) {
-        onResortsChange((prev) =>
+        setDraftSelectedResorts((prev) =>
           prev.includes(node.resortId!)
             ? prev.filter((id) => id !== node.resortId)
             : [...prev, node.resortId!]
@@ -175,7 +175,7 @@ export function useResortHierarchy({
       setSearchTerm('');
       setSelectedIndex(0);
     }
-  }, [onResortsChange]);
+  }, []);
 
   const goBack = useCallback(() => {
     if (isSearchMode) {
