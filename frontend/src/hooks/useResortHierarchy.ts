@@ -83,14 +83,20 @@ export function useResortHierarchy({
   // Get hierarchy from context (fetched from backend)
   const { hierarchyTree, loading: isLoading } = useHierarchy();
 
+  // Modal state
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Draft selection state - only committed on modal close to avoid lag
+  const [draftSelectedResorts, setDraftSelectedResorts] = useState<string[]>(selectedResorts);
+
+  // Use draft state when modal is open, committed state when closed
+  const activeSelectedResorts = isOpen ? draftSelectedResorts : selectedResorts;
+
   // Initialize resort cache for performance (O(1) lookups instead of tree traversals)
   const {
     getResortsUnderNode: cachedGetResortsUnderNode,
     getSelectionState: cachedGetSelectionState,
-  } = useResortCache({ hierarchyTree, selectedResorts });
-
-  // Modal state
-  const [isOpen, setIsOpen] = useState(false);
+  } = useResortCache({ hierarchyTree, selectedResorts: activeSelectedResorts });
 
   // Navigation state - stack of parent nodes
   const [navigationStack, setNavigationStack] = useState<HierarchyNode[]>([]);
