@@ -121,7 +121,7 @@ export function useCommandPalette(
     const handleKeyDown = (e: KeyboardEvent) => {
       // Open palette with Escape or Ctrl+Shift+P
       if (!isOpen) {
-        if (e.key === 'Escape' || e.key === 'Tab' || (e.ctrlKey && e.shiftKey && e.key === 'P')) {
+        if (e.key === 'Escape' || e.key === 'Tab' || ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toUpperCase() === 'P')) {
           e.preventDefault();
           openPalette();
           return;
