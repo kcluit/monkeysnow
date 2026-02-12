@@ -111,7 +111,7 @@ function App(): JSX.Element {
     const navigate = useNavigate();
 
     // Theme, font, fullscreen, FPS, rainbow, hide emoji, and language hooks
-    const { theme, setTheme, availableThemes } = useTheme();
+    const { theme, setTheme, availableThemes, applyTheme, resetPreview } = useTheme();
     const { font, setFont, availableFonts } = useFont();
     const { isFullscreen, enterFullscreen, exitFullscreen } = useFullscreen();
     const { fps, isEnabled: isFPSEnabled, setEnabled: setFPSEnabled } = useFPSCounter();
@@ -436,6 +436,32 @@ function App(): JSX.Element {
             return false;
         }
     }, [allWeatherData, selectedElevation, selectedTemperatureMetric, snowfallEstimateMode, unitSystem]);
+
+    // Preview theme when selecting in command palette
+    useEffect(() => {
+        if (!commandPalette.isOpen) {
+            resetPreview();
+            return;
+        }
+
+        const selectedCommand = commandPalette.filteredCommands[commandPalette.selectedIndex];
+        if (selectedCommand && selectedCommand.id.startsWith('theme-')) {
+            const themeId = selectedCommand.id.replace('theme-', '');
+            const themeToPreview = availableThemes.find(t => t.id === themeId);
+            if (themeToPreview) {
+                applyTheme(themeToPreview);
+            }
+        } else {
+            resetPreview();
+        }
+    }, [
+        commandPalette.isOpen,
+        commandPalette.selectedIndex,
+        commandPalette.filteredCommands,
+        availableThemes,
+        applyTheme,
+        resetPreview
+    ]);
 
     // Load all selected resorts
     const loadSelectedResorts = useCallback(async (): Promise<void> => {

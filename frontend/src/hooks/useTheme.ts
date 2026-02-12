@@ -77,10 +77,18 @@ export function useTheme(): UseThemeReturn {
         }
     }, []);
 
+    const resetPreview = useCallback(() => {
+        if (theme) {
+            applyTheme(theme);
+        }
+    }, [theme, applyTheme]);
+
     return {
         theme,
         setTheme,
         isDark: theme.isDark,
         availableThemes: themes,
+        applyTheme,
+        resetPreview,
     };
-}
+};

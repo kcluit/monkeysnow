@@ -46,6 +46,8 @@ export interface UseThemeReturn {
     setTheme: (themeId: string) => void;
     isDark: boolean;
     availableThemes: Theme[];
+    applyTheme: (theme: Theme) => void;
+    resetPreview: () => void;
 }
 
 // Elevation & sorting types
