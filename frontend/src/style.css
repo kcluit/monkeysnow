@@ -1273,14 +1273,8 @@ input[type="checkbox"] {
     font-weight: 600;
 }
 
-.resort-grid-footer-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-left: auto;
-}
-
 .resort-selection-count {
+    margin-left: auto;
     padding: 2px 8px;
     background: var(--accent, #0a84ff);
     border-radius: 10px;
@@ -1337,7 +1331,7 @@ input[type="checkbox"] {
     background: transparent;
     border: none;
     border-radius: 6px;
-    color: var(--accent, #0a84ff);
+    color: var(--textSecondary, #a1a1a6);
     font-size: 16px;
     cursor: pointer;
     transition: all 0.15s ease;
@@ -1345,7 +1339,7 @@ input[type="checkbox"] {
 
 .resort-grid-close-btn:hover {
     background: var(--cardBg, rgba(255, 255, 255, 0.1));
-    color: var(--accent, #0a84ff);
+    color: var(--text, #ffffff);
 }
 
 .resort-grid-clear-btn {

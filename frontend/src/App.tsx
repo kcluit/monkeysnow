@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { Header } from './components/Header';
 import { UtilityBar } from './components/UtilityBar';
@@ -125,7 +125,7 @@ function App(): JSX.Element {
     const { skiResorts, getDisplayName, loading: hierarchyLoading } = useHierarchy();
 
     // Weather data hook
-    const { allWeatherData, loading: weatherLoading, error, createLoadingController, cancelLoading } = useWeatherData();
+    const { allWeatherData, loading: weatherLoading, error, fetchResorts, createLoadingController, cancelLoading } = useWeatherData();
 
     // Only block UI if NO cached data at all
     const loading = (!allWeatherData && weatherLoading) || (!allWeatherData && hierarchyLoading);
@@ -164,6 +164,14 @@ function App(): JSX.Element {
         }
     }, [hierarchyLoading, skiResorts, hasInitialized, setSelectedResorts, setHasInitialized]);
 
+    // Initial page load fetch — fetch selected resorts once on mount
+    const initialFetchDone = useRef(false);
+    useEffect(() => {
+        if (!initialFetchDone.current && selectedResorts.length > 0) {
+            initialFetchDone.current = true;
+            fetchResorts(selectedResorts);
+        }
+    }, [selectedResorts, fetchResorts]);
 
     // Banner dismissal state
     const [bannerDismissed, setBannerDismissed] = useLocalStorage<boolean>('bannerDismissed', false);
@@ -174,6 +182,14 @@ function App(): JSX.Element {
         onResortsChange: setSelectedResorts,
     });
 
+    // Fetch fresh weather data when resort selection modal closes
+    const prevModalOpen = useRef(false);
+    useEffect(() => {
+        if (prevModalOpen.current && !resortHierarchy.isOpen) {
+            fetchResorts(selectedResorts);
+        }
+        prevModalOpen.current = resortHierarchy.isOpen;
+    }, [resortHierarchy.isOpen, selectedResorts, fetchResorts]);
 
     // Open resort modal and auto-dismiss the banner
     const openResortModalAndDismissBanner = useCallback(() => {
