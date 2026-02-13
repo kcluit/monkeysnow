@@ -58,8 +58,8 @@ export function useWeatherData(): UseWeatherDataReturn {
         setTimeout(() => {
           try {
             setCompressed(CACHE_KEY, data);
-          } catch {
-            // Quota exceeded or unavailable — silently ignore
+          } catch (err) {
+            console.warn('Failed to cache weather data to localStorage:', err);
           }
         }, 0);
       } catch (err) {
