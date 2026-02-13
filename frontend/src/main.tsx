@@ -50,8 +50,9 @@ const migrateResortIds = () => {
     }
 };
 
-// Run migration before rendering
+// Run migrations before rendering
 migrateResortIds();
+deleteOldIndexedDB();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
