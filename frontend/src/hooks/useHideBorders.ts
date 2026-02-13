@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useLayoutEffect, useCallback } from 'react';
 import { useLocalStorage } from './useLocalStorage';
 
 export interface UseHideBordersReturn {
