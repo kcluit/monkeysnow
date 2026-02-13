@@ -287,6 +287,34 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                         </div>
                     </div>
                     <div className="settings-subsection">
+                        <span className="settings-subsection-label">Sort day</span>
+                        <div className="settings-options-grid">
+                            {sortDayData.specialOptions.map(option => (
+                                <OptionButton
+                                    key={option.value}
+                                    label={option.name}
+                                    isSelected={selectedSortDay === option.value}
+                                    onClick={() => setSelectedSortDay(option.value as SortDay)}
+                                />
+                            ))}
+                            {sortDayData.regularDays.map((day, index) => (
+                                <OptionButton
+                                    key={index}
+                                    label={day.name}
+                                    isSelected={selectedSortDay === index}
+                                    onClick={() => setSelectedSortDay(index)}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                    <div className="settings-subsection">
+                        <span className="settings-subsection-label">Sort order</span>
+                        <div className="settings-options-row">
+                            <OptionButton label="Normal" isSelected={!isReversed} onClick={() => setIsReversed(false)} />
+                            <OptionButton label="Reverse" isSelected={isReversed} onClick={() => setIsReversed(true)} />
+                        </div>
+                    </div>
+                    <div className="settings-subsection">
                         <span className="settings-subsection-label">View mode</span>
                         <div className="settings-options-row">
                             <OptionButton label="Default" isSelected={viewMode === 'default'} onClick={() => setViewMode('default')} />
