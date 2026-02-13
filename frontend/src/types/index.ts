@@ -224,8 +224,6 @@ export interface UseWeatherDataReturn {
     allWeatherData: AllWeatherData | null;
     loading: boolean;
     error: Error | null;
-    updatedAt: string | null;
-    fetchResorts: (resortNames: string[]) => Promise<void>;
     createLoadingController: () => AbortController;
     cancelLoading: () => void;
 }
