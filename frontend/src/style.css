@@ -1273,8 +1273,14 @@ input[type="checkbox"] {
     font-weight: 600;
 }
 
-.resort-selection-count {
+.resort-grid-footer-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     margin-left: auto;
+}
+
+.resort-selection-count {
     padding: 2px 8px;
     background: var(--accent, #0a84ff);
     border-radius: 10px;
