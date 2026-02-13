@@ -9,14 +9,14 @@ export function useWeatherData(): UseWeatherDataReturn {
   const [error, setError] = useState<Error | null>(null);
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
   const loadingController = useRef<AbortController | null>(null);
+  const sessionCache = useRef<Map<string, ResortData>>(new Map());
 
-  // On mount: restore cached resort data from IndexedDB for selected resorts
+  // On mount: restore cached resort data from IndexedDB and populate session cache
   useEffect(() => {
     let cancelled = false;
 
     async function restoreCache() {
       try {
-        // Read selectedResorts directly from localStorage to avoid prop dependency
         const raw = localStorage.getItem('selectedResorts');
         if (!raw) return;
         const selectedResorts: string[] = JSON.parse(raw);
@@ -28,13 +28,15 @@ export function useWeatherData(): UseWeatherDataReturn {
         await Promise.all(
           selectedResorts.map(async (name) => {
             const entry = await idbGet<ResortData>(`resort:${name}`);
-            if (entry) data[name] = entry;
+            if (entry) {
+              data[name] = entry;
+              sessionCache.current.set(name, entry);
+            }
           })
         );
 
         if (cancelled) return;
 
-        // Only set state if we got at least some cached data
         if (Object.keys(data).length > 0) {
           setAllWeatherData({ updatedAt: cachedUpdatedAt || '', data });
           setUpdatedAt(cachedUpdatedAt || null);
@@ -52,12 +54,56 @@ export function useWeatherData(): UseWeatherDataReturn {
     if (resortNames.length === 0) return;
 
     try {
-      setLoading(true);
       setError(null);
+
+      // Phase 1: Check session cache, then IndexedDB for misses
+      const cachedData: Record<string, ResortData> = {};
+      const missingFromSession: string[] = [];
+
+      for (const name of resortNames) {
+        const cached = sessionCache.current.get(name);
+        if (cached) {
+          cachedData[name] = cached;
+        } else {
+          missingFromSession.push(name);
+        }
+      }
+
+      if (missingFromSession.length > 0) {
+        await Promise.all(
+          missingFromSession.map(async (name) => {
+            try {
+              const entry = await idbGet<ResortData>(`resort:${name}`);
+              if (entry) {
+                cachedData[name] = entry;
+                sessionCache.current.set(name, entry);
+              }
+            } catch {
+              // IndexedDB read failed — skip this resort
+            }
+          })
+        );
+      }
+
+      // Phase 2: Display cached data immediately
+      if (Object.keys(cachedData).length > 0) {
+        setAllWeatherData((prev) => {
+          const merged = { ...prev?.data, ...cachedData };
+          return { updatedAt: prev?.updatedAt || '', data: merged };
+        });
+      }
+
+      // Phase 3: Always fetch fresh data in background (stale-while-revalidate)
+      setLoading(true);
 
       const freshData = await fetchSelectedResorts(resortNames);
 
-      // Merge fresh data into existing state
+      // Update session cache with fresh data
+      for (const [name, resortData] of Object.entries(freshData.data)) {
+        sessionCache.current.set(name, resortData);
+      }
+
+      // Merge fresh data into state
       setAllWeatherData((prev) => {
         const merged = { ...prev?.data, ...freshData.data };
         return { updatedAt: freshData.updatedAt, data: merged };
