@@ -39,6 +39,25 @@ export async function fetchAllData(): Promise<AllWeatherData> {
     }
 }
 
+export async function fetchSelectedResorts(resortNames: string[]): Promise<AllWeatherData> {
+    try {
+        const response = await fetch(`${API_URL}/resorts`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ resortNames }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error('Error fetching selected resorts:', err);
+        throw err;
+    }
+}
+
 export function processResortData(
     allData: AllWeatherData,
     resortName: string,
