@@ -130,24 +130,43 @@ export interface UseHierarchyDataReturn {
   error: Error | null;
 }
 
+function readCachedHierarchy(): ContinentData[] | null {
+  try {
+    const raw = localStorage.getItem('hierarchyCache');
+    if (raw) return JSON.parse(raw) as ContinentData[];
+  } catch { /* ignore */ }
+  return null;
+}
+
 export function useHierarchyData(): UseHierarchyDataReturn {
-  const [hierarchy, setHierarchy] = useState<ContinentData[] | null>(null);
-  const [loading, setLoading] = useState(true);
+  const cached = readCachedHierarchy();
+  const [hierarchy, setHierarchy] = useState<ContinentData[] | null>(cached);
+  const [loading, setLoading] = useState(!cached);
   const [error, setError] = useState<Error | null>(null);
+  const hierarchyRef = useRef(hierarchy);
+  hierarchyRef.current = hierarchy;
 
   useEffect(() => {
     const fetchHierarchy = async () => {
       try {
-        setLoading(true);
+        if (!hierarchyRef.current) setLoading(true);
         const response = await fetch(`${API_URL}/hierarchy`);
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data: HierarchyResponse = await response.json();
-        setHierarchy(data.continents);
+        const fresh = data.continents;
+        // Only update state + localStorage if data actually changed
+        if (JSON.stringify(fresh) !== JSON.stringify(hierarchyRef.current)) {
+          setHierarchy(fresh);
+          try { localStorage.setItem('hierarchyCache', JSON.stringify(fresh)); } catch { /* ignore */ }
+        }
       } catch (err) {
         console.error('Failed to fetch hierarchy:', err);
-        setError(err instanceof Error ? err : new Error('Unknown error'));
+        // Only show error if no cached fallback
+        if (!hierarchyRef.current) {
+          setError(err instanceof Error ? err : new Error('Unknown error'));
+        }
       } finally {
         setLoading(false);
       }
