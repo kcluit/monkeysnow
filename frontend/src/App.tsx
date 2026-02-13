@@ -182,6 +182,15 @@ function App(): JSX.Element {
         onResortsChange: setSelectedResorts,
     });
 
+    // Fetch fresh weather data when resort selection modal closes
+    const prevModalOpen = useRef(false);
+    useEffect(() => {
+        if (prevModalOpen.current && !resortHierarchy.isOpen) {
+            fetchResorts(selectedResorts);
+        }
+        prevModalOpen.current = resortHierarchy.isOpen;
+    }, [resortHierarchy.isOpen, selectedResorts, fetchResorts]);
+
     // Open resort modal and auto-dismiss the banner
     const openResortModalAndDismissBanner = useCallback(() => {
         resortHierarchy.openModal();
