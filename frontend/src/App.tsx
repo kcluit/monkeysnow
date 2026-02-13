@@ -125,7 +125,7 @@ function App(): JSX.Element {
     const { skiResorts, getDisplayName, loading: hierarchyLoading } = useHierarchy();
 
     // Weather data hook
-    const { allWeatherData, loading: weatherLoading, error, createLoadingController, cancelLoading } = useWeatherData();
+    const { allWeatherData, error, createLoadingController, cancelLoading } = useWeatherData();
 
     // Local storage state
     const [selectedResorts, setSelectedResorts] = useLocalStorage<string[]>('selectedResorts', defaultSelectedResorts);
