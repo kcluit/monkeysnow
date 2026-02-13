@@ -57,6 +57,8 @@ const app = express();
 
 // Enable CORS for all origins (for local development)
 app.use(cors());
+// Enable JSON body parsing for POST requests
+app.use(express.json());
 
 // --- Helpers ---
 
@@ -730,6 +732,26 @@ app.get('/:resortName', (req, res) => {
     if (!weatherCache) return res.status(503).json({ error: "Initializing..." });
     const data = weatherCache[req.params.resortName];
     if (!data) return res.status(404).json({ error: "Resort not found" });
+    res.json({ updatedAt: lastSuccessfulUpdate, data });
+});
+
+app.post('/resorts', (req, res) => {
+    if (!weatherCache) return res.status(503).json({ error: "Initializing..." });
+
+    const { resortNames } = req.body;
+
+    if (!Array.isArray(resortNames)) {
+        return res.status(400).json({ error: "Invalid input: resortNames must be an array" });
+    }
+
+    const data: Record<string, any> = {};
+
+    for (const name of resortNames) {
+        if (typeof name === 'string' && weatherCache[name]) {
+            data[name] = weatherCache[name];
+        }
+    }
+
     res.json({ updatedAt: lastSuccessfulUpdate, data });
 });
 
