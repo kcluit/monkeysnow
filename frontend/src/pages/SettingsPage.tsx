@@ -49,12 +49,19 @@ export interface SettingsPageProps {
     setSelectedElevation: (e: ElevationLevel) => void;
     selectedSort: SortOption;
     setSelectedSort: (s: SortOption) => void;
+    selectedSortDay: SortDay;
+    setSelectedSortDay: (d: SortDay) => void;
+    sortDayData: SortDayData;
+    isReversed: boolean;
+    setIsReversed: (r: boolean) => void;
     viewMode: ViewMode;
     setViewMode: (m: ViewMode) => void;
     selectedTemperatureMetric: TemperatureMetric;
     setSelectedTemperatureMetric: (m: TemperatureMetric) => void;
     snowfallEstimateMode: SnowfallEstimateMode;
     setSnowfallEstimateMode: (m: SnowfallEstimateMode) => void;
+    weatherModel: WeatherModelSetting;
+    setWeatherModel: (m: WeatherModelSetting) => void;
     // Utility bar
     showUtilityBar: boolean;
     setShowUtilityBar: (show: boolean) => void;
