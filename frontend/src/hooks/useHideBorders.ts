@@ -12,7 +12,7 @@ export function useHideBorders(): UseHideBordersReturn {
 
   // Apply no-borders class to document when state changes
   // Note: isHideBordersEnabled=true means borders are hidden (no-borders class applied)
-  useEffect(() => {
+  useLayoutEffect(() => {
     const root = document.documentElement;
     if (isHideBordersEnabled) {
       root.classList.add('no-borders');
