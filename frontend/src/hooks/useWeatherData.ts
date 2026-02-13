@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { fetchAllData } from '../utils/weather';
-import { idbGet, idbSet } from '../utils/indexedDB';
-import type { AllWeatherData, ResortData, UseWeatherDataReturn } from '../types';
+import { getCompressed, setCompressed } from '../utils/compressedStorage';
+import type { AllWeatherData, UseWeatherDataReturn } from '../types';
+
+const CACHE_KEY = 'weather:all';
 
 // Module-level cache for request deduplication (prevents duplicate fetches in React StrictMode)
 let cachedData: AllWeatherData | null = null;
@@ -24,33 +26,14 @@ export function useWeatherData(): UseWeatherDataReturn {
         return;
       }
 
-      // Try to restore from IndexedDB for instant display while fetch happens
+      // Try to restore from compressed localStorage for instant display while fetch happens
       try {
-        const raw = localStorage.getItem('selectedResorts');
-        if (raw) {
-          const selectedResorts: string[] = JSON.parse(raw);
-          if (selectedResorts.length > 0) {
-            const cachedUpdatedAt = await idbGet<string>('meta:updatedAt');
-            const data: Record<string, ResortData> = {};
-
-            await Promise.all(
-              selectedResorts.map(async (name) => {
-                try {
-                  const entry = await idbGet<ResortData>(`resort:${name}`);
-                  if (entry) data[name] = entry;
-                } catch {
-                  // Individual read failed — skip
-                }
-              })
-            );
-
-            if (!cancelled && Object.keys(data).length > 0) {
-              setAllWeatherData({ updatedAt: cachedUpdatedAt || '', data });
-            }
-          }
+        const cached = getCompressed<AllWeatherData>(CACHE_KEY);
+        if (cached && !cancelled) {
+          setAllWeatherData(cached);
         }
       } catch {
-        // IndexedDB unavailable — continue to network fetch
+        // localStorage unavailable or corrupt — continue to network fetch
       }
 
       // Always fetch fresh data
@@ -71,19 +54,14 @@ export function useWeatherData(): UseWeatherDataReturn {
           setAllWeatherData(data);
         }
 
-        // Write to IndexedDB in background (non-blocking)
-        (async () => {
+        // Write to compressed localStorage in background (non-blocking)
+        setTimeout(() => {
           try {
-            await idbSet('meta:updatedAt', data.updatedAt);
-            await Promise.all(
-              Object.entries(data.data).map(([name, resortData]) =>
-                idbSet(`resort:${name}`, resortData)
-              )
-            );
+            setCompressed(CACHE_KEY, data);
           } catch {
-            // IndexedDB unavailable — silently ignore
+            // Quota exceeded or unavailable — silently ignore
           }
-        })();
+        }, 0);
       } catch (err) {
         pendingRequest = null;
         if (!cancelled) {
