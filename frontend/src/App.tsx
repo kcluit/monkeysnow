@@ -683,9 +683,13 @@ function App(): JSX.Element {
                     </button>
                 )}
 
-                {selectedResorts.length === 0 && (
+                {selectedResorts.length === 0 ? (
                     <div className="text-center py-12">
                         <div className="text-theme-textSecondary text-lg">{t('empty.selectResorts')}</div>
+                    </div>
+                ) : displayResorts.length === 0 && !error && (
+                    <div className="text-center py-12">
+                        <div className="text-theme-textSecondary text-lg">{t('loading.weatherData')}</div>
                     </div>
                 )}
             </div>
