@@ -127,8 +127,8 @@ function App(): JSX.Element {
     // Weather data hook
     const { allWeatherData, loading: weatherLoading, error, updatedAt, fetchResorts, createLoadingController, cancelLoading } = useWeatherData();
 
-    // Combined loading state
-    const loading = weatherLoading || hierarchyLoading;
+    // Only block UI if NO cached data at all
+    const loading = (!allWeatherData && weatherLoading) || (!allWeatherData && hierarchyLoading);
 
     // Local storage state
     const [selectedResorts, setSelectedResorts] = useLocalStorage<string[]>('selectedResorts', defaultSelectedResorts);
