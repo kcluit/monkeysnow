@@ -6,9 +6,12 @@ import type { Language } from '../types/i18n';
 import type {
     ElevationLevel,
     SortOption,
+    SortDay,
+    SortDayData,
     ViewMode,
     TemperatureMetric,
     SnowfallEstimateMode,
+    WeatherModelSetting,
     UtilityBarStyle,
     UnitSystem,
 } from '../types';
@@ -46,12 +49,19 @@ export interface SettingsPageProps {
     setSelectedElevation: (e: ElevationLevel) => void;
     selectedSort: SortOption;
     setSelectedSort: (s: SortOption) => void;
+    selectedSortDay: SortDay;
+    setSelectedSortDay: (d: SortDay) => void;
+    sortDayData: SortDayData;
+    isReversed: boolean;
+    setIsReversed: (r: boolean) => void;
     viewMode: ViewMode;
     setViewMode: (m: ViewMode) => void;
     selectedTemperatureMetric: TemperatureMetric;
     setSelectedTemperatureMetric: (m: TemperatureMetric) => void;
     snowfallEstimateMode: SnowfallEstimateMode;
     setSnowfallEstimateMode: (m: SnowfallEstimateMode) => void;
+    weatherModel: WeatherModelSetting;
+    setWeatherModel: (m: WeatherModelSetting) => void;
     // Utility bar
     showUtilityBar: boolean;
     setShowUtilityBar: (show: boolean) => void;
@@ -145,9 +155,12 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
         chartZoomSyncEnabled, setChartZoomSyncEnabled,
         selectedElevation, setSelectedElevation,
         selectedSort, setSelectedSort,
+        selectedSortDay, setSelectedSortDay, sortDayData,
+        isReversed, setIsReversed,
         viewMode, setViewMode,
         selectedTemperatureMetric, setSelectedTemperatureMetric,
         snowfallEstimateMode, setSnowfallEstimateMode,
+        weatherModel, setWeatherModel,
         showUtilityBar, setShowUtilityBar,
         utilityBarStyle, setUtilityBarStyle,
         unitSystem, setUnitSystem,
@@ -274,6 +287,34 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                         </div>
                     </div>
                     <div className="settings-subsection">
+                        <span className="settings-subsection-label">Sort day</span>
+                        <div className="settings-options-grid">
+                            {sortDayData.specialOptions.map(option => (
+                                <OptionButton
+                                    key={option.value}
+                                    label={option.name}
+                                    isSelected={selectedSortDay === option.value}
+                                    onClick={() => setSelectedSortDay(option.value as SortDay)}
+                                />
+                            ))}
+                            {sortDayData.regularDays.map((day, index) => (
+                                <OptionButton
+                                    key={index}
+                                    label={day.name}
+                                    isSelected={selectedSortDay === index}
+                                    onClick={() => setSelectedSortDay(index)}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                    <div className="settings-subsection">
+                        <span className="settings-subsection-label">Sort order</span>
+                        <div className="settings-options-row">
+                            <OptionButton label="Normal" isSelected={!isReversed} onClick={() => setIsReversed(false)} />
+                            <OptionButton label="Reverse" isSelected={isReversed} onClick={() => setIsReversed(true)} />
+                        </div>
+                    </div>
+                    <div className="settings-subsection">
                         <span className="settings-subsection-label">View mode</span>
                         <div className="settings-options-row">
                             <OptionButton label="Default" isSelected={viewMode === 'default'} onClick={() => setViewMode('default')} />
@@ -295,6 +336,12 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                         <div className="settings-options-row">
                             <OptionButton label="Model estimate" isSelected={snowfallEstimateMode === 'model'} onClick={() => setSnowfallEstimateMode('model')} />
                             <OptionButton label="monkeysnow estimate" isSelected={snowfallEstimateMode === 'totalPrecip'} onClick={() => setSnowfallEstimateMode('totalPrecip')} />
+                        </div>
+                    </div>
+                    <div className="settings-subsection">
+                        <span className="settings-subsection-label">Weather model</span>
+                        <div className="settings-options-row">
+                            <OptionButton label="Auto" isSelected={weatherModel === 'auto'} onClick={() => setWeatherModel('auto')} />
                         </div>
                     </div>
                 </SettingSection>
