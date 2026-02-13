@@ -164,6 +164,15 @@ function App(): JSX.Element {
         }
     }, [hierarchyLoading, skiResorts, hasInitialized, setSelectedResorts, setHasInitialized]);
 
+    // Initial page load fetch — fetch selected resorts once on mount
+    const initialFetchDone = useRef(false);
+    useEffect(() => {
+        if (!initialFetchDone.current && selectedResorts.length > 0) {
+            initialFetchDone.current = true;
+            fetchResorts(selectedResorts);
+        }
+    }, [selectedResorts, fetchResorts]);
+
     // Banner dismissal state
     const [bannerDismissed, setBannerDismissed] = useLocalStorage<boolean>('bannerDismissed', false);
 
