@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useLayoutEffect, useEffect, useCallback } from 'react';
 import { fonts, getFontById, getDefaultFont } from '../types/fonts';
 import type { Font } from '../types/fonts';
 
@@ -9,7 +9,16 @@ export interface UseFontReturn {
 }
 
 export function useFont(): UseFontReturn {
-  const [font, setFontState] = useState<Font>(getDefaultFont());
+  const [font, setFontState] = useState<Font>(() => {
+    try {
+      const savedId = localStorage.getItem('fontId');
+      if (savedId) {
+        const saved = getFontById(savedId);
+        if (saved) return saved;
+      }
+    } catch { /* ignore */ }
+    return getDefaultFont();
+  });
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Apply font CSS variable to document
