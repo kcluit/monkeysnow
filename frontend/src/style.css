@@ -1283,6 +1283,10 @@ input[type="checkbox"] {
     font-weight: 600;
 }
 
+.resort-grid-clear-btn + .resort-selection-count {
+    margin-left: 8px;
+}
+
 /* Rainbow mode for resort selection */
 .rainbow-mode .resort-checkbox.checked,
 .rainbow-mode .resort-checkbox.indeterminate {
@@ -1331,7 +1335,7 @@ input[type="checkbox"] {
     background: transparent;
     border: none;
     border-radius: 6px;
-    color: var(--textSecondary, #a1a1a6);
+    color: var(--accent, #0a84ff);
     font-size: 16px;
     cursor: pointer;
     transition: all 0.15s ease;
@@ -1339,20 +1343,21 @@ input[type="checkbox"] {
 
 .resort-grid-close-btn:hover {
     background: var(--cardBg, rgba(255, 255, 255, 0.1));
-    color: var(--text, #ffffff);
+    color: var(--accent, #0a84ff);
 }
 
 .resort-grid-clear-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 32px;
-    padding: 0 12px;
+    height: 24px;
+    padding: 0 10px;
+    margin-left: auto;
     background: transparent;
     border: none;
     border-radius: 6px;
     color: var(--textSecondary, #a1a1a6);
-    font-size: 13px;
+    font-size: 11px;
     font-family: inherit;
     cursor: pointer;
     transition: all 0.15s ease;

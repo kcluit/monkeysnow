@@ -30,6 +30,7 @@ import { useHideBorders } from './hooks/useHideBorders';
 import { useShowDate } from './hooks/useShowDate';
 import { useResortHierarchy } from './hooks/useResortHierarchy';
 import { useUnitSystem } from './hooks/useUnitSystem';
+import { useIsMobile } from './hooks/useIsMobile';
 import { useLanguage } from './hooks/useLanguage';
 import { useHierarchy } from './contexts/HierarchyContext';
 import { processResortData } from './utils/weather';
@@ -120,6 +121,7 @@ function App(): JSX.Element {
     const { isHideBordersEnabled, setHideBordersEnabled } = useHideBorders();
     const { isShowDateEnabled, setShowDateEnabled } = useShowDate();
     const { t, language, setLanguage, availableLanguages } = useLanguage();
+    const isMobile = useIsMobile();
 
     // Hierarchy data from backend (resort list, display names)
     const { skiResorts, getDisplayName, loading: hierarchyLoading } = useHierarchy();
@@ -570,6 +572,7 @@ function App(): JSX.Element {
     }, [navigate]);
 
     // Get sorted resort data for display
+    const MOBILE_RESORT_LIMIT = 100;
     const displayResorts = useMemo((): ProcessedResortData[] => {
         if (!allWeatherData || selectedResorts.length === 0) return [];
 
@@ -584,9 +587,14 @@ function App(): JSX.Element {
             unitSystem
         );
 
-        return sortedResorts
+        const processed = sortedResorts
             .map(resortId => resortData.get(resortId))
             .filter((resort): resort is ProcessedResortData => Boolean(resort));
+
+        if (isMobile && processed.length > MOBILE_RESORT_LIMIT) {
+            return processed.slice(0, MOBILE_RESORT_LIMIT);
+        }
+        return processed;
     }, [
         allWeatherData,
         selectedResorts,
@@ -598,8 +606,11 @@ function App(): JSX.Element {
         snowfallEstimateMode,
         unitSystem,
         resortData,
-        sortResorts
+        sortResorts,
+        isMobile
     ]);
+
+    const isTruncated = isMobile && selectedResorts.length > MOBILE_RESORT_LIMIT;
 
     // Show loading state
     if (loading) {
@@ -706,6 +717,12 @@ function App(): JSX.Element {
                         </div>
                     ))}
                 </Suspense>
+
+                {isTruncated && (
+                    <div className="text-center py-3 text-sm text-theme-textSecondary">
+                        Showing {MOBILE_RESORT_LIMIT} of {selectedResorts.length} selected resorts on mobile
+                    </div>
+                )}
 
                 {/* Ghost "Add more resorts" card */}
                 {selectedResorts.length > 0 && (

@@ -476,15 +476,6 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
               spellCheck={false}
             />
           </div>
-          {selectedResorts.length > 0 && (
-            <button
-              className="resort-grid-clear-btn"
-              onClick={clearAllResorts}
-              aria-label="Clear selection"
-            >
-              Clear
-            </button>
-          )}
           <button
             className="resort-grid-close-btn"
             onClick={closeModal}
@@ -526,6 +517,15 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
           <span className="command-hint">
             <kbd>esc</kbd> close
           </span>
+          {selectedResorts.length > 0 && (
+            <button
+              className="resort-grid-clear-btn"
+              onClick={clearAllResorts}
+              aria-label="Clear selection"
+            >
+              Clear
+            </button>
+          )}
           <span className="resort-selection-count">
             {selectedResorts.length} selected
           </span>
