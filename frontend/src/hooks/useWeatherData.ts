@@ -78,6 +78,7 @@ export function useWeatherData(): UseWeatherDataReturn {
             try {
                 const cached = getCompressed<AllWeatherData>(CACHE_KEY);
                 if (cached && !cancelled) {
+                    cachedData = cached;
                     setAllWeatherData(cached);
                     setLoading(false);
                     hasCachedData = true;
