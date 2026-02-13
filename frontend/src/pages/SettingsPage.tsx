@@ -6,9 +6,12 @@ import type { Language } from '../types/i18n';
 import type {
     ElevationLevel,
     SortOption,
+    SortDay,
+    SortDayData,
     ViewMode,
     TemperatureMetric,
     SnowfallEstimateMode,
+    WeatherModelSetting,
     UtilityBarStyle,
     UnitSystem,
 } from '../types';
