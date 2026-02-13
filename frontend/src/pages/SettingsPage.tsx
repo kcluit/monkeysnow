@@ -338,6 +338,12 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                             <OptionButton label="monkeysnow estimate" isSelected={snowfallEstimateMode === 'totalPrecip'} onClick={() => setSnowfallEstimateMode('totalPrecip')} />
                         </div>
                     </div>
+                    <div className="settings-subsection">
+                        <span className="settings-subsection-label">Weather model</span>
+                        <div className="settings-options-row">
+                            <OptionButton label="Auto" isSelected={weatherModel === 'auto'} onClick={() => setWeatherModel('auto')} />
+                        </div>
+                    </div>
                 </SettingSection>
 
                 {/* Utility Bar */}
