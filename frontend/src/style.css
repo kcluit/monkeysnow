@@ -1331,7 +1331,7 @@ input[type="checkbox"] {
     background: transparent;
     border: none;
     border-radius: 6px;
-    color: var(--textSecondary, #a1a1a6);
+    color: var(--accent, #0a84ff);
     font-size: 16px;
     cursor: pointer;
     transition: all 0.15s ease;
@@ -1339,7 +1339,7 @@ input[type="checkbox"] {
 
 .resort-grid-close-btn:hover {
     background: var(--cardBg, rgba(255, 255, 255, 0.1));
-    color: var(--text, #ffffff);
+    color: var(--accent, #0a84ff);
 }
 
 .resort-grid-clear-btn {
