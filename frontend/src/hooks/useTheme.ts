@@ -44,25 +44,9 @@ export function useTheme(): UseThemeReturn {
         }
     }, []);
 
-    // Initialize theme on mount
-    useEffect(() => {
-        try {
-            const savedThemeId = localStorage.getItem('themeId');
-            if (savedThemeId) {
-                const savedTheme = getThemeById(savedThemeId);
-                if (savedTheme) {
-                    setThemeState(savedTheme);
-                    applyTheme(savedTheme);
-                } else {
-                    applyTheme(getDefaultTheme());
-                }
-            } else {
-                applyTheme(getDefaultTheme());
-            }
-        } catch (error) {
-            console.warn('Error accessing localStorage:', error);
-            applyTheme(getDefaultTheme());
-        }
+    // Apply theme CSS before first paint (theme already loaded in useState init)
+    useLayoutEffect(() => {
+        applyTheme(theme);
         setIsInitialized(true);
     }, [applyTheme]);
 
