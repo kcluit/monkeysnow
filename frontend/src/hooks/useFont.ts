@@ -27,25 +27,9 @@ export function useFont(): UseFontReturn {
     root.style.setProperty('--fontFamily', fontToApply.family);
   }, []);
 
-  // Initialize font on mount
-  useEffect(() => {
-    try {
-      const savedFontId = localStorage.getItem('fontId');
-      if (savedFontId) {
-        const savedFont = getFontById(savedFontId);
-        if (savedFont) {
-          setFontState(savedFont);
-          applyFont(savedFont);
-        } else {
-          applyFont(getDefaultFont());
-        }
-      } else {
-        applyFont(getDefaultFont());
-      }
-    } catch (error) {
-      console.warn('Error accessing localStorage:', error);
-      applyFont(getDefaultFont());
-    }
+  // Apply font CSS before first paint (font already loaded in useState init)
+  useLayoutEffect(() => {
+    applyFont(font);
     setIsInitialized(true);
   }, [applyFont]);
 
