@@ -1,10 +1,19 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useLayoutEffect, useEffect, useCallback } from 'react';
 import { themes, getThemeById, getDefaultTheme } from '../types/themes';
 import type { Theme } from '../types/themes';
 import type { UseThemeReturn } from '../types';
 
 export function useTheme(): UseThemeReturn {
-    const [theme, setThemeState] = useState<Theme>(getDefaultTheme());
+    const [theme, setThemeState] = useState<Theme>(() => {
+        try {
+            const savedId = localStorage.getItem('themeId');
+            if (savedId) {
+                const saved = getThemeById(savedId);
+                if (saved) return saved;
+            }
+        } catch { /* ignore */ }
+        return getDefaultTheme();
+    });
     const [isInitialized, setIsInitialized] = useState(false);
 
     // Apply theme CSS variables to document
