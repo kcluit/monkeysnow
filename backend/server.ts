@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import compression from 'compression';
 import { fetchWeatherApi } from 'openmeteo';
 import fs from 'fs';
 import path from 'path';
