@@ -17,30 +17,13 @@ export function useWeatherData(): UseWeatherDataReturn {
 
     useEffect(() => {
         let cancelled = false;
+        let delayTimer: ReturnType<typeof setTimeout> | null = null;
 
-        async function init() {
-            // If we already have module-level cached data, use it
-            if (cachedData) {
-                setAllWeatherData(cachedData);
-                setLoading(false);
-                return;
-            }
-
-            // Try to restore from compressed localStorage for instant display while fetch happens
+        async function fetchFreshData(hasCachedData: boolean) {
             try {
-                const cached = getCompressed<AllWeatherData>(CACHE_KEY);
-                if (cached && !cancelled) {
-                    setAllWeatherData(cached);
-                    console.log('Weather data restored from localStorage');
+                if (!hasCachedData) {
+                    setLoading(true);
                 }
-            } catch {
-                // localStorage unavailable or corrupt — continue to network fetch
-                console.warn('Failed to restore weather data from localStorage');
-            }
-
-            // Always fetch fresh data
-            try {
-                setLoading(true);
                 setError(null);
 
                 // Reuse pending request if one exists (deduplication)
@@ -67,8 +50,13 @@ export function useWeatherData(): UseWeatherDataReturn {
             } catch (err) {
                 pendingRequest = null;
                 if (!cancelled) {
-                    console.error('Failed to fetch weather data:', err);
-                    setError(err instanceof Error ? err : new Error('Unknown error'));
+                    if (hasCachedData) {
+                        // Silently keep cached data if delayed fetch fails
+                        console.warn('Failed to refresh weather data, keeping cached version:', err);
+                    } else {
+                        console.error('Failed to fetch weather data:', err);
+                        setError(err instanceof Error ? err : new Error('Unknown error'));
+                    }
                 }
             } finally {
                 if (!cancelled) {
@@ -77,8 +65,49 @@ export function useWeatherData(): UseWeatherDataReturn {
             }
         }
 
+        function init() {
+            // If we already have module-level cached data, use it
+            if (cachedData) {
+                setAllWeatherData(cachedData);
+                setLoading(false);
+                return;
+            }
+
+            // Try to restore from compressed localStorage for instant display
+            let hasCachedData = false;
+            try {
+                const cached = getCompressed<AllWeatherData>(CACHE_KEY);
+                if (cached && !cancelled) {
+                    setAllWeatherData(cached);
+                    setLoading(false);
+                    hasCachedData = true;
+                    console.log('Weather data restored from localStorage, fetching fresh data in 5s');
+                }
+            } catch {
+                // localStorage unavailable or corrupt — continue to network fetch
+                console.warn('Failed to restore weather data from localStorage');
+            }
+
+            if (hasCachedData) {
+                // Delay fresh fetch by 5 seconds when cached data is available
+                delayTimer = setTimeout(() => {
+                    if (!cancelled) {
+                        fetchFreshData(true);
+                    }
+                }, 5000);
+            } else {
+                // No cached data — fetch immediately
+                fetchFreshData(false);
+            }
+        }
+
         init();
-        return () => { cancelled = true; };
+        return () => {
+            cancelled = true;
+            if (delayTimer) {
+                clearTimeout(delayTimer);
+            }
+        };
     }, []);
 
     const createLoadingController = useCallback((): AbortController => {
