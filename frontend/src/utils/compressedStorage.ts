@@ -38,6 +38,7 @@ export function deleteOldIndexedDB(): void {
         const request = indexedDB.deleteDatabase('monkeysnow');
         request.onsuccess = () => console.log('Deleted old IndexedDB database');
         request.onerror = () => console.warn('Failed to delete old IndexedDB');
+        request.onblocked = () => console.warn('IndexedDB deletion blocked — close other tabs');
     } catch {
         // IndexedDB not available — ignore
     }
