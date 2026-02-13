@@ -148,3 +148,6 @@ vite.config.ts.timestamp-*
 CLAUDE.md
 # Turborepo
 .turbo/
+
+# Ignore macOS Finder files
+.DS_Store

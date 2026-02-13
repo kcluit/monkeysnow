@@ -35,6 +35,7 @@ import {
   faCalendarDays,
   faLink,
   faCloud,
+  faHashtag,
   // Theme icons
   faMoon,
   faSun,
@@ -108,6 +109,7 @@ export const icons = {
   link: faLink,
 
   weatherModel: faCloud,
+  resortLimit: faHashtag,
 
   // Theme sub-icons
   dark: faMoon,

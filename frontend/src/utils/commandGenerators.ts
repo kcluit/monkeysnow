@@ -3,7 +3,7 @@
  * Generates commands with checkmarks based on current state.
  */
 
-import type { Command, ElevationLevel, SortOption, SortDay, SortDayData, ViewMode, TemperatureMetric, SnowfallEstimateMode, WeatherModelSetting, UtilityBarStyle, UnitSystem } from '../types';
+import type { Command, ElevationLevel, SortOption, SortDay, SortDayData, ViewMode, TemperatureMetric, SnowfallEstimateMode, WeatherModelSetting, UtilityBarStyle, UnitSystem, ResortDisplayLimit } from '../types';
 import type { Language } from '../types/i18n';
 import { icons } from '../constants/icons';
 
@@ -42,6 +42,9 @@ export interface ControlCommandParams {
   // Unit System
   unitSystem: UnitSystem;
   setUnitSystem: (system: UnitSystem) => void;
+  // Resort display limit
+  resortDisplayLimit: ResortDisplayLimit;
+  setResortDisplayLimit: (limit: ResortDisplayLimit) => void;
   // Resort selector
   openResortSelector: () => void;
   // Language
@@ -338,6 +341,30 @@ export function generateUnitSystemCommands(
 }
 
 /**
+ * Generate resort display limit submenu commands with checkmarks.
+ */
+export function generateResortDisplayLimitCommands(
+  currentLimit: ResortDisplayLimit,
+  setLimit: (limit: ResortDisplayLimit) => void
+): Command[] {
+  const presets: { value: ResortDisplayLimit; name: string }[] = [
+    { value: 'auto', name: 'Auto (100 on mobile)' },
+    { value: 50, name: '50' },
+    { value: 100, name: '100' },
+    { value: 200, name: '200' },
+    { value: 500, name: '500' },
+    { value: 0, name: 'No limit' },
+  ];
+
+  return presets.map(({ value, name }) => ({
+    id: `resort-limit-${value}`,
+    name,
+    icon: currentLimit === value ? icons.check : undefined,
+    action: () => setLimit(value),
+  }));
+}
+
+/**
  * Generate language submenu commands with checkmarks.
  * Shows both English name and native name for each language.
  */
@@ -466,6 +493,15 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
       subCommands: generateUnitSystemCommands(
         params.unitSystem,
         params.setUnitSystem
+      ),
+    },
+    {
+      id: 'resort-display-limit',
+      name: 'Resort display limit',
+      icon: icons.resortLimit,
+      subCommands: generateResortDisplayLimitCommands(
+        params.resortDisplayLimit,
+        params.setResortDisplayLimit
       ),
     },
     {

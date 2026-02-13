@@ -56,7 +56,8 @@ import type {
     TemperatureMetric,
     SnowfallEstimateMode,
     WeatherModelSetting,
-    UtilityBarStyle
+    UtilityBarStyle,
+    ResortDisplayLimit
 } from './types';
 
 // Resort Detail Page wrapper component
@@ -148,6 +149,7 @@ function App(): JSX.Element {
     const [weatherModel, setWeatherModel] = useLocalStorage<WeatherModelSetting>('weatherModel', 'auto');
     const [chartZoomSyncEnabled, setChartZoomSyncEnabled] = useLocalStorage<boolean>('chartZoomSync', true);
     const [unitSystem, setUnitSystem] = useUnitSystem();
+    const [resortDisplayLimit, setResortDisplayLimit] = useLocalStorage<ResortDisplayLimit>('resortDisplayLimit', 'auto');
 
     // Sync chart zoom sync setting to registry
     useEffect(() => {
@@ -235,6 +237,7 @@ function App(): JSX.Element {
         showUtilityBar, setShowUtilityBar,
         utilityBarStyle, setUtilityBarStyle,
         unitSystem, setUnitSystem,
+        resortDisplayLimit, setResortDisplayLimit,
         resortHierarchy.openModal,
         language.id, setLanguage, availableLanguages,
     ];
@@ -426,6 +429,8 @@ function App(): JSX.Element {
             setUtilityBarStyle,
             unitSystem,
             setUnitSystem,
+            resortDisplayLimit,
+            setResortDisplayLimit,
             openResortSelector: resortHierarchy.openModal,
             languageId: language.id,
             setLanguage,
@@ -572,7 +577,10 @@ function App(): JSX.Element {
     }, [navigate]);
 
     // Get sorted resort data for display
-    const MOBILE_RESORT_LIMIT = 100;
+    const effectiveDisplayLimit = resortDisplayLimit === 'auto'
+        ? (isMobile ? 100 : 0)
+        : resortDisplayLimit;
+
     const displayResorts = useMemo((): ProcessedResortData[] => {
         if (!allWeatherData || selectedResorts.length === 0) return [];
 
@@ -591,8 +599,8 @@ function App(): JSX.Element {
             .map(resortId => resortData.get(resortId))
             .filter((resort): resort is ProcessedResortData => Boolean(resort));
 
-        if (isMobile && processed.length > MOBILE_RESORT_LIMIT) {
-            return processed.slice(0, MOBILE_RESORT_LIMIT);
+        if (effectiveDisplayLimit > 0 && processed.length > effectiveDisplayLimit) {
+            return processed.slice(0, effectiveDisplayLimit);
         }
         return processed;
     }, [
@@ -607,10 +615,10 @@ function App(): JSX.Element {
         unitSystem,
         resortData,
         sortResorts,
-        isMobile
+        effectiveDisplayLimit
     ]);
 
-    const isTruncated = isMobile && selectedResorts.length > MOBILE_RESORT_LIMIT;
+    const isTruncated = effectiveDisplayLimit > 0 && selectedResorts.length > effectiveDisplayLimit;
 
     // Show loading state
     if (loading) {
@@ -720,7 +728,7 @@ function App(): JSX.Element {
 
                 {isTruncated && (
                     <div className="text-center py-3 text-sm text-theme-textSecondary">
-                        Showing {MOBILE_RESORT_LIMIT} of {selectedResorts.length} selected resorts on mobile
+                        Showing {effectiveDisplayLimit} of {selectedResorts.length} selected resorts
                     </div>
                 )}
 
