@@ -6,12 +6,14 @@ import pako from 'pako';
 export function setCompressed<T>(key: string, value: T): void {
     const json = JSON.stringify(value);
     const compressed = pako.gzip(json);
-    // Convert Uint8Array to base64 in chunks to avoid call stack overflow
-    let binary = '';
+    // Convert Uint8Array to binary string in chunks to avoid call stack overflow
+    const parts: string[] = [];
     const chunkSize = 8192;
     for (let i = 0; i < compressed.length; i += chunkSize) {
-        binary += String.fromCharCode(...compressed.subarray(i, i + chunkSize));
+        const chunk = compressed.subarray(i, i + chunkSize);
+        parts.push(String.fromCharCode.apply(null, chunk as unknown as number[]));
     }
+    const binary = parts.join('');
     localStorage.setItem(key, btoa(binary));
 }
 
