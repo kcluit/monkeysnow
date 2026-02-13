@@ -650,6 +650,13 @@ function App(): JSX.Element {
                 </div>
             )}
 
+            {error && (
+                <div className="text-center py-12">
+                    <div className="text-xl font-semibold text-red-600">{t('error.loadingWeatherData')}</div>
+                    <div className="text-sm text-theme-textSecondary mt-2">{t('error.tryRefreshing')}</div>
+                </div>
+            )}
+
             <div className={viewMode === 'compact' ? "compact-grid" : "space-y-8"}>
                 <Suspense fallback={<div className="text-center py-4 text-theme-textSecondary">Loading...</div>}>
                     {displayResorts.map((resort, index) => (
