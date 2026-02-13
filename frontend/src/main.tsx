@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { HierarchyProvider } from './contexts/HierarchyContext'
+import { deleteOldIndexedDB } from './utils/compressedStorage'
 import './style.css'
 
 // Main app wrapper
