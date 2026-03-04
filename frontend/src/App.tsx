@@ -57,7 +57,8 @@ import type {
     SnowfallEstimateMode,
     WeatherModelSetting,
     UtilityBarStyle,
-    ResortDisplayLimit
+    ResortDisplayLimit,
+    ModelLineOpacity
 } from './types';
 
 // Resort Detail Page wrapper component
