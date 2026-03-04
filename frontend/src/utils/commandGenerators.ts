@@ -542,5 +542,14 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
         params.availableLanguages
       ),
     },
+    {
+      id: 'model-line-opacity',
+      name: 'Model line opacity',
+      icon: icons.chart,
+      subCommands: generateModelLineOpacityCommands(
+        params.modelLineOpacity,
+        params.setModelLineOpacity
+      ),
+    },
   ];
 }
