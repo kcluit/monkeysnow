@@ -12,6 +12,7 @@ import {
     faShieldAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { Link } from 'react-router-dom';
 import { useGitHubContributors } from '../hooks/useGitHubContributors';
 
 interface SectionProps {
