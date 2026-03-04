@@ -224,7 +224,7 @@ export function DetailedResortView({
                             {isLoadingElevation || customLocation.elevation === null ? (
                                 <span className="animate-pulse">Fetching elevation...</span>
                             ) : (
-                                <span>Elevation: {customLocation.elevation}m</span>
+                                <span>Elevation: {formatElevation(customLocation.elevation, unitSystem)}</span>
                             )}
                         </>
                     ) : (
