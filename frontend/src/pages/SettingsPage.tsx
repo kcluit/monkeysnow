@@ -21,10 +21,14 @@ export interface SettingsPageProps {
     availableThemes: Theme[];
     setTheme: (id: string) => void;
     currentThemeId: string;
+    applyTheme: (theme: Theme) => void;
+    resetThemePreview: () => void;
     // Font
     availableFonts: Font[];
     setFont: (id: string) => void;
     currentFontId: string;
+    applyFont: (font: Font) => void;
+    resetFontPreview: () => void;
     // Display toggles
     isRainbowEnabled: boolean;
     setRainbowEnabled: (enabled: boolean) => void;
