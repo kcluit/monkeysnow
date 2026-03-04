@@ -201,8 +201,8 @@ function createMidnightAlignedSplitsFunction(midnightIndices: number[], dataLeng
         // For multi-day increments (>24h), only place ticks at midnights
         if (incr >= 48) {
             const dayStep = Math.round(incr / 24);
-            // Find midnights within the visible range, stepping by dayStep
-            let startIdx = 0;
+            // Find first midnight at or after scaleMin
+            let startIdx = midnightIndices.length; // default: no midnights in range
             for (let i = 0; i < midnightIndices.length; i++) {
                 if (midnightIndices[i] >= scaleMin) {
                     startIdx = i;
