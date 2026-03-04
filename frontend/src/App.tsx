@@ -97,7 +97,14 @@ function ResortDetailRoute({
         topElevation: location.top,
     };
 
+    const displayName = getDisplayName(resortId);
     const handleBack = () => navigate('/');
+
+    usePageMeta({
+        title: `${displayName} Snow Forecast — monkeysnow`,
+        description: `Detailed snow forecast for ${displayName}. Multi-model weather charts, hourly snowfall estimates, temperature and wind data.`,
+        canonical: `https://monkeysnow.com/resort/${encodeURIComponent(resortId)}`,
+    });
 
     return (
         <Suspense fallback={<div className="text-center py-12 text-theme-textSecondary">Loading charts...</div>}>
