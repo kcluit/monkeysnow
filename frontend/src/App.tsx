@@ -710,7 +710,7 @@ function App(): JSX.Element {
                         allWeatherData={allWeatherData}
                         processResortData={processResortData}
                         cancelLoading={cancelLoading}
-                        openResortModal={resortHierarchy.openModal}
+                        openResortModal={openResortModalAndDismissBanner}
                     />
                 ) : (
                     <UtilityBar
@@ -732,7 +732,7 @@ function App(): JSX.Element {
                         allWeatherData={allWeatherData}
                         processResortData={processResortData}
                         cancelLoading={cancelLoading}
-                        openResortModal={resortHierarchy.openModal}
+                        openResortModal={openResortModalAndDismissBanner}
                     />
                 )
             )}
