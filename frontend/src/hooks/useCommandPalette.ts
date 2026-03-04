@@ -22,6 +22,7 @@ export function useCommandPalette(
 
   // Store latest factory in ref to avoid stale closures
   const factoryRef = useRef(commandFactory);
+  const pendingNavRef = useRef<PendingNav>(null);
   useEffect(() => {
     factoryRef.current = commandFactory;
   });
