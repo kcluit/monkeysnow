@@ -927,6 +927,11 @@ function App(): JSX.Element {
                 {/* Settings route */}
                 <Route path="/settings" element={
                     <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
+                        <PageMeta
+                            title="Settings — monkeysnow"
+                            description="Customize monkeysnow: themes, fonts, view modes, elevation display, temperature units, and weather model preferences."
+                            canonical="https://monkeysnow.com/settings"
+                        />
                         <Header font={font} hideIcons={isHideIconsEnabled} />
                         <SettingsPage {...settingsProps} />
                     </div>
