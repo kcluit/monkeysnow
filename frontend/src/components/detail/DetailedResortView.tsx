@@ -10,6 +10,7 @@ import { aggregationOptions } from '../../data/modelHierarchy';
 import type { DetailedResortViewProps, ElevationSelection, CustomLocation } from '../../types/detailView';
 import type { WeatherModel, WeatherVariable, AggregationType } from '../../types/openMeteo';
 import type { UnitSystem } from '../../types';
+import { formatElevation } from '../../utils/unitConversion';
 
 interface DetailedResortViewPropsWithUnits extends DetailedResortViewProps {
     unitSystem: UnitSystem;
