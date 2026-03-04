@@ -30,16 +30,5 @@ export function usePageMeta({ title, description, canonical }: PageMetaOptions):
     setMetaContent('meta[property="og:url"]', canonical);
     setMetaContent('meta[name="twitter:title"]', title);
     setMetaContent('meta[name="twitter:description"]', description);
-
-    return () => {
-      document.title = BASE_TITLE;
-      setMetaContent('meta[name="description"]', BASE_DESCRIPTION);
-      setLinkHref('canonical', BASE_URL);
-      setMetaContent('meta[property="og:title"]', BASE_TITLE);
-      setMetaContent('meta[property="og:description"]', BASE_DESCRIPTION);
-      setMetaContent('meta[property="og:url"]', BASE_URL);
-      setMetaContent('meta[name="twitter:title"]', BASE_TITLE);
-      setMetaContent('meta[name="twitter:description"]', BASE_DESCRIPTION);
-    };
   }, [title, description, canonical]);
 }
