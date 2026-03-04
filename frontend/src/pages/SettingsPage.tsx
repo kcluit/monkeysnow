@@ -229,7 +229,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                 </SettingSection>
 
                 <SettingSection title="Font" icon={icons.font}>
-                    <div className="settings-options-grid">
+                    <div className="settings-options-grid" onMouseLeave={resetFontPreview}>
                         {availableFonts.map(f => (
                             <OptionButton
                                 key={f.id}
@@ -237,6 +237,8 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                                 isSelected={currentFontId === f.id}
                                 onClick={() => setFont(f.id)}
                                 icon={f.isMonospace ? icons.monospace : icons.regular}
+                                onHover={() => applyFont(f)}
+                                onHoverEnd={resetFontPreview}
                             />
                         ))}
                     </div>
