@@ -107,12 +107,16 @@ interface OptionButtonProps {
     isSelected: boolean;
     onClick: () => void;
     icon?: typeof icons[keyof typeof icons];
+    onHover?: () => void;
+    onHoverEnd?: () => void;
 }
 
-function OptionButton({ label, isSelected, onClick, icon }: OptionButtonProps): JSX.Element {
+function OptionButton({ label, isSelected, onClick, icon, onHover, onHoverEnd }: OptionButtonProps): JSX.Element {
     return (
         <button
             onClick={onClick}
+            onMouseEnter={onHover}
+            onMouseLeave={onHoverEnd}
             className={`settings-option-btn ${isSelected ? 'selected' : ''}`}
         >
             {icon && <Icon icon={icon} className="settings-option-icon" />}
