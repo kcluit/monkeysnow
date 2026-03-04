@@ -813,6 +813,7 @@ export function buildWeatherChartConfig(
         hideAggregationMembers = false,
         showMinMaxFill = false,
         showPercentileFill = false,
+        modelLineOpacity = 'auto',
         variable,
         unitSystem,
         timezoneInfo,
