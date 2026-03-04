@@ -51,6 +51,9 @@ export interface ControlCommandParams {
   languageId: string;
   setLanguage: (id: string) => void;
   availableLanguages: Language[];
+  // Model line opacity
+  modelLineOpacity: ModelLineOpacity;
+  setModelLineOpacity: (opacity: ModelLineOpacity) => void;
 }
 
 /**
