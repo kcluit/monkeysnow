@@ -17,7 +17,7 @@ export interface UseResortHierarchyProps {
 export interface UseResortHierarchyReturn {
   // Modal state
   isOpen: boolean;
-  openModal: () => void;
+  openModal: (initialDraft?: string[]) => void;
   closeModal: () => void;
 
   // Navigation
