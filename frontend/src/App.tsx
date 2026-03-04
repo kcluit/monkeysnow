@@ -242,6 +242,7 @@ function App(): JSX.Element {
         resortDisplayLimit, setResortDisplayLimit,
         resortHierarchy.openModal,
         language.id, setLanguage, availableLanguages,
+        modelLineOpacity, setModelLineOpacity,
     ];
 
     // Command factory for lazy generation - commands only built when palette opens
