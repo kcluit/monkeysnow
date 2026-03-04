@@ -213,7 +213,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
 
                 {/* Appearance Section */}
                 <SettingSection title="Theme" icon={icons.theme}>
-                    <div className="settings-options-grid">
+                    <div className="settings-options-grid" onMouseLeave={resetThemePreview}>
                         {availableThemes.map(t => (
                             <OptionButton
                                 key={t.id}
@@ -221,6 +221,8 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                                 isSelected={currentThemeId === t.id}
                                 onClick={() => setTheme(t.id)}
                                 icon={t.isDark ? icons.dark : icons.light}
+                                onHover={() => applyTheme(t)}
+                                onHoverEnd={resetThemePreview}
                             />
                         ))}
                     </div>
