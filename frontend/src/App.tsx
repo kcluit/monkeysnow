@@ -106,6 +106,7 @@ function ResortDetailRoute({
                 unitSystem={unitSystem}
                 showUtilityBar={showUtilityBar}
                 utilityBarStyle={utilityBarStyle}
+                modelLineOpacity={modelLineOpacity}
                 onBack={handleBack}
             />
         </Suspense>
