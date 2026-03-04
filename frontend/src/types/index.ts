@@ -29,6 +29,7 @@ export interface UseCommandPaletteReturn {
     selectedIndex: number;
     filteredCommands: Command[];
     openPalette: () => void;
+    openToCommand: (commandId: string) => void;
     closePalette: () => void;
     setSearchQuery: (query: string) => void;
     setSelectedIndex: (index: number) => void;
