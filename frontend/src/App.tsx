@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useNavigate, useParams, Link } from 'react-router-dom';
 import { Header } from './components/Header';
+import { PageMeta } from './components/PageMeta';
 import { usePageMeta } from './hooks/usePageMeta';
 import { UtilityBar } from './components/UtilityBar';
 import { CompactUtilityBar } from './components/CompactUtilityBar';
