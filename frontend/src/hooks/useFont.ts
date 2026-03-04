@@ -6,6 +6,8 @@ export interface UseFontReturn {
   font: Font;
   setFont: (fontId: string) => void;
   availableFonts: Font[];
+  applyFont: (fontToApply: Font) => void;
+  resetPreview: () => void;
 }
 
 export function useFont(): UseFontReturn {
