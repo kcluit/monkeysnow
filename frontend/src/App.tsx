@@ -953,6 +953,11 @@ function App(): JSX.Element {
                 {/* Privacy route */}
                 <Route path="/privacy" element={
                     <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
+                        <PageMeta
+                            title="Privacy Policy — monkeysnow"
+                            description="Privacy policy for monkeysnow. We do not collect personal data."
+                            canonical="https://monkeysnow.com/privacy"
+                        />
                         <Header font={font} hideIcons={isHideIconsEnabled} />
                         <PrivacyPage />
                     </div>
