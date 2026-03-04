@@ -133,6 +133,7 @@ export interface WeatherChartProps {
     hideAggregationMembers?: boolean;
     showMinMaxFill?: boolean;
     showPercentileFill?: boolean;
+    modelLineOpacity?: ModelLineOpacity;
     variable: WeatherVariable;
     unitSystem: UnitSystem;
     timezoneInfo?: TimezoneInfo;
