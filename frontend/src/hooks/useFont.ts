@@ -62,9 +62,17 @@ export function useFont(): UseFontReturn {
     }
   }, []);
 
+  const resetPreview = useCallback(() => {
+    if (font) {
+      applyFont(font);
+    }
+  }, [font, applyFont]);
+
   return {
     font,
     setFont,
     availableFonts: fonts,
+    applyFont,
+    resetPreview,
   };
 }
