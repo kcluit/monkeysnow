@@ -66,11 +66,13 @@ function ResortDetailRoute({
     unitSystem,
     showUtilityBar,
     utilityBarStyle,
+    modelLineOpacity,
     getDisplayName,
 }: {
     unitSystem: 'metric' | 'imperial';
     showUtilityBar: boolean;
     utilityBarStyle: UtilityBarStyle;
+    modelLineOpacity: ModelLineOpacity;
     getDisplayName: (id: string) => string;
 }): JSX.Element | null {
     const { resortId } = useParams<{ resortId: string }>();
