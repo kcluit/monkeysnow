@@ -8,6 +8,8 @@ import {
     faListOl,
     faCode,
     faEnvelope,
+    faFileContract,
+    faShieldAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { useGitHubContributors } from '../hooks/useGitHubContributors';
