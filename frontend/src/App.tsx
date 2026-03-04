@@ -185,6 +185,9 @@ function App(): JSX.Element {
     // Banner dismissal state
     const [bannerDismissed, setBannerDismissed] = useLocalStorage<boolean>('bannerDismissed', false);
 
+    // Track whether the resort modal has ever been opened (for first-visit empty draft)
+    const [hasOpenedResortModal, setHasOpenedResortModal] = useLocalStorage<boolean>('hasOpenedResortModal', false);
+
     // Resort hierarchy hook for modal
     const resortHierarchy = useResortHierarchy({
         selectedResorts,
@@ -200,11 +203,16 @@ function App(): JSX.Element {
         prevModalOpen.current = resortHierarchy.isOpen;
     }, [resortHierarchy.isOpen, selectedResorts, fetchResorts]);
 
-    // Open resort modal and auto-dismiss the banner
+    // Open resort modal, auto-dismiss the banner, and handle first-visit empty draft
     const openResortModalAndDismissBanner = useCallback(() => {
-        resortHierarchy.openModal();
+        if (!hasOpenedResortModal) {
+            resortHierarchy.openModal([]);
+            setHasOpenedResortModal(true);
+        } else {
+            resortHierarchy.openModal();
+        }
         setBannerDismissed(true);
-    }, [resortHierarchy.openModal, setBannerDismissed]);
+    }, [resortHierarchy.openModal, setBannerDismissed, hasOpenedResortModal, setHasOpenedResortModal]);
 
     useEffect(() => {
         new Konami("https://monkeytype.com/");
