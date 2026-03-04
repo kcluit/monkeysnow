@@ -7,6 +7,7 @@ import { VariableSelectionModal } from '../VariableSelectionModal';
 import { CompactDetailUtilityBar } from './CompactDetailUtilityBar';
 import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
+import { formatElevation } from '../../utils/unitConversion';
 
 export function DetailUtilityBar(props: DetailUtilityBarProps): JSX.Element {
     if (props.utilityBarStyle === 'compact') {
