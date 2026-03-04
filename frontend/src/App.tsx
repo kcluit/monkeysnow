@@ -912,6 +912,22 @@ function App(): JSX.Element {
                     </div>
                 } />
 
+                {/* Terms route */}
+                <Route path="/terms" element={
+                    <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
+                        <Header font={font} hideIcons={isHideIconsEnabled} />
+                        <TermsPage />
+                    </div>
+                } />
+
+                {/* Privacy route */}
+                <Route path="/privacy" element={
+                    <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
+                        <Header font={font} hideIcons={isHideIconsEnabled} />
+                        <PrivacyPage />
+                    </div>
+                } />
+
                 {/* Catch-all redirect to home */}
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
