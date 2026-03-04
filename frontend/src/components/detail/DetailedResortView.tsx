@@ -37,6 +37,7 @@ export function DetailedResortView({
     unitSystem,
     showUtilityBar,
     utilityBarStyle,
+    modelLineOpacity,
     onBack,
 }: DetailedResortViewPropsWithUnits): JSX.Element {
     // State for selected models
