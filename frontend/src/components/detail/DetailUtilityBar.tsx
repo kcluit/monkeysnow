@@ -178,7 +178,7 @@ function LargeDetailUtilityBar({
                                         }`}
                                 >
                                     <span>{option.label}</span>
-                                    <span className="text-xs text-theme-textSecondary opacity-70">{option.displayValue}m</span>
+                                    <span className="text-xs text-theme-textSecondary opacity-70">{formatElevation(option.displayValue, unitSystem)}</span>
                                 </button>
                             ))}
                             <div className="border-t border-theme-border mt-1 pt-1">
