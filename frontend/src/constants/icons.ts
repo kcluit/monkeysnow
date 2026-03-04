@@ -146,6 +146,10 @@ export const icons = {
 
   // Modal controls
   close: faXmark,
+
+  // Lock icons
+  lock: faLock,
+  lockOpen: faLockOpen,
 } as const;
 
 export type IconKey = keyof typeof icons;
