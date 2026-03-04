@@ -153,7 +153,7 @@ export function CompactDetailUtilityBar({
                         onClick={() => setIsChartLocked(!isChartLocked)}
                         className="compact-bar-text text-theme-textSecondary hover:text-theme-accent transition-colors"
                     >
-                        {isChartLocked ? 'Locked' : 'Unlocked'}
+                        <Icon icon={isChartLocked ? icons.lock : icons.lockOpen} />
                     </button>
 
                     {/* Reset location button when custom location active */}
