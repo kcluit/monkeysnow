@@ -187,11 +187,13 @@ function LargeDetailUtilityBar({
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             setShowCustomElevationInput(true);
-                                            setCustomElevationValue(
-                                                typeof elevationSelection === 'number'
-                                                    ? elevationSelection.toString()
-                                                    : resolvedElevation.toString()
-                                            );
+                                            const metersValue = typeof elevationSelection === 'number'
+                                                ? elevationSelection
+                                                : resolvedElevation;
+                                            const displayValue = unitSystem === 'imperial'
+                                                ? Math.round(metersValue * 3.28084)
+                                                : metersValue;
+                                            setCustomElevationValue(displayValue.toString());
                                         }}
                                         className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm ${typeof elevationSelection === 'number'
                                                 ? 'bg-theme-secondary text-theme-textPrimary'
