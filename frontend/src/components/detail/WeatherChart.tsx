@@ -92,6 +92,7 @@ export function WeatherChart({
                 hideAggregationMembers,
                 showMinMaxFill,
                 showPercentileFill,
+                modelLineOpacity,
                 variable,
                 unitSystem,
                 timezoneInfo,
