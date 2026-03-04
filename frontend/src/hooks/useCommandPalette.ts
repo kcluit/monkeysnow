@@ -197,6 +197,7 @@ export function useCommandPalette(
     selectedIndex,
     filteredCommands,
     openPalette,
+    openToCommand,
     closePalette,
     setSearchQuery,
     setSelectedIndex,
