@@ -387,6 +387,31 @@ export function generateLanguageCommands(
 }
 
 /**
+ * Generate model line opacity submenu commands with checkmarks.
+ */
+export function generateModelLineOpacityCommands(
+  currentOpacity: ModelLineOpacity,
+  setOpacity: (opacity: ModelLineOpacity) => void
+): Command[] {
+  const presets: { value: ModelLineOpacity; name: string }[] = [
+    { value: 'auto', name: 'Auto' },
+    { value: 0.05, name: '5%' },
+    { value: 0.1, name: '10%' },
+    { value: 0.2, name: '20%' },
+    { value: 0.35, name: '35%' },
+    { value: 0.5, name: '50%' },
+    { value: 1, name: '100%' },
+  ];
+
+  return presets.map(({ value, name }) => ({
+    id: `model-opacity-${value}`,
+    name,
+    icon: currentOpacity === value ? icons.check : undefined,
+    action: () => setOpacity(value),
+  }));
+}
+
+/**
  * Generate all control-related commands for the command palette.
  * This is the main entry point for command generation.
  */
