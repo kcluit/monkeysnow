@@ -231,9 +231,9 @@ export function DetailedResortView({
                         <>
                             <span>Lat: {location.lat.toFixed(4)}</span>
                             <span>Lon: {location.lon.toFixed(4)}</span>
-                            <span>Base: {location.baseElevation}m</span>
-                            <span>Mid: {location.midElevation}m</span>
-                            <span>Top: {location.topElevation}m</span>
+                            <span>Base: {formatElevation(location.baseElevation, unitSystem)}</span>
+                            <span>Mid: {formatElevation(location.midElevation, unitSystem)}</span>
+                            <span>Top: {formatElevation(location.topElevation, unitSystem)}</span>
                         </>
                     )}
                     {timezoneInfo && (
