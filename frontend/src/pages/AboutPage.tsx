@@ -233,6 +233,14 @@ export function AboutPage(): JSX.Element {
                         <Icon icon={faCode} />
                         <span>GitHub</span>
                     </a>
+                    <Link to="/terms" className="about-contact-btn">
+                        <Icon icon={faFileContract} />
+                        <span>Terms</span>
+                    </Link>
+                    <Link to="/privacy" className="about-contact-btn">
+                        <Icon icon={faShieldAlt} />
+                        <span>Privacy</span>
+                    </Link>
                 </div>
             </Section>
 
