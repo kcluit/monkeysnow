@@ -112,7 +112,7 @@ function ResortDetailRoute({
         <Suspense fallback={<div className="text-center py-12 text-theme-textSecondary">Loading charts...</div>}>
             <DetailedResortView
                 resortId={resortId}
-                resortName={getDisplayName(resortId)}
+                resortName={displayName}
                 location={resortLocation}
                 unitSystem={unitSystem}
                 showUtilityBar={showUtilityBar}
