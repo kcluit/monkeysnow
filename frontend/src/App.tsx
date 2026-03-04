@@ -81,12 +81,20 @@ function ResortDetailRoute({
     const { resortId } = useParams<{ resortId: string }>();
     const navigate = useNavigate();
 
-    if (!resortId) {
-        return <Navigate to="/" replace />;
-    }
+    const location = resortId ? getResortLocation(resortId) : null;
+    const displayName = resortId ? getDisplayName(resortId) : '';
 
-    const location = getResortLocation(resortId);
-    if (!location) {
+    usePageMeta({
+        title: displayName ? `${displayName} Snow Forecast — monkeysnow` : 'monkeysnow — ski resort snow forecasts',
+        description: displayName
+            ? `Detailed snow forecast for ${displayName}. Multi-model weather charts, hourly snowfall estimates, temperature and wind data.`
+            : 'Real-time snow forecasts for ski resorts worldwide.',
+        canonical: resortId
+            ? `https://monkeysnow.com/resort/${encodeURIComponent(resortId)}`
+            : 'https://monkeysnow.com/',
+    });
+
+    if (!resortId || !location) {
         return <Navigate to="/" replace />;
     }
 
@@ -98,14 +106,7 @@ function ResortDetailRoute({
         topElevation: location.top,
     };
 
-    const displayName = getDisplayName(resortId);
     const handleBack = () => navigate('/');
-
-    usePageMeta({
-        title: `${displayName} Snow Forecast — monkeysnow`,
-        description: `Detailed snow forecast for ${displayName}. Multi-model weather charts, hourly snowfall estimates, temperature and wind data.`,
-        canonical: `https://monkeysnow.com/resort/${encodeURIComponent(resortId)}`,
-    });
 
     return (
         <Suspense fallback={<div className="text-center py-12 text-theme-textSecondary">Loading charts...</div>}>
