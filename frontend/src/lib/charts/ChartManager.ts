@@ -273,14 +273,8 @@ function buildUPlotAxes(config: ChartConfig): uPlot.Axis[] {
                     return xAxis.data[idx] || '';
                 }),
             gap: 8,
-            // Use 55px to accommodate potentially rotated labels
-            // (size callback receives cycleNum, not foundSpace, so we use a static value)
-            size: 55,
-            rotate: (_u, _values, _axisIdx, foundSpace) => {
-                // Rotate labels when space per tick is tight
-                if (foundSpace < 80) return -45;
-                return 0;
-            },
+            // Multi-day tick skipping handles narrow screens, no rotation needed
+            size: 40,
             font: '11px system-ui, -apple-system, sans-serif',
         },
         {
