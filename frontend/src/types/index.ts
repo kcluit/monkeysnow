@@ -60,6 +60,7 @@ export type TemperatureMetric = 'max' | 'min' | 'avg' | 'median';
 export type SnowfallEstimateMode = 'model' | 'totalPrecip';
 export type WeatherModelSetting = 'auto';
 export type ResortDisplayLimit = 'auto' | number;
+export type ModelLineOpacity = 'auto' | 0.05 | 0.1 | 0.2 | 0.35 | 0.5 | 1;
 export type SnowQuality = 'rain' | 'sleet/mix' | 'wet_snow' | 'powder' | 'dry_snow';
 
 // Weather data structures from new API format
