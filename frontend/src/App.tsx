@@ -151,6 +151,7 @@ function App(): JSX.Element {
     const [chartZoomSyncEnabled, setChartZoomSyncEnabled] = useLocalStorage<boolean>('chartZoomSync', true);
     const [unitSystem, setUnitSystem] = useUnitSystem();
     const [resortDisplayLimit, setResortDisplayLimit] = useLocalStorage<ResortDisplayLimit>('resortDisplayLimit', 'auto');
+    const [modelLineOpacity, setModelLineOpacity] = useLocalStorage<ModelLineOpacity>('modelLineOpacity', 'auto');
 
     // Sync chart zoom sync setting to registry
     useEffect(() => {
