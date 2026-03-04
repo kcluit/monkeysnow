@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import type { Command, UseCommandPaletteReturn } from '../types';
 
+type PendingNav = { commandId: string } | null;
+
 /**
  * Hook for managing command palette state with lazy command generation.
  * Commands are only generated when the palette opens, not on every state change.
