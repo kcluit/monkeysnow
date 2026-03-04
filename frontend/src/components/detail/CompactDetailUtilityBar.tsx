@@ -65,7 +65,7 @@ export function CompactDetailUtilityBar({
         if (elevationSelection === 'base') return 'Base';
         if (elevationSelection === 'mid') return 'Mid';
         if (elevationSelection === 'top') return 'Top';
-        return `${elevationSelection}m`;
+        return formatElevation(elevationSelection, unitSystem);
     };
 
     // Cycle forecast days: 1 → 3 → 7 → 14 → 16 → 1
