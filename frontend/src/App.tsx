@@ -438,6 +438,8 @@ function App(): JSX.Element {
             languageId: language.id,
             setLanguage,
             availableLanguages,
+            modelLineOpacity,
+            setModelLineOpacity,
         });
 
         return [...baseCommands, ...controlCommands];
