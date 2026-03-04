@@ -251,7 +251,7 @@ function App(): JSX.Element {
         utilityBarStyle, setUtilityBarStyle,
         unitSystem, setUnitSystem,
         resortDisplayLimit, setResortDisplayLimit,
-        resortHierarchy.openModal,
+        openResortModalAndDismissBanner,
         language.id, setLanguage, availableLanguages,
         modelLineOpacity, setModelLineOpacity,
     ];
