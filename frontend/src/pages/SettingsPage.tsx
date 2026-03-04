@@ -152,8 +152,8 @@ function Toggle({ label, isEnabled, onToggle, icon }: ToggleProps): JSX.Element 
 
 export function SettingsPage(props: SettingsPageProps): JSX.Element {
     const {
-        availableThemes, setTheme, currentThemeId,
-        availableFonts, setFont, currentFontId,
+        availableThemes, setTheme, currentThemeId, applyTheme, resetThemePreview,
+        availableFonts, setFont, currentFontId, applyFont, resetFontPreview,
         isRainbowEnabled, setRainbowEnabled,
         isHideIconsEnabled, setHideIconsEnabled,
         isHideBordersEnabled, setHideBordersEnabled,
