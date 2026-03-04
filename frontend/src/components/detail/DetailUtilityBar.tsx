@@ -252,7 +252,7 @@ function LargeDetailUtilityBar({
                         {isLoadingElevation || customLocation.elevation === null ? (
                             <span className="text-sm text-theme-textPrimary font-medium animate-pulse">Loading...</span>
                         ) : (
-                            <span className="text-sm text-theme-textPrimary font-medium">{customLocation.elevation}m</span>
+                            <span className="text-sm text-theme-textPrimary font-medium">{formatElevation(customLocation.elevation, unitSystem)}</span>
                         )}
                     </div>
                     <button
