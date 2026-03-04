@@ -151,6 +151,9 @@ export const icons = {
   // Lock icons
   lock: faLock,
   lockOpen: faLockOpen,
+
+  // Footer icons
+  palette: faPalette,
 } as const;
 
 export type IconKey = keyof typeof icons;
