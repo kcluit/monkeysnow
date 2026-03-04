@@ -4,6 +4,7 @@ import { useModelHierarchy } from '../../hooks/useModelHierarchy';
 import { useVariableSelection } from '../../hooks/useVariableSelection';
 import { ModelSelectionGridModal } from '../ModelSelectionModal';
 import { VariableSelectionModal } from '../VariableSelectionModal';
+import { formatElevation } from '../../utils/unitConversion';
 
 export function CompactDetailUtilityBar({
     onBack,
