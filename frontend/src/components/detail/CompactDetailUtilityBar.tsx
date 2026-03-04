@@ -8,6 +8,7 @@ import { formatElevation } from '../../utils/unitConversion';
 
 export function CompactDetailUtilityBar({
     onBack,
+    unitSystem,
     selectedModels,
     setSelectedModels,
     selectedVariables,
