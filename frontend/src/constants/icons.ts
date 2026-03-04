@@ -56,6 +56,9 @@ import {
   faGear,
   // Modal controls
   faXmark,
+  // Lock icons
+  faLock,
+  faLockOpen,
 } from '@fortawesome/free-solid-svg-icons';
 
 // Re-export for direct usage
