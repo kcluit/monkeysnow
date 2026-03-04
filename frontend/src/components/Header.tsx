@@ -35,30 +35,6 @@ export function Header({ font, hideIcons }: HeaderProps): JSX.Element {
     // Track font links to properly clean them up
     const fontLinksRef = useRef<HTMLLinkElement[]>([]);
 
-    // Meta tags and title - only run once on mount
-    useEffect(() => {
-        const meta = document.createElement('meta');
-        meta.name = 'viewport';
-        meta.content = 'width=device-width, initial-scale=1.0';
-        document.head.appendChild(meta);
-
-        const metaDesc = document.createElement('meta');
-        metaDesc.name = 'description';
-        metaDesc.content = 'Get real-time snow forecasts for your favorite British Columbia ski resorts';
-        document.head.appendChild(metaDesc);
-
-        document.title = 'monkeysnow';
-
-        return () => {
-            if (document.head.contains(meta)) {
-                document.head.removeChild(meta);
-            }
-            if (document.head.contains(metaDesc)) {
-                document.head.removeChild(metaDesc);
-            }
-        };
-    }, []);
-
     // Load fonts dynamically - clean up old links before adding new ones
     useEffect(() => {
         // Clean up previous font links
