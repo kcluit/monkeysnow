@@ -112,6 +112,7 @@ export interface DetailChartGridProps {
     hideAggregationMembers?: boolean;
     showMinMaxFill?: boolean;
     showPercentileFill?: boolean;
+    modelLineOpacity?: ModelLineOpacity;
     unitSystem: UnitSystem;
     timezoneInfo?: TimezoneInfo;
     isChartLocked?: boolean;
