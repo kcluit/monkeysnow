@@ -445,7 +445,8 @@ function buildSeriesConfigs(
     selectedModels: WeatherModel[],
     chartType: ChartType,
     hasAggregations: boolean,
-    hideAggregationMembers: boolean = false
+    hideAggregationMembers: boolean = false,
+    modelLineOpacity: ModelLineOpacity = 'auto'
 ): SeriesConfig[] {
     // Skip model series entirely if hiding members and aggregations are active
     if (hideAggregationMembers && hasAggregations) {
@@ -453,7 +454,9 @@ function buildSeriesConfigs(
     }
 
     const configs: SeriesConfig[] = [];
-    const modelOpacity = hasAggregations ? calculateModelOpacity(selectedModels.length) : 1;
+    const modelOpacity = hasAggregations
+        ? (modelLineOpacity === 'auto' ? calculateModelOpacity(selectedModels.length) : modelLineOpacity)
+        : 1;
 
     for (const model of selectedModels) {
         const data = seriesData.get(model);
