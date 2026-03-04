@@ -273,13 +273,9 @@ function buildUPlotAxes(config: ChartConfig): uPlot.Axis[] {
                     return xAxis.data[idx] || '';
                 }),
             gap: 8,
-            // Dynamically size the axis and rotate labels when space is tight
-            size: (_u, _values, _axisIdx, foundSpace) => {
-                // foundSpace is pixels available per tick
-                // Rotate when labels would overlap (< 80px per tick)
-                if (foundSpace < 80) return 55;
-                return 40;
-            },
+            // Use 55px to accommodate potentially rotated labels
+            // (size callback receives cycleNum, not foundSpace, so we use a static value)
+            size: 55,
             rotate: (_u, _values, _axisIdx, foundSpace) => {
                 // Rotate labels when space per tick is tight
                 if (foundSpace < 80) return -45;
