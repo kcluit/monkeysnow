@@ -445,7 +445,7 @@ function App(): JSX.Element {
             setUnitSystem,
             resortDisplayLimit,
             setResortDisplayLimit,
-            openResortSelector: resortHierarchy.openModal,
+            openResortSelector: openResortModalAndDismissBanner,
             languageId: language.id,
             setLanguage,
             availableLanguages,
@@ -847,7 +847,7 @@ function App(): JSX.Element {
         language,
         setLanguage,
         availableLanguages,
-        openResortSelector: resortHierarchy.openModal,
+        openResortSelector: openResortModalAndDismissBanner,
     };
 
     return (
