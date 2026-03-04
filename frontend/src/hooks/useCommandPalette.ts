@@ -87,6 +87,14 @@ export function useCommandPalette(
     setCommandStack([]);
   }, []);
 
+  const openToCommand = useCallback((commandId: string) => {
+    pendingNavRef.current = { commandId };
+    setIsOpen(true);
+    setSearchQuery('');
+    setSelectedIndex(0);
+    setCommandStack([]);
+  }, []);
+
   const navigateUp = useCallback(() => {
     setSelectedIndex((prev) =>
       prev <= 0 ? filteredCommands.length - 1 : prev - 1
