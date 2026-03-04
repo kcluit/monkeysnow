@@ -215,11 +215,11 @@ function LargeDetailUtilityBar({
                                                 onKeyDown={handleCustomElevationKeyDown}
                                                 placeholder="Elevation"
                                                 min="0"
-                                                max="9000"
+                                                max={maxElevationInput.toString()}
                                                 autoFocus
                                                 className="w-full px-2 py-1 text-sm rounded border border-theme-border bg-theme-cardBg text-theme-textPrimary placeholder-theme-textSecondary focus:outline-none focus:border-theme-accent"
                                             />
-                                            <span className="text-sm text-theme-textSecondary">m</span>
+                                            <span className="text-sm text-theme-textSecondary">{elevationUnit}</span>
                                         </div>
                                         <div className="flex gap-1 mt-2">
                                             <button
