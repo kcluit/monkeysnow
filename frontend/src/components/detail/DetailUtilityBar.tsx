@@ -152,7 +152,7 @@ function LargeDetailUtilityBar({
                             {elevationSelection === 'base' ? 'Base' :
                                 elevationSelection === 'mid' ? 'Mid' :
                                     elevationSelection === 'top' ? 'Top' :
-                                        `${elevationSelection}m`}
+                                        formatElevation(elevationSelection, unitSystem)}
                         </span>
                         <svg className="w-4 h-4 text-theme-textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
