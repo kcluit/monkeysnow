@@ -496,6 +496,32 @@ function App(): JSX.Element {
         resetPreview
     ]);
 
+    // Preview font when selecting in command palette
+    useEffect(() => {
+        if (!commandPalette.isOpen) {
+            resetFontPreview();
+            return;
+        }
+
+        const selectedCommand = commandPalette.filteredCommands[commandPalette.selectedIndex];
+        if (selectedCommand && selectedCommand.id.startsWith('font-')) {
+            const fontId = selectedCommand.id.replace('font-', '');
+            const fontToPreview = availableFonts.find(f => f.id === fontId);
+            if (fontToPreview) {
+                applyFont(fontToPreview);
+            }
+        } else {
+            resetFontPreview();
+        }
+    }, [
+        commandPalette.isOpen,
+        commandPalette.selectedIndex,
+        commandPalette.filteredCommands,
+        availableFonts,
+        applyFont,
+        resetFontPreview
+    ]);
+
     // Load all selected resorts
     const loadSelectedResorts = useCallback(async (): Promise<void> => {
         if (!allWeatherData || selectedResorts.length === 0) {
