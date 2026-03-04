@@ -956,7 +956,7 @@ function App(): JSX.Element {
                     onClick={() => commandPalette.openToCommand('theme')}
                     className="flex items-center gap-1.5 opacity-40 hover:opacity-100 hover:text-theme-textPrimary transition-all cursor-pointer"
                 >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="19" cy="13.5" r="2.5"/><circle cx="15.5" cy="20.5" r="2.5"/><circle cx="8.5" cy="20.5" r="2.5"/><circle cx="5" cy="13.5" r="2.5"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="12" cy="13" r="3"/></svg>
+                    <FontAwesomeIcon icon={icons.palette} style={{ width: 14, height: 14 }} />
                     {theme.name.toLowerCase()}
                 </button>
             </footer>
