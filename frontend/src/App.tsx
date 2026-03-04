@@ -885,6 +885,11 @@ function App(): JSX.Element {
                 {/* Home route - resort list */}
                 <Route path="/" element={
                     <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
+                        <PageMeta
+                            title="monkeysnow — ski resort snow forecasts"
+                            description="Real-time snow forecasts for ski resorts worldwide. Compare powder, dry snow, wet snow and rain estimates across multiple weather models."
+                            canonical="https://monkeysnow.com/"
+                        />
                         <Header font={font} hideIcons={isHideIconsEnabled} />
                         {homeContent}
                     </div>
