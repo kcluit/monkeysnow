@@ -5,6 +5,8 @@ import { useVariableSelection } from '../../hooks/useVariableSelection';
 import { ModelSelectionGridModal } from '../ModelSelectionModal';
 import { VariableSelectionModal } from '../VariableSelectionModal';
 import { formatElevation } from '../../utils/unitConversion';
+import { Icon } from '../Icon';
+import { icons } from '../../constants/icons';
 
 export function CompactDetailUtilityBar({
     onBack,
