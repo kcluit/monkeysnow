@@ -852,6 +852,7 @@ function App(): JSX.Element {
                             unitSystem={unitSystem}
                             showUtilityBar={showUtilityBar}
                             utilityBarStyle={utilityBarStyle}
+                            modelLineOpacity={modelLineOpacity}
                             getDisplayName={getDisplayName}
                         />
                     </>
