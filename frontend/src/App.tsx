@@ -914,6 +914,11 @@ function App(): JSX.Element {
                 {/* About route */}
                 <Route path="/about" element={
                     <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
+                        <PageMeta
+                            title="About — monkeysnow"
+                            description="monkeysnow is a minimalistic ski resort snow forecast app using Kuchera ratio snow estimation and multi-model weather data from Open-Meteo."
+                            canonical="https://monkeysnow.com/about"
+                        />
                         <Header font={font} hideIcons={isHideIconsEnabled} />
                         <AboutPage />
                     </div>
