@@ -18,6 +18,7 @@ export function DetailChartGrid({
     hideAggregationMembers,
     showMinMaxFill,
     showPercentileFill,
+    modelLineOpacity,
     unitSystem,
     timezoneInfo,
     isChartLocked,
