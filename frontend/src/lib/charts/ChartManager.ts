@@ -273,7 +273,18 @@ function buildUPlotAxes(config: ChartConfig): uPlot.Axis[] {
                     return xAxis.data[idx] || '';
                 }),
             gap: 8,
-            size: 40,
+            // Dynamically size the axis and rotate labels when space is tight
+            size: (_u, _values, _axisIdx, foundSpace) => {
+                // foundSpace is pixels available per tick
+                // Rotate when labels would overlap (< 80px per tick)
+                if (foundSpace < 80) return 55;
+                return 40;
+            },
+            rotate: (_u, _values, _axisIdx, foundSpace) => {
+                // Rotate labels when space per tick is tight
+                if (foundSpace < 80) return -45;
+                return 0;
+            },
             font: '11px system-ui, -apple-system, sans-serif',
         },
         {
