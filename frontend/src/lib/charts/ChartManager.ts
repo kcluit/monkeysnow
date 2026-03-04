@@ -182,7 +182,8 @@ function createMidnightAlignedSplitsFunction(midnightIndices: number[], dataLeng
     return (_u: uPlot, _axisIdx: number, scaleMin: number, scaleMax: number, foundIncr: number, _foundSpace: number) => {
         // Snap the increment to a "nice" hour interval that divides 24 evenly
         // Valid intervals: 1, 2, 3, 4, 6, 8, 12, 24 hours
-        const niceIntervals = [1, 2, 3, 4, 6, 8, 12, 24];
+        // Extended with multi-day intervals for mobile/narrow views with many days
+        const niceIntervals = [1, 2, 3, 4, 6, 8, 12, 24, 48, 72, 96];
         let incr = Math.max(1, Math.round(foundIncr));
 
         // Find the smallest "nice" interval that's >= the calculated increment
@@ -192,10 +193,31 @@ function createMidnightAlignedSplitsFunction(midnightIndices: number[], dataLeng
                 break;
             }
         }
-        // If increment is larger than 24, use 24 (one tick per day at midnight)
-        if (incr > 24) incr = 24;
+        // If increment is larger than 96, snap to nearest multiple of 24
+        if (incr > 96) incr = Math.ceil(incr / 24) * 24;
 
         const splits: number[] = [];
+
+        // For multi-day increments (>24h), only place ticks at midnights
+        if (incr >= 48) {
+            const dayStep = Math.round(incr / 24);
+            // Find midnights within the visible range, stepping by dayStep
+            let startIdx = 0;
+            for (let i = 0; i < midnightIndices.length; i++) {
+                if (midnightIndices[i] >= scaleMin) {
+                    startIdx = i;
+                    break;
+                }
+            }
+            for (let i = startIdx; i < midnightIndices.length; i += dayStep) {
+                const idx = midnightIndices[i];
+                if (idx > scaleMax || idx >= dataLength) break;
+                if (idx >= scaleMin) {
+                    splits.push(idx);
+                }
+            }
+            return splits;
+        }
 
         // Find the first midnight at or before scaleMin
         let firstMidnight = 0;
