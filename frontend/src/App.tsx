@@ -118,7 +118,7 @@ function App(): JSX.Element {
 
     // Theme, font, fullscreen, FPS, rainbow, hide emoji, and language hooks
     const { theme, setTheme, availableThemes, applyTheme, resetPreview } = useTheme();
-    const { font, setFont, availableFonts } = useFont();
+    const { font, setFont, availableFonts, applyFont, resetPreview: resetFontPreview } = useFont();
     const { isFullscreen, enterFullscreen, exitFullscreen } = useFullscreen();
     const { fps, isEnabled: isFPSEnabled, setEnabled: setFPSEnabled } = useFPSCounter();
     const { isRainbowEnabled, setRainbowEnabled } = useRainbowText();
