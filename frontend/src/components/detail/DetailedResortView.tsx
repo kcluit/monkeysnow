@@ -16,6 +16,7 @@ interface DetailedResortViewPropsWithUnits extends DetailedResortViewProps {
     unitSystem: UnitSystem;
     showUtilityBar: boolean;
     utilityBarStyle: import('../../types').UtilityBarStyle;
+    modelLineOpacity?: ModelLineOpacity;
     onBack: () => void;
 }
 
