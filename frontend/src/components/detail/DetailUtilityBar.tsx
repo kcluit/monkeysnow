@@ -202,7 +202,7 @@ function LargeDetailUtilityBar({
                                     >
                                         <span>Custom...</span>
                                         {typeof elevationSelection === 'number' && (
-                                            <span className="text-xs text-theme-textSecondary opacity-70">{elevationSelection}m</span>
+                                            <span className="text-xs text-theme-textSecondary opacity-70">{formatElevation(elevationSelection, unitSystem)}</span>
                                         )}
                                     </button>
                                 ) : (
