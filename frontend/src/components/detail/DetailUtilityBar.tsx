@@ -19,6 +19,7 @@ export function DetailUtilityBar(props: DetailUtilityBarProps): JSX.Element {
 
 function LargeDetailUtilityBar({
     onBack,
+    unitSystem,
     selectedModels,
     setSelectedModels,
     selectedVariables,
