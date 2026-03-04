@@ -120,7 +120,7 @@ export function CompactDetailUtilityBar({
                         <span className="compact-bar-text text-theme-accent">
                             {isLoadingElevation || customLocation.elevation === null
                                 ? '...'
-                                : `${customLocation.elevation}m`}
+                                : formatElevation(customLocation.elevation!, unitSystem)}
                         </span>
                     )}
 
