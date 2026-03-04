@@ -9,7 +9,7 @@
 import type { ChartConfig, ChartType, SeriesConfig, ChartTheme, BoxWhiskerData, HeatmapData, WindArrowData } from '../lib/charts';
 import type { WeatherChartProps } from '../types/detailView';
 import type { WeatherModel, HourlyDataPoint, AggregationType } from '../types/openMeteo';
-import type { UnitSystem } from '../types';
+import type { UnitSystem, ModelLineOpacity } from '../types';
 import { supportsAccumulation } from '../types/chartSettings';
 import type { ChartDisplayType } from '../types/chartSettings';
 import { getModelConfig, getVariableConfig, getOverlayConfig, hasOverlays } from './chartConfigurations';
@@ -445,7 +445,8 @@ function buildSeriesConfigs(
     selectedModels: WeatherModel[],
     chartType: ChartType,
     hasAggregations: boolean,
-    hideAggregationMembers: boolean = false
+    hideAggregationMembers: boolean = false,
+    modelLineOpacity: ModelLineOpacity = 'auto'
 ): SeriesConfig[] {
     // Skip model series entirely if hiding members and aggregations are active
     if (hideAggregationMembers && hasAggregations) {
@@ -453,7 +454,9 @@ function buildSeriesConfigs(
     }
 
     const configs: SeriesConfig[] = [];
-    const modelOpacity = hasAggregations ? calculateModelOpacity(selectedModels.length) : 1;
+    const modelOpacity = hasAggregations
+        ? (modelLineOpacity === 'auto' ? calculateModelOpacity(selectedModels.length) : modelLineOpacity)
+        : 1;
 
     for (const model of selectedModels) {
         const data = seriesData.get(model);
@@ -810,6 +813,7 @@ export function buildWeatherChartConfig(
         hideAggregationMembers = false,
         showMinMaxFill = false,
         showPercentileFill = false,
+        modelLineOpacity = 'auto',
         variable,
         unitSystem,
         timezoneInfo,
@@ -847,7 +851,7 @@ export function buildWeatherChartConfig(
     const hasAggregations = selectedAggregations.length > 0 && seriesData.size > 1;
 
     // Build model series (with reduced opacity if aggregations enabled, or hidden if hideAggregationMembers)
-    const modelSeries = buildSeriesConfigs(seriesData, selectedModels, chartType, hasAggregations, hideAggregationMembers);
+    const modelSeries = buildSeriesConfigs(seriesData, selectedModels, chartType, hasAggregations, hideAggregationMembers, modelLineOpacity);
 
     // Build aggregation series
     const aggregationSeries = calculateAggregationSeries(

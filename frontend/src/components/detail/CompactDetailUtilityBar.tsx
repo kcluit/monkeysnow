@@ -4,9 +4,13 @@ import { useModelHierarchy } from '../../hooks/useModelHierarchy';
 import { useVariableSelection } from '../../hooks/useVariableSelection';
 import { ModelSelectionGridModal } from '../ModelSelectionModal';
 import { VariableSelectionModal } from '../VariableSelectionModal';
+import { formatElevation } from '../../utils/unitConversion';
+import { Icon } from '../Icon';
+import { icons } from '../../constants/icons';
 
 export function CompactDetailUtilityBar({
     onBack,
+    unitSystem,
     selectedModels,
     setSelectedModels,
     selectedVariables,
@@ -63,7 +67,7 @@ export function CompactDetailUtilityBar({
         if (elevationSelection === 'base') return 'Base';
         if (elevationSelection === 'mid') return 'Mid';
         if (elevationSelection === 'top') return 'Top';
-        return `${elevationSelection}m`;
+        return formatElevation(elevationSelection, unitSystem);
     };
 
     // Cycle forecast days: 1 → 3 → 7 → 14 → 16 → 1
@@ -118,7 +122,7 @@ export function CompactDetailUtilityBar({
                         <span className="compact-bar-text text-theme-accent">
                             {isLoadingElevation || customLocation.elevation === null
                                 ? '...'
-                                : `${customLocation.elevation}m`}
+                                : formatElevation(customLocation.elevation!, unitSystem)}
                         </span>
                     )}
 
@@ -149,7 +153,7 @@ export function CompactDetailUtilityBar({
                         onClick={() => setIsChartLocked(!isChartLocked)}
                         className="compact-bar-text text-theme-textSecondary hover:text-theme-accent transition-colors"
                     >
-                        {isChartLocked ? 'Locked' : 'Unlocked'}
+                        <Icon icon={isChartLocked ? icons.lock : icons.lockOpen} />
                     </button>
 
                     {/* Reset location button when custom location active */}

@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import type { Command, UseCommandPaletteReturn } from '../types';
 
+type PendingNav = { commandId: string } | null;
+
 /**
  * Hook for managing command palette state with lazy command generation.
  * Commands are only generated when the palette opens, not on every state change.
@@ -20,6 +22,7 @@ export function useCommandPalette(
 
   // Store latest factory in ref to avoid stale closures
   const factoryRef = useRef(commandFactory);
+  const pendingNavRef = useRef<PendingNav>(null);
   useEffect(() => {
     factoryRef.current = commandFactory;
   });
@@ -29,6 +32,16 @@ export function useCommandPalette(
     if (isOpen) {
       const newCommands = factoryRef.current();
       setCommands(newCommands);
+
+      // Auto-navigate to a specific command's subcommands if requested
+      const nav = pendingNavRef.current;
+      if (nav) {
+        pendingNavRef.current = null;
+        const cmd = newCommands.find(c => c.id === nav.commandId);
+        if (cmd?.subCommands) {
+          setCommandStack([cmd.subCommands]);
+        }
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, ...dependencies]);
@@ -68,6 +81,14 @@ export function useCommandPalette(
   }, []);
 
   const openPalette = useCallback(() => {
+    setIsOpen(true);
+    setSearchQuery('');
+    setSelectedIndex(0);
+    setCommandStack([]);
+  }, []);
+
+  const openToCommand = useCallback((commandId: string) => {
+    pendingNavRef.current = { commandId };
     setIsOpen(true);
     setSearchQuery('');
     setSelectedIndex(0);
@@ -176,6 +197,7 @@ export function useCommandPalette(
     selectedIndex,
     filteredCommands,
     openPalette,
+    openToCommand,
     closePalette,
     setSearchQuery,
     setSelectedIndex,

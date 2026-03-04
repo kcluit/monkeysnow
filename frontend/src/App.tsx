@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from 'react';
-import { Routes, Route, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate, useParams, Link } from 'react-router-dom';
 import { Header } from './components/Header';
 import { UtilityBar } from './components/UtilityBar';
 import { CompactUtilityBar } from './components/CompactUtilityBar';
 import { CommandPalette } from './components/CommandPalette';
-import { AboutPage, SettingsPage } from './pages';
+import { AboutPage, SettingsPage, TermsPage, PrivacyPage } from './pages';
 import Konami from 'konami';
 
 // Lazy load card components - only one is rendered based on viewMode
@@ -36,6 +36,7 @@ import { useHierarchy } from './contexts/HierarchyContext';
 import { processResortData } from './utils/weather';
 import { generateControlCommands } from './utils/commandGenerators';
 import { icons } from './constants/icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { setGlobalZoomSync } from './lib/charts/chartRegistry';
 import { getSortDayData } from './utils/sortDayHelpers';
 import { getResortLocation } from './utils/openMeteoClient';
@@ -57,7 +58,8 @@ import type {
     SnowfallEstimateMode,
     WeatherModelSetting,
     UtilityBarStyle,
-    ResortDisplayLimit
+    ResortDisplayLimit,
+    ModelLineOpacity
 } from './types';
 
 // Resort Detail Page wrapper component
@@ -65,11 +67,13 @@ function ResortDetailRoute({
     unitSystem,
     showUtilityBar,
     utilityBarStyle,
+    modelLineOpacity,
     getDisplayName,
 }: {
     unitSystem: 'metric' | 'imperial';
     showUtilityBar: boolean;
     utilityBarStyle: UtilityBarStyle;
+    modelLineOpacity: ModelLineOpacity;
     getDisplayName: (id: string) => string;
 }): JSX.Element | null {
     const { resortId } = useParams<{ resortId: string }>();
@@ -103,6 +107,7 @@ function ResortDetailRoute({
                 unitSystem={unitSystem}
                 showUtilityBar={showUtilityBar}
                 utilityBarStyle={utilityBarStyle}
+                modelLineOpacity={modelLineOpacity}
                 onBack={handleBack}
             />
         </Suspense>
@@ -114,7 +119,7 @@ function App(): JSX.Element {
 
     // Theme, font, fullscreen, FPS, rainbow, hide emoji, and language hooks
     const { theme, setTheme, availableThemes, applyTheme, resetPreview } = useTheme();
-    const { font, setFont, availableFonts } = useFont();
+    const { font, setFont, availableFonts, applyFont, resetPreview: resetFontPreview } = useFont();
     const { isFullscreen, enterFullscreen, exitFullscreen } = useFullscreen();
     const { fps, isEnabled: isFPSEnabled, setEnabled: setFPSEnabled } = useFPSCounter();
     const { isRainbowEnabled, setRainbowEnabled } = useRainbowText();
@@ -150,6 +155,7 @@ function App(): JSX.Element {
     const [chartZoomSyncEnabled, setChartZoomSyncEnabled] = useLocalStorage<boolean>('chartZoomSync', true);
     const [unitSystem, setUnitSystem] = useUnitSystem();
     const [resortDisplayLimit, setResortDisplayLimit] = useLocalStorage<ResortDisplayLimit>('resortDisplayLimit', 'auto');
+    const [modelLineOpacity, setModelLineOpacity] = useLocalStorage<ModelLineOpacity>('modelLineOpacity', 'auto');
 
     // Sync chart zoom sync setting to registry
     useEffect(() => {
@@ -180,6 +186,9 @@ function App(): JSX.Element {
     // Banner dismissal state
     const [bannerDismissed, setBannerDismissed] = useLocalStorage<boolean>('bannerDismissed', false);
 
+    // Track whether the resort modal has ever been opened (for first-visit empty draft)
+    const [hasOpenedResortModal, setHasOpenedResortModal] = useLocalStorage<boolean>('hasOpenedResortModal', false);
+
     // Resort hierarchy hook for modal
     const resortHierarchy = useResortHierarchy({
         selectedResorts,
@@ -195,11 +204,16 @@ function App(): JSX.Element {
         prevModalOpen.current = resortHierarchy.isOpen;
     }, [resortHierarchy.isOpen, selectedResorts, fetchResorts]);
 
-    // Open resort modal and auto-dismiss the banner
+    // Open resort modal, auto-dismiss the banner, and handle first-visit empty draft
     const openResortModalAndDismissBanner = useCallback(() => {
-        resortHierarchy.openModal();
+        if (!hasOpenedResortModal) {
+            resortHierarchy.openModal([]);
+            setHasOpenedResortModal(true);
+        } else {
+            resortHierarchy.openModal();
+        }
         setBannerDismissed(true);
-    }, [resortHierarchy.openModal, setBannerDismissed]);
+    }, [resortHierarchy.openModal, setBannerDismissed, hasOpenedResortModal, setHasOpenedResortModal]);
 
     useEffect(() => {
         new Konami("https://monkeytype.com/");
@@ -238,8 +252,9 @@ function App(): JSX.Element {
         utilityBarStyle, setUtilityBarStyle,
         unitSystem, setUnitSystem,
         resortDisplayLimit, setResortDisplayLimit,
-        resortHierarchy.openModal,
+        openResortModalAndDismissBanner,
         language.id, setLanguage, availableLanguages,
+        modelLineOpacity, setModelLineOpacity,
     ];
 
     // Command factory for lazy generation - commands only built when palette opens
@@ -431,10 +446,12 @@ function App(): JSX.Element {
             setUnitSystem,
             resortDisplayLimit,
             setResortDisplayLimit,
-            openResortSelector: resortHierarchy.openModal,
+            openResortSelector: openResortModalAndDismissBanner,
             languageId: language.id,
             setLanguage,
             availableLanguages,
+            modelLineOpacity,
+            setModelLineOpacity,
         });
 
         return [...baseCommands, ...controlCommands];
@@ -486,6 +503,32 @@ function App(): JSX.Element {
         availableThemes,
         applyTheme,
         resetPreview
+    ]);
+
+    // Preview font when selecting in command palette
+    useEffect(() => {
+        if (!commandPalette.isOpen) {
+            resetFontPreview();
+            return;
+        }
+
+        const selectedCommand = commandPalette.filteredCommands[commandPalette.selectedIndex];
+        if (selectedCommand && selectedCommand.id.startsWith('font-')) {
+            const fontId = selectedCommand.id.replace('font-', '');
+            const fontToPreview = availableFonts.find(f => f.id === fontId);
+            if (fontToPreview) {
+                applyFont(fontToPreview);
+            }
+        } else {
+            resetFontPreview();
+        }
+    }, [
+        commandPalette.isOpen,
+        commandPalette.selectedIndex,
+        commandPalette.filteredCommands,
+        availableFonts,
+        applyFont,
+        resetFontPreview
     ]);
 
     // Load all selected resorts
@@ -668,7 +711,7 @@ function App(): JSX.Element {
                         allWeatherData={allWeatherData}
                         processResortData={processResortData}
                         cancelLoading={cancelLoading}
-                        openResortModal={resortHierarchy.openModal}
+                        openResortModal={openResortModalAndDismissBanner}
                     />
                 ) : (
                     <UtilityBar
@@ -690,7 +733,7 @@ function App(): JSX.Element {
                         allWeatherData={allWeatherData}
                         processResortData={processResortData}
                         cancelLoading={cancelLoading}
-                        openResortModal={resortHierarchy.openModal}
+                        openResortModal={openResortModalAndDismissBanner}
                     />
                 )
             )}
@@ -757,9 +800,13 @@ function App(): JSX.Element {
         availableThemes,
         setTheme,
         currentThemeId: theme?.id || 'dark',
+        applyTheme,
+        resetThemePreview: resetPreview,
         availableFonts,
         setFont,
         currentFontId: font?.id || 'system',
+        applyFont,
+        resetFontPreview,
         isRainbowEnabled,
         setRainbowEnabled,
         isHideIconsEnabled,
@@ -801,7 +848,7 @@ function App(): JSX.Element {
         language,
         setLanguage,
         availableLanguages,
-        openResortSelector: resortHierarchy.openModal,
+        openResortSelector: openResortModalAndDismissBanner,
     };
 
     return (
@@ -844,6 +891,7 @@ function App(): JSX.Element {
                             unitSystem={unitSystem}
                             showUtilityBar={showUtilityBar}
                             utilityBarStyle={utilityBarStyle}
+                            modelLineOpacity={modelLineOpacity}
                             getDisplayName={getDisplayName}
                         />
                     </>
@@ -865,21 +913,52 @@ function App(): JSX.Element {
                     </div>
                 } />
 
+                {/* Terms route */}
+                <Route path="/terms" element={
+                    <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
+                        <Header font={font} hideIcons={isHideIconsEnabled} />
+                        <TermsPage />
+                    </div>
+                } />
+
+                {/* Privacy route */}
+                <Route path="/privacy" element={
+                    <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
+                        <Header font={font} hideIcons={isHideIconsEnabled} />
+                        <PrivacyPage />
+                    </div>
+                } />
+
                 {/* Catch-all redirect to home */}
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
 
             {/* Footer */}
-            <footer className="fixed bottom-2 left-4 text-xs text-theme-textSecondary opacity-40 hover:opacity-100 transition-opacity z-10">
+            <footer className="fixed bottom-2 left-0 right-0 px-4 text-xs text-theme-textSecondary z-10 flex items-center justify-evenly">
                 <a
                     href="https://github.com/kcluit/monkeysnow"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 hover:text-theme-textPrimary transition-colors"
+                    className="flex items-center gap-1.5 opacity-40 hover:opacity-100 hover:text-theme-textPrimary transition-all"
                 >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
                     github
                 </a>
+                <Link to="/terms" className="flex items-center gap-1.5 opacity-40 hover:opacity-100 hover:text-theme-textPrimary transition-all">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    terms
+                </Link>
+                <Link to="/privacy" className="flex items-center gap-1.5 opacity-40 hover:opacity-100 hover:text-theme-textPrimary transition-all">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    privacy
+                </Link>
+                <button
+                    onClick={() => commandPalette.openToCommand('theme')}
+                    className="flex items-center gap-1.5 opacity-40 hover:opacity-100 hover:text-theme-textPrimary transition-all cursor-pointer"
+                >
+                    <FontAwesomeIcon icon={icons.palette} style={{ width: 14, height: 14 }} />
+                    {theme.name.toLowerCase()}
+                </button>
             </footer>
         </div>
     );

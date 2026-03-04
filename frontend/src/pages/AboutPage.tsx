@@ -8,8 +8,11 @@ import {
     faListOl,
     faCode,
     faEnvelope,
+    faFileContract,
+    faShieldAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { Link } from 'react-router-dom';
 import { useGitHubContributors } from '../hooks/useGitHubContributors';
 
 interface SectionProps {
@@ -230,6 +233,14 @@ export function AboutPage(): JSX.Element {
                         <Icon icon={faCode} />
                         <span>GitHub</span>
                     </a>
+                    <Link to="/terms" className="about-contact-btn">
+                        <Icon icon={faFileContract} />
+                        <span>Terms</span>
+                    </Link>
+                    <Link to="/privacy" className="about-contact-btn">
+                        <Icon icon={faShieldAlt} />
+                        <span>Privacy</span>
+                    </Link>
                 </div>
             </Section>
 

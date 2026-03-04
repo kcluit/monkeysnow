@@ -17,7 +17,7 @@ export interface UseResortHierarchyProps {
 export interface UseResortHierarchyReturn {
   // Modal state
   isOpen: boolean;
-  openModal: () => void;
+  openModal: (initialDraft?: string[]) => void;
   closeModal: () => void;
 
   // Navigation
@@ -144,8 +144,8 @@ export function useResortHierarchy({
   }, [currentNodes]);
 
   // Open/close modal
-  const openModal = useCallback(() => {
-    setDraftSelectedResorts(selectedResorts);
+  const openModal = useCallback((initialDraft?: string[]) => {
+    setDraftSelectedResorts(initialDraft ?? selectedResorts);
     setIsOpen(true);
     setNavigationStack([]);
     setSearchTerm('');

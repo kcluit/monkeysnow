@@ -21,10 +21,14 @@ export interface SettingsPageProps {
     availableThemes: Theme[];
     setTheme: (id: string) => void;
     currentThemeId: string;
+    applyTheme: (theme: Theme) => void;
+    resetThemePreview: () => void;
     // Font
     availableFonts: Font[];
     setFont: (id: string) => void;
     currentFontId: string;
+    applyFont: (font: Font) => void;
+    resetFontPreview: () => void;
     // Display toggles
     isRainbowEnabled: boolean;
     setRainbowEnabled: (enabled: boolean) => void;
@@ -103,12 +107,16 @@ interface OptionButtonProps {
     isSelected: boolean;
     onClick: () => void;
     icon?: typeof icons[keyof typeof icons];
+    onHover?: () => void;
+    onHoverEnd?: () => void;
 }
 
-function OptionButton({ label, isSelected, onClick, icon }: OptionButtonProps): JSX.Element {
+function OptionButton({ label, isSelected, onClick, icon, onHover, onHoverEnd }: OptionButtonProps): JSX.Element {
     return (
         <button
             onClick={onClick}
+            onMouseEnter={onHover}
+            onMouseLeave={onHoverEnd}
             className={`settings-option-btn ${isSelected ? 'selected' : ''}`}
         >
             {icon && <Icon icon={icon} className="settings-option-icon" />}
@@ -144,8 +152,8 @@ function Toggle({ label, isEnabled, onToggle, icon }: ToggleProps): JSX.Element 
 
 export function SettingsPage(props: SettingsPageProps): JSX.Element {
     const {
-        availableThemes, setTheme, currentThemeId,
-        availableFonts, setFont, currentFontId,
+        availableThemes, setTheme, currentThemeId, applyTheme, resetThemePreview,
+        availableFonts, setFont, currentFontId, applyFont, resetFontPreview,
         isRainbowEnabled, setRainbowEnabled,
         isHideIconsEnabled, setHideIconsEnabled,
         isHideBordersEnabled, setHideBordersEnabled,
@@ -205,7 +213,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
 
                 {/* Appearance Section */}
                 <SettingSection title="Theme" icon={icons.theme}>
-                    <div className="settings-options-grid">
+                    <div className="settings-options-grid" onMouseLeave={resetThemePreview}>
                         {availableThemes.map(t => (
                             <OptionButton
                                 key={t.id}
@@ -213,13 +221,15 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                                 isSelected={currentThemeId === t.id}
                                 onClick={() => setTheme(t.id)}
                                 icon={t.isDark ? icons.dark : icons.light}
+                                onHover={() => applyTheme(t)}
+                                onHoverEnd={resetThemePreview}
                             />
                         ))}
                     </div>
                 </SettingSection>
 
                 <SettingSection title="Font" icon={icons.font}>
-                    <div className="settings-options-grid">
+                    <div className="settings-options-grid" onMouseLeave={resetFontPreview}>
                         {availableFonts.map(f => (
                             <OptionButton
                                 key={f.id}
@@ -227,6 +237,8 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                                 isSelected={currentFontId === f.id}
                                 onClick={() => setFont(f.id)}
                                 icon={f.isMonospace ? icons.monospace : icons.regular}
+                                onHover={() => applyFont(f)}
+                                onHoverEnd={resetFontPreview}
                             />
                         ))}
                     </div>

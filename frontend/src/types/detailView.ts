@@ -1,6 +1,6 @@
 import type { WeatherModel, WeatherVariable, TimezoneInfo, AggregationType } from './openMeteo';
 import type { UnitSystem } from '../utils/unitConversion';
-import type { UtilityBarStyle } from './index';
+import type { UtilityBarStyle, ModelLineOpacity } from './index';
 
 // Elevation selection can be a preset type or a custom number
 export type ElevationSelection = 'base' | 'mid' | 'top' | number;
@@ -69,6 +69,7 @@ export interface DetailViewHeaderProps {
 
 export interface DetailUtilityBarProps {
     onBack: () => void;
+    unitSystem: UnitSystem;
     selectedModels: WeatherModel[];
     setSelectedModels: (models: WeatherModel[] | ((prev: WeatherModel[]) => WeatherModel[])) => void;
     selectedVariables: WeatherVariable[];
@@ -111,6 +112,7 @@ export interface DetailChartGridProps {
     hideAggregationMembers?: boolean;
     showMinMaxFill?: boolean;
     showPercentileFill?: boolean;
+    modelLineOpacity?: ModelLineOpacity;
     unitSystem: UnitSystem;
     timezoneInfo?: TimezoneInfo;
     isChartLocked?: boolean;
@@ -131,6 +133,7 @@ export interface WeatherChartProps {
     hideAggregationMembers?: boolean;
     showMinMaxFill?: boolean;
     showPercentileFill?: boolean;
+    modelLineOpacity?: ModelLineOpacity;
     variable: WeatherVariable;
     unitSystem: UnitSystem;
     timezoneInfo?: TimezoneInfo;

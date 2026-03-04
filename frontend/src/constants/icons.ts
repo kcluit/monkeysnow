@@ -56,6 +56,10 @@ import {
   faGear,
   // Modal controls
   faXmark,
+  // Lock icons
+  faLock,
+  faLockOpen,
+  faPalette,
 } from '@fortawesome/free-solid-svg-icons';
 
 // Re-export for direct usage
@@ -143,6 +147,13 @@ export const icons = {
 
   // Modal controls
   close: faXmark,
+
+  // Lock icons
+  lock: faLock,
+  lockOpen: faLockOpen,
+
+  // Footer icons
+  palette: faPalette,
 } as const;
 
 export type IconKey = keyof typeof icons;

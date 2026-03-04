@@ -9,12 +9,14 @@ import { DEFAULT_VARIABLES, DEFAULT_MODELS } from '../../utils/chartConfiguratio
 import { aggregationOptions } from '../../data/modelHierarchy';
 import type { DetailedResortViewProps, ElevationSelection, CustomLocation } from '../../types/detailView';
 import type { WeatherModel, WeatherVariable, AggregationType } from '../../types/openMeteo';
-import type { UnitSystem } from '../../types';
+import type { UnitSystem, ModelLineOpacity } from '../../types';
+import { formatElevation } from '../../utils/unitConversion';
 
 interface DetailedResortViewPropsWithUnits extends DetailedResortViewProps {
     unitSystem: UnitSystem;
     showUtilityBar: boolean;
     utilityBarStyle: import('../../types').UtilityBarStyle;
+    modelLineOpacity: ModelLineOpacity;
     onBack: () => void;
 }
 
@@ -35,6 +37,7 @@ export function DetailedResortView({
     unitSystem,
     showUtilityBar,
     utilityBarStyle,
+    modelLineOpacity,
     onBack,
 }: DetailedResortViewPropsWithUnits): JSX.Element {
     // State for selected models
@@ -223,16 +226,16 @@ export function DetailedResortView({
                             {isLoadingElevation || customLocation.elevation === null ? (
                                 <span className="animate-pulse">Fetching elevation...</span>
                             ) : (
-                                <span>Elevation: {customLocation.elevation}m</span>
+                                <span>Elevation: {formatElevation(customLocation.elevation, unitSystem)}</span>
                             )}
                         </>
                     ) : (
                         <>
                             <span>Lat: {location.lat.toFixed(4)}</span>
                             <span>Lon: {location.lon.toFixed(4)}</span>
-                            <span>Base: {location.baseElevation}m</span>
-                            <span>Mid: {location.midElevation}m</span>
-                            <span>Top: {location.topElevation}m</span>
+                            <span>Base: {formatElevation(location.baseElevation, unitSystem)}</span>
+                            <span>Mid: {formatElevation(location.midElevation, unitSystem)}</span>
+                            <span>Top: {formatElevation(location.topElevation, unitSystem)}</span>
                         </>
                     )}
                     {timezoneInfo && (
@@ -246,6 +249,7 @@ export function DetailedResortView({
                 <div className="px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
                     <DetailUtilityBar
                         onBack={onBack}
+                        unitSystem={unitSystem}
                         selectedModels={selectedModels}
                         setSelectedModels={setSelectedModels}
                         selectedVariables={selectedVariables}
@@ -318,6 +322,7 @@ export function DetailedResortView({
                         hideAggregationMembers={hideAggregationMembers}
                         showMinMaxFill={showMinMaxFill}
                         showPercentileFill={showPercentileFill}
+                        modelLineOpacity={modelLineOpacity}
                         unitSystem={unitSystem}
                         timezoneInfo={timezoneInfo ?? undefined}
                         isChartLocked={isChartLocked}

@@ -7,6 +7,7 @@ import { VariableSelectionModal } from '../VariableSelectionModal';
 import { CompactDetailUtilityBar } from './CompactDetailUtilityBar';
 import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
+import { formatElevation } from '../../utils/unitConversion';
 
 export function DetailUtilityBar(props: DetailUtilityBarProps): JSX.Element {
     if (props.utilityBarStyle === 'compact') {
@@ -18,6 +19,7 @@ export function DetailUtilityBar(props: DetailUtilityBarProps): JSX.Element {
 
 function LargeDetailUtilityBar({
     onBack,
+    unitSystem,
     selectedModels,
     setSelectedModels,
     selectedVariables,
@@ -79,10 +81,15 @@ function LargeDetailUtilityBar({
         return () => document.removeEventListener('click', handleClickOutside);
     }, []);
 
+    const elevationUnit = unitSystem === 'imperial' ? 'ft' : 'm';
+    const maxElevationInput = unitSystem === 'imperial' ? 29528 : 9000;
+
     const handleCustomElevationSubmit = () => {
         const value = parseInt(customElevationValue, 10);
-        if (!isNaN(value) && value >= 0 && value <= 9000) {
-            setElevationSelection(value);
+        if (!isNaN(value) && value >= 0 && value <= maxElevationInput) {
+            // Convert to meters for internal storage if imperial
+            const meters = unitSystem === 'imperial' ? Math.round(value / 3.28084) : value;
+            setElevationSelection(meters);
             setShowElevationDropdown(false);
             setShowCustomElevationInput(false);
             setCustomElevationValue('');
@@ -145,7 +152,7 @@ function LargeDetailUtilityBar({
                             {elevationSelection === 'base' ? 'Base' :
                                 elevationSelection === 'mid' ? 'Mid' :
                                     elevationSelection === 'top' ? 'Top' :
-                                        `${elevationSelection}m`}
+                                        formatElevation(elevationSelection, unitSystem)}
                         </span>
                         <svg className="w-4 h-4 text-theme-textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -171,7 +178,7 @@ function LargeDetailUtilityBar({
                                         }`}
                                 >
                                     <span>{option.label}</span>
-                                    <span className="text-xs text-theme-textSecondary opacity-70">{option.displayValue}m</span>
+                                    <span className="text-xs text-theme-textSecondary opacity-70">{formatElevation(option.displayValue, unitSystem)}</span>
                                 </button>
                             ))}
                             <div className="border-t border-theme-border mt-1 pt-1">
@@ -180,11 +187,13 @@ function LargeDetailUtilityBar({
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             setShowCustomElevationInput(true);
-                                            setCustomElevationValue(
-                                                typeof elevationSelection === 'number'
-                                                    ? elevationSelection.toString()
-                                                    : resolvedElevation.toString()
-                                            );
+                                            const metersValue = typeof elevationSelection === 'number'
+                                                ? elevationSelection
+                                                : resolvedElevation;
+                                            const displayValue = unitSystem === 'imperial'
+                                                ? Math.round(metersValue * 3.28084)
+                                                : metersValue;
+                                            setCustomElevationValue(displayValue.toString());
                                         }}
                                         className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm ${typeof elevationSelection === 'number'
                                                 ? 'bg-theme-secondary text-theme-textPrimary'
@@ -193,7 +202,7 @@ function LargeDetailUtilityBar({
                                     >
                                         <span>Custom...</span>
                                         {typeof elevationSelection === 'number' && (
-                                            <span className="text-xs text-theme-textSecondary opacity-70">{elevationSelection}m</span>
+                                            <span className="text-xs text-theme-textSecondary opacity-70">{formatElevation(elevationSelection, unitSystem)}</span>
                                         )}
                                     </button>
                                 ) : (
@@ -206,11 +215,11 @@ function LargeDetailUtilityBar({
                                                 onKeyDown={handleCustomElevationKeyDown}
                                                 placeholder="Elevation"
                                                 min="0"
-                                                max="9000"
+                                                max={maxElevationInput.toString()}
                                                 autoFocus
                                                 className="w-full px-2 py-1 text-sm rounded border border-theme-border bg-theme-cardBg text-theme-textPrimary placeholder-theme-textSecondary focus:outline-none focus:border-theme-accent"
                                             />
-                                            <span className="text-sm text-theme-textSecondary">m</span>
+                                            <span className="text-sm text-theme-textSecondary">{elevationUnit}</span>
                                         </div>
                                         <div className="flex gap-1 mt-2">
                                             <button
@@ -243,7 +252,7 @@ function LargeDetailUtilityBar({
                         {isLoadingElevation || customLocation.elevation === null ? (
                             <span className="text-sm text-theme-textPrimary font-medium animate-pulse">Loading...</span>
                         ) : (
-                            <span className="text-sm text-theme-textPrimary font-medium">{customLocation.elevation}m</span>
+                            <span className="text-sm text-theme-textPrimary font-medium">{formatElevation(customLocation.elevation, unitSystem)}</span>
                         )}
                     </div>
                     <button
