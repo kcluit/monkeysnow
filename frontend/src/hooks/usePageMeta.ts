@@ -6,10 +6,6 @@ export interface PageMetaOptions {
   canonical: string;
 }
 
-const BASE_TITLE = 'monkeysnow \u2014 ski resort snow forecasts';
-const BASE_DESCRIPTION = 'Real-time snow forecasts for ski resorts worldwide. Powder, dry snow, wet snow and rain estimates using Kuchera ratios and multi-model weather data.';
-const BASE_URL = 'https://monkeysnow.com/';
-
 function setMetaContent(selector: string, content: string): void {
   const el = document.querySelector<HTMLMetaElement>(selector);
   if (el) el.content = content;
