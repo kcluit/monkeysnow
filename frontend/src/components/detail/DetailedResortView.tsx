@@ -322,6 +322,7 @@ export function DetailedResortView({
                         hideAggregationMembers={hideAggregationMembers}
                         showMinMaxFill={showMinMaxFill}
                         showPercentileFill={showPercentileFill}
+                        modelLineOpacity={modelLineOpacity}
                         unitSystem={unitSystem}
                         timezoneInfo={timezoneInfo ?? undefined}
                         isChartLocked={isChartLocked}
