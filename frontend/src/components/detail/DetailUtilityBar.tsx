@@ -81,10 +81,15 @@ function LargeDetailUtilityBar({
         return () => document.removeEventListener('click', handleClickOutside);
     }, []);
 
+    const elevationUnit = unitSystem === 'imperial' ? 'ft' : 'm';
+    const maxElevationInput = unitSystem === 'imperial' ? 29528 : 9000;
+
     const handleCustomElevationSubmit = () => {
         const value = parseInt(customElevationValue, 10);
-        if (!isNaN(value) && value >= 0 && value <= 9000) {
-            setElevationSelection(value);
+        if (!isNaN(value) && value >= 0 && value <= maxElevationInput) {
+            // Convert to meters for internal storage if imperial
+            const meters = unitSystem === 'imperial' ? Math.round(value / 3.28084) : value;
+            setElevationSelection(meters);
             setShowElevationDropdown(false);
             setShowCustomElevationInput(false);
             setCustomElevationValue('');
