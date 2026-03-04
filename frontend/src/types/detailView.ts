@@ -69,6 +69,7 @@ export interface DetailViewHeaderProps {
 
 export interface DetailUtilityBarProps {
     onBack: () => void;
+    unitSystem: UnitSystem;
     selectedModels: WeatherModel[];
     setSelectedModels: (models: WeatherModel[] | ((prev: WeatherModel[]) => WeatherModel[])) => void;
     selectedVariables: WeatherVariable[];
