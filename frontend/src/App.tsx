@@ -4,7 +4,7 @@ import { Header } from './components/Header';
 import { UtilityBar } from './components/UtilityBar';
 import { CompactUtilityBar } from './components/CompactUtilityBar';
 import { CommandPalette } from './components/CommandPalette';
-import { AboutPage, SettingsPage } from './pages';
+import { AboutPage, SettingsPage, TermsPage, PrivacyPage } from './pages';
 import Konami from 'konami';
 
 // Lazy load card components - only one is rendered based on viewMode
