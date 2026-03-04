@@ -32,6 +32,16 @@ export function useCommandPalette(
     if (isOpen) {
       const newCommands = factoryRef.current();
       setCommands(newCommands);
+
+      // Auto-navigate to a specific command's subcommands if requested
+      const nav = pendingNavRef.current;
+      if (nav) {
+        pendingNavRef.current = null;
+        const cmd = newCommands.find(c => c.id === nav.commandId);
+        if (cmd?.subCommands) {
+          setCommandStack([cmd.subCommands]);
+        }
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, ...dependencies]);
