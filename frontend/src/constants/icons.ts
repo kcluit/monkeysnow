@@ -60,6 +60,7 @@ import {
   faLock,
   faLockOpen,
   faPalette,
+  faHeart,
 } from '@fortawesome/free-solid-svg-icons';
 
 // Re-export for direct usage
@@ -154,6 +155,7 @@ export const icons = {
 
   // Footer icons
   palette: faPalette,
+  donate: faHeart,
 } as const;
 
 export type IconKey = keyof typeof icons;

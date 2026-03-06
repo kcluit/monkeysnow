@@ -10,6 +10,7 @@ import {
     faEnvelope,
     faFileContract,
     faShieldAlt,
+    faHeart,
 } from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { Link } from 'react-router-dom';
@@ -241,6 +242,15 @@ export function AboutPage(): JSX.Element {
                         <Icon icon={faShieldAlt} />
                         <span>Privacy</span>
                     </Link>
+                    <a
+                        href="https://ko-fi.com/kcluit"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="about-contact-btn"
+                    >
+                        <Icon icon={faHeart} />
+                        <span>Donate</span>
+                    </a>
                 </div>
             </Section>
 

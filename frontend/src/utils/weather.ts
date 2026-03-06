@@ -103,6 +103,9 @@ export function processResortData(
             // Create periods from AM/PM/NIGHT data
             const periods = createPeriodsFromDayData(dayData, temperatureMetric, snowfallEstimateMode, unitSystem);
 
+            // Skip days with no meaningful forecast data (API returned zeros beyond model range)
+            if (periods.length === 0 || periods.every(p => p.tempMax === 0 && p.tempMin === 0 && p.tempAvg === 0 && p.tempMedian === 0)) continue;
+
             // Get snow condition from periods' snow quality (use first available with precipitation)
             const snowCondition = getSnowConditionFromPeriods(periods);
 
