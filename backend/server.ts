@@ -102,25 +102,39 @@ const buildHierarchyFromLocations = (): ContinentData[] => {
                     provinces: []
                 };
 
-                for (const [provinceName, provinceData] of Object.entries(countryData as Record<string, any>)) {
-                    const province: ProvinceData = {
-                        id: toSlugId(provinceName),
-                        name: provinceName,
-                        resorts: []
-                    };
-
-                    for (const [resortId, resortData] of Object.entries(provinceData as Record<string, any>)) {
-                        // Check if this is actually a resort (has elevation data)
-                        if (resortData && typeof resortData === 'object' && resortData.bot !== undefined) {
-                            province.resorts.push({
-                                id: resortId,
-                                displayName: resortData.displayName || resortId.replace(/-/g, ' ')
-                            });
+                for (const [key, value] of Object.entries(countryData as Record<string, any>)) {
+                    if (value && typeof value === 'object' && value.bot !== undefined) {
+                        // 3-level: entry is a resort directly under the country
+                        // Create an implicit province named after the country
+                        let province = country.provinces.find(p => p.id === toSlugId(countryName));
+                        if (!province) {
+                            province = { id: toSlugId(countryName), name: countryName, resorts: [] };
+                            country.provinces.push(province);
                         }
-                    }
+                        province.resorts.push({
+                            id: key,
+                            displayName: value.displayName || key.replace(/-/g, ' ')
+                        });
+                    } else if (value && typeof value === 'object') {
+                        // 4-level: entry is a province containing resorts
+                        const province: ProvinceData = {
+                            id: toSlugId(key),
+                            name: key,
+                            resorts: []
+                        };
 
-                    if (province.resorts.length > 0) {
-                        country.provinces.push(province);
+                        for (const [resortId, resortData] of Object.entries(value as Record<string, any>)) {
+                            if (resortData && typeof resortData === 'object' && resortData.bot !== undefined) {
+                                province.resorts.push({
+                                    id: resortId,
+                                    displayName: resortData.displayName || resortId.replace(/-/g, ' ')
+                                });
+                            }
+                        }
+
+                        if (province.resorts.length > 0) {
+                            country.provinces.push(province);
+                        }
                     }
                 }
 
