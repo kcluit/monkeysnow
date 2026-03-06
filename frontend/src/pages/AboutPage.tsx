@@ -242,6 +242,15 @@ export function AboutPage(): JSX.Element {
                         <Icon icon={faShieldAlt} />
                         <span>Privacy</span>
                     </Link>
+                    <a
+                        href="https://ko-fi.com/kcluit"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="about-contact-btn"
+                    >
+                        <Icon icon={faHeart} />
+                        <span>Donate</span>
+                    </a>
                 </div>
             </Section>
 
