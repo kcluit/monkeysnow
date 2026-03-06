@@ -181,6 +181,8 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
         utilityBarStyle, setUtilityBarStyle,
         unitSystem, setUnitSystem,
         language, setLanguage, availableLanguages,
+        resortDisplayLimit, setResortDisplayLimit,
+        modelLineOpacity, setModelLineOpacity,
         openResortSelector,
     } = props;
 
