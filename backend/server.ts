@@ -303,7 +303,22 @@ function estimateHourlySnow(tempC: number, humidity: number, snowfallCm: number)
 const COUNTRY_MODELS: Record<string, string> = {
     'Canada': 'gem_seamless',
     'USA': 'gfs_seamless',
-    'Japan': 'jma_seamless'
+    'Japan': 'jma_seamless',
+    // DWD ICON Seamless — Central Europe & Alps
+    'Germany': 'dwd_icon_seamless',
+    'Austria': 'dwd_icon_seamless',
+    'Switzerland': 'dwd_icon_seamless',
+    'Liechtenstein': 'dwd_icon_seamless',
+    'Italy': 'dwd_icon_seamless',
+    'Slovenia': 'dwd_icon_seamless',
+    'France': 'dwd_icon_seamless',
+    // MET Norway Nordic Seamless — Scandinavia & Nordics
+    'Norway': 'metno_seamless',
+    'Sweden': 'metno_seamless',
+    'Finland': 'metno_seamless',
+    'Iceland': 'metno_seamless',
+    // DMI Seamless — Denmark & Greenland
+    'Denmark': 'dmi_seamless',
 };
 const DEFAULT_MODEL = 'best_match';
 
