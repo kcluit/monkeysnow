@@ -60,6 +60,7 @@ import {
   faLock,
   faLockOpen,
   faPalette,
+  faHeart,
 } from '@fortawesome/free-solid-svg-icons';
 
 // Re-export for direct usage
