@@ -155,6 +155,7 @@ export const icons = {
 
   // Footer icons
   palette: faPalette,
+  donate: faHeart,
 } as const;
 
 export type IconKey = keyof typeof icons;
