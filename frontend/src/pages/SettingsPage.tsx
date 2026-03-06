@@ -14,6 +14,8 @@ import type {
     WeatherModelSetting,
     UtilityBarStyle,
     UnitSystem,
+    ResortDisplayLimit,
+    ModelLineOpacity,
 } from '../types';
 
 export interface SettingsPageProps {
