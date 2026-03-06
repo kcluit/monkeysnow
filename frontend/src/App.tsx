@@ -858,6 +858,10 @@ function App(): JSX.Element {
         language,
         setLanguage,
         availableLanguages,
+        resortDisplayLimit,
+        setResortDisplayLimit,
+        modelLineOpacity,
+        setModelLineOpacity,
         openResortSelector: openResortModalAndDismissBanner,
     };
 
