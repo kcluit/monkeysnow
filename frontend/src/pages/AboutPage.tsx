@@ -10,6 +10,7 @@ import {
     faEnvelope,
     faFileContract,
     faShieldAlt,
+    faHeart,
 } from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { Link } from 'react-router-dom';
