@@ -402,6 +402,47 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                             icon={icons.link}
                         />
                     </div>
+                    <div className="settings-subsection">
+                        <span className="settings-subsection-label">Resort display limit</span>
+                        <div className="settings-options-grid">
+                            {([
+                                { value: 'auto' as ResortDisplayLimit, label: 'Auto (100 on mobile)' },
+                                { value: 50 as ResortDisplayLimit, label: '50' },
+                                { value: 100 as ResortDisplayLimit, label: '100' },
+                                { value: 200 as ResortDisplayLimit, label: '200' },
+                                { value: 500 as ResortDisplayLimit, label: '500' },
+                                { value: 0 as ResortDisplayLimit, label: 'No limit' },
+                            ]).map(option => (
+                                <OptionButton
+                                    key={String(option.value)}
+                                    label={option.label}
+                                    isSelected={resortDisplayLimit === option.value}
+                                    onClick={() => setResortDisplayLimit(option.value)}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                    <div className="settings-subsection">
+                        <span className="settings-subsection-label">Model line opacity</span>
+                        <div className="settings-options-grid">
+                            {([
+                                { value: 'auto' as ModelLineOpacity, label: 'Auto' },
+                                { value: 0.05 as ModelLineOpacity, label: '5%' },
+                                { value: 0.1 as ModelLineOpacity, label: '10%' },
+                                { value: 0.2 as ModelLineOpacity, label: '20%' },
+                                { value: 0.35 as ModelLineOpacity, label: '35%' },
+                                { value: 0.5 as ModelLineOpacity, label: '50%' },
+                                { value: 1 as ModelLineOpacity, label: '100%' },
+                            ]).map(option => (
+                                <OptionButton
+                                    key={String(option.value)}
+                                    label={option.label}
+                                    isSelected={modelLineOpacity === option.value}
+                                    onClick={() => setModelLineOpacity(option.value)}
+                                />
+                            ))}
+                        </div>
+                    </div>
                 </SettingSection>
 
                 {/* Actions */}
