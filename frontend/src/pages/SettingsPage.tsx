@@ -80,6 +80,12 @@ export interface SettingsPageProps {
     language: Language;
     setLanguage: (id: string) => void;
     availableLanguages: Language[];
+    // Resort display limit
+    resortDisplayLimit: ResortDisplayLimit;
+    setResortDisplayLimit: (limit: ResortDisplayLimit) => void;
+    // Model line opacity
+    modelLineOpacity: ModelLineOpacity;
+    setModelLineOpacity: (opacity: ModelLineOpacity) => void;
     // Resort selector
     openResortSelector: () => void;
 }
