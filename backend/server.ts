@@ -44,7 +44,7 @@ interface LocationsMap {
 
 // --- Configuration ---
 const PORT = process.env.PORT || 3000;
-const UPDATE_INTERVAL_MS = 5 * 60 * 60 * 1000; // 5 Hours
+const UPDATE_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 Hours
 const BATCH_SIZE = 30; // Max resorts per Open-Meteo API call (30 resorts = 90 elevation points)
 const BATCH_DELAY_MS = 60 * 1000; // Delay between API batches to respect rate limits (1 min)
 const LOCATIONS_FILE = path.join(__dirname, 'locations.json');
