@@ -147,21 +147,24 @@ const loadLocations = (): LocationsMap => {
         const json = JSON.parse(rawData);
         const flattened: LocationsMap = {};
 
-        // Traverse the hierarchy: Continent -> Country -> Province -> Resort
+        // Traverse the hierarchy: Continent -> Country -> [Province] -> Resort
+        // Some countries (e.g. Europe) use 3-level (no province), others use 4-level
         for (const continentName in json) {
             const continentData = json[continentName];
             for (const countryName in continentData) {
                 const countryData = continentData[countryName];
-                for (const provinceName in countryData) {
-                    const provinceData = countryData[provinceName];
-                    for (const resortId in provinceData) {
-                        const resortData = provinceData[resortId];
-                        // Identify resort by presence of 'bot' (elevation) or 'loc'
-                        if (resortData.bot !== undefined || resortData.loc) {
-                            flattened[resortId] = {
-                                ...resortData,
-                                country: countryName
-                            };
+                for (const key in countryData) {
+                    const value = countryData[key];
+                    if (value && typeof value === 'object' && (value.bot !== undefined || value.loc)) {
+                        // 3-level: this entry is a resort directly under the country
+                        flattened[key] = { ...value, country: countryName };
+                    } else if (value && typeof value === 'object') {
+                        // 4-level: this entry is a province containing resorts
+                        for (const resortId in value) {
+                            const resortData = value[resortId];
+                            if (resortData && typeof resortData === 'object' && (resortData.bot !== undefined || resortData.loc)) {
+                                flattened[resortId] = { ...resortData, country: countryName };
+                            }
                         }
                     }
                 }
