@@ -320,7 +320,24 @@ const COUNTRY_MODELS: Record<string, string> = {
     // DMI Seamless — Denmark & Greenland
     'Denmark': 'dmi_seamless',
 };
-const DEFAULT_MODEL = 'best_match';
+const DEFAULT_MODEL = 'gfs_seamless';
+
+// Country-to-freezing-level-model mapping
+const FREEZING_LEVEL_MODELS: Record<string, string> = {
+    'Germany': 'icon_seamless',
+    'Austria': 'icon_seamless',
+    'Switzerland': 'icon_seamless',
+    'Liechtenstein': 'icon_seamless',
+    'Italy': 'icon_seamless',
+    'Slovenia': 'icon_seamless',
+    'France': 'icon_seamless',
+    'Norway': 'icon_seamless',
+    'Sweden': 'icon_seamless',
+    'Finland': 'icon_seamless',
+    'Iceland': 'icon_seamless',
+    'Denmark': 'icon_seamless',
+};
+const DEFAULT_FREEZING_MODEL = 'gfs_seamless';
 
 const updateWeatherData = async () => {
     console.log(`[${new Date().toISOString()}] Starting optimized weather update (Country-Based Model Strategy)...`);
