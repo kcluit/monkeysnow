@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useNavigate, useParams, Link } from 'react-router-dom';
 import { Header } from './components/Header';
+import { PageMeta } from './components/PageMeta';
+import { usePageMeta } from './hooks/usePageMeta';
 import { UtilityBar } from './components/UtilityBar';
 import { CompactUtilityBar } from './components/CompactUtilityBar';
 import { CommandPalette } from './components/CommandPalette';
@@ -79,12 +81,20 @@ function ResortDetailRoute({
     const { resortId } = useParams<{ resortId: string }>();
     const navigate = useNavigate();
 
-    if (!resortId) {
-        return <Navigate to="/" replace />;
-    }
+    const location = resortId ? getResortLocation(resortId) : null;
+    const displayName = resortId ? getDisplayName(resortId) : '';
 
-    const location = getResortLocation(resortId);
-    if (!location) {
+    usePageMeta({
+        title: displayName ? `${displayName} Snow Forecast — monkeysnow` : 'monkeysnow — ski resort snow forecasts',
+        description: displayName
+            ? `Detailed snow forecast for ${displayName}. Multi-model weather charts, hourly snowfall estimates, temperature and wind data.`
+            : 'Real-time snow forecasts for ski resorts worldwide.',
+        canonical: resortId
+            ? `https://monkeysnow.com/resort/${encodeURIComponent(resortId)}`
+            : 'https://monkeysnow.com/',
+    });
+
+    if (!resortId || !location) {
         return <Navigate to="/" replace />;
     }
 
@@ -102,7 +112,7 @@ function ResortDetailRoute({
         <Suspense fallback={<div className="text-center py-12 text-theme-textSecondary">Loading charts...</div>}>
             <DetailedResortView
                 resortId={resortId}
-                resortName={getDisplayName(resortId)}
+                resortName={displayName}
                 location={resortLocation}
                 unitSystem={unitSystem}
                 showUtilityBar={showUtilityBar}
@@ -876,6 +886,11 @@ function App(): JSX.Element {
                 {/* Home route - resort list */}
                 <Route path="/" element={
                     <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
+                        <PageMeta
+                            title="monkeysnow — ski resort snow forecasts"
+                            description="Real-time snow forecasts for ski resorts worldwide. Compare powder, dry snow, wet snow and rain estimates across multiple weather models."
+                            canonical="https://monkeysnow.com/"
+                        />
                         <Header font={font} hideIcons={isHideIconsEnabled} />
                         {homeContent}
                     </div>
@@ -900,6 +915,11 @@ function App(): JSX.Element {
                 {/* About route */}
                 <Route path="/about" element={
                     <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
+                        <PageMeta
+                            title="About — monkeysnow"
+                            description="monkeysnow is a minimalistic ski resort snow forecast app using Kuchera ratio snow estimation and multi-model weather data from Open-Meteo."
+                            canonical="https://monkeysnow.com/about"
+                        />
                         <Header font={font} hideIcons={isHideIconsEnabled} />
                         <AboutPage />
                     </div>
@@ -908,6 +928,11 @@ function App(): JSX.Element {
                 {/* Settings route */}
                 <Route path="/settings" element={
                     <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
+                        <PageMeta
+                            title="Settings — monkeysnow"
+                            description="Customize monkeysnow: themes, fonts, view modes, elevation display, temperature units, and weather model preferences."
+                            canonical="https://monkeysnow.com/settings"
+                        />
                         <Header font={font} hideIcons={isHideIconsEnabled} />
                         <SettingsPage {...settingsProps} />
                     </div>
@@ -916,6 +941,11 @@ function App(): JSX.Element {
                 {/* Terms route */}
                 <Route path="/terms" element={
                     <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
+                        <PageMeta
+                            title="Terms of Use — monkeysnow"
+                            description="Terms of use for monkeysnow, a free ski resort snow forecast application."
+                            canonical="https://monkeysnow.com/terms"
+                        />
                         <Header font={font} hideIcons={isHideIconsEnabled} />
                         <TermsPage />
                     </div>
@@ -924,6 +954,11 @@ function App(): JSX.Element {
                 {/* Privacy route */}
                 <Route path="/privacy" element={
                     <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
+                        <PageMeta
+                            title="Privacy Policy — monkeysnow"
+                            description="Privacy policy for monkeysnow. We do not collect personal data."
+                            canonical="https://monkeysnow.com/privacy"
+                        />
                         <Header font={font} hideIcons={isHideIconsEnabled} />
                         <PrivacyPage />
                     </div>

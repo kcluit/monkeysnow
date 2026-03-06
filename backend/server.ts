@@ -44,9 +44,9 @@ interface LocationsMap {
 
 // --- Configuration ---
 const PORT = process.env.PORT || 3000;
-const UPDATE_INTERVAL_MS = 5 * 60 * 60 * 1000; // 5 Hours
+const UPDATE_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 Hours
 const BATCH_SIZE = 30; // Max resorts per Open-Meteo API call (30 resorts = 90 elevation points)
-const BATCH_DELAY_MS = 60 * 1000; // Delay between API batches to respect rate limits (1 min)
+const BATCH_DELAY_MS = 30 * 1000; // Delay between API batches to respect rate limits (30 secs)
 const LOCATIONS_FILE = path.join(__dirname, 'locations.json');
 
 // --- Global State ---
@@ -303,9 +303,41 @@ function estimateHourlySnow(tempC: number, humidity: number, snowfallCm: number)
 const COUNTRY_MODELS: Record<string, string> = {
     'Canada': 'gem_seamless',
     'USA': 'gfs_seamless',
-    'Japan': 'jma_seamless'
+    'Japan': 'jma_seamless',
+    // DWD ICON Seamless — Central Europe & Alps
+    'Germany': 'dwd_icon_seamless',
+    'Austria': 'dwd_icon_seamless',
+    'Switzerland': 'dwd_icon_seamless',
+    'Liechtenstein': 'dwd_icon_seamless',
+    'Italy': 'dwd_icon_seamless',
+    'Slovenia': 'dwd_icon_seamless',
+    'France': 'dwd_icon_seamless',
+    // MET Norway Nordic Seamless — Scandinavia & Nordics
+    'Norway': 'metno_seamless',
+    'Sweden': 'metno_seamless',
+    'Finland': 'metno_seamless',
+    'Iceland': 'metno_seamless',
+    // DMI Seamless — Denmark & Greenland
+    'Denmark': 'dmi_seamless',
 };
-const DEFAULT_MODEL = 'best_match';
+const DEFAULT_MODEL = 'gfs_seamless';
+
+// Country-to-freezing-level-model mapping
+const FREEZING_LEVEL_MODELS: Record<string, string> = {
+    'Germany': 'icon_seamless',
+    'Austria': 'icon_seamless',
+    'Switzerland': 'icon_seamless',
+    'Liechtenstein': 'icon_seamless',
+    'Italy': 'icon_seamless',
+    'Slovenia': 'icon_seamless',
+    'France': 'icon_seamless',
+    'Norway': 'icon_seamless',
+    'Sweden': 'icon_seamless',
+    'Finland': 'icon_seamless',
+    'Iceland': 'icon_seamless',
+    'Denmark': 'icon_seamless',
+};
+const DEFAULT_FREEZING_MODEL = 'gfs_seamless';
 
 const updateWeatherData = async () => {
     console.log(`[${new Date().toISOString()}] Starting optimized weather update (Country-Based Model Strategy)...`);
@@ -432,7 +464,7 @@ const updateWeatherData = async () => {
             const freezingParams = {
                 latitude: chunkFreezingLats,
                 longitude: chunkFreezingLons,
-                models: 'gfs_seamless',
+                models: FREEZING_LEVEL_MODELS[country] ?? DEFAULT_FREEZING_MODEL,
                 hourly: ["freezing_level_height"],
                 forecast_days: 10,
                 timezone: "auto"
