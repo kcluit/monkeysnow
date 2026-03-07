@@ -762,7 +762,21 @@ const updateWeatherData = async () => {
 // --- Routes/Start ---
 let isUpdating = false;
 
+const loadCacheFromDisk = () => {
+    try {
+        if (fs.existsSync(CACHE_FILE)) {
+            const raw = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf-8'));
+            weatherCache = raw.data;
+            lastSuccessfulUpdate = new Date(raw.updatedAt);
+            console.log(`Loaded cache from disk (${Object.keys(weatherCache!).length} resorts, updated ${lastSuccessfulUpdate.toISOString()})`);
+        }
+    } catch (err) {
+        console.error('Failed to load cache file:', err);
+    }
+};
+
 const startWeatherUpdates = async () => {
+    loadCacheFromDisk();
     try { await updateWeatherData(); } catch (e) { console.error("Init failed", e); }
     setInterval(async () => {
         if (isUpdating) {
