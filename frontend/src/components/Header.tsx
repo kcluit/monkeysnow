@@ -8,7 +8,6 @@ import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
 interface HeaderProps {
     font?: Font;
-    hideIcons?: boolean;
 }
 
 interface NavIconLinkProps {
@@ -23,14 +22,14 @@ function NavIconLink({ to, icon, isActive, title }: NavIconLinkProps): JSX.Eleme
         <Link
             to={to}
             title={title}
-            className={`nav-icon-btn ${isActive ? 'active' : ''}`}
+            className={`nav-icon-btn no-rainbow ${isActive ? 'active' : ''}`}
         >
             <Icon icon={icon} size="sm" />
         </Link>
     );
 }
 
-export function Header({ font, hideIcons }: HeaderProps): JSX.Element {
+export function Header({ font }: HeaderProps): JSX.Element {
     const location = useLocation();
     // Track font links to properly clean them up
     const fontLinksRef = useRef<HTMLLinkElement[]>([]);
@@ -82,28 +81,26 @@ export function Header({ font, hideIcons }: HeaderProps): JSX.Element {
                         monkeysnow
                     </h1>
                 </Link>
-                {!hideIcons && (
-                    <nav className="header-nav">
-                        <NavIconLink
-                            to="/"
-                            icon={icons.home}
-                            isActive={location.pathname === '/' || location.pathname.startsWith('/resort/')}
-                            title="Home"
-                        />
-                        <NavIconLink
-                            to="/about"
-                            icon={icons.info}
-                            isActive={location.pathname === '/about'}
-                            title="About"
-                        />
-                        <NavIconLink
-                            to="/settings"
-                            icon={icons.settings}
-                            isActive={location.pathname === '/settings'}
-                            title="Settings"
-                        />
-                    </nav>
-                )}
+                <nav className="header-nav">
+                    <NavIconLink
+                        to="/"
+                        icon={icons.home}
+                        isActive={location.pathname === '/' || location.pathname.startsWith('/resort/')}
+                        title="Home"
+                    />
+                    <NavIconLink
+                        to="/about"
+                        icon={icons.info}
+                        isActive={location.pathname === '/about'}
+                        title="About"
+                    />
+                    <NavIconLink
+                        to="/settings"
+                        icon={icons.settings}
+                        isActive={location.pathname === '/settings'}
+                        title="Settings"
+                    />
+                </nav>
             </div>
         </header>
     );

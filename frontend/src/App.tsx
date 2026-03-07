@@ -895,7 +895,7 @@ function App(): JSX.Element {
                             description="Real-time snow forecasts for ski resorts worldwide. Compare powder, dry snow, wet snow and rain estimates across multiple weather models."
                             canonical="https://monkeysnow.com/"
                         />
-                        <Header font={font} hideIcons={isHideIconsEnabled} />
+                        <Header font={font} />
                         {homeContent}
                     </div>
                 } />
@@ -904,7 +904,7 @@ function App(): JSX.Element {
                 <Route path="/resort/:resortId" element={
                     <>
                         <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
-                            <Header font={font} hideIcons={isHideIconsEnabled} />
+                            <Header font={font} />
                         </div>
                         <ResortDetailRoute
                             unitSystem={unitSystem}
@@ -924,7 +924,7 @@ function App(): JSX.Element {
                             description="monkeysnow is a minimalistic ski resort snow forecast app using Kuchera ratio snow estimation and multi-model weather data from Open-Meteo."
                             canonical="https://monkeysnow.com/about"
                         />
-                        <Header font={font} hideIcons={isHideIconsEnabled} />
+                        <Header font={font} />
                         <AboutPage />
                     </div>
                 } />
@@ -937,7 +937,7 @@ function App(): JSX.Element {
                             description="Customize monkeysnow: themes, fonts, view modes, elevation display, temperature units, and weather model preferences."
                             canonical="https://monkeysnow.com/settings"
                         />
-                        <Header font={font} hideIcons={isHideIconsEnabled} />
+                        <Header font={font} />
                         <SettingsPage {...settingsProps} />
                     </div>
                 } />
@@ -950,7 +950,7 @@ function App(): JSX.Element {
                             description="Terms of use for monkeysnow, a free ski resort snow forecast application."
                             canonical="https://monkeysnow.com/terms"
                         />
-                        <Header font={font} hideIcons={isHideIconsEnabled} />
+                        <Header font={font} />
                         <TermsPage />
                     </div>
                 } />
@@ -963,7 +963,7 @@ function App(): JSX.Element {
                             description="Privacy policy for monkeysnow. We do not collect personal data."
                             canonical="https://monkeysnow.com/privacy"
                         />
-                        <Header font={font} hideIcons={isHideIconsEnabled} />
+                        <Header font={font} />
                         <PrivacyPage />
                     </div>
                 } />
