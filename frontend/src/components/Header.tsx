@@ -29,7 +29,7 @@ function NavIconLink({ to, icon, isActive, title }: NavIconLinkProps): JSX.Eleme
     );
 }
 
-export function Header({ font, hideIcons }: HeaderProps): JSX.Element {
+export function Header({ font }: HeaderProps): JSX.Element {
     const location = useLocation();
     // Track font links to properly clean them up
     const fontLinksRef = useRef<HTMLLinkElement[]>([]);
