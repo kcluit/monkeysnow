@@ -8,7 +8,6 @@ import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
 interface HeaderProps {
     font?: Font;
-    hideIcons?: boolean;
 }
 
 interface NavIconLinkProps {
