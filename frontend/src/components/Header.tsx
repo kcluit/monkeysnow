@@ -22,7 +22,7 @@ function NavIconLink({ to, icon, isActive, title }: NavIconLinkProps): JSX.Eleme
         <Link
             to={to}
             title={title}
-            className={`nav-icon-btn ${isActive ? 'active' : ''}`}
+            className={`nav-icon-btn no-rainbow ${isActive ? 'active' : ''}`}
         >
             <Icon icon={icon} size="sm" />
         </Link>
