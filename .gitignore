@@ -146,6 +146,9 @@ vite.config.ts.timestamp-*
 .gemini
 .opencode
 CLAUDE.md
+# Weather cache (generated at runtime)
+weather_cache.json
+
 # Turborepo
 .turbo/
 
