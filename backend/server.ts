@@ -748,6 +748,15 @@ const updateWeatherData = async () => {
     lastSuccessfulUpdate = new Date();
     const resortCount = Object.keys(structuredData).length;
     console.log(`[${lastSuccessfulUpdate.toISOString()}] Weather update complete. Updated ${resortCount} resorts.`);
+
+    // Persist cache to disk
+    try {
+        const cachePayload = JSON.stringify({ updatedAt: lastSuccessfulUpdate, data: weatherCache });
+        fs.writeFileSync(CACHE_FILE, cachePayload);
+        console.log(`Cache saved to ${CACHE_FILE}`);
+    } catch (err) {
+        console.error('Failed to write cache file:', err);
+    }
 };
 
 // --- Routes/Start ---
