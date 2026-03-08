@@ -803,7 +803,14 @@ app.get('/all', (req, res) => {
     if (!weatherCache) return res.status(503).json({ error: "Initializing..." });
     if (!fs.existsSync(CACHE_FILE)) return res.status(503).json({ error: "Cache file not ready" });
     res.setHeader('Content-Type', 'application/json');
-    fs.createReadStream(CACHE_FILE).pipe(res);
+    const stream = fs.createReadStream(CACHE_FILE);
+    stream.on('error', (err) => {
+        console.error('Cache stream error:', err);
+        if (!res.headersSent) {
+            res.status(503).json({ error: 'Cache read error' });
+        }
+    });
+    stream.pipe(res);
 });
 
 app.get('/:resortName', (req, res) => {
