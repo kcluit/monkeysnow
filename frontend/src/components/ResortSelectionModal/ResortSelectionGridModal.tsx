@@ -7,7 +7,7 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
 import { useHierarchy, type HierarchyNode } from '../../contexts/HierarchyContext';
-import type { UseResortHierarchyReturn } from '../../hooks/useResortHierarchy';
+import { MAX_SELECTED_RESORTS, type UseResortHierarchyReturn } from '../../hooks/useResortHierarchy';
 import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
 
@@ -527,7 +527,7 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
             </button>
           )}
           <span className="resort-selection-count">
-            {selectedResorts.length} selected
+            {selectedResorts.length} / {MAX_SELECTED_RESORTS} selected
           </span>
         </div>
       </div>

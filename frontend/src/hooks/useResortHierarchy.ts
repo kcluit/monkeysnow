@@ -9,6 +9,8 @@ import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useHierarchy, type HierarchyNode } from '../contexts/HierarchyContext';
 import { useResortCache } from './useResortCache';
 
+export const MAX_SELECTED_RESORTS = 600;
+
 export interface UseResortHierarchyProps {
   selectedResorts: string[];
   onResortsChange: (resorts: string[] | ((prev: string[]) => string[])) => void;
@@ -166,11 +168,13 @@ export function useResortHierarchy({
     if (node.type === 'resort') {
       // Toggle selection for resorts (draft state only)
       if (node.resortId) {
-        setDraftSelectedResorts((prev) =>
-          prev.includes(node.resortId!)
-            ? prev.filter((id) => id !== node.resortId)
-            : [...prev, node.resortId!]
-        );
+        setDraftSelectedResorts((prev) => {
+          if (prev.includes(node.resortId!)) {
+            return prev.filter((id) => id !== node.resortId);
+          }
+          if (prev.length >= MAX_SELECTED_RESORTS) return prev;
+          return [...prev, node.resortId!];
+        });
       }
     } else if (node.children && node.children.length > 0) {
       // Navigate into non-resort nodes
@@ -196,18 +200,22 @@ export function useResortHierarchy({
 
   // Selection helpers - operate on draft state only
   const toggleResort = useCallback((resortId: string) => {
-    setDraftSelectedResorts((prev) =>
-      prev.includes(resortId)
-        ? prev.filter((id) => id !== resortId)
-        : [...prev, resortId]
-    );
+    setDraftSelectedResorts((prev) => {
+      if (prev.includes(resortId)) {
+        return prev.filter((id) => id !== resortId);
+      }
+      if (prev.length >= MAX_SELECTED_RESORTS) return prev;
+      return [...prev, resortId];
+    });
   }, []);
 
   const selectAllInNode = useCallback((node: HierarchyNode) => {
     const resortIds = cachedGetResortsUnderNode(node);
     setDraftSelectedResorts((prev) => {
       const newSet = new Set(prev);
-      for (const id of resortIds) {
+      const toAdd = resortIds.filter((id) => !newSet.has(id));
+      const remaining = MAX_SELECTED_RESORTS - newSet.size;
+      for (const id of toAdd.slice(0, remaining)) {
         newSet.add(id);
       }
       return Array.from(newSet);

@@ -6,7 +6,7 @@
 
 import { useEffect, useRef, memo } from 'react';
 import { ResortTreeNode } from './ResortTreeNode';
-import type { UseResortHierarchyReturn } from '../../hooks/useResortHierarchy';
+import { MAX_SELECTED_RESORTS, type UseResortHierarchyReturn } from '../../hooks/useResortHierarchy';
 import type { HierarchyNode } from '../../data/resortHierarchy';
 
 interface ResortSelectionModalProps {
@@ -166,7 +166,7 @@ export const ResortSelectionModal = memo(function ResortSelectionModal({
             <kbd>esc</kbd> {canGoBack ? 'back' : 'close'}
           </span>
           <span className="resort-selection-count">
-            {selectedResorts.length} selected
+            {selectedResorts.length} / {MAX_SELECTED_RESORTS} selected
           </span>
         </div>
       </div>
