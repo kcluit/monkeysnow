@@ -213,7 +213,9 @@ export function useResortHierarchy({
     const resortIds = cachedGetResortsUnderNode(node);
     setDraftSelectedResorts((prev) => {
       const newSet = new Set(prev);
-      for (const id of resortIds) {
+      const toAdd = resortIds.filter((id) => !newSet.has(id));
+      const remaining = MAX_SELECTED_RESORTS - newSet.size;
+      for (const id of toAdd.slice(0, remaining)) {
         newSet.add(id);
       }
       return Array.from(newSet);
