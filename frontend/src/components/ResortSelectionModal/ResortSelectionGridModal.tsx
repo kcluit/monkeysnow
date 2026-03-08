@@ -527,7 +527,7 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
             </button>
           )}
           <span className="resort-selection-count">
-            {selectedResorts.length} selected
+            {selectedResorts.length} / {MAX_SELECTED_RESORTS} selected
           </span>
         </div>
       </div>
