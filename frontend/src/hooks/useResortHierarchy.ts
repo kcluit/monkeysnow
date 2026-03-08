@@ -168,11 +168,13 @@ export function useResortHierarchy({
     if (node.type === 'resort') {
       // Toggle selection for resorts (draft state only)
       if (node.resortId) {
-        setDraftSelectedResorts((prev) =>
-          prev.includes(node.resortId!)
-            ? prev.filter((id) => id !== node.resortId)
-            : [...prev, node.resortId!]
-        );
+        setDraftSelectedResorts((prev) => {
+          if (prev.includes(node.resortId!)) {
+            return prev.filter((id) => id !== node.resortId);
+          }
+          if (prev.length >= MAX_SELECTED_RESORTS) return prev;
+          return [...prev, node.resortId!];
+        });
       }
     } else if (node.children && node.children.length > 0) {
       // Navigate into non-resort nodes
