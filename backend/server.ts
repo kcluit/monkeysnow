@@ -752,7 +752,9 @@ const updateWeatherData = async () => {
     // Persist cache to disk
     try {
         const cachePayload = JSON.stringify({ updatedAt: lastSuccessfulUpdate, data: weatherCache });
-        await fs.promises.writeFile(CACHE_FILE, cachePayload);
+        const tmpFile = CACHE_FILE + '.tmp';
+        await fs.promises.writeFile(tmpFile, cachePayload);
+        await fs.promises.rename(tmpFile, CACHE_FILE);
         console.log(`Cache saved to ${CACHE_FILE}`);
     } catch (err) {
         console.error('Failed to write cache file:', err);
