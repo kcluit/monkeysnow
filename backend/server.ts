@@ -801,7 +801,9 @@ app.get('/hierarchy', (req, res) => {
 
 app.get('/all', (req, res) => {
     if (!weatherCache) return res.status(503).json({ error: "Initializing..." });
-    res.json({ updatedAt: lastSuccessfulUpdate, data: weatherCache });
+    if (!fs.existsSync(CACHE_FILE)) return res.status(503).json({ error: "Cache file not ready" });
+    res.setHeader('Content-Type', 'application/json');
+    fs.createReadStream(CACHE_FILE).pipe(res);
 });
 
 app.get('/:resortName', (req, res) => {
