@@ -11805,6 +11805,16 @@
             }
         },
         "Greece": {
+            "3-5-Pigadia": {
+                "displayName": "3-5 Pigadia",
+                "bot": 1430,
+                "mid": 1718,
+                "top": 2005,
+                "loc": [
+                    40.55,
+                    22.07
+                ]
+            },
             "Anilio-Ski-Resort": {
                 "displayName": "Anilio Ski Resort",
                 "bot": 1650,
@@ -11823,6 +11833,16 @@
                 "loc": [
                     40.32,
                     22.21
+                ]
+            },
+            "Falakro": {
+                "displayName": "Falakro",
+                "bot": 1730,
+                "mid": 1981,
+                "top": 2232,
+                "loc": [
+                    41.31,
+                    24.07
                 ]
             },
             "Karpenisi": {
@@ -11933,6 +11953,16 @@
                 "loc": [
                     40.03,
                     21.08
+                ]
+            },
+            "Vigla-Pisoderi": {
+                "displayName": "Vigla Pisoderi",
+                "bot": 1519,
+                "mid": 1729,
+                "top": 1939,
+                "loc": [
+                    40.74,
+                    21.25
                 ]
             },
             "Ziria-of-Corinth-Ski-Center": {

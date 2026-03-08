@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import compression from 'compression';
 import { fetchWeatherApi } from 'openmeteo';
 import fs from 'fs';
 import path from 'path';
@@ -48,6 +49,7 @@ const UPDATE_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 Hours
 const BATCH_SIZE = 30; // Max resorts per Open-Meteo API call (30 resorts = 90 elevation points)
 const BATCH_DELAY_MS = 30 * 1000; // Delay between API batches to respect rate limits (30 secs)
 const LOCATIONS_FILE = path.join(__dirname, 'locations.json');
+const CACHE_FILE = path.join(__dirname, 'weather_cache.json');
 
 // --- Global State ---
 let weatherCache: Record<string, any> | null = null;
@@ -57,6 +59,8 @@ const app = express();
 
 // Enable CORS for all origins (for local development)
 app.use(cors());
+// Enable gzip/brotli compression for all responses
+app.use(compression());
 // Enable JSON body parsing for POST requests
 app.use(express.json());
 
@@ -744,12 +748,37 @@ const updateWeatherData = async () => {
     lastSuccessfulUpdate = new Date();
     const resortCount = Object.keys(structuredData).length;
     console.log(`[${lastSuccessfulUpdate.toISOString()}] Weather update complete. Updated ${resortCount} resorts.`);
+
+    // Persist cache to disk
+    try {
+        const cachePayload = JSON.stringify({ updatedAt: lastSuccessfulUpdate, data: weatherCache });
+        const tmpFile = CACHE_FILE + '.tmp';
+        await fs.promises.writeFile(tmpFile, cachePayload);
+        await fs.promises.rename(tmpFile, CACHE_FILE);
+        console.log(`Cache saved to ${CACHE_FILE}`);
+    } catch (err) {
+        console.error('Failed to write cache file:', err);
+    }
 };
 
 // --- Routes/Start ---
 let isUpdating = false;
 
+const loadCacheFromDisk = () => {
+    try {
+        if (fs.existsSync(CACHE_FILE)) {
+            const raw = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf-8'));
+            weatherCache = raw.data;
+            lastSuccessfulUpdate = new Date(raw.updatedAt);
+            console.log(`Loaded cache from disk (${Object.keys(weatherCache!).length} resorts, updated ${lastSuccessfulUpdate.toISOString()})`);
+        }
+    } catch (err) {
+        console.error('Failed to load cache file:', err);
+    }
+};
+
 const startWeatherUpdates = async () => {
+    loadCacheFromDisk();
     try { await updateWeatherData(); } catch (e) { console.error("Init failed", e); }
     setInterval(async () => {
         if (isUpdating) {
@@ -772,10 +801,6 @@ app.get('/hierarchy', (req, res) => {
     res.json({ continents: hierarchy });
 });
 
-app.get('/all', (req, res) => {
-    if (!weatherCache) return res.status(503).json({ error: "Initializing..." });
-    res.json({ updatedAt: lastSuccessfulUpdate, data: weatherCache });
-});
 
 app.get('/:resortName', (req, res) => {
     if (!weatherCache) return res.status(503).json({ error: "Initializing..." });
@@ -791,6 +816,10 @@ app.post('/resorts', (req, res) => {
 
     if (!Array.isArray(resortNames)) {
         return res.status(400).json({ error: "Invalid input: resortNames must be an array" });
+    }
+
+    if (resortNames.length > 600) {
+        return res.status(400).json({ error: "Too many resorts requested (max 600)" });
     }
 
     const data: Record<string, any> = {};

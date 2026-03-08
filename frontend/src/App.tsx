@@ -143,7 +143,7 @@ function App(): JSX.Element {
     const { skiResorts, getDisplayName, loading: hierarchyLoading } = useHierarchy();
 
     // Weather data hook
-    const { allWeatherData, loading: weatherLoading, error, fetchResorts, createLoadingController, cancelLoading } = useWeatherData();
+    const { allWeatherData, loading: weatherLoading, fetchResorts, createLoadingController, cancelLoading } = useWeatherData();
 
     // Only block UI if NO cached data at all
     const loading = (!allWeatherData && weatherLoading) || (!allWeatherData && hierarchyLoading);
@@ -679,18 +679,6 @@ function App(): JSX.Element {
             <div className="min-h-screen p-4 sm:p-6 md:p-8 flex items-center justify-center bg-theme-background transition-colors duration-300 overflow-x-hidden">
                 <div className="text-center">
                     <div className="text-xl font-semibold text-theme-textSecondary">{t('loading.weatherData')}</div>
-                </div>
-            </div>
-        );
-    }
-
-    // Show error state
-    if (error) {
-        return (
-            <div className="min-h-screen p-4 sm:p-6 md:p-8 flex items-center justify-center bg-theme-background transition-colors duration-300 overflow-x-hidden">
-                <div className="text-center">
-                    <div className="text-xl font-semibold text-red-600">{t('error.loadingWeatherData')}</div>
-                    <div className="text-sm text-theme-textSecondary mt-2">{t('error.tryRefreshing')}</div>
                 </div>
             </div>
         );
