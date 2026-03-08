@@ -166,7 +166,7 @@ export const ResortSelectionModal = memo(function ResortSelectionModal({
             <kbd>esc</kbd> {canGoBack ? 'back' : 'close'}
           </span>
           <span className="resort-selection-count">
-            {selectedResorts.length} selected
+            {selectedResorts.length} / {MAX_SELECTED_RESORTS} selected
           </span>
         </div>
       </div>
