@@ -6,7 +6,7 @@
 
 import { useEffect, useRef, memo } from 'react';
 import { ResortTreeNode } from './ResortTreeNode';
-import type { UseResortHierarchyReturn } from '../../hooks/useResortHierarchy';
+import { MAX_SELECTED_RESORTS, type UseResortHierarchyReturn } from '../../hooks/useResortHierarchy';
 import type { HierarchyNode } from '../../data/resortHierarchy';
 
 interface ResortSelectionModalProps {
