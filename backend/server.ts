@@ -822,6 +822,10 @@ app.post('/resorts', (req, res) => {
         return res.status(400).json({ error: "Invalid input: resortNames must be an array" });
     }
 
+    if (resortNames.length > 600) {
+        return res.status(400).json({ error: "Too many resorts requested (max 600)" });
+    }
+
     const data: Record<string, any> = {};
 
     for (const name of resortNames) {
