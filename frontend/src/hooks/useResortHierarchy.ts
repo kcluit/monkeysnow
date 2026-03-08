@@ -9,6 +9,8 @@ import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useHierarchy, type HierarchyNode } from '../contexts/HierarchyContext';
 import { useResortCache } from './useResortCache';
 
+export const MAX_SELECTED_RESORTS = 600;
+
 export interface UseResortHierarchyProps {
   selectedResorts: string[];
   onResortsChange: (resorts: string[] | ((prev: string[]) => string[])) => void;
