@@ -11805,6 +11805,16 @@
             }
         },
         "Greece": {
+            "3-5-Pigadia": {
+                "displayName": "3-5 Pigadia",
+                "bot": 1430,
+                "mid": 1718,
+                "top": 2005,
+                "loc": [
+                    40.55,
+                    22.07
+                ]
+            },
             "Anilio-Ski-Resort": {
                 "displayName": "Anilio Ski Resort",
                 "bot": 1650,
