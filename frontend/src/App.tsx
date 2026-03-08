@@ -143,7 +143,7 @@ function App(): JSX.Element {
     const { skiResorts, getDisplayName, loading: hierarchyLoading } = useHierarchy();
 
     // Weather data hook
-    const { allWeatherData, loading: weatherLoading, error, fetchResorts, createLoadingController, cancelLoading } = useWeatherData();
+    const { allWeatherData, loading: weatherLoading, fetchResorts, createLoadingController, cancelLoading } = useWeatherData();
 
     // Only block UI if NO cached data at all
     const loading = (!allWeatherData && weatherLoading) || (!allWeatherData && hierarchyLoading);
