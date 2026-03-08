@@ -200,11 +200,13 @@ export function useResortHierarchy({
 
   // Selection helpers - operate on draft state only
   const toggleResort = useCallback((resortId: string) => {
-    setDraftSelectedResorts((prev) =>
-      prev.includes(resortId)
-        ? prev.filter((id) => id !== resortId)
-        : [...prev, resortId]
-    );
+    setDraftSelectedResorts((prev) => {
+      if (prev.includes(resortId)) {
+        return prev.filter((id) => id !== resortId);
+      }
+      if (prev.length >= MAX_SELECTED_RESORTS) return prev;
+      return [...prev, resortId];
+    });
   }, []);
 
   const selectAllInNode = useCallback((node: HierarchyNode) => {
