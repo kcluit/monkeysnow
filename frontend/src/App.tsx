@@ -673,6 +673,17 @@ function App(): JSX.Element {
 
     const isTruncated = effectiveDisplayLimit > 0 && selectedResorts.length > effectiveDisplayLimit;
 
+    // Backend unreachable and nothing cached — off-season message
+    if (!allWeatherData && (weatherError || hierarchyError)) {
+        return (
+            <div className="min-h-screen p-4 sm:p-6 md:p-8 flex items-center justify-center bg-theme-background transition-colors duration-300 overflow-x-hidden">
+                <div className="text-center">
+                    <div className="text-xl font-semibold text-theme-textSecondary">{t('error.offSeason')}</div>
+                </div>
+            </div>
+        );
+    }
+
     // Show loading state
     if (loading) {
         return (
