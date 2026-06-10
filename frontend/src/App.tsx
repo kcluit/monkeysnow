@@ -140,10 +140,10 @@ function App(): JSX.Element {
     const isMobile = useIsMobile();
 
     // Hierarchy data from backend (resort list, display names)
-    const { skiResorts, getDisplayName, loading: hierarchyLoading } = useHierarchy();
+    const { skiResorts, getDisplayName, loading: hierarchyLoading, error: hierarchyError } = useHierarchy();
 
     // Weather data hook
-    const { allWeatherData, loading: weatherLoading, fetchResorts, createLoadingController, cancelLoading } = useWeatherData();
+    const { allWeatherData, loading: weatherLoading, error: weatherError, fetchResorts, createLoadingController, cancelLoading } = useWeatherData();
 
     // Only block UI if NO cached data at all
     const loading = (!allWeatherData && weatherLoading) || (!allWeatherData && hierarchyLoading);
@@ -672,6 +672,17 @@ function App(): JSX.Element {
     ]);
 
     const isTruncated = effectiveDisplayLimit > 0 && selectedResorts.length > effectiveDisplayLimit;
+
+    // Backend unreachable and nothing cached — off-season message
+    if (!allWeatherData && (weatherError || hierarchyError)) {
+        return (
+            <div className="min-h-screen p-4 sm:p-6 md:p-8 flex items-center justify-center bg-theme-background transition-colors duration-300 overflow-x-hidden">
+                <div className="text-center">
+                    <div className="text-xl font-semibold text-theme-textSecondary">{t('error.offSeason')}</div>
+                </div>
+            </div>
+        );
+    }
 
     // Show loading state
     if (loading) {

@@ -26,7 +26,9 @@ const API_URL = 'https://snowscraper.camdvr.org';
 
 export async function fetchAllData(): Promise<AllWeatherData> {
     try {
-        const response = await fetch(`${API_URL}/all`);
+        const response = await fetch(`${API_URL}/all`, {
+            signal: AbortSignal.timeout(10000),
+        });
 
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
@@ -45,6 +47,7 @@ export async function fetchSelectedResorts(resortNames: string[]): Promise<AllWe
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ resortNames }),
+            signal: AbortSignal.timeout(10000),
         });
 
         if (!response.ok) {
