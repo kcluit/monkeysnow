@@ -107,6 +107,7 @@ export interface Translations {
     'loading.weatherData': string;
     'error.loadingWeatherData': string;
     'error.tryRefreshing': string;
+    'error.offSeason': string;
 
     // Empty states
     'empty.selectResorts': string;
