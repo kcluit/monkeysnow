@@ -150,7 +150,9 @@ export function useHierarchyData(): UseHierarchyDataReturn {
     const fetchHierarchy = async () => {
       try {
         if (!hierarchyRef.current) setLoading(true);
-        const response = await fetch(`${API_URL}/hierarchy`);
+        const response = await fetch(`${API_URL}/hierarchy`, {
+          signal: AbortSignal.timeout(10000),
+        });
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
