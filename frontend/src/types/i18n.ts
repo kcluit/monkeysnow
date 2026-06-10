@@ -242,6 +242,7 @@ export const TranslationsSchema = z.object({
     'loading.weatherData': z.string(),
     'error.loadingWeatherData': z.string(),
     'error.tryRefreshing': z.string(),
+    'error.offSeason': z.string(),
 
     // Empty states
     'empty.selectResorts': z.string(),
