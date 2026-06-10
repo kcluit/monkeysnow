@@ -105,7 +105,7 @@ export const en: Translations = {
     'units.imperial': 'Imperial (°F, in, mph)',
 
     // Loading and Error states
-    'loading.weatherData': 'Loading weather data...',
+    'loading.weatherData': 'Coming back next winter... ❄️',
     'error.loadingWeatherData': 'Error loading weather data',
     'error.tryRefreshing': 'Please try refreshing the page',
     'error.offSeason': 'Coming back next winter... ❄️',
