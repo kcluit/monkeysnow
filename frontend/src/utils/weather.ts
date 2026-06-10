@@ -47,6 +47,7 @@ export async function fetchSelectedResorts(resortNames: string[]): Promise<AllWe
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ resortNames }),
+            signal: AbortSignal.timeout(10000),
         });
 
         if (!response.ok) {
