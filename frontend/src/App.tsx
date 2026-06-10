@@ -140,10 +140,10 @@ function App(): JSX.Element {
     const isMobile = useIsMobile();
 
     // Hierarchy data from backend (resort list, display names)
-    const { skiResorts, getDisplayName, loading: hierarchyLoading } = useHierarchy();
+    const { skiResorts, getDisplayName, loading: hierarchyLoading, error: hierarchyError } = useHierarchy();
 
     // Weather data hook
-    const { allWeatherData, loading: weatherLoading, fetchResorts, createLoadingController, cancelLoading } = useWeatherData();
+    const { allWeatherData, loading: weatherLoading, error: weatherError, fetchResorts, createLoadingController, cancelLoading } = useWeatherData();
 
     // Only block UI if NO cached data at all
     const loading = (!allWeatherData && weatherLoading) || (!allWeatherData && hierarchyLoading);
