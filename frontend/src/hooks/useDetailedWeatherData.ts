@@ -130,6 +130,7 @@ export function useDetailedWeatherData({
                     // and each retry spends the user's Open-Meteo quota
                     if (!isTransientError(err)) {
                         console.warn(`Model ${model} unavailable:`, err instanceof Error ? err.message : err);
+                        setUnavailableModels(prev => new Set(prev).add(model));
                         return;
                     }
 
