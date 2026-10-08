@@ -64,8 +64,8 @@ interface RawCountry {
     regions: boolean;
 }
 
-const rawCountries = resortData.countries as Record<string, RawCountry>;
-const rawResorts = resortData.resorts as Record<string, RawResort>;
+const rawCountries = resortData.countries as unknown as Record<string, RawCountry>;
+const rawResorts = resortData.resorts as unknown as Record<string, RawResort>;
 
 const CONTINENT_ORDER = ['North America', 'Europe', 'Asia', 'Oceania', 'South America', 'Africa'];
 
@@ -156,7 +156,7 @@ export const RESORT_HIERARCHY: ContinentData[] = buildHierarchy();
 
 // Earlier slugs and pre-OpenSkiData IDs (e.g. "Big-White", "Big Sky") that still resolve
 const normalizeId = (id: string) => id.trim().toLowerCase().replace(/\s+/g, '-');
-const ALIASES = new Map(Object.entries(resortData.aliases as Record<string, string>));
+const ALIASES = new Map(Object.entries(resortData.aliases as unknown as Record<string, string>));
 const NORMALIZED_ALIASES = new Map([...ALIASES].map(([alias, slug]) => [normalizeId(alias), slug]));
 
 /**

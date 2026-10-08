@@ -1,0 +1,239 @@
+{
+  "resorts": {
+    "apex": {
+      "bot": 1570,
+      "mid": 1875,
+      "top": 2180,
+      "note": "Hand-curated elevations (was Apex)"
+    },
+    "banff-sunshine-village": {
+      "bot": 1658,
+      "mid": 2194,
+      "top": 2729,
+      "note": "Hand-curated elevations (was Sunshine)"
+    },
+    "big-white": {
+      "bot": 1524,
+      "mid": 1905,
+      "top": 2286,
+      "note": "Hand-curated elevations (was Big-White)"
+    },
+    "castle": {
+      "bot": 1410,
+      "mid": 1842,
+      "top": 2273,
+      "note": "Hand-curated elevations (was Castle-Mountain-Resort)"
+    },
+    "cypress-mountain": {
+      "bot": 826,
+      "mid": 1132,
+      "top": 1439,
+      "note": "Hand-curated elevations (was Cypress-Mountain)"
+    },
+    "eastlink-park": {
+      "bot": 277,
+      "mid": 291,
+      "top": 305,
+      "note": "Hand-curated elevations (was Eastlink-Park)"
+    },
+    "fairmont-hot-springs": {
+      "bot": 1219,
+      "mid": 1372,
+      "top": 1524,
+      "note": "Hand-curated elevations (was Fairmont-Hot-Springs)"
+    },
+    "fernie-alpine": {
+      "bot": 1195,
+      "mid": 1560,
+      "top": 1925,
+      "note": "Hand-curated elevations (was Fernie)"
+    },
+    "grouse-mountain": {
+      "bot": 881,
+      "mid": 1053,
+      "top": 1225,
+      "note": "Hand-curated elevations (was Grouse-Mountain)"
+    },
+    "harper-mountain": {
+      "bot": 1097,
+      "mid": 1310,
+      "top": 1524,
+      "note": "Hand-curated elevations (was Harper-Mountain)"
+    },
+    "hudson-bay-mountain": {
+      "bot": 1146,
+      "mid": 1411,
+      "top": 1676,
+      "note": "Hand-curated elevations (was Hudson Bay Mountain)"
+    },
+    "kicking-horse": {
+      "bot": 1190,
+      "mid": 1848,
+      "top": 2505,
+      "note": "Hand-curated elevations (was Kicking-Horse)"
+    },
+    "kimberley-alpine": {
+      "bot": 1231,
+      "mid": 1606,
+      "top": 1982,
+      "note": "Hand-curated elevations (was Kimberley)"
+    },
+    "lake-louise": {
+      "bot": 1646,
+      "mid": 2141,
+      "top": 2636,
+      "note": "Hand-curated elevations (was Lake-Louise)"
+    },
+    "manning-park": {
+      "bot": 1357,
+      "mid": 1572,
+      "top": 1788,
+      "note": "Hand-curated elevations (was Manning-Park-Resort)"
+    },
+    "marmot-basin": {
+      "bot": 1698,
+      "mid": 2155,
+      "top": 2612,
+      "note": "Hand-curated elevations (was Marmot-Basin)"
+    },
+    "mount-cain-alpine-park": {
+      "bot": 1311,
+      "mid": 1540,
+      "top": 1768,
+      "note": "Hand-curated elevations (was MountCain)"
+    },
+    "mount-timothy": {
+      "bot": 1378,
+      "mid": 1500,
+      "top": 1621,
+      "note": "Hand-curated elevations (was Mount-Timothy-Ski-Area)"
+    },
+    "mount-washington-alpine": {
+      "bot": 1084,
+      "mid": 1336,
+      "top": 1589,
+      "note": "Hand-curated elevations (was Mount-Washington)"
+    },
+    "mt-baldy-family": {
+      "bot": 1663,
+      "mid": 1893,
+      "top": 2123,
+      "note": "Hand-curated elevations (was Mt-Baldy-Ski-Area)"
+    },
+    "mt-norquay": {
+      "bot": 1539,
+      "mid": 1790,
+      "top": 2042,
+      "note": "Hand-curated elevations (was Banff-Norquay)"
+    },
+    "mt-seymour": {
+      "bot": 936,
+      "mid": 1100,
+      "top": 1265,
+      "note": "Hand-curated elevations (was Mount-Seymour)"
+    },
+    "murray-ridge": {
+      "bot": 611,
+      "mid": 876,
+      "top": 1141,
+      "note": "Hand-curated elevations (was Murray-Ridge)"
+    },
+    "nakiska": {
+      "bot": 1525,
+      "mid": 1892,
+      "top": 2260,
+      "note": "Hand-curated elevations (was Nakiska)"
+    },
+    "panorama": {
+      "bot": 1181,
+      "mid": 1790,
+      "top": 2400,
+      "note": "Hand-curated elevations (was Panorama)"
+    },
+    "pass-powderkeg-ski": {
+      "bot": 1274,
+      "mid": 1457,
+      "top": 1640,
+      "note": "Hand-curated elevations (was Pass-Powderkeg)"
+    },
+    "powder-king": {
+      "bot": 935,
+      "mid": 1255,
+      "top": 1575,
+      "note": "Hand-curated elevations (was PowderKing)"
+    },
+    "red": {
+      "bot": 1183,
+      "mid": 1628,
+      "top": 2073,
+      "note": "Hand-curated elevations (was Red-Mountain)"
+    },
+    "revelstoke": {
+      "bot": 512,
+      "mid": 1368,
+      "top": 2225,
+      "note": "Hand-curated elevations (was Revelstoke)"
+    },
+    "sasquatch": {
+      "bot": 975,
+      "mid": 1174,
+      "top": 1372,
+      "note": "Hand-curated elevations (was Sasquatch Mountain Resort)"
+    },
+    "shames-mountain": {
+      "bot": 671,
+      "mid": 930,
+      "top": 1189,
+      "note": "Hand-curated elevations (was ShamesMountain)"
+    },
+    "silver-star": {
+      "bot": 1155,
+      "mid": 1536,
+      "top": 1916,
+      "note": "Hand-curated elevations (was Silver-Star)"
+    },
+    "summit-lake-ski-snowboard-area": {
+      "bot": 780,
+      "mid": 850,
+      "top": 920,
+      "note": "Hand-curated elevations (was Summit-Lake-Ski-and-Snowboard-Area)"
+    },
+    "sun-peaks": {
+      "bot": 1186,
+      "mid": 1634,
+      "top": 2081,
+      "note": "Hand-curated elevations (was Sun-Peaks)"
+    },
+    "troll": {
+      "bot": 1118,
+      "mid": 1382,
+      "top": 1645,
+      "note": "Hand-curated elevations (was Troll-Resort)"
+    },
+    "vista-ridge": {
+      "bot": 256,
+      "mid": 313,
+      "top": 370,
+      "note": "Hand-curated elevations (was Vista-Ridge)"
+    },
+    "whistler-blackcomb": {
+      "bot": 675,
+      "mid": 1580,
+      "top": 2284,
+      "note": "Hand-curated elevations (was Whistler-Blackcomb)"
+    },
+    "whitewater": {
+      "bot": 1388,
+      "mid": 1695,
+      "top": 2002,
+      "note": "Hand-curated elevations (was Whitewater)"
+    },
+    "winsport-canada-olympic-park": {
+      "bot": 1130,
+      "mid": 1188,
+      "top": 1246,
+      "note": "Hand-curated elevations (was Calgary-Canada-Olympic-Park)"
+    }
+  },
+  "reviewedPairs": []
+}

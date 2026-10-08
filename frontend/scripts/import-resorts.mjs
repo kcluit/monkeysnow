@@ -372,7 +372,7 @@ async function importResorts() {
   for (const entry of Object.values(registry)) for (const alias of entry.aliases ?? []) taken.add(alias.toLowerCase());
   for (const area of candidates) {
     if (slugOf.has(area)) continue;
-    const place = area.properties.places?.[0];
+    const place = mainPlace(area);
     const base = slugForName(splitName(area.properties.name).name) || 'resort';
     const options = [base, `${base}-${toSlug(place?.localized?.en?.region ?? '')}`, `${base}-${toSlug(place?.iso3166_1Alpha2 ?? '')}`]
       .map(s => s.replace(/-+$/, ''));
@@ -395,7 +395,7 @@ async function importResorts() {
     const o = overrideFor(slug);
     if (o.exclude) continue;
     const p = area.properties;
-    const place = p.places?.[0];
+    const place = mainPlace(area);
     const country = o.country ?? place?.iso3166_1Alpha2;
     if (!country || !CONTINENT_BY_COUNTRY.has(country)) {
       report.unplaced.push(`\`${slug}\` (${p.name}): ${country ? `country \`${country}\` has no continent in CONTINENTS` : 'no country'}`);
@@ -435,8 +435,7 @@ async function importResorts() {
   const reviewed = new Set(overrides.reviewedPairs ?? []);
   const slugByAreaId = new Map([...areaOf].filter(([slug]) => resorts[slug] && !resorts[slug].missingSince).map(([slug, a]) => [a.id, slug]));
   const liftsOf = new Map();
-  for (const lift of parseCsv(liftsText)) {
-    if (lift.status !== 'operating') continue;
+  for (const lift of lifts) {
     for (const areaId of lift.ski_area_ids.split(';')) {
       const slug = slugByAreaId.get(areaId);
       if (!slug) continue;

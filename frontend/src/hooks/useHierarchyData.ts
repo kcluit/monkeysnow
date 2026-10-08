@@ -12,6 +12,13 @@ export interface HierarchyNode {
   type: HierarchyNodeType;
   children?: HierarchyNode[];
   resortId?: string;
+  /** A resort's other names, often in the local script; matched by search but not shown. */
+  aka?: string[];
+}
+
+/** Whether a node's name, or one of its other names, contains the (lowercased) query. */
+export function nodeMatchesSearch(node: HierarchyNode, query: string): boolean {
+  return [node.name, ...(node.aka ?? [])].some(name => name.toLowerCase().includes(query));
 }
 
 /**
@@ -35,6 +42,7 @@ function buildHierarchyTree(hierarchy: ContinentData[]): HierarchyNode[] {
           name: resort.displayName,
           type: 'resort',
           resortId: resort.id,
+          ...(resort.aka ? { aka: resort.aka } : {}),
         })),
       })),
     })),

@@ -8,6 +8,7 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useHierarchy, type HierarchyNode } from '../contexts/HierarchyContext';
 import { useResortCache } from './useResortCache';
+import { nodeMatchesSearch } from './useHierarchyData';
 
 /** The Selection cap: sized so a full Selection loads within Open-Meteo's free limits. */
 export const MAX_SELECTED_RESORTS = 300;
@@ -161,9 +162,7 @@ export function useResortHierarchy({
     if (!isSearchMode) return [];
 
     const query = searchTerm.toLowerCase();
-    return allResorts.filter((node) =>
-      node.name.toLowerCase().includes(query)
-    );
+    return allResorts.filter((node) => nodeMatchesSearch(node, query));
   }, [allResorts, searchTerm, isSearchMode]);
 
   // Current nodes to display

@@ -11,6 +11,7 @@ import { MAX_SELECTED_RESORTS, type UseResortHierarchyReturn } from '../../hooks
 import { CapNotice } from './CapNotice';
 import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
+import { nodeMatchesSearch } from '../../hooks/useHierarchyData';
 
 interface ResortSelectionGridModalProps {
   hierarchy: UseResortHierarchyReturn;
@@ -46,7 +47,7 @@ function filterHierarchy(nodes: HierarchyNode[], searchTerm: string): HierarchyN
   function filterNode(node: HierarchyNode): HierarchyNode | null {
     // If this is a resort, check if it matches
     if (node.type === 'resort') {
-      return node.name.toLowerCase().includes(query) ? node : null;
+      return nodeMatchesSearch(node, query) ? node : null;
     }
 
     // For non-resort nodes, filter children
