@@ -1,17 +1,18 @@
 /**
  * Resort Selection Grid Modal component.
- * Displays all resorts in a multi-column grid layout organized by
- * Continent > Country > Province > Resorts.
- * All levels are expanded by default but collapsible.
+ * Shows Saved locations and Resorts in columns, one per continent, then by
+ * Country and Region. It opens with the continents open and everything below
+ * them closed. A search shows only the matching Resorts, with every group that
+ * holds one open, and clearing it puts the tree back as it was.
  */
 
-import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback, useDeferredValue, memo } from 'react';
 import { useHierarchy, type HierarchyNode } from '../../contexts/HierarchyContext';
 import { MAX_SELECTED_RESORTS, type UseResortHierarchyReturn } from '../../hooks/useResortHierarchy';
 import { CapNotice } from './CapNotice';
 import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
-import { nodeMatchesSearch } from '../../hooks/useHierarchyData';
+import { matchesSearchWords, normalizeForSearch, toSearchWords } from '../../utils/resortSearch';
 import { useOverlay } from '../../hooks/useOverlay';
 import { shouldAutoFocusSearch } from '../../utils/autoFocus';
 
@@ -20,57 +21,78 @@ interface ResortSelectionGridModalProps {
   hideIcons?: boolean;
 }
 
-// Get all node IDs from the hierarchy tree for default expansion
-function getAllNodeIds(nodes: HierarchyNode[]): Set<string> {
-  const ids = new Set<string>();
+// The text search compares each resort with: its names, its Region and its country, but not its continent
+function buildSearchTexts(tree: HierarchyNode[]): Map<string, string> {
+  const texts = new Map<string, string>();
 
-  function traverse(node: HierarchyNode): void {
-    ids.add(node.id);
-    if (node.children) {
-      for (const child of node.children) {
-        traverse(child);
-      }
+  function visit(node: HierarchyNode, places: string[]): void {
+    if (node.type === 'resort') {
+      texts.set(node.id, normalizeForSearch([node.name, ...(node.aka ?? []), ...places].join(' ')));
+      return;
     }
+    const childPlaces = node.type === 'country' || node.type === 'province' ? [...places, node.name] : places;
+    node.children?.forEach((child) => visit(child, childPlaces));
   }
 
-  for (const node of nodes) {
-    traverse(node);
-  }
-
-  return ids;
+  tree.forEach((node) => visit(node, []));
+  return texts;
 }
 
-// Filter hierarchy tree based on search term
-function filterHierarchy(nodes: HierarchyNode[], searchTerm: string): HierarchyNode[] {
-  if (!searchTerm.trim()) return nodes;
-
-  const query = searchTerm.toLowerCase();
-
-  function filterNode(node: HierarchyNode): HierarchyNode | null {
-    // If this is a resort, check if it matches
+// The tree cut down to the matching resorts and the groups that hold them
+function filterTree(nodes: HierarchyNode[], words: string[], texts: Map<string, string>): HierarchyNode[] {
+  const kept: HierarchyNode[] = [];
+  for (const node of nodes) {
     if (node.type === 'resort') {
-      return nodeMatchesSearch(node, query) ? node : null;
+      if (matchesSearchWords(texts.get(node.id) ?? '', words)) kept.push(node);
+    } else if (node.children) {
+      const children = filterTree(node.children, words, texts);
+      if (children.length > 0) kept.push({ ...node, children });
     }
+  }
+  return kept;
+}
 
-    // For non-resort nodes, filter children
-    if (!node.children) return null;
+// Each group's resorts in the tree shown, so while searching its count and checkbox cover only its matches
+function collectGroupResorts(tree: HierarchyNode[]): Map<string, string[]> {
+  const groups = new Map<string, string[]>();
 
-    const filteredChildren = node.children
-      .map(child => filterNode(child))
-      .filter((child): child is HierarchyNode => child !== null);
-
-    // Only include this node if it has matching children
-    if (filteredChildren.length === 0) return null;
-
-    return {
-      ...node,
-      children: filteredChildren,
-    };
+  function visit(node: HierarchyNode): string[] {
+    if (node.type === 'resort') return node.resortId ? [node.resortId] : [];
+    const resortIds = (node.children ?? []).flatMap(visit);
+    groups.set(node.id, resortIds);
+    return resortIds;
   }
 
-  return nodes
-    .map(node => filterNode(node))
-    .filter((node): node is HierarchyNode => node !== null);
+  tree.forEach(visit);
+  return groups;
+}
+
+// The one resort a search found, if it found exactly one: Enter adds or removes it
+function findOnlyResort(tree: HierarchyNode[]): HierarchyNode | null {
+  const found: HierarchyNode[] = [];
+
+  function visit(node: HierarchyNode): void {
+    if (found.length > 1) return;
+    if (node.type === 'resort') found.push(node);
+    node.children?.forEach(visit);
+  }
+
+  tree.forEach(visit);
+  return found.length === 1 ? found[0] : null;
+}
+
+function isTopLevel(node: HierarchyNode): boolean {
+  return node.type === 'custom' || node.type === 'continent';
+}
+
+function toggleInSet(set: Set<string>, id: string): Set<string> {
+  const next = new Set(set);
+  if (next.has(id)) {
+    next.delete(id);
+  } else {
+    next.add(id);
+  }
+  return next;
 }
 
 // Checkbox component with tri-state support
@@ -100,264 +122,114 @@ const Checkbox = memo(function Checkbox({
 const ResortItem = memo(function ResortItem({
   node,
   isSelected,
+  isHighlighted,
   onToggle,
   hideIcons,
   icon = icons.resort,
 }: {
   node: HierarchyNode;
   isSelected: boolean;
-  onToggle: () => void;
+  isHighlighted: boolean;
+  onToggle: (resortId: string) => void;
   hideIcons?: boolean;
   icon?: typeof icons.resort;
 }) {
+  const toggle = (): void => {
+    if (node.resortId) onToggle(node.resortId);
+  };
+
   return (
-    <label className="resort-grid-item" onClick={(e) => { e.preventDefault(); onToggle(); }}>
-      <Checkbox state={isSelected ? 'all' : 'none'} onClick={(e) => { e.stopPropagation(); onToggle(); }} />
+    <label
+      className={`resort-grid-item ${isHighlighted ? 'highlighted' : ''}`}
+      onClick={(e) => { e.preventDefault(); toggle(); }}
+    >
+      <Checkbox state={isSelected ? 'all' : 'none'} onClick={(e) => { e.stopPropagation(); toggle(); }} />
       {!hideIcons && <span className="resort-grid-item-icon"><Icon icon={icon} /></span>}
       <span className="resort-grid-item-name">{node.name}</span>
     </label>
   );
 });
 
-// Province group component
-const ProvinceGroup = memo(function ProvinceGroup({
-  node,
-  expandedNodes,
-  onToggleExpand,
-  selectedResorts,
-  onToggleResort,
-  onToggleAll,
-  getSelectionState,
-  getResortsUnderNode,
-  hideIcons,
-}: {
+interface GroupNodeProps {
   node: HierarchyNode;
-  expandedNodes: Set<string>;
-  onToggleExpand: (id: string) => void;
-  selectedResorts: string[];
+  isGroupOpen: (node: HierarchyNode) => boolean;
+  onToggleOpen: (groupId: string) => void;
+  groupResorts: Map<string, string[]>;
+  selected: Set<string>;
+  onToggleGroup: (resortIds: string[]) => void;
   onToggleResort: (resortId: string) => void;
-  onToggleAll: (node: HierarchyNode) => void;
-  getSelectionState: (node: HierarchyNode) => 'all' | 'some' | 'none';
-  getResortsUnderNode: (node: HierarchyNode) => string[];
+  highlightedId: string | null;
   hideIcons?: boolean;
-}) {
-  const isExpanded = expandedNodes.has(node.id);
-  const selectionState = getSelectionState(node);
-  const resortsUnder = getResortsUnderNode(node);
-  const selectedCount = resortsUnder.filter(id => selectedResorts.includes(id)).length;
+}
 
-  const handleHeaderClick = useCallback(() => {
-    onToggleAll(node);
-  }, [node, onToggleAll]);
+// One group at any level: Saved locations, a continent, a country or a Region
+const GroupNode = memo(function GroupNode(props: GroupNodeProps) {
+  const { node, isGroupOpen, onToggleOpen, groupResorts, selected, onToggleGroup, onToggleResort, highlightedId, hideIcons } = props;
+  const level = isTopLevel(node) ? 'continent' : node.type === 'country' ? 'country' : 'province';
+  const icon = node.type === 'custom' ? icons.custom : icons[level];
+  const isOpen = isGroupOpen(node);
+  const children = node.children ?? [];
 
-  const handleToggleExpand = useCallback((e: React.MouseEvent) => {
+  const resortIds = groupResorts.get(node.id) ?? [];
+  const selectedCount = resortIds.filter((id) => selected.has(id)).length;
+  const selectionState = selectedCount === 0 ? 'none' : selectedCount === resortIds.length ? 'all' : 'some';
+
+  const handleToggleOpen = useCallback(() => {
+    onToggleOpen(node.id);
+  }, [node.id, onToggleOpen]);
+
+  const handleCheckboxClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    onToggleExpand(node.id);
-  }, [node.id, onToggleExpand]);
+    onToggleGroup(resortIds);
+  }, [resortIds, onToggleGroup]);
 
   return (
-    <div className="resort-grid-province">
-      <div className="resort-grid-province-header" onClick={handleHeaderClick}>
+    <div className={`resort-grid-${level}`}>
+      {/* The whole heading opens and closes the group; only its checkbox selects it */}
+      <div className={`resort-grid-${level}-header resort-grid-group-header`} onClick={handleToggleOpen}>
+        {/* Its click reaches the heading, which does the opening and closing */}
         <button
-          className={`resort-grid-toggle ${isExpanded ? 'expanded' : ''}`}
-          onClick={handleToggleExpand}
-          aria-expanded={isExpanded}
-          aria-label={isExpanded ? 'Collapse' : 'Expand'}
+          type="button"
+          className={`resort-grid-toggle ${isOpen ? 'expanded' : ''}`}
+          aria-expanded={isOpen}
+          aria-label={`${isOpen ? 'Collapse' : 'Expand'} ${node.name}`}
         >
-          <Icon icon={isExpanded ? icons.caretDown : icons.caretRight} />
+          <Icon icon={isOpen ? icons.caretDown : icons.caretRight} />
         </button>
-        <Checkbox state={selectionState} onClick={(e) => { e.stopPropagation(); handleHeaderClick(); }} />
-        {!hideIcons && <span className="resort-grid-header-icon"><Icon icon={icons.province} /></span>}
-        <span className="resort-grid-province-name">{node.name}</span>
+        <Checkbox state={selectionState} onClick={handleCheckboxClick} />
+        {!hideIcons && <span className="resort-grid-header-icon"><Icon icon={icon} /></span>}
+        <span className={`resort-grid-${level}-name`}>{node.name}</span>
         <span className="resort-grid-count">
-          {selectedCount}/{resortsUnder.length}
+          {selectedCount}/{resortIds.length}
         </span>
       </div>
-      {isExpanded && node.children && (
-        <div className="resort-grid-resorts">
-          {node.children.map(resort => (
-            <ResortItem
-              key={resort.id}
-              node={resort}
-              isSelected={resort.resortId ? selectedResorts.includes(resort.resortId) : false}
-              onToggle={() => resort.resortId && onToggleResort(resort.resortId)}
-              hideIcons={hideIcons}
-            />
-          ))}
+      {isOpen && node.type === 'custom' && children.length === 0 && (
+        <div className="resort-grid-custom-hint">
+          Click any resort's map in its forecast view to save a location here.
         </div>
       )}
-    </div>
-  );
-});
-
-// Country section component
-const CountrySection = memo(function CountrySection({
-  node,
-  expandedNodes,
-  onToggleExpand,
-  selectedResorts,
-  onToggleResort,
-  onToggleAll,
-  getSelectionState,
-  getResortsUnderNode,
-  hideIcons,
-}: {
-  node: HierarchyNode;
-  expandedNodes: Set<string>;
-  onToggleExpand: (id: string) => void;
-  selectedResorts: string[];
-  onToggleResort: (resortId: string) => void;
-  onToggleAll: (node: HierarchyNode) => void;
-  getSelectionState: (node: HierarchyNode) => 'all' | 'some' | 'none';
-  getResortsUnderNode: (node: HierarchyNode) => string[];
-  hideIcons?: boolean;
-}) {
-  const isExpanded = expandedNodes.has(node.id);
-  const selectionState = getSelectionState(node);
-  const resortsUnder = getResortsUnderNode(node);
-  const selectedCount = resortsUnder.filter(id => selectedResorts.includes(id)).length;
-
-  const handleHeaderClick = useCallback(() => {
-    onToggleAll(node);
-  }, [node, onToggleAll]);
-
-  const handleToggleExpand = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    onToggleExpand(node.id);
-  }, [node.id, onToggleExpand]);
-
-  return (
-    <div className="resort-grid-country">
-      <div className="resort-grid-country-header" onClick={handleHeaderClick}>
-        <button
-          className={`resort-grid-toggle ${isExpanded ? 'expanded' : ''}`}
-          onClick={handleToggleExpand}
-          aria-expanded={isExpanded}
-          aria-label={isExpanded ? 'Collapse' : 'Expand'}
-        >
-          <Icon icon={isExpanded ? icons.caretDown : icons.caretRight} />
-        </button>
-        <Checkbox state={selectionState} onClick={(e) => { e.stopPropagation(); handleHeaderClick(); }} />
-        {!hideIcons && <span className="resort-grid-header-icon"><Icon icon={icons.country} /></span>}
-        <span className="resort-grid-country-name">{node.name}</span>
-        <span className="resort-grid-count">
-          {selectedCount}/{resortsUnder.length}
-        </span>
-      </div>
-      {isExpanded && node.children && (
-        <div className="resort-grid-provinces">
-          {node.children.map(province => (
-            <ProvinceGroup
-              key={province.id}
-              node={province}
-              expandedNodes={expandedNodes}
-              onToggleExpand={onToggleExpand}
-              selectedResorts={selectedResorts}
-              onToggleResort={onToggleResort}
-              onToggleAll={onToggleAll}
-              getSelectionState={getSelectionState}
-              getResortsUnderNode={getResortsUnderNode}
-              hideIcons={hideIcons}
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-});
-
-// Continent column component
-const ContinentColumn = memo(function ContinentColumn({
-  node,
-  expandedNodes,
-  onToggleExpand,
-  selectedResorts,
-  onToggleResort,
-  onToggleAll,
-  getSelectionState,
-  getResortsUnderNode,
-  hideIcons,
-}: {
-  node: HierarchyNode;
-  expandedNodes: Set<string>;
-  onToggleExpand: (id: string) => void;
-  selectedResorts: string[];
-  onToggleResort: (resortId: string) => void;
-  onToggleAll: (node: HierarchyNode) => void;
-  getSelectionState: (node: HierarchyNode) => 'all' | 'some' | 'none';
-  getResortsUnderNode: (node: HierarchyNode) => string[];
-  hideIcons?: boolean;
-}) {
-  const isExpanded = expandedNodes.has(node.id);
-  const selectionState = getSelectionState(node);
-  const resortsUnder = getResortsUnderNode(node);
-  const selectedCount = resortsUnder.filter(id => selectedResorts.includes(id)).length;
-
-  const handleHeaderClick = useCallback(() => {
-    onToggleAll(node);
-  }, [node, onToggleAll]);
-
-  const handleToggleExpand = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    onToggleExpand(node.id);
-  }, [node.id, onToggleExpand]);
-
-  return (
-    <div className="resort-grid-continent">
-      <div className="resort-grid-continent-header" onClick={handleHeaderClick}>
-        <button
-          className={`resort-grid-toggle ${isExpanded ? 'expanded' : ''}`}
-          onClick={handleToggleExpand}
-          aria-expanded={isExpanded}
-          aria-label={isExpanded ? 'Collapse' : 'Expand'}
-        >
-          <Icon icon={isExpanded ? icons.caretDown : icons.caretRight} />
-        </button>
-        <Checkbox state={selectionState} onClick={(e) => { e.stopPropagation(); handleHeaderClick(); }} />
-        {!hideIcons && <span className="resort-grid-header-icon"><Icon icon={node.type === 'custom' ? icons.custom : icons.continent} /></span>}
-        <span className="resort-grid-continent-name">{node.name}</span>
-        <span className="resort-grid-count">
-          {selectedCount}/{resortsUnder.length}
-        </span>
-      </div>
-      {/* The Custom group lists Saved locations directly, with no Country or Region */}
-      {isExpanded && node.type === 'custom' && node.children && (
-        node.children.length === 0 ? (
-          <div className="resort-grid-custom-hint">
-            Click any resort's map in its forecast view to save a location here.
-          </div>
-        ) : (
+      {isOpen && children.length > 0 && (
+        children[0].type === 'resort' ? (
           <div className="resort-grid-resorts">
-            {node.children.map(location => (
+            {children.map((resort) => (
               <ResortItem
-                key={location.id}
-                node={location}
-                isSelected={location.resortId ? selectedResorts.includes(location.resortId) : false}
-                onToggle={() => location.resortId && onToggleResort(location.resortId)}
+                key={resort.id}
+                node={resort}
+                isSelected={resort.resortId ? selected.has(resort.resortId) : false}
+                isHighlighted={resort.id === highlightedId}
+                onToggle={onToggleResort}
                 hideIcons={hideIcons}
-                icon={icons.custom}
+                icon={node.type === 'custom' ? icons.custom : icons.resort}
               />
             ))}
           </div>
+        ) : (
+          <div className={level === 'continent' ? 'resort-grid-countries' : 'resort-grid-provinces'}>
+            {children.map((child) => (
+              <GroupNode key={child.id} {...props} node={child} />
+            ))}
+          </div>
         )
-      )}
-      {isExpanded && node.type !== 'custom' && node.children && (
-        <div className="resort-grid-countries">
-          {node.children.map(country => (
-            <CountrySection
-              key={country.id}
-              node={country}
-              expandedNodes={expandedNodes}
-              onToggleExpand={onToggleExpand}
-              selectedResorts={selectedResorts}
-              onToggleResort={onToggleResort}
-              onToggleAll={onToggleAll}
-              getSelectionState={getSelectionState}
-              getResortsUnderNode={getResortsUnderNode}
-              hideIcons={hideIcons}
-            />
-          ))}
-        </div>
       )}
     </div>
   );
@@ -373,10 +245,8 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
     closeModal,
     selectedResorts,
     toggleResort,
-    toggleAllInNode,
+    toggleGroup,
     clearAllResorts,
-    getSelectionState,
-    getResortsUnderNode,
     searchTerm,
     setSearchTerm,
     capNotice,
@@ -387,37 +257,58 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
   // Get hierarchy tree from context
   const { hierarchyTree } = useHierarchy();
 
-  // Memoize all node IDs for performance
-  const allNodeIds = useMemo(() => getAllNodeIds(hierarchyTree), [hierarchyTree]);
+  const searchTexts = useMemo(() => buildSearchTexts(hierarchyTree), [hierarchyTree]);
+  // A short search can match a thousand resorts, so the list catches up after each keystroke instead of holding it up
+  const shownSearchTerm = useDeferredValue(searchTerm);
+  const searchWords = useMemo(() => toSearchWords(shownSearchTerm), [shownSearchTerm]);
+  const isSearching = searchWords.length > 0;
 
-  // Initialize expanded nodes with all node IDs (default expanded)
-  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(() => new Set(allNodeIds));
+  const shownTree = useMemo(
+    () => (isSearching ? filterTree(hierarchyTree, searchWords, searchTexts) : hierarchyTree),
+    [hierarchyTree, isSearching, searchWords, searchTexts]
+  );
+  const groupResorts = useMemo(() => collectGroupResorts(shownTree), [shownTree]);
+  const onlyResort = useMemo(() => (isSearching ? findOnlyResort(shownTree) : null), [isSearching, shownTree]);
+  const selected = useMemo(() => new Set(selectedResorts), [selectedResorts]);
 
-  // Reset expansion state when modal opens
+  // Groups opened or closed away from how the picker opens (top level open, the rest closed)
+  const [toggledIds, setToggledIds] = useState<Set<string>>(() => new Set());
+  // Groups closed during the current search; every other group holding a match is open
+  const [closedInSearch, setClosedInSearch] = useState<Set<string>>(() => new Set());
+
+  // Every time it opens, it opens the same way
   useEffect(() => {
     if (isOpen) {
-      setExpandedNodes(new Set(allNodeIds));
+      setToggledIds(new Set());
+      setClosedInSearch(new Set());
     }
-  }, [isOpen, allNodeIds]);
+  }, [isOpen]);
 
-  // Filter hierarchy based on search
-  const filteredHierarchy = useMemo(
-    () => filterHierarchy(hierarchyTree, searchTerm),
-    [hierarchyTree, searchTerm]
+  // Clearing the search goes back to the tree as it was before
+  useEffect(() => {
+    if (!isSearching) setClosedInSearch(new Set());
+  }, [isSearching]);
+
+  const isGroupOpen = useCallback(
+    (node: HierarchyNode) => (isSearching ? !closedInSearch.has(node.id) : isTopLevel(node) !== toggledIds.has(node.id)),
+    [isSearching, closedInSearch, toggledIds]
   );
 
-  // Toggle node expansion
-  const handleToggleExpand = useCallback((nodeId: string) => {
-    setExpandedNodes(prev => {
-      const next = new Set(prev);
-      if (next.has(nodeId)) {
-        next.delete(nodeId);
-      } else {
-        next.add(nodeId);
-      }
-      return next;
-    });
-  }, []);
+  const handleToggleOpen = useCallback((groupId: string) => {
+    if (isSearching) {
+      setClosedInSearch((prev) => toggleInSet(prev, groupId));
+    } else {
+      setToggledIds((prev) => toggleInSet(prev, groupId));
+    }
+  }, [isSearching]);
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Not while the list is still catching up with what was typed, when its one match may no longer be the one
+    if (e.key === 'Enter' && onlyResort?.resortId && shownSearchTerm === searchTerm) {
+      e.preventDefault();
+      toggleResort(onlyResort.resortId);
+    }
+  };
 
   // Auto-focus input on open, unless that would open a phone's keyboard
   useEffect(() => {
@@ -426,7 +317,7 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
     }
   }, [isOpen]);
 
-  // Lock page scroll while open, and close on Esc (ahead of the hook's own Escape handling)
+  // Lock page scroll while open, and close on Esc
   useOverlay(isOpen, closeModal);
 
   if (!isOpen) {
@@ -451,7 +342,8 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
               className="command-input"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search resorts..."
+              onKeyDown={handleSearchKeyDown}
+              placeholder="Search resorts, regions or countries..."
               autoComplete="off"
               spellCheck={false}
             />
@@ -467,23 +359,23 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
 
         {/* Grid content */}
         <div className="resort-grid-content">
-          {filteredHierarchy.length === 0 ? (
+          {shownTree.length === 0 ? (
             <div className="resort-grid-empty">
-              {searchTerm ? 'No resorts found' : 'No resorts available'}
+              {isSearching ? 'No resorts found' : 'No resorts available'}
             </div>
           ) : (
             <div className="resort-grid-columns">
-              {filteredHierarchy.map(continent => (
-                <ContinentColumn
-                  key={continent.id}
-                  node={continent}
-                  expandedNodes={expandedNodes}
-                  onToggleExpand={handleToggleExpand}
-                  selectedResorts={selectedResorts}
+              {shownTree.map((group) => (
+                <GroupNode
+                  key={group.id}
+                  node={group}
+                  isGroupOpen={isGroupOpen}
+                  onToggleOpen={handleToggleOpen}
+                  groupResorts={groupResorts}
+                  selected={selected}
+                  onToggleGroup={toggleGroup}
                   onToggleResort={toggleResort}
-                  onToggleAll={toggleAllInNode}
-                  getSelectionState={getSelectionState}
-                  getResortsUnderNode={getResortsUnderNode}
+                  highlightedId={onlyResort?.id ?? null}
                   hideIcons={hideIcons}
                 />
               ))}
@@ -493,6 +385,11 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
 
         {/* Footer */}
         <div className="command-palette-footer">
+          {onlyResort?.resortId && (
+            <span className="command-hint">
+              <kbd>↵</kbd> {selected.has(onlyResort.resortId) ? 'remove' : 'add'}
+            </span>
+          )}
           <span className="command-hint">
             <kbd>esc</kbd> close
           </span>

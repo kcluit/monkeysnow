@@ -38,6 +38,8 @@ export interface ProvinceData {
 export interface CountryData {
     id: string;
     name: string;
+    /** Whether it is split into Regions; if not, its one implicit group is left out of the picker. */
+    hasRegions: boolean;
     provinces: ProvinceData[];
 }
 
@@ -116,7 +118,7 @@ function buildHierarchy(): ContinentData[] {
 
         let countryNode = countries.get(r.country);
         if (!countryNode) {
-            countryNode = { id: toSlugId(country.name), name: country.name, provinces: [] };
+            countryNode = { id: toSlugId(country.name), name: country.name, hasRegions: country.regions, provinces: [] };
             countries.set(r.country, countryNode);
             continent.countries.push(countryNode);
         }

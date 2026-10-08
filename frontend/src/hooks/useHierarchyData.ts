@@ -1,12 +1,15 @@
 import { useCallback, useMemo } from 'react';
 import { RESORT_HIERARCHY } from '../data/resortLocations';
-import type { ContinentData } from '../data/resortLocations';
+import type { ContinentData, ResortInfo } from '../data/resortLocations';
 import { useSavedLocations } from './useSavedLocations';
 import type { SavedLocation } from '../utils/savedLocations';
 
 export type { ContinentData, CountryData, ProvinceData, ResortInfo } from '../data/resortLocations';
 
-/** 'custom' is the group of Saved locations, listed before the continents; its children are 'resort' nodes. */
+/**
+ * 'custom' is the group of Saved locations, listed before the continents; its children are 'resort' nodes.
+ * A 'country' holds 'province' nodes (its Regions), or 'resort' nodes when it isn't split into Regions.
+ */
 export type HierarchyNodeType = 'custom' | 'continent' | 'country' | 'province' | 'resort';
 
 export interface HierarchyNode {
@@ -19,9 +22,14 @@ export interface HierarchyNode {
   aka?: string[];
 }
 
-/** Whether a node's name, or one of its other names, contains the (lowercased) query. */
-export function nodeMatchesSearch(node: HierarchyNode, query: string): boolean {
-  return [node.name, ...(node.aka ?? [])].some(name => name.toLowerCase().includes(query));
+function toResortNode(resort: ResortInfo): HierarchyNode {
+  return {
+    id: `resort-${resort.id}`,
+    name: resort.displayName,
+    type: 'resort',
+    resortId: resort.id,
+    ...(resort.aka ? { aka: resort.aka } : {}),
+  };
 }
 
 /**
@@ -36,18 +44,14 @@ function buildHierarchyTree(hierarchy: ContinentData[]): HierarchyNode[] {
       id: country.id,
       name: country.name,
       type: 'country',
-      children: country.provinces.map((province): HierarchyNode => ({
-        id: province.id,
-        name: province.name,
-        type: 'province',
-        children: province.resorts.map((resort): HierarchyNode => ({
-          id: `resort-${resort.id}`,
-          name: resort.displayName,
-          type: 'resort',
-          resortId: resort.id,
-          ...(resort.aka ? { aka: resort.aka } : {}),
-        })),
-      })),
+      children: country.hasRegions
+        ? country.provinces.map((province): HierarchyNode => ({
+            id: province.id,
+            name: province.name,
+            type: 'province',
+            children: province.resorts.map(toResortNode),
+          }))
+        : country.provinces.flatMap((province) => province.resorts.map(toResortNode)),
     })),
   }));
 }
@@ -103,11 +107,11 @@ function buildDisplayNames(hierarchy: ContinentData[]): Map<string, string> {
   return names;
 }
 
-/** The picker's Custom group: Saved locations by name, straight under it with no Country or Region. */
+/** The picker's Saved locations group: Saved locations by name, straight under it with no Country or Region. */
 function buildCustomNode(savedLocations: SavedLocation[]): HierarchyNode {
   return {
     id: 'custom',
-    name: 'Custom',
+    name: 'Saved locations',
     type: 'custom',
     children: [...savedLocations]
       .sort((a, b) => a.name.localeCompare(b.name))

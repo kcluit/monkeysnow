@@ -139,7 +139,7 @@ export const icons = {
   continent: faEarthAmericas,
   country: faFlag,
   province: faLocationDot,
-  custom: faMapPin, // the Custom group of Saved locations
+  custom: faMapPin, // the Saved locations group
   // resort is already defined above (faPersonSkiing)
 
   // Provider icons (model selection)
