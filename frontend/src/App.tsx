@@ -753,6 +753,9 @@ function App(): JSX.Element {
                     ))}
                 </Suspense>
 
+                {/* Queued resorts (and rate-limit pauses) */}
+                <FetchStatus count={queuedCount} calls={queuedCalls} things="resorts" />
+
                 {isTruncated && (
                     <div className="text-center py-3 text-sm text-theme-textSecondary">
                         Showing {effectiveDisplayLimit} of {selectedResorts.length} selected resorts
