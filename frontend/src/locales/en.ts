@@ -44,6 +44,7 @@ export const en: Translations = {
     'command.theme': 'Theme',
     'command.font': 'Font',
     'command.rainbowText': 'Rainbow text',
+    'command.boldText': 'Bold text',
     'command.fullscreen': 'Fullscreen',
     'command.fpsCounter': 'FPS counter',
     'command.hideIcons': 'Hide icons',

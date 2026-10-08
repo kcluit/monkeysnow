@@ -8,7 +8,6 @@ import { useEffect, useRef, memo } from 'react';
 import { ResortTreeNode } from './ResortTreeNode';
 import { MAX_SELECTED_RESORTS, type UseResortHierarchyReturn } from '../../hooks/useResortHierarchy';
 import { CapNotice } from './CapNotice';
-import type { HierarchyNode } from '../../data/resortHierarchy';
 
 interface ResortSelectionModalProps {
   hierarchy: UseResortHierarchyReturn;
@@ -28,8 +27,7 @@ export const ResortSelectionModal = memo(function ResortSelectionModal({
     goBack,
     canGoBack,
     selectedResorts,
-    selectAllInNode,
-    deselectAllInNode,
+    toggleAllInNode,
     getSelectionState,
     selectedIndex,
     setSelectedIndex,
@@ -74,14 +72,6 @@ export const ResortSelectionModal = memo(function ResortSelectionModal({
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       closeModal();
-    }
-  };
-
-  const handleToggleAll = (node: HierarchyNode, select: boolean) => {
-    if (select) {
-      selectAllInNode(node);
-    } else {
-      deselectAllInNode(node);
     }
   };
 
@@ -148,7 +138,7 @@ export const ResortSelectionModal = memo(function ResortSelectionModal({
                   selectedResorts={selectedResorts}
                   onNavigate={navigateTo}
                   onHover={setSelectedIndex}
-                  onToggleAll={handleToggleAll}
+                  onToggleAll={toggleAllInNode}
                   hideIcons={hideIcons}
                 />
               </div>

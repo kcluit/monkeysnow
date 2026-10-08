@@ -36,6 +36,9 @@ const customLocationIcon = L.divIcon({
 // Marks the history entry pushed on entering fullscreen, so Back closes the map instead of leaving the page
 const FULLSCREEN_HISTORY_KEY = 'resortMapFullscreen';
 
+// Close enough for a typical Resort, a small hill of about 200 m vertical, to fill the map; big Resorts open cropped
+const INITIAL_ZOOM = 14;
+
 type MapSize = 'small' | 'expanded' | 'fullscreen';
 
 interface ResortMapProps {
@@ -109,7 +112,7 @@ export function ResortMap({
             <div className={`resort-map-frame ${isFullscreen ? 'resort-map-fullscreen' : ''}`}>
                 <MapContainer
                     center={[lat, lon]}
-                    zoom={11}
+                    zoom={INITIAL_ZOOM}
                     maxZoom={18}
                     scrollWheelZoom={true}
                     className={`h-full rounded-xl shadow-lg ${className}`}

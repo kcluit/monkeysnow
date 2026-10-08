@@ -27,6 +27,7 @@ import {
   // Command palette - base commands
   faCircleHalfStroke,
   faFont,
+  faBold,
   faGem,
   faExpand,
   faBolt,
@@ -106,6 +107,7 @@ export const icons = {
   // Base commands
   theme: faCircleHalfStroke,
   font: faFont,
+  bold: faBold,
   rainbow: faGem,
   fullscreen: faExpand,
   fps: faBolt,

@@ -51,8 +51,8 @@ export function Header({ font }: HeaderProps): JSX.Element {
         document.head.appendChild(lexendLink);
         fontLinksRef.current.push(lexendLink);
 
-        // Load the selected font (if it has a Google Fonts URL and isn't Lexend)
-        if (font?.googleFontsUrl && font.id !== 'lexend') {
+        // Load the selected font (if it has a Google Fonts URL); the logo's link above only has weight 400
+        if (font?.googleFontsUrl) {
             const fontLink = document.createElement('link');
             fontLink.rel = 'stylesheet';
             fontLink.href = font.googleFontsUrl;

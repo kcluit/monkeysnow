@@ -40,8 +40,7 @@ export interface UseResortHierarchyReturn {
   // Selection
   selectedResorts: string[];
   toggleResort: (resortId: string) => void;
-  selectAllInNode: (node: HierarchyNode) => void;
-  deselectAllInNode: (node: HierarchyNode) => void;
+  toggleAllInNode: (node: HierarchyNode) => void;
   clearAllResorts: () => void;
   getSelectionState: (node: HierarchyNode) => 'all' | 'some' | 'none';
   getResortsUnderNode: (node: HierarchyNode) => string[];
@@ -234,13 +233,20 @@ export function useResortHierarchy({
   // Selection helpers - operate on draft state only
   const toggleResort = toggleInDraft;
 
-  const selectAllInNode = useCallback((node: HierarchyNode) => {
-    addToDraft(cachedGetResortsUnderNode(node));
-  }, [cachedGetResortsUnderNode, addToDraft]);
-
-  const deselectAllInNode = useCallback((node: HierarchyNode) => {
-    removeFromDraft(cachedGetResortsUnderNode(node));
-  }, [cachedGetResortsUnderNode, removeFromDraft]);
+  // A group's header fills it up to the Selection cap; it clears the group once the group is
+  // complete, or once the Selection is full and part of the group is in it
+  const toggleAllInNode = useCallback((node: HierarchyNode) => {
+    const resortIds = cachedGetResortsUnderNode(node);
+    const draft = new Set(draftRef.current);
+    const selectedCount = resortIds.filter((id) => draft.has(id)).length;
+    const isComplete = resortIds.length > 0 && selectedCount === resortIds.length;
+    const isFull = draft.size >= MAX_SELECTED_RESORTS;
+    if (isComplete || (isFull && selectedCount > 0)) {
+      removeFromDraft(resortIds);
+    } else {
+      addToDraft(resortIds);
+    }
+  }, [cachedGetResortsUnderNode, addToDraft, removeFromDraft]);
 
   const clearAllResorts = useCallback(() => {
     setDraft([]);
@@ -321,8 +327,7 @@ export function useResortHierarchy({
     // Selection (draft state when modal is open, committed state when closed)
     selectedResorts: activeSelectedResorts,
     toggleResort,
-    selectAllInNode,
-    deselectAllInNode,
+    toggleAllInNode,
     clearAllResorts,
     getSelectionState,
     getResortsUnderNode: cachedGetResortsUnderNode,

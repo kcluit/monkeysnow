@@ -20,7 +20,14 @@ export default {
           'secondary': 'var(--secondary)',
           'border': 'var(--border)',
         },
-      }
+      },
+      // Font weights reference CSS variables in style.css, which Bold text mode shifts
+      fontWeight: {
+        'normal': 'var(--weight-normal)',
+        'medium': 'var(--weight-medium)',
+        'semibold': 'var(--weight-semibold)',
+        'bold': 'var(--weight-bold)',
+      },
     },
   },
   plugins: [],

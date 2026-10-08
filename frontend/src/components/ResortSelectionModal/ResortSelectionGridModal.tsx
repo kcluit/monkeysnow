@@ -126,8 +126,7 @@ const ProvinceGroup = memo(function ProvinceGroup({
   onToggleExpand,
   selectedResorts,
   onToggleResort,
-  onSelectAll,
-  onDeselectAll,
+  onToggleAll,
   getSelectionState,
   getResortsUnderNode,
   hideIcons,
@@ -137,8 +136,7 @@ const ProvinceGroup = memo(function ProvinceGroup({
   onToggleExpand: (id: string) => void;
   selectedResorts: string[];
   onToggleResort: (resortId: string) => void;
-  onSelectAll: (node: HierarchyNode) => void;
-  onDeselectAll: (node: HierarchyNode) => void;
+  onToggleAll: (node: HierarchyNode) => void;
   getSelectionState: (node: HierarchyNode) => 'all' | 'some' | 'none';
   getResortsUnderNode: (node: HierarchyNode) => string[];
   hideIcons?: boolean;
@@ -149,12 +147,8 @@ const ProvinceGroup = memo(function ProvinceGroup({
   const selectedCount = resortsUnder.filter(id => selectedResorts.includes(id)).length;
 
   const handleHeaderClick = useCallback(() => {
-    if (selectionState === 'all') {
-      onDeselectAll(node);
-    } else {
-      onSelectAll(node);
-    }
-  }, [selectionState, node, onSelectAll, onDeselectAll]);
+    onToggleAll(node);
+  }, [node, onToggleAll]);
 
   const handleToggleExpand = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -203,8 +197,7 @@ const CountrySection = memo(function CountrySection({
   onToggleExpand,
   selectedResorts,
   onToggleResort,
-  onSelectAll,
-  onDeselectAll,
+  onToggleAll,
   getSelectionState,
   getResortsUnderNode,
   hideIcons,
@@ -214,8 +207,7 @@ const CountrySection = memo(function CountrySection({
   onToggleExpand: (id: string) => void;
   selectedResorts: string[];
   onToggleResort: (resortId: string) => void;
-  onSelectAll: (node: HierarchyNode) => void;
-  onDeselectAll: (node: HierarchyNode) => void;
+  onToggleAll: (node: HierarchyNode) => void;
   getSelectionState: (node: HierarchyNode) => 'all' | 'some' | 'none';
   getResortsUnderNode: (node: HierarchyNode) => string[];
   hideIcons?: boolean;
@@ -226,12 +218,8 @@ const CountrySection = memo(function CountrySection({
   const selectedCount = resortsUnder.filter(id => selectedResorts.includes(id)).length;
 
   const handleHeaderClick = useCallback(() => {
-    if (selectionState === 'all') {
-      onDeselectAll(node);
-    } else {
-      onSelectAll(node);
-    }
-  }, [selectionState, node, onSelectAll, onDeselectAll]);
+    onToggleAll(node);
+  }, [node, onToggleAll]);
 
   const handleToggleExpand = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -266,8 +254,7 @@ const CountrySection = memo(function CountrySection({
               onToggleExpand={onToggleExpand}
               selectedResorts={selectedResorts}
               onToggleResort={onToggleResort}
-              onSelectAll={onSelectAll}
-              onDeselectAll={onDeselectAll}
+              onToggleAll={onToggleAll}
               getSelectionState={getSelectionState}
               getResortsUnderNode={getResortsUnderNode}
               hideIcons={hideIcons}
@@ -286,8 +273,7 @@ const ContinentColumn = memo(function ContinentColumn({
   onToggleExpand,
   selectedResorts,
   onToggleResort,
-  onSelectAll,
-  onDeselectAll,
+  onToggleAll,
   getSelectionState,
   getResortsUnderNode,
   hideIcons,
@@ -297,8 +283,7 @@ const ContinentColumn = memo(function ContinentColumn({
   onToggleExpand: (id: string) => void;
   selectedResorts: string[];
   onToggleResort: (resortId: string) => void;
-  onSelectAll: (node: HierarchyNode) => void;
-  onDeselectAll: (node: HierarchyNode) => void;
+  onToggleAll: (node: HierarchyNode) => void;
   getSelectionState: (node: HierarchyNode) => 'all' | 'some' | 'none';
   getResortsUnderNode: (node: HierarchyNode) => string[];
   hideIcons?: boolean;
@@ -309,12 +294,8 @@ const ContinentColumn = memo(function ContinentColumn({
   const selectedCount = resortsUnder.filter(id => selectedResorts.includes(id)).length;
 
   const handleHeaderClick = useCallback(() => {
-    if (selectionState === 'all') {
-      onDeselectAll(node);
-    } else {
-      onSelectAll(node);
-    }
-  }, [selectionState, node, onSelectAll, onDeselectAll]);
+    onToggleAll(node);
+  }, [node, onToggleAll]);
 
   const handleToggleExpand = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -370,8 +351,7 @@ const ContinentColumn = memo(function ContinentColumn({
               onToggleExpand={onToggleExpand}
               selectedResorts={selectedResorts}
               onToggleResort={onToggleResort}
-              onSelectAll={onSelectAll}
-              onDeselectAll={onDeselectAll}
+              onToggleAll={onToggleAll}
               getSelectionState={getSelectionState}
               getResortsUnderNode={getResortsUnderNode}
               hideIcons={hideIcons}
@@ -393,8 +373,7 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
     closeModal,
     selectedResorts,
     toggleResort,
-    selectAllInNode,
-    deselectAllInNode,
+    toggleAllInNode,
     clearAllResorts,
     getSelectionState,
     getResortsUnderNode,
@@ -502,8 +481,7 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
                   onToggleExpand={handleToggleExpand}
                   selectedResorts={selectedResorts}
                   onToggleResort={toggleResort}
-                  onSelectAll={selectAllInNode}
-                  onDeselectAll={deselectAllInNode}
+                  onToggleAll={toggleAllInNode}
                   getSelectionState={getSelectionState}
                   getResortsUnderNode={getResortsUnderNode}
                   hideIcons={hideIcons}
