@@ -201,25 +201,17 @@ function App(): JSX.Element {
     // Set by main.tsx when a selection saved under the old cap was trimmed
     const [selectionTrimmed, setSelectionTrimmed] = useLocalStorage<boolean>('selectionTrimmed', false);
 
-    // Track whether the resort modal has ever been opened (for first-visit empty draft)
-    const [hasOpenedResortModal, setHasOpenedResortModal] = useLocalStorage<boolean>('hasOpenedResortModal', false);
-
     // Resort hierarchy hook for modal
     const resortHierarchy = useResortHierarchy({
         selectedResorts,
         onResortsChange: setSelectedResorts,
     });
 
-    // Open resort modal, auto-dismiss the banner, and handle first-visit empty draft
+    // Open resort modal and auto-dismiss the banner
     const openResortModalAndDismissBanner = useCallback(() => {
-        if (!hasOpenedResortModal) {
-            resortHierarchy.openModal([]);
-            setHasOpenedResortModal(true);
-        } else {
-            resortHierarchy.openModal();
-        }
+        resortHierarchy.openModal();
         setBannerDismissed(true);
-    }, [resortHierarchy.openModal, setBannerDismissed, hasOpenedResortModal, setHasOpenedResortModal]);
+    }, [resortHierarchy.openModal, setBannerDismissed]);
 
     useEffect(() => {
         new Konami("https://monkeytype.com/");
