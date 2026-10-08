@@ -382,12 +382,6 @@ async function importResorts() {
       continue;
     }
     resorts[slug] = entry;
-
-    registry[slug] = {
-      ...registry[slug],
-      sources: area.sources,
-      ...(area.wikidata ? { wikidata: area.wikidata } : {}),
-    };
     if (!LATIN.test(entry.name)) report.nonLatin.push(`\`${slug}\`: ${entry.name} (${place?.localized?.en?.country ?? country})`);
   }
 
