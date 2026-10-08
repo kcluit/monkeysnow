@@ -546,14 +546,17 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
     }
   };
 
-  // Get total selection count
+  // Get total selection count: Preferred models drawn at this point, of all Preferred models
   const getTotalCount = (): string => {
-    const modelCount = selectedModels.length;
+    const shownCount = selectedModels.filter(
+      (id) => getUnavailableReason(id, modelAvailability) === null
+    ).length;
+    const modelCount = `${shownCount} shown of ${selectedModels.length} preferred`;
     const aggCount = selectedAggregations.length;
     if (aggCount > 0) {
-      return `${modelCount} models + ${aggCount} aggregation${aggCount > 1 ? 's' : ''}`;
+      return `${modelCount} + ${aggCount} aggregation${aggCount > 1 ? 's' : ''}`;
     }
-    return `${modelCount} model${modelCount !== 1 ? 's' : ''}`;
+    return modelCount;
   };
 
   return (
