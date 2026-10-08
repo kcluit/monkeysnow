@@ -44,6 +44,7 @@ export function DetailChartGrid({
                     unitSystem={unitSystem}
                     timezoneInfo={timezoneInfo}
                     isChartLocked={isChartLocked}
+                    isLoading={isLoading}
                     onToggleVisibility={
                         onToggleVariable ? () => onToggleVariable(variable) : undefined
                     }
