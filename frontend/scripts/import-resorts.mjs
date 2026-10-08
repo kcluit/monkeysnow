@@ -331,9 +331,11 @@ async function importResorts() {
   // Areas whose source IDs all changed upstream: recognise them by name and place
   for (const area of candidates) {
     if (slugOf.has(area)) continue;
-    const name = slugify(splitName(area.properties.name).name);
+    const name = slugForName(splitName(area.properties.name).name);
     const match = Object.entries(previous.resorts).find(([slug, r]) =>
-      !areaOf.has(slug) && slugify(r.name) === name && distanceKm(r.loc, area.loc) <= RENAMED_SOURCE_MATCH_KM
+      !areaOf.has(slug)
+      && [r.name, ...(r.aka ?? [])].some(n => slugForName(n) === name)
+      && distanceKm(r.loc, area.loc) <= RENAMED_SOURCE_MATCH_KM
     );
     if (match) assign(area, match[0]);
   }
