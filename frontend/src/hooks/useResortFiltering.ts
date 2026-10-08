@@ -14,6 +14,11 @@ import type {
   UnitSystem
 } from '../types';
 
+/** Whether the cards run from the smallest value up: sortResorts puts the coldest first, but the most snow and wind first, until the order is reversed */
+export function isAscendingOrder(sortBy: SortOption, isReversed: boolean): boolean {
+  return (sortBy === 'temperature') !== isReversed;
+}
+
 export function useResortFiltering(
   skiResorts: string[],
   allWeatherData: AllWeatherData | null
@@ -114,7 +119,15 @@ export function useResortFiltering(
       resortDataMap.set(resort, processResortData(allWeatherData, resort, selectedElevation, temperatureMetric, snowfallEstimateMode, unitSystem));
     }
 
-    let sortedResorts = [...resorts].sort((a, b) => {
+    // Resorts without a forecast for the sort day (still queued, failed, or a shorter model) go last:
+    // a comparator calling them equal to every other resort would scramble the order of the rest
+    const canCompare = (resort: string): boolean => {
+      const resortData = resortDataMap.get(resort);
+      return Boolean(resortData && (typeof selectedSortDay === 'string' || resortData.days[selectedSortDay]));
+    };
+    const withoutData = resorts.filter((resort) => !canCompare(resort));
+
+    let sortedResorts = resorts.filter(canCompare).sort((a, b) => {
       const resortDataA = resortDataMap.get(a);  // O(1) lookup
       const resortDataB = resortDataMap.get(b);  // O(1) lookup
 
@@ -159,7 +172,7 @@ export function useResortFiltering(
       sortedResorts = sortedResorts.reverse();
     }
 
-    return sortedResorts;
+    return [...sortedResorts, ...withoutData];
   }, [allWeatherData]);
 
   return {

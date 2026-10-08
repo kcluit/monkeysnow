@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { UtilityBarProps, SortDay, ElevationLevel, SortOption, ViewMode } from '../types';
 import { getSortDayData, getSortDayText } from '../utils/sortDayHelpers';
+import { isAscendingOrder } from '../hooks/useResortFiltering';
 import { MobileSortModal } from './MobileSortModal';
 
 interface ExtendedCompactUtilityBarProps extends UtilityBarProps {
@@ -189,7 +190,7 @@ export function CompactUtilityBar({
                         onClick={() => setIsReversed(!isReversed)}
                         className="compact-bar-text text-theme-textSecondary hover:text-theme-accent transition-colors"
                     >
-                        {isReversed ? 'Descending' : 'Ascending'}
+                        {isAscendingOrder(selectedSort, isReversed) ? 'Ascending' : 'Descending'}
                     </button>
                 </div>
 

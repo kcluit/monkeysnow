@@ -30,7 +30,11 @@ export function getSortDayData(
     return { specialOptions, regularDays: [] };
   }
 
-  const firstResort = selectedResorts[0];
+  // The days of the first resort with a forecast: the first selected one may still be queued
+  const firstResort = selectedResorts.find((resort) => allWeatherData.data[resort]);
+  if (!firstResort) {
+    return { specialOptions, regularDays: [] };
+  }
   const resortData = processResortData(allWeatherData, firstResort, selectedElevation);
 
   return {
