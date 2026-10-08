@@ -350,7 +350,7 @@ async function importResorts() {
     if (slugOf.has(area)) continue;
     const place = area.properties.places?.[0];
     const base = slugForName(splitName(area.properties.name).name) || 'resort';
-    const options = [base, `${base}-${slugify(place?.localized?.en?.region ?? '')}`, `${base}-${slugify(place?.iso3166_1Alpha2 ?? '')}`]
+    const options = [base, `${base}-${toSlug(place?.localized?.en?.region ?? '')}`, `${base}-${toSlug(place?.iso3166_1Alpha2 ?? '')}`]
       .map(s => s.replace(/-+$/, ''));
     let slug = options.find(s => !taken.has(s));
     for (let n = 2; !slug; n++) if (!taken.has(`${base}-${n}`)) slug = `${base}-${n}`;
