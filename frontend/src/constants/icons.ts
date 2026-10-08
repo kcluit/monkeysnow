@@ -58,6 +58,7 @@ import {
   faGear,
   // Modal controls
   faXmark,
+  faRotateLeft,
   // Lock icons
   faLock,
   faLockOpen,
@@ -152,6 +153,7 @@ export const icons = {
 
   // Modal controls
   close: faXmark,
+  reset: faRotateLeft,
 
   // Lock icons
   lock: faLock,

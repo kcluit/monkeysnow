@@ -168,15 +168,23 @@ export function DetailedResortView({
 
     // Custom location state (temporary - NOT persisted unless saved as a Saved location)
     const [customLocation, setCustomLocation] = useState<CustomLocation | null>(null);
+    // A height typed for this one Custom location, or null to forecast it at its Ground elevation
+    const [customElevation, setCustomElevation] = useState<number | null>(null);
+    // Open-Meteo reports back whatever height it is asked for, so the Ground elevation is kept from before one was typed
+    const [rememberedGroundElevation, setRememberedGroundElevation] = useState<number | null>(null);
 
-    // A click on the map forecasts that point at its own ground elevation
+    // A click on the map forecasts that point at its own Ground elevation
     const handleMapClick = useCallback((lat: number, lon: number) => {
         setCustomLocation({ lat, lon });
+        setCustomElevation(null);
+        setRememberedGroundElevation(null);
     }, []);
 
     // Reset custom location to return to original resort
     const handleResetCustomLocation = useCallback(() => {
         setCustomLocation(null);
+        setCustomElevation(null);
+        setRememberedGroundElevation(null);
     }, []);
 
     // Save and Edit dialogs, and the in-page confirmation before deleting a Saved location
@@ -214,13 +222,32 @@ export function DetailedResortView({
     const { data, unavailableModels, loadingModels, timezoneInfo, elevation: forecastElevation } = useDetailedWeatherData({
         latitude: effectiveCoords.lat,
         longitude: effectiveCoords.lon,
-        // Left out for a Custom location: Open-Meteo forecasts it at its own ground elevation and reports that back
-        elevation: customLocation ? undefined : resolvedElevation,
+        // Left out for a Custom location with no Custom elevation: Open-Meteo forecasts it at its Ground elevation and reports that back
+        elevation: customLocation ? customElevation ?? undefined : resolvedElevation,
         models: coveringModels,
         variables: selectedVariables,
         forecastDays,
     });
-    const customElevation = customLocation ? forecastElevation : null;
+    const reportedGroundElevation = customElevation === null ? forecastElevation : null;
+    const groundElevation = customLocation ? reportedGroundElevation ?? rememberedGroundElevation : null;
+    // The height a Custom location is forecast at, once known
+    const customLocationElevation = customElevation ?? groundElevation;
+
+    const handleCustomElevationChange = useCallback((elevation: number | null) => {
+        if (reportedGroundElevation !== null) {
+            setRememberedGroundElevation(reportedGroundElevation);
+        }
+        setCustomElevation(elevation);
+    }, [reportedGroundElevation]);
+
+    // e.g. "2100m (ground 1845m)" while a Custom elevation is forecast; null until the height is known
+    const customLocationElevationText = customLocationElevation === null
+        ? null
+        : formatElevation(customLocationElevation, unitSystem) + (
+            groundElevation !== null && groundElevation !== customLocationElevation
+                ? ` (ground ${formatElevation(groundElevation, unitSystem)})`
+                : ''
+        );
 
     // Drop models that came back empty and Clones, leaving the Comparison models
     const { comparisonModels, dropped } = useMemo(
@@ -280,8 +307,7 @@ export function DetailedResortView({
                     resortName={resortName}
                     onMapClick={handleMapClick}
                     customLocation={customLocation}
-                    customElevation={customElevation}
-                    unitSystem={unitSystem}
+                    customElevationText={customLocationElevationText}
                 />
             </div>
 
@@ -362,10 +388,10 @@ export function DetailedResortView({
                         <>
                             <span>Lat: {customLocation.lat.toFixed(4)}</span>
                             <span>Lon: {customLocation.lon.toFixed(4)}</span>
-                            {customElevation === null ? (
+                            {customLocationElevationText === null ? (
                                 <span className="animate-pulse">Fetching elevation...</span>
                             ) : (
-                                <span>Elevation: {formatElevation(customElevation, unitSystem)}</span>
+                                <span>Elevation: {customLocationElevationText}</span>
                             )}
                         </>
                     ) : savedLocation ? (
@@ -411,7 +437,9 @@ export function DetailedResortView({
                         setIsChartLocked={setIsChartLocked}
                         fixedElevation={savedLocation?.elevation}
                         customLocation={customLocation}
+                        groundElevation={groundElevation}
                         customElevation={customElevation}
+                        setCustomElevation={handleCustomElevationChange}
                         onResetCustomLocation={handleResetCustomLocation}
                         utilityBarStyle={utilityBarStyle}
                     />
@@ -483,9 +511,10 @@ export function DetailedResortView({
                     title="Save location"
                     submitLabel="Save"
                     initialName={suggestedName(customLocation.lat, customLocation.lon)}
-                    // The ground elevation the forecast reported; empty for the visitor to fill if none arrives
-                    initialElevation={customElevation}
-                    isLoadingElevation={customElevation === null && isLoading}
+                    // The height being forecast: the Custom elevation, or else the Ground elevation the forecast reported;
+                    // empty for the visitor to fill if none arrives
+                    initialElevation={customLocationElevation}
+                    isLoadingElevation={customLocationElevation === null && isLoading}
                     unitSystem={unitSystem}
                     onSubmit={({ name, elevation }) => {
                         setDialog(null);

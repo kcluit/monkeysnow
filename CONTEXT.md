@@ -22,8 +22,16 @@ _Avoid_: province, state (as the general term)
 One of a **Resort**'s three forecast heights: base (`bot`), mid or top.
 _Avoid_: level, elevation (when meaning the band rather than a height in metres)
 
+**Ground elevation**:
+The height of the terrain at a point, as Open-Meteo knows it. A **Custom location** is forecast at its Ground elevation unless the visitor types a **Custom elevation**.
+_Avoid_: default elevation, terrain height
+
+**Custom elevation**:
+A height the visitor types to be forecast at, in place of an **Elevation band** on a **Resort** or the **Ground elevation** of a **Custom location**. On a **Custom location** it belongs to that one point: picking another point, or leaving it, goes back to the **Ground elevation**.
+_Avoid_: manual elevation, override
+
 **Custom location**:
-A point a visitor picks on the map of a **Resort** or a **Saved location**, forecast at its own ground elevation in place of the one they picked it from. It is not kept unless the visitor saves it as a new **Saved location**; an existing **Saved location** never moves.
+A point a visitor picks on the map of a **Resort** or a **Saved location**, forecast at its **Ground elevation** (or a **Custom elevation**) in place of the one they picked it from. It is not kept unless the visitor saves it as a new **Saved location**; an existing **Saved location** never moves.
 _Avoid_: pin, spot, point, location (on its own)
 
 **Saved location**:

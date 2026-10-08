@@ -6,7 +6,7 @@ import type { WeatherModel, WeatherVariable, HourlyDataPoint, TimezoneInfo } fro
 export interface UseDetailedWeatherDataProps {
     latitude: number;
     longitude: number;
-    /** Height to forecast for; left out for a Custom location, which is forecast at its own ground elevation */
+    /** Height to forecast for; left out to forecast a Custom location at its Ground elevation */
     elevation?: number;
     models: WeatherModel[];
     variables: WeatherVariable[];
@@ -44,6 +44,8 @@ interface Session {
 }
 
 interface ForecastState {
+    /** The Session this state was fetched for */
+    key: string;
     data: ReadonlyMap<WeatherModel, HourlyDataPoint[]>;
     unavailable: ReadonlySet<WeatherModel>;
     loading: ReadonlySet<WeatherModel>;
@@ -85,7 +87,13 @@ export function useDetailedWeatherData({
     variables,
     forecastDays,
 }: UseDetailedWeatherDataProps): UseDetailedWeatherDataReturn {
+    const forecastKey = JSON.stringify([latitude, longitude, elevation ?? null, forecastDays]);
+    // Sorted, so reordering models or variables changes nothing
+    const modelsKey = [...models].sort().join(',');
+    const variablesKey = [...variables].sort().join(',');
+
     const [state, setState] = useState<ForecastState>(() => ({
+        key: forecastKey,
         data: new Map(),
         unavailable: new Set(),
         // Loading from the first paint, so the page never flashes an empty state
@@ -95,18 +103,13 @@ export function useDetailedWeatherData({
     }));
     const sessionRef = useRef<Session | null>(null);
 
-    const forecastKey = JSON.stringify([latitude, longitude, elevation ?? null, forecastDays]);
-    // Sorted, so reordering models or variables changes nothing
-    const modelsKey = [...models].sort().join(',');
-    const variablesKey = [...variables].sort().join(',');
-
     useEffect(() => {
         let session = sessionRef.current;
         if (!session || session.key !== forecastKey) {
             if (session) abortSession(session);
             session = { key: forecastKey, fetched: new Map(), inFlight: new Map(), unavailable: new Set() };
             sessionRef.current = session;
-            setState({ data: new Map(), unavailable: new Set(), loading: new Set(), timezoneInfo: null, elevation: null });
+            setState({ key: forecastKey, data: new Map(), unavailable: new Set(), loading: new Set(), timezoneInfo: null, elevation: null });
         }
         const current = session;
 
@@ -131,9 +134,9 @@ export function useDetailedWeatherData({
                     current.inFlight.delete(model);
                     current.fetched.set(model, request.variables);
                     setState((s) => ({
+                        ...s,
                         // A model with no hourly data is kept as empty, so it's dropped as having no data here
                         data: new Map(s.data).set(model, result.data.get(model) ?? []),
-                        unavailable: s.unavailable,
                         loading: without(s.loading, model),
                         timezoneInfo: s.timezoneInfo ?? result.timezoneInfo,
                         elevation: s.elevation ?? result.elevation,
@@ -209,6 +212,7 @@ export function useDetailedWeatherData({
         unavailableModels: state.unavailable,
         loadingModels: state.loading,
         timezoneInfo: state.timezoneInfo,
-        elevation: state.elevation,
+        // Until the effect starts the new Session, the state is the last one's, whose elevation was for another point or height
+        elevation: state.key === forecastKey ? state.elevation : null,
     };
 }
