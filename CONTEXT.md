@@ -67,7 +67,7 @@ The area a **Forecast model** produces its own forecasts for. Outside it, a mode
 _Avoid_: domain, region (when meaning a model's area)
 
 **Seamless model**:
-A **Forecast model** that blends a **Provider**'s high-resolution regional model with a coarser global one, switching by location.
+A **Forecast model** that blends a **Provider**'s high-resolution models, which each cover part of the world, with a coarser global model (its own or ECMWF's), switching by location and forecast hour.
 _Avoid_: combined model, blend
 
 **Clone**:
