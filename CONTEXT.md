@@ -15,7 +15,7 @@ A named, operating downhill **Ski area** with at least one lift and a known elev
 _Avoid_: location, mountain, spot
 
 **Region**:
-An administrative area inside a country, such as a state, province, canton or prefecture, used to group **Resorts** for picking. Only countries with many **Resorts** are split into Regions.
+An administrative area inside a country, such as a state, province, canton or prefecture, used to group **Resorts** for picking. A country is split into Regions only when it has many **Resorts** and its Regions each hold several; the rest list their **Resorts** directly.
 _Avoid_: province, state (as the general term)
 
 **Elevation band**:
