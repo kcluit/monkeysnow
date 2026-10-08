@@ -79,7 +79,7 @@ A visitor's own list of **Forecast models**, one list for every **Resort**. Out 
 _Avoid_: selected models, default models, **Selection** (that is **Resorts**)
 
 **Comparison models**:
-The **Preferred models** whose **Coverage** includes a **Resort**, minus **Clones**. These are the models drawn side by side in that **Resort**'s detail view.
+The **Preferred models** whose **Coverage** includes the point being forecast (a **Resort** or a **Custom location**), minus **Clones**. These are the models drawn side by side in the detail view.
 _Avoid_: selected models, model selection
 
 **Aggregation**:
