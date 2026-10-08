@@ -149,13 +149,29 @@ function App(): JSX.Element {
     // Local storage state
     const [selectedResorts, setSelectedResorts] = useLocalStorage<string[]>('selectedResorts', defaultSelectedResorts);
 
+    // First visit: start the Selection with the Starter resort
+    const [hasInitialized, setHasInitialized] = useLocalStorage<boolean>('hasInitializedResorts', false);
+    const [landingPath] = useState(useLocation().pathname);
+
+    useEffect(() => {
+        if (hasInitialized) return;
+        const controller = new AbortController();
+        pickStarterResort(landingPath, controller.signal).then((resortId) => {
+            if (controller.signal.aborted) return;
+            setSelectedResorts([resortId]);
+            setHasInitialized(true);
+        });
+        return () => controller.abort();
+    }, [hasInitialized, landingPath, setSelectedResorts, setHasInitialized]);
+
     // Weather data hook — keeps the selection's forecasts loaded within the Fetch budget
     const { allWeatherData, loading: weatherLoading, queuedCount, queuedCalls, createLoadingController, cancelLoading } = useWeatherData(selectedResorts);
 
-    // Only block UI if NO cached data at all, and not through a rate-limit pause
-    // (that can last until tomorrow; the home page explains it in its status row)
+    // Block UI while the Starter resort is picked, and if there is NO cached data at all,
+    // but not through a rate-limit pause (that can last until tomorrow; the home page
+    // explains it in its status row)
     const fetchPause = useBudgetPause();
-    const loading = !fetchPause && ((!allWeatherData && weatherLoading) || (!allWeatherData && hierarchyLoading));
+    const loading = !hasInitialized || (!fetchPause && ((!allWeatherData && weatherLoading) || (!allWeatherData && hierarchyLoading)));
     const [selectedElevation, setSelectedElevation] = useLocalStorage<ElevationLevel>('selectedElevation', defaultElevation);
     const [selectedSort, setSelectedSort] = useLocalStorage<SortOption>('selectedSort', defaultSort);
     const [selectedSortDay, setSelectedSortDay] = useLocalStorage<SortDay>('selectedSortDay', defaultSortDay);
