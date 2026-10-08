@@ -84,6 +84,7 @@ export function useDetailedWeatherData({
 
         // Initialize with empty map
         setData(new Map());
+        setUnavailableModels(new Set());
         setTimezoneInfo(null); // Reset timezone on new fetch
         setLoading(true);
         setError(null);
