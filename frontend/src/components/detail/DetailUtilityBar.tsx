@@ -106,9 +106,9 @@ function LargeDetailUtilityBar({
         }
     };
 
-    // Get model button text
+    // Get model button text: Comparison models shown here / Preferred models
     const getModelButtonText = (): string => {
-        const modelCount = selectedModels.length;
+        const modelCount = `${modelAvailability.shownModelCount}/${selectedModels.length}`;
         const aggCount = selectedAggregations.length;
         if (aggCount > 0) {
             return `Models (${modelCount} + ${aggCount})`;
