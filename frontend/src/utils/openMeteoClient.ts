@@ -105,35 +105,7 @@ function generateMockData(
   };
 }
 
-// Location data structure from locations.json
-interface ResortLocation {
-  bot: number;
-  mid: number;
-  top: number;
-  loc: [number, number]; // [lat, lon]
-}
-
-// Flatten locations.json for easy lookup
-function buildLocationMap(): Map<string, ResortLocation> {
-  const map = new Map<string, ResortLocation>();
-
-  function traverse(obj: unknown, path: string[] = []): void {
-    if (obj && typeof obj === 'object' && 'loc' in obj && 'bot' in obj) {
-      // This is a resort location
-      const key = path[path.length - 1];
-      map.set(key, obj as ResortLocation);
-    } else if (obj && typeof obj === 'object') {
-      for (const [key, value] of Object.entries(obj)) {
-        traverse(value, [...path, key]);
-      }
-    }
-  }
-
-  traverse(locationsData);
-  return map;
-}
-
-const LOCATION_MAP = buildLocationMap();
+const LOCATION_MAP = RESORT_LOCATIONS;
 
 // Get resort location by name (API format like "Big-White")
 export function getResortLocation(resortName: string): ResortLocation | null {
