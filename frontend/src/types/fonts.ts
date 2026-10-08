@@ -180,7 +180,7 @@ export const fonts: Font[] = [
   {
     id: 'open-dyslexic',
     name: 'OpenDyslexic',
-    family: "'OpenDyslexic', sans-serif",
+    family: "'Open-Dyslexic', 'OpenDyslexic', sans-serif", // cdnfonts names the family 'Open-Dyslexic'
     googleFontsUrl: 'https://fonts.cdnfonts.com/css/open-dyslexic',
     isMonospace: false,
   },
