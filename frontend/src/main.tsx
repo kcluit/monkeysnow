@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { HierarchyProvider } from './contexts/HierarchyContext'
+import { MAX_SELECTED_RESORTS } from './hooks/useResortHierarchy'
 import './style.css'
 
 // Main app wrapper
