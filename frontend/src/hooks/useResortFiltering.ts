@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { processResortData } from '../utils/weather';
+import { RESORT_LOCATIONS } from '../data/resortLocations';
 import type {
   AllWeatherData,
   ElevationLevel,
