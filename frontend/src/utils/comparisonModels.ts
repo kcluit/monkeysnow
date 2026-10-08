@@ -66,7 +66,7 @@ export function isClone(a: HourlyDataPoint[], b: HourlyDataPoint[]): boolean {
  */
 export function resolveComparisonModels(
     fetchedModels: WeatherModel[],
-    data: Map<WeatherModel, HourlyDataPoint[]> | null,
+    data: ReadonlyMap<WeatherModel, HourlyDataPoint[]> | null,
     unavailable: ReadonlySet<WeatherModel>
 ): ComparisonModelsResult {
     const dropped = new Map<WeatherModel, DroppedModel>();

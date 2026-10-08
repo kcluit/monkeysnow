@@ -1,8 +1,6 @@
 import type { DetailUtilityBarProps } from '../../types/detailView';
 import type { ElevationSelection } from '../../types/detailView';
-import { useModelHierarchy } from '../../hooks/useModelHierarchy';
 import { useVariableSelection } from '../../hooks/useVariableSelection';
-import { ModelSelectionGridModal } from '../ModelSelectionModal';
 import { VariableSelectionModal } from '../VariableSelectionModal';
 import { formatElevation } from '../../utils/unitConversion';
 import { Icon } from '../Icon';
@@ -11,20 +9,12 @@ import { icons } from '../../constants/icons';
 export function CompactDetailUtilityBar({
     onBack,
     unitSystem,
-    selectedModels,
-    setSelectedModels,
+    shownModelCount,
+    preferredModelCount,
+    aggregationCount,
+    onOpenModels,
     selectedVariables,
     setSelectedVariables,
-    selectedAggregations,
-    setSelectedAggregations,
-    aggregationColors,
-    setAggregationColors,
-    hideAggregationMembers,
-    setHideAggregationMembers,
-    showMinMaxFill,
-    setShowMinMaxFill,
-    showPercentileFill,
-    setShowPercentileFill,
     elevationSelection,
     setElevationSelection,
     forecastDays,
@@ -33,20 +23,9 @@ export function CompactDetailUtilityBar({
     setIsChartLocked,
     fixedElevation,
     customLocation,
+    customElevation,
     onResetCustomLocation,
-    isLoadingElevation,
-    modelAvailability,
 }: DetailUtilityBarProps): JSX.Element {
-    // Model hierarchy hook for modal
-    const modelHierarchy = useModelHierarchy({
-        selectedModels,
-        onModelsChange: setSelectedModels,
-        selectedAggregations,
-        onAggregationsChange: setSelectedAggregations,
-        aggregationColors,
-        onAggregationColorsChange: setAggregationColors,
-    });
-
     // Variable selection hook for modal
     const variableSelection = useVariableSelection({
         selectedVariables,
@@ -82,9 +61,8 @@ export function CompactDetailUtilityBar({
 
     // Model button text: Comparison models shown here / Preferred models
     const getModelButtonText = (): string => {
-        const modelCount = `${modelAvailability.shownModelCount}/${selectedModels.length}`;
-        const aggCount = selectedAggregations.length;
-        if (aggCount > 0) return `Models (${modelCount}+${aggCount})`;
+        const modelCount = `${shownModelCount}/${preferredModelCount}`;
+        if (aggregationCount > 0) return `Models (${modelCount}+${aggregationCount})`;
         return `Models (${modelCount})`;
     };
 
@@ -104,7 +82,7 @@ export function CompactDetailUtilityBar({
 
                     {/* Models - opens modal */}
                     <button
-                        onClick={modelHierarchy.openModal}
+                        onClick={onOpenModels}
                         className="compact-bar-text text-theme-textSecondary hover:text-theme-textPrimary hover:font-bold transition-colors"
                     >
                         {getModelButtonText()}
@@ -126,9 +104,9 @@ export function CompactDetailUtilityBar({
                         </button>
                     ) : (
                         <span className="compact-bar-text text-theme-accent">
-                            {isLoadingElevation || customLocation.elevation === null
+                            {customElevation === null
                                 ? '...'
-                                : formatElevation(customLocation.elevation!, unitSystem)}
+                                : formatElevation(customElevation, unitSystem)}
                         </span>
                     )}
 
@@ -176,18 +154,6 @@ export function CompactDetailUtilityBar({
                     )}
                 </div>
             </div>
-
-            {/* Model Selection Modal */}
-            <ModelSelectionGridModal
-                hierarchy={modelHierarchy}
-                modelAvailability={modelAvailability}
-                hideAggregationMembers={hideAggregationMembers}
-                onToggleHideMembers={() => setHideAggregationMembers(!hideAggregationMembers)}
-                showMinMaxFill={showMinMaxFill}
-                onToggleMinMaxFill={() => setShowMinMaxFill(!showMinMaxFill)}
-                showPercentileFill={showPercentileFill}
-                onTogglePercentileFill={() => setShowPercentileFill(!showPercentileFill)}
-            />
 
             {/* Variable Selection Modal */}
             <VariableSelectionModal selection={variableSelection} />

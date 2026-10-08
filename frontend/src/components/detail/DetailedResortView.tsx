@@ -1,12 +1,14 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useDetailedWeatherData } from '../../hooks/useDetailedWeatherData';
-import { useElevationFetch } from '../../hooks/useElevationFetch';
 import { useBudgetPause } from '../../hooks/useBudgetPause';
+import { useModelHierarchy } from '../../hooks/useModelHierarchy';
+import { useLanguage } from '../../hooks/useLanguage';
 import { FetchStatus } from '../FetchStatus';
 import { DetailUtilityBar } from './DetailUtilityBar';
 import { DetailChartGrid } from './DetailChartGrid';
 import { SavedLocationDialog } from './SavedLocationDialog';
+import { ModelSelectionGridModal } from '../ModelSelectionModal';
 import { ResortMap } from '../map/ResortMap';
 import { suggestedName, updateSavedLocation, type SavedLocationInput } from '../../utils/savedLocations';
 import { MAX_SELECTED_RESORTS } from '../../hooks/useResortHierarchy';
@@ -50,6 +52,25 @@ const DEFAULT_AGGREGATION_COLORS: Record<AggregationType, string> = {
     p75: aggregationOptions.find(a => a.id === 'p75')?.defaultColor ?? '#10b981',
 };
 
+/** Shown in place of the charts when there is nothing to draw, with a way to pick other models. */
+function NoChartsNotice({ message, actionLabel, onAction }: {
+    message: string;
+    actionLabel: string;
+    onAction: () => void;
+}): JSX.Element {
+    return (
+        <div className="text-center py-12">
+            <div className="text-theme-textSecondary text-lg">{message}</div>
+            <button
+                onClick={onAction}
+                className="mt-4 px-4 py-2 rounded-lg bg-theme-accent text-white hover:opacity-90 transition-opacity"
+            >
+                {actionLabel}
+            </button>
+        </div>
+    );
+}
+
 export function DetailedResortView({
     resortId: _resortId,
     resortName,
@@ -65,6 +86,8 @@ export function DetailedResortView({
     selectionWasFull = false,
     onDismissSelectionWasFull,
 }: DetailedResortViewPropsWithUnits): JSX.Element {
+    const { t } = useLanguage();
+
     // The visitor's Preferred models: one list for every Resort, starting as the Recommended models.
     // New keys wipe saved model lists and Aggregations once (docs/adr/0003, docs/adr/0005).
     const [preferredModels, setPreferredModels] = useLocalStorage<WeatherModel[]>(
@@ -145,37 +168,11 @@ export function DetailedResortView({
 
     // Custom location state (temporary - NOT persisted unless saved as a Saved location)
     const [customLocation, setCustomLocation] = useState<CustomLocation | null>(null);
-    const [isLoadingElevation, setIsLoadingElevation] = useState(false);
-    // The 0 m fallback below is fine to forecast at for a moment, but never to save
-    const [elevationLookupFailed, setElevationLookupFailed] = useState(false);
 
-    // Elevation fetch hook
-    const { fetchElevation } = useElevationFetch();
-
-    // Handle map click - set custom location and fetch elevation
-    const handleMapClick = useCallback(async (lat: number, lon: number) => {
-        // Set custom location immediately with null elevation
-        setCustomLocation({ lat, lon, elevation: null });
-        setIsLoadingElevation(true);
-        setElevationLookupFailed(false);
-
-        try {
-            const elevation = await fetchElevation(lat, lon);
-            setCustomLocation({ lat, lon, elevation });
-            setIsLoadingElevation(false);
-        } catch (error) {
-            if ((error as Error).name === 'AbortError') {
-                // Request was cancelled (user clicked again), don't update state
-                // The next click will manage loading state
-                return;
-            }
-            console.error('Failed to fetch elevation:', error);
-            // Fall back to 0m elevation on error
-            setCustomLocation({ lat, lon, elevation: 0 });
-            setIsLoadingElevation(false);
-            setElevationLookupFailed(true);
-        }
-    }, [fetchElevation]);
+    // A click on the map forecasts that point at its own ground elevation
+    const handleMapClick = useCallback((lat: number, lon: number) => {
+        setCustomLocation({ lat, lon });
+    }, []);
 
     // Reset custom location to return to original resort
     const handleResetCustomLocation = useCallback(() => {
@@ -194,15 +191,6 @@ export function DetailedResortView({
         }
         return { lat: location.lat, lon: location.lon };
     }, [customLocation, location.lat, location.lon]);
-
-    // Compute effective elevation for weather data
-    const effectiveElevation = useMemo(() => {
-        if (customLocation?.elevation !== null && customLocation?.elevation !== undefined) {
-            return customLocation.elevation;
-        }
-        // While loading custom elevation, use resolved resort elevation
-        return resolvedElevation;
-    }, [customLocation, resolvedElevation]);
 
     // Toggle variable visibility (for the eye icon on each chart)
     const toggleVariable = useCallback((variable: WeatherVariable) => {
@@ -223,15 +211,16 @@ export function DetailedResortView({
     );
 
     // Fetch weather data using effective coordinates
-    const { data, unavailableModels, timezoneInfo, loading, error, refetch } = useDetailedWeatherData({
+    const { data, unavailableModels, loadingModels, timezoneInfo, elevation: forecastElevation } = useDetailedWeatherData({
         latitude: effectiveCoords.lat,
         longitude: effectiveCoords.lon,
-        elevation: effectiveElevation,
+        // Left out for a Custom location: Open-Meteo forecasts it at its own ground elevation and reports that back
+        elevation: customLocation ? undefined : resolvedElevation,
         models: coveringModels,
         variables: selectedVariables,
         forecastDays,
-        enabled: true,
     });
+    const customElevation = customLocation ? forecastElevation : null;
 
     // Drop models that came back empty and Clones, leaving the Comparison models
     const { comparisonModels, dropped } = useMemo(
@@ -245,12 +234,22 @@ export function DetailedResortView({
         shownModelCount: comparisonModels.length,
     }), [effectiveCoords, dropped, comparisonModels.length]);
 
+    // The Models modal lives here rather than in the utility bar, so the notices below can open it too
+    const modelHierarchy = useModelHierarchy({
+        selectedModels: preferredModels,
+        onModelsChange: setPreferredModels,
+        selectedAggregations,
+        onAggregationsChange: setSelectedAggregations,
+        aggregationColors,
+        onAggregationColorsChange: setAggregationColors,
+    });
+
     // One time axis for every chart, spanning the Comparison models' forecasts
     const axisRange = useMemo(() => {
         let start = Infinity;
         let end = -Infinity;
         for (const model of comparisonModels) {
-            const points = data?.get(model);
+            const points = data.get(model);
             if (!points || points.length === 0) continue;
             start = Math.min(start, points[0].timestamp);
             end = Math.max(end, points[points.length - 1].timestamp);
@@ -267,7 +266,8 @@ export function DetailedResortView({
 
     // During a rate-limit pause, say how many models are still waiting instead of a bare spinner
     const pause = useBudgetPause();
-    const pendingModels = Math.max(0, coveringModels.length - (data?.size ?? 0) - unavailableModels.size);
+    const pendingModels = coveringModels.filter((model) => loadingModels.has(model)).length;
+    const isLoading = pendingModels > 0;
 
     return (
         <div>
@@ -280,8 +280,8 @@ export function DetailedResortView({
                     resortName={resortName}
                     onMapClick={handleMapClick}
                     customLocation={customLocation}
-                    customElevation={customLocation?.elevation}
-                    isLoadingElevation={isLoadingElevation}
+                    customElevation={customElevation}
+                    unitSystem={unitSystem}
                 />
             </div>
 
@@ -362,10 +362,10 @@ export function DetailedResortView({
                         <>
                             <span>Lat: {customLocation.lat.toFixed(4)}</span>
                             <span>Lon: {customLocation.lon.toFixed(4)}</span>
-                            {isLoadingElevation || customLocation.elevation === null ? (
+                            {customElevation === null ? (
                                 <span className="animate-pulse">Fetching elevation...</span>
                             ) : (
-                                <span>Elevation: {formatElevation(customLocation.elevation, unitSystem)}</span>
+                                <span>Elevation: {formatElevation(customElevation, unitSystem)}</span>
                             )}
                         </>
                     ) : savedLocation ? (
@@ -395,20 +395,12 @@ export function DetailedResortView({
                     <DetailUtilityBar
                         onBack={onBack}
                         unitSystem={unitSystem}
-                        selectedModels={preferredModels}
-                        setSelectedModels={setPreferredModels}
+                        shownModelCount={comparisonModels.length}
+                        preferredModelCount={preferredModels.length}
+                        aggregationCount={selectedAggregations.length}
+                        onOpenModels={modelHierarchy.openModal}
                         selectedVariables={selectedVariables}
                         setSelectedVariables={setSelectedVariables}
-                        selectedAggregations={selectedAggregations}
-                        setSelectedAggregations={setSelectedAggregations}
-                        aggregationColors={aggregationColors}
-                        setAggregationColors={setAggregationColors}
-                        hideAggregationMembers={hideAggregationMembers}
-                        setHideAggregationMembers={setHideAggregationMembers}
-                        showMinMaxFill={showMinMaxFill}
-                        setShowMinMaxFill={setShowMinMaxFill}
-                        showPercentileFill={showPercentileFill}
-                        setShowPercentileFill={setShowPercentileFill}
                         elevationSelection={elevationSelection}
                         setElevationSelection={setElevationSelection}
                         resolvedElevation={resolvedElevation}
@@ -419,46 +411,27 @@ export function DetailedResortView({
                         setIsChartLocked={setIsChartLocked}
                         fixedElevation={savedLocation?.elevation}
                         customLocation={customLocation}
+                        customElevation={customElevation}
                         onResetCustomLocation={handleResetCustomLocation}
-                        isLoadingElevation={isLoadingElevation}
                         utilityBarStyle={utilityBarStyle}
-                        modelAvailability={modelAvailability}
                     />
                 </div>
             )}
 
-            {/* Loading State - Only show when no data at all */}
-            {loading && !data && (
-                <div className="text-center py-12">
-                    <div className="text-xl font-semibold text-theme-textSecondary">
-                        Loading forecast data...
-                    </div>
-                    <div className="text-sm text-theme-textSecondary mt-2">
-                        Fetching from {coveringModels.length} weather model(s)
-                    </div>
-                </div>
-            )}
-
-            {/* Error State - Only show if no data and not loading (completed with error) */}
-            {error && !loading && !data && (
-                <div className="text-center py-12">
-                    <div className="text-xl font-semibold text-red-600">
-                        Error loading forecast data
-                    </div>
-                    <div className="text-sm text-theme-textSecondary mt-2">
-                        {error.message}
-                    </div>
-                    <button
-                        onClick={refetch}
-                        className="mt-4 px-4 py-2 rounded-lg bg-theme-accent text-white hover:opacity-90 transition-opacity"
-                    >
-                        Retry
-                    </button>
-                </div>
-            )}
-
-            {/* Charts */}
-            {data && (
+            {/* Charts, or why there are none */}
+            {coveringModels.length === 0 ? (
+                <NoChartsNotice
+                    message={t('detail.noModelCovers')}
+                    actionLabel={t('detail.chooseModels')}
+                    onAction={modelHierarchy.openModal}
+                />
+            ) : !isLoading && comparisonModels.length === 0 ? (
+                <NoChartsNotice
+                    message={t('detail.noModelHasData')}
+                    actionLabel={t('detail.chooseModels')}
+                    onAction={modelHierarchy.openModal}
+                />
+            ) : (
                 <>
                     <DetailChartGrid
                         data={data}
@@ -473,11 +446,11 @@ export function DetailedResortView({
                         modelLineOpacity={modelLineOpacity}
                         unitSystem={unitSystem}
                         isChartLocked={isChartLocked}
-                        isLoading={loading}
+                        isLoading={isLoading}
                         onToggleVariable={toggleVariable}
                         location={location}
                     />
-                    {loading && (pause ? (
+                    {isLoading && (pause ? (
                         <FetchStatus
                             count={pendingModels}
                             calls={pendingModels}
@@ -485,7 +458,7 @@ export function DetailedResortView({
                             onlyWhenLimited
                             className="text-center py-2 text-sm text-theme-textSecondary"
                         />
-                    ) : (
+                    ) : comparisonModels.length > 0 && (
                         <div className="text-center py-2 text-sm text-theme-textSecondary animate-pulse">
                             Loading additional model data...
                         </div>
@@ -493,22 +466,26 @@ export function DetailedResortView({
                 </>
             )}
 
-            {/* No data state */}
-            {!loading && !error && !data && (
-                <div className="text-center py-12">
-                    <div className="text-theme-textSecondary text-lg">
-                        Select models and variables to view forecast
-                    </div>
-                </div>
-            )}
+            {/* Model Selection Modal */}
+            <ModelSelectionGridModal
+                hierarchy={modelHierarchy}
+                modelAvailability={modelAvailability}
+                hideAggregationMembers={hideAggregationMembers}
+                onToggleHideMembers={() => setHideAggregationMembers(!hideAggregationMembers)}
+                showMinMaxFill={showMinMaxFill}
+                onToggleMinMaxFill={() => setShowMinMaxFill(!showMinMaxFill)}
+                showPercentileFill={showPercentileFill}
+                onTogglePercentileFill={() => setShowPercentileFill(!showPercentileFill)}
+            />
 
             {dialog === 'save' && customLocation && (
                 <SavedLocationDialog
                     title="Save location"
                     submitLabel="Save"
                     initialName={suggestedName(customLocation.lat, customLocation.lon)}
-                    initialElevation={elevationLookupFailed ? null : customLocation.elevation}
-                    isLoadingElevation={isLoadingElevation}
+                    // The ground elevation the forecast reported; empty for the visitor to fill if none arrives
+                    initialElevation={customElevation}
+                    isLoadingElevation={customElevation === null && isLoading}
                     unitSystem={unitSystem}
                     onSubmit={({ name, elevation }) => {
                         setDialog(null);

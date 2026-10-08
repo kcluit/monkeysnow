@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 're
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useFullscreenView } from '../../hooks/useFullscreenView';
+import { formatElevation, type UnitSystem } from '../../utils/unitConversion';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -45,8 +46,9 @@ interface ResortMapProps {
     // Custom location feature props
     onMapClick?: (lat: number, lon: number) => void;
     customLocation?: { lat: number; lon: number } | null;
+    /** The Custom location's ground elevation in metres, or null until the forecast reports it */
     customElevation?: number | null;
-    isLoadingElevation?: boolean;
+    unitSystem: UnitSystem;
 }
 
 // Inner component to invalidate map size whenever its container resizes
@@ -79,7 +81,7 @@ export function ResortMap({
     onMapClick,
     customLocation,
     customElevation,
-    isLoadingElevation,
+    unitSystem,
 }: ResortMapProps): JSX.Element {
     const hasCustomLocation = customLocation !== null && customLocation !== undefined;
     const [isExpanded, setIsExpanded] = useState(false);
@@ -146,11 +148,11 @@ export function ResortMap({
                                     <div className="font-semibold mb-1">Custom Location</div>
                                     <div className="text-gray-600">Lat: {customLocation.lat.toFixed(4)}</div>
                                     <div className="text-gray-600">Lon: {customLocation.lon.toFixed(4)}</div>
-                                    {isLoadingElevation ? (
+                                    {customElevation === null || customElevation === undefined ? (
                                         <div className="text-gray-500 italic mt-1">Loading elevation...</div>
-                                    ) : customElevation !== null && customElevation !== undefined ? (
-                                        <div className="text-gray-600 mt-1">Elevation: {customElevation}m</div>
-                                    ) : null}
+                                    ) : (
+                                        <div className="text-gray-600 mt-1">Elevation: {formatElevation(customElevation, unitSystem)}</div>
+                                    )}
                                 </div>
                             </Popup>
                         </Marker>

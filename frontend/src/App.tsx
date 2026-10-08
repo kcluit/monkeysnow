@@ -236,7 +236,10 @@ function App(): JSX.Element {
 
     // First visit: start the Selection with the Starter resort
     const [hasInitialized, setHasInitialized] = useLocalStorage<boolean>('hasInitializedResorts', false);
-    const [landingPath] = useState(useLocation().pathname);
+    const { pathname } = useLocation();
+    const [landingPath] = useState(pathname);
+    // Only the home page shows the Selection, so only it waits for (or fails with) the Selection's forecasts
+    const isHomePage = pathname === '/';
 
     useEffect(() => {
         if (hasInitialized) return;
@@ -759,7 +762,7 @@ function App(): JSX.Element {
     const isTruncated = effectiveDisplayLimit > 0 && selectedResorts.length > effectiveDisplayLimit;
 
     // Forecasts failed to load and nothing cached — error state
-    if (!allWeatherData && weatherError) {
+    if (isHomePage && !allWeatherData && weatherError) {
         return (
             <div className="min-h-screen p-4 sm:p-6 md:p-8 flex items-center justify-center bg-theme-background transition-colors duration-300 overflow-x-hidden">
                 <div className="text-center">
@@ -771,7 +774,7 @@ function App(): JSX.Element {
     }
 
     // Show loading state
-    if (loading) {
+    if (isHomePage && loading) {
         return (
             <div className="min-h-screen p-4 sm:p-6 md:p-8 flex items-center justify-center bg-theme-background transition-colors duration-300 overflow-x-hidden">
                 <div className="text-center">

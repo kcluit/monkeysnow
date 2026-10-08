@@ -15,11 +15,11 @@ export interface ModelAvailabilityContext {
 // Elevation selection can be a preset type or a custom number
 export type ElevationSelection = 'base' | 'mid' | 'top' | number;
 
-// Custom location when user clicks on map (temporary unless saved as a Saved location)
+// Custom location when user clicks on map (temporary unless saved as a Saved location).
+// Its elevation is the ground elevation Open-Meteo reports with the forecast.
 export interface CustomLocation {
     lat: number;
     lon: number;
-    elevation: number | null;  // null while loading
 }
 
 // Detail view navigation state
@@ -82,20 +82,13 @@ export interface DetailViewHeaderProps {
 export interface DetailUtilityBarProps {
     onBack: () => void;
     unitSystem: UnitSystem;
-    selectedModels: WeatherModel[];
-    setSelectedModels: (models: WeatherModel[] | ((prev: WeatherModel[]) => WeatherModel[])) => void;
+    /** Comparison models drawn here, Preferred models and Aggregations, for the Models button */
+    shownModelCount: number;
+    preferredModelCount: number;
+    aggregationCount: number;
+    onOpenModels: () => void;
     selectedVariables: WeatherVariable[];
     setSelectedVariables: (variables: WeatherVariable[]) => void;
-    selectedAggregations: AggregationType[];
-    setSelectedAggregations: (aggregations: AggregationType[] | ((prev: AggregationType[]) => AggregationType[])) => void;
-    aggregationColors: Record<AggregationType, string>;
-    setAggregationColors: (colors: Record<AggregationType, string>) => void;
-    hideAggregationMembers: boolean;
-    setHideAggregationMembers: (hide: boolean) => void;
-    showMinMaxFill: boolean;
-    setShowMinMaxFill: (show: boolean) => void;
-    showPercentileFill: boolean;
-    setShowPercentileFill: (show: boolean) => void;
     elevationSelection: ElevationSelection;
     setElevationSelection: (selection: ElevationSelection) => void;
     resolvedElevation: number;
@@ -111,11 +104,11 @@ export interface DetailUtilityBarProps {
     /** A Saved location's one elevation, shown in place of the Base/Mid/Top choice */
     fixedElevation?: number;
     // Custom location state (temporary unless saved)
-    customLocation: import('./detailView').CustomLocation | null;
+    customLocation: CustomLocation | null;
+    /** The Custom location's ground elevation, once the forecast has reported it */
+    customElevation: number | null;
     onResetCustomLocation: () => void;
-    isLoadingElevation: boolean;
     utilityBarStyle: UtilityBarStyle;
-    modelAvailability: ModelAvailabilityContext;
 }
 
 export interface DetailChartGridProps {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useOverlay } from '../../hooks/useOverlay';
 import {
     MAX_SAVED_ELEVATION,
     MAX_SAVED_NAME_LENGTH,
@@ -13,9 +14,9 @@ interface SavedLocationDialogProps {
     title: string;
     submitLabel: string;
     initialName: string;
-    /** Metres; null leaves the field empty for the visitor to fill, e.g. when the lookup failed */
+    /** Metres; null leaves the field empty for the visitor to fill, e.g. when no forecast reported it */
     initialElevation: number | null;
-    /** True while the ground elevation is still being looked up */
+    /** True while the forecast that reports the ground elevation is still loading */
     isLoadingElevation?: boolean;
     unitSystem: UnitSystem;
     onSubmit: (values: { name: string; elevation: number }) => void;
@@ -42,7 +43,7 @@ export function SavedLocationDialog({
     const [name, setName] = useState(initialName);
     const [elevationText, setElevationText] = useState(initialElevation === null ? '' : toDisplay(initialElevation));
 
-    // Fill in the ground elevation once the lookup finishes, unless the visitor typed one already
+    // Fill in the ground elevation once the forecast reports it, unless the visitor typed one already
     useEffect(() => {
         if (initialElevation !== null) {
             setElevationText((current) => current || toDisplay(initialElevation));
@@ -50,20 +51,8 @@ export function SavedLocationDialog({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialElevation]);
 
-    // Esc cancels; Esc and Tab would otherwise also open the command palette
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-                onCancel();
-            } else if (e.key === 'Tab') {
-                e.stopImmediatePropagation();
-            }
-        };
-        window.addEventListener('keydown', handleKeyDown, true);
-        return () => window.removeEventListener('keydown', handleKeyDown, true);
-    }, [onCancel]);
+    // Esc cancels, the page behind can't scroll, and Tab moves between the fields
+    useOverlay(true, onCancel);
 
     const trimmedName = name.trim();
     const typed = Number(elevationText);

@@ -126,6 +126,9 @@ export interface Translations {
     'detail.loadingForecast': string;
     'detail.errorLoadingForecast': string;
     'detail.back': string;
+    'detail.noModelCovers': string;
+    'detail.noModelHasData': string;
+    'detail.chooseModels': string;
 }
 
 /**
@@ -271,6 +274,9 @@ export const TranslationsSchema = z.object({
     'detail.loadingForecast': z.string(),
     'detail.errorLoadingForecast': z.string(),
     'detail.back': z.string(),
+    'detail.noModelCovers': z.string(),
+    'detail.noModelHasData': z.string(),
+    'detail.chooseModels': z.string(),
 }) satisfies z.ZodType<Translations>;
 
 /**
