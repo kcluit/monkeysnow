@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 /**
- * Generates frontend/public/sitemap.xml by fetching the resort hierarchy
- * from the backend API. Run as part of the build step.
+ * Generates frontend/public/sitemap.xml from the bundled resort locations
+ * (src/data/locations.json). Run as part of the build step.
  */
 
-import { writeFile, mkdir } from 'fs/promises';
+import { readFile, writeFile, mkdir } from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = join(__dirname, '..', 'public');
 const SITEMAP_PATH = join(PUBLIC_DIR, 'sitemap.xml');
-const HIERARCHY_URL = 'https://snowscraper.camdvr.org/hierarchy';
+const LOCATIONS_PATH = join(__dirname, '..', 'src', 'data', 'locations.json');
 const SITE_URL = 'https://monkeysnow.com';
 
 const STATIC_ROUTES = [
@@ -21,22 +21,22 @@ const STATIC_ROUTES = [
   { path: '/privacy', changefreq: 'yearly',  priority: '0.2' },
 ];
 
-async function fetchResortIds() {
-  console.log(`Fetching hierarchy from ${HIERARCHY_URL}...`);
-  const response = await fetch(HIERARCHY_URL, {
-    signal: AbortSignal.timeout(15_000),
-  });
-  if (!response.ok) {
-    throw new Error(`Hierarchy API responded ${response.status}`);
-  }
-  const data = await response.json();
+// Continent -> Country -> [Province] -> Resort; some countries skip the province level
+const isResort = (value) => Boolean(value) && typeof value === 'object' && value.bot !== undefined;
+
+async function readResortIds() {
+  const locations = JSON.parse(await readFile(LOCATIONS_PATH, 'utf-8'));
 
   const ids = [];
-  for (const continent of data.continents ?? []) {
-    for (const country of continent.countries ?? []) {
-      for (const province of country.provinces ?? []) {
-        for (const resort of province.resorts ?? []) {
-          ids.push(resort.id);
+  for (const continent of Object.values(locations)) {
+    for (const country of Object.values(continent)) {
+      for (const [key, value] of Object.entries(country)) {
+        if (isResort(value)) {
+          ids.push(key);
+        } else if (value && typeof value === 'object') {
+          for (const [resortId, resort] of Object.entries(value)) {
+            if (isResort(resort)) ids.push(resortId);
+          }
         }
       }
     }
@@ -70,14 +70,8 @@ function buildSitemapXml(resortIds) {
 }
 
 async function main() {
-  let resortIds = [];
-  try {
-    resortIds = await fetchResortIds();
-    console.log(`Found ${resortIds.length} resorts.`);
-  } catch (err) {
-    console.warn(`Warning: Could not fetch hierarchy - ${err.message}`);
-    console.warn('Generating sitemap with static routes only.');
-  }
+  const resortIds = await readResortIds();
+  console.log(`Found ${resortIds.length} resorts.`);
 
   const xml = buildSitemapXml(resortIds);
   await mkdir(PUBLIC_DIR, { recursive: true });

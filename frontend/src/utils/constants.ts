@@ -61,7 +61,7 @@ export function getDisplayNameFallback(apiId: string): string {
 
 /**
  * @deprecated Use HierarchyContext's skiResorts instead.
- * This empty array is a placeholder - the actual resort list comes from the backend.
+ * This empty array is a placeholder - the actual resort list comes from the HierarchyContext.
  */
 export const skiResorts: string[] = [];
 

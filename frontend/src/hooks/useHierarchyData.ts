@@ -1,32 +1,8 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useEffect, useCallback } from 'react';
+import { RESORT_HIERARCHY } from '../data/resortLocations';
+import type { ContinentData } from '../data/resortLocations';
 
-// Types matching backend /hierarchy response
-export interface ResortInfo {
-  id: string;
-  displayName: string;
-}
-
-export interface ProvinceData {
-  id: string;
-  name: string;
-  resorts: ResortInfo[];
-}
-
-export interface CountryData {
-  id: string;
-  name: string;
-  provinces: ProvinceData[];
-}
-
-export interface ContinentData {
-  id: string;
-  name: string;
-  countries: CountryData[];
-}
-
-export interface HierarchyResponse {
-  continents: ContinentData[];
-}
+export type { ContinentData, CountryData, ProvinceData, ResortInfo } from '../data/resortLocations';
 
 export type HierarchyNodeType = 'continent' | 'country' | 'province' | 'resort';
 
@@ -37,8 +13,6 @@ export interface HierarchyNode {
   children?: HierarchyNode[];
   resortId?: string;
 }
-
-const API_URL = 'https://snowscraper.camdvr.org';
 
 /**
  * Converts hierarchy data to a flat HierarchyNode tree for UI rendering.
@@ -102,23 +76,27 @@ function getAllResortIds(hierarchy: ContinentData[]): string[] {
 }
 
 /**
- * Gets display name for a resort ID from the hierarchy.
+ * Builds a mapping of resortId -> displayName from hierarchy data.
  */
-function getDisplayNameFromHierarchy(hierarchy: ContinentData[], resortId: string): string {
+function buildDisplayNames(hierarchy: ContinentData[]): Map<string, string> {
+  const names = new Map<string, string>();
   for (const continent of hierarchy) {
     for (const country of continent.countries) {
       for (const province of country.provinces) {
         for (const resort of province.resorts) {
-          if (resort.id === resortId) {
-            return resort.displayName;
-          }
+          if (!names.has(resort.id)) names.set(resort.id, resort.displayName);
         }
       }
     }
   }
-  // Fallback: convert ID to readable name
-  return resortId.replace(/-/g, ' ');
+  return names;
 }
+
+// The hierarchy is bundled with the app, so everything derived from it is built once.
+const HIERARCHY_TREE = buildHierarchyTree(RESORT_HIERARCHY);
+const RESORT_ALIASES = buildResortAliases(RESORT_HIERARCHY);
+const SKI_RESORTS = getAllResortIds(RESORT_HIERARCHY);
+const DISPLAY_NAMES = buildDisplayNames(RESORT_HIERARCHY);
 
 export interface UseHierarchyDataReturn {
   hierarchy: ContinentData[] | null;
@@ -130,79 +108,24 @@ export interface UseHierarchyDataReturn {
   error: Error | null;
 }
 
-function readCachedHierarchy(): ContinentData[] | null {
-  try {
-    const raw = localStorage.getItem('hierarchyCache');
-    if (raw) return JSON.parse(raw) as ContinentData[];
-  } catch { /* ignore */ }
-  return null;
-}
-
 export function useHierarchyData(): UseHierarchyDataReturn {
-  const cached = readCachedHierarchy();
-  const [hierarchy, setHierarchy] = useState<ContinentData[] | null>(cached);
-  const [loading, setLoading] = useState(!cached);
-  const [error, setError] = useState<Error | null>(null);
-  const hierarchyRef = useRef(hierarchy);
-  hierarchyRef.current = hierarchy;
-
+  // Drop the copy of the hierarchy that used to be cached from the backend
   useEffect(() => {
-    const fetchHierarchy = async () => {
-      try {
-        if (!hierarchyRef.current) setLoading(true);
-        const response = await fetch(`${API_URL}/hierarchy`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data: HierarchyResponse = await response.json();
-        const fresh = data.continents;
-        // Only update state + localStorage if data actually changed
-        if (JSON.stringify(fresh) !== JSON.stringify(hierarchyRef.current)) {
-          setHierarchy(fresh);
-          try { localStorage.setItem('hierarchyCache', JSON.stringify(fresh)); } catch { /* ignore */ }
-        }
-      } catch (err) {
-        console.error('Failed to fetch hierarchy:', err);
-        // Only show error if no cached fallback
-        if (!hierarchyRef.current) {
-          setError(err instanceof Error ? err : new Error('Unknown error'));
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchHierarchy();
+    try { localStorage.removeItem('hierarchyCache'); } catch { /* ignore */ }
   }, []);
 
-  const hierarchyTree = useMemo(
-    () => (hierarchy ? buildHierarchyTree(hierarchy) : []),
-    [hierarchy]
-  );
-
-  const resortAliases = useMemo(
-    () => (hierarchy ? buildResortAliases(hierarchy) : {}),
-    [hierarchy]
-  );
-
-  const skiResorts = useMemo(
-    () => (hierarchy ? getAllResortIds(hierarchy) : []),
-    [hierarchy]
-  );
-
   const getDisplayName = useCallback(
-    (resortId: string) =>
-      hierarchy ? getDisplayNameFromHierarchy(hierarchy, resortId) : resortId.replace(/-/g, ' '),
-    [hierarchy]
+    (resortId: string) => DISPLAY_NAMES.get(resortId) ?? resortId.replace(/-/g, ' '),
+    []
   );
 
   return {
-    hierarchy,
-    hierarchyTree,
-    resortAliases,
-    skiResorts,
+    hierarchy: RESORT_HIERARCHY,
+    hierarchyTree: HIERARCHY_TREE,
+    resortAliases: RESORT_ALIASES,
+    skiResorts: SKI_RESORTS,
     getDisplayName,
-    loading,
-    error,
+    loading: false,
+    error: null,
   };
 }

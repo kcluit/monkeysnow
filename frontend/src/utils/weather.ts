@@ -22,42 +22,6 @@ import {
     formatFreezingLevel
 } from './unitConversion';
 
-const API_URL = 'https://snowscraper.camdvr.org';
-
-export async function fetchAllData(): Promise<AllWeatherData> {
-    try {
-        const response = await fetch(`${API_URL}/all`);
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        return await response.json();
-    } catch (err) {
-        console.error('Error fetching weather data:', err);
-        throw err;
-    }
-}
-
-export async function fetchSelectedResorts(resortNames: string[]): Promise<AllWeatherData> {
-    try {
-        const response = await fetch(`${API_URL}/resorts`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ resortNames }),
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        return await response.json();
-    } catch (err) {
-        console.error('Error fetching selected resorts:', err);
-        throw err;
-    }
-}
-
 export function processResortData(
     allData: AllWeatherData,
     resortName: string,
@@ -95,7 +59,7 @@ export function processResortData(
             if (!dayData) continue;
 
             const date = new Date(dateKey);
-            // Use getUTCDay() to match the date string from backend (which is in UTC)
+            // Use getUTCDay() to match the forecast date key (which is parsed as UTC)
             const dayName = daysInWeek[date.getUTCDay()];
             // Format date as "Jan 25" for optional display
             const dateDisplay = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });

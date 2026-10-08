@@ -1,6 +1,6 @@
 /**
  * Utility functions for working with resort hierarchy data.
- * The hierarchy data is now fetched from the backend via the HierarchyContext.
+ * The hierarchy data comes from the HierarchyContext.
  * These functions operate on passed-in data rather than static data.
  */
 
@@ -55,7 +55,7 @@ export function findNodeById(nodes: HierarchyNode[], id: string): HierarchyNode 
 
 /**
  * @deprecated Use HierarchyContext's hierarchyTree instead.
- * This function now returns an empty array as hierarchy data comes from the backend.
+ * This function now returns an empty array; use the HierarchyContext.
  */
 export function buildHierarchyTree(): HierarchyNode[] {
   console.warn('buildHierarchyTree() is deprecated. Use HierarchyContext instead.');

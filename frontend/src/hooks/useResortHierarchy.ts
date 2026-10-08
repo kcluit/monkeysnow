@@ -2,14 +2,21 @@
  * Hook for managing resort hierarchy state and navigation.
  * Provides tree navigation, selection tracking, and search filtering.
  *
- * This hook now gets hierarchy data from the HierarchyContext (fetched from backend).
+ * This hook gets hierarchy data from the HierarchyContext.
  */
 
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useHierarchy, type HierarchyNode } from '../contexts/HierarchyContext';
 import { useResortCache } from './useResortCache';
 
-export const MAX_SELECTED_RESORTS = 600;
+/** The Selection cap: sized so a full Selection loads within Open-Meteo's free limits. */
+export const MAX_SELECTED_RESORTS = 300;
+
+/** Shown when an add would go past the Selection cap; only `added` of `requested` fit. */
+export interface SelectionCapNotice {
+  added: number;
+  requested: number;
+}
 
 export interface UseResortHierarchyProps {
   selectedResorts: string[];
@@ -37,6 +44,7 @@ export interface UseResortHierarchyReturn {
   clearAllResorts: () => void;
   getSelectionState: (node: HierarchyNode) => 'all' | 'some' | 'none';
   getResortsUnderNode: (node: HierarchyNode) => string[];
+  capNotice: SelectionCapNotice | null;
 
   // Keyboard navigation
   selectedIndex: number;
@@ -83,7 +91,7 @@ export function useResortHierarchy({
   selectedResorts,
   onResortsChange,
 }: UseResortHierarchyProps): UseResortHierarchyReturn {
-  // Get hierarchy from context (fetched from backend)
+  // Get hierarchy from context
   const { hierarchyTree, loading: isLoading } = useHierarchy();
 
   // Modal state
@@ -93,6 +101,36 @@ export function useResortHierarchy({
   const [draftSelectedResorts, setDraftSelectedResorts] = useState<string[]>(selectedResorts);
   const draftRef = useRef(draftSelectedResorts);
   draftRef.current = draftSelectedResorts;
+  const [capNotice, setCapNotice] = useState<SelectionCapNotice | null>(null);
+
+  const setDraft = useCallback((next: string[]) => {
+    draftRef.current = next; // keep rapid clicks consistent before the re-render
+    setDraftSelectedResorts(next);
+  }, []);
+
+  // Adds resorts to the draft up to the Selection cap, and says so when some didn't fit
+  const addToDraft = useCallback((resortIds: string[]) => {
+    const prev = draftRef.current;
+    const prevSet = new Set(prev);
+    const toAdd = resortIds.filter((id) => !prevSet.has(id));
+    const added = toAdd.slice(0, Math.max(0, MAX_SELECTED_RESORTS - prev.length));
+    setCapNotice(added.length < toAdd.length ? { added: added.length, requested: toAdd.length } : null);
+    if (added.length > 0) setDraft([...prev, ...added]);
+  }, [setDraft]);
+
+  const removeFromDraft = useCallback((resortIds: string[]) => {
+    const toRemove = new Set(resortIds);
+    setDraft(draftRef.current.filter((id) => !toRemove.has(id)));
+    setCapNotice(null);
+  }, [setDraft]);
+
+  const toggleInDraft = useCallback((resortId: string) => {
+    if (draftRef.current.includes(resortId)) {
+      removeFromDraft([resortId]);
+    } else {
+      addToDraft([resortId]);
+    }
+  }, [addToDraft, removeFromDraft]);
 
   // Use draft state when modal is open, committed state when closed
   const activeSelectedResorts = isOpen ? draftSelectedResorts : selectedResorts;
@@ -147,16 +185,18 @@ export function useResortHierarchy({
 
   // Open/close modal
   const openModal = useCallback((initialDraft?: string[]) => {
-    setDraftSelectedResorts(initialDraft ?? selectedResorts);
+    setDraft(initialDraft ?? selectedResorts);
+    setCapNotice(null);
     setIsOpen(true);
     setNavigationStack([]);
     setSearchTerm('');
     setSelectedIndex(0);
-  }, [selectedResorts]);
+  }, [selectedResorts, setDraft]);
 
   const closeModal = useCallback(() => {
     // Commit draft selection to parent state on close
     onResortsChange(draftRef.current);
+    setCapNotice(null);
     setIsOpen(false);
     setNavigationStack([]);
     setSearchTerm('');
@@ -168,13 +208,7 @@ export function useResortHierarchy({
     if (node.type === 'resort') {
       // Toggle selection for resorts (draft state only)
       if (node.resortId) {
-        setDraftSelectedResorts((prev) => {
-          if (prev.includes(node.resortId!)) {
-            return prev.filter((id) => id !== node.resortId);
-          }
-          if (prev.length >= MAX_SELECTED_RESORTS) return prev;
-          return [...prev, node.resortId!];
-        });
+        toggleInDraft(node.resortId);
       }
     } else if (node.children && node.children.length > 0) {
       // Navigate into non-resort nodes
@@ -182,7 +216,7 @@ export function useResortHierarchy({
       setSearchTerm('');
       setSelectedIndex(0);
     }
-  }, []);
+  }, [toggleInDraft]);
 
   const goBack = useCallback(() => {
     if (isSearchMode) {
@@ -199,38 +233,20 @@ export function useResortHierarchy({
   const canGoBack = navigationStack.length > 0 || isSearchMode;
 
   // Selection helpers - operate on draft state only
-  const toggleResort = useCallback((resortId: string) => {
-    setDraftSelectedResorts((prev) => {
-      if (prev.includes(resortId)) {
-        return prev.filter((id) => id !== resortId);
-      }
-      if (prev.length >= MAX_SELECTED_RESORTS) return prev;
-      return [...prev, resortId];
-    });
-  }, []);
+  const toggleResort = toggleInDraft;
 
   const selectAllInNode = useCallback((node: HierarchyNode) => {
-    const resortIds = cachedGetResortsUnderNode(node);
-    setDraftSelectedResorts((prev) => {
-      const newSet = new Set(prev);
-      const toAdd = resortIds.filter((id) => !newSet.has(id));
-      const remaining = MAX_SELECTED_RESORTS - newSet.size;
-      for (const id of toAdd.slice(0, remaining)) {
-        newSet.add(id);
-      }
-      return Array.from(newSet);
-    });
-  }, [cachedGetResortsUnderNode]);
+    addToDraft(cachedGetResortsUnderNode(node));
+  }, [cachedGetResortsUnderNode, addToDraft]);
 
   const deselectAllInNode = useCallback((node: HierarchyNode) => {
-    const resortIds = cachedGetResortsUnderNode(node);
-    const resortIdSet = new Set(resortIds);
-    setDraftSelectedResorts((prev) => prev.filter((id) => !resortIdSet.has(id)));
-  }, [cachedGetResortsUnderNode]);
+    removeFromDraft(cachedGetResortsUnderNode(node));
+  }, [cachedGetResortsUnderNode, removeFromDraft]);
 
   const clearAllResorts = useCallback(() => {
-    setDraftSelectedResorts([]);
-  }, []);
+    setDraft([]);
+    setCapNotice(null);
+  }, [setDraft]);
 
   // Use cached version for O(1) lookups
   const getSelectionState = cachedGetSelectionState;
@@ -311,6 +327,7 @@ export function useResortHierarchy({
     clearAllResorts,
     getSelectionState,
     getResortsUnderNode: cachedGetResortsUnderNode,
+    capNotice,
 
     // Keyboard navigation
     selectedIndex,
