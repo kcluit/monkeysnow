@@ -94,7 +94,9 @@ export function useDetailedWeatherData({
                         elevation,
                         [model], // Fetch just this model
                         variables,
-                        forecastDays
+                        forecastDays,
+                        'auto',
+                        controller.signal
                     );
 
                     if (!cancelled) {
