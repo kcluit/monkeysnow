@@ -111,6 +111,20 @@ export interface Translations {
     // Empty states
     'empty.selectResorts': string;
 
+    // Fetch status ({count}, {things}, {eta} and {n} are filled in at runtime)
+    'fetchStatus.queued': string;
+    'fetchStatus.limitReached': string;
+    'fetchStatus.limitReachedTomorrow': string;
+    'fetchStatus.etaMinutes': string;
+    'fetchStatus.etaHours': string;
+    'fetchStatus.resort': string;
+    'fetchStatus.resorts': string;
+    'fetchStatus.model': string;
+    'fetchStatus.models': string;
+
+    // Selection ({max} is filled in at runtime)
+    'selection.trimmed': string;
+
     // Detail View
     'detail.loadingForecast': string;
     'detail.errorLoadingForecast': string;
