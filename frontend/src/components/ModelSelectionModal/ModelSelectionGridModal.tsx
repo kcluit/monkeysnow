@@ -14,14 +14,18 @@ import {
   buildModelHierarchyTree,
   getModelsUnderNode,
   getAggregationsUnderNode,
+  coversPoint,
   type ModelHierarchyNode,
 } from '../../data/modelHierarchy';
 import { getModelConfig } from '../../utils/chartConfigurations';
 import type { UseModelHierarchyReturn } from '../../hooks/useModelHierarchy';
 import type { WeatherModel, AggregationType } from '../../types/openMeteo';
+import type { ModelAvailabilityContext } from '../../types/detailView';
 
 interface ModelSelectionGridModalProps {
   hierarchy: UseModelHierarchyReturn;
+  /** Which models are drawn at the point being forecast, for dimming the rest */
+  modelAvailability: ModelAvailabilityContext;
   hideAggregationMembers?: boolean;
   onToggleHideMembers?: () => void;
   showMinMaxFill?: boolean;
