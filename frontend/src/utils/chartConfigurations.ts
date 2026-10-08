@@ -36,6 +36,18 @@ const kpaToPsi = (kpa: number): number => kpa * 0.145038;
 // Helper to convert seconds to minutes
 const secToMin = (sec: number): number => sec / 60;
 
+// ECMWF precipitation type codes
+const PRECIPITATION_TYPES: Record<number, string> = {
+  0: 'None',
+  1: 'Rain',
+  3: 'Freezing rain',
+  5: 'Snow',
+  6: 'Wet snow',
+  7: 'Rain and snow',
+  8: 'Ice pellets',
+  12: 'Freezing drizzle',
+};
+
 // Variable configurations
 export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
   ['temperature_2m', {
