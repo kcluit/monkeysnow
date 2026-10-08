@@ -388,6 +388,7 @@ const ProviderSection = memo(function ProviderSection({
 // Main modal component
 export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
   hierarchy,
+  modelAvailability,
   hideAggregationMembers,
   onToggleHideMembers,
   showMinMaxFill,
