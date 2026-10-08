@@ -179,21 +179,6 @@ function App(): JSX.Element {
     }, [chartZoomSyncEnabled]);
     const [resortData, setResortData] = useState<Map<string, ProcessedResortData>>(new Map());
 
-    // First visit: start the Selection with the Starter resort
-    const [hasInitialized, setHasInitialized] = useLocalStorage<boolean>('hasInitializedResorts', false);
-    const [landingPath] = useState(useLocation().pathname);
-
-    useEffect(() => {
-        if (hasInitialized) return;
-        const controller = new AbortController();
-        pickStarterResort(landingPath, controller.signal).then((resortId) => {
-            if (controller.signal.aborted) return;
-            setSelectedResorts([resortId]);
-            setHasInitialized(true);
-        });
-        return () => controller.abort();
-    }, [hasInitialized, landingPath, setSelectedResorts, setHasInitialized]);
-
     // Banner dismissal state
     const [bannerDismissed, setBannerDismissed] = useLocalStorage<boolean>('bannerDismissed', false);
 
