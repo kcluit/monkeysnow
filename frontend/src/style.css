@@ -2717,7 +2717,7 @@ input[type="checkbox"] {
     transition: background 0.2s, color 0.2s;
 }
 
-.resort-map-expand-btn:hover {
+.resort-map-btn:hover {
     background: var(--secondary, rgba(50, 50, 50, 0.9));
     color: var(--textPrimary, #fff);
 }
