@@ -45,6 +45,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { setGlobalZoomSync } from './lib/charts/chartRegistry';
 import { getSortDayData } from './utils/sortDayHelpers';
 import { getResortLocation } from './utils/openMeteoClient';
+import { pickStarterResort } from './utils/starterResort';
 import {
     defaultSelectedResorts,
     defaultElevation,
