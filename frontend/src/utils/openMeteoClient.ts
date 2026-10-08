@@ -107,28 +107,10 @@ function generateMockData(
 
 const LOCATION_MAP = RESORT_LOCATIONS;
 
-// Get resort location by name (API format like "Big-White")
+// Get resort location by slug ("big-white"), earlier slug or pre-OpenSkiData ID ("Big-White")
 export function getResortLocation(resortName: string): ResortLocation | null {
-  // Try direct lookup
-  if (LOCATION_MAP.has(resortName)) {
-    return LOCATION_MAP.get(resortName)!;
-  }
-
-  // Try with dashes converted from spaces
-  const dashName = resortName.replace(/\s+/g, '-');
-  if (LOCATION_MAP.has(dashName)) {
-    return LOCATION_MAP.get(dashName)!;
-  }
-
-  // Try case-insensitive lookup
-  for (const [key, value] of LOCATION_MAP.entries()) {
-    if (key.toLowerCase() === resortName.toLowerCase() ||
-        key.toLowerCase() === dashName.toLowerCase()) {
-      return value;
-    }
-  }
-
-  return null;
+  const id = resolveResortId(resortName);
+  return id ? LOCATION_MAP.get(id)! : null;
 }
 
 // Get all resort names
