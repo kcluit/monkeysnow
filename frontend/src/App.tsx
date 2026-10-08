@@ -171,7 +171,7 @@ function App(): JSX.Element {
     }, [hasInitialized, landingPath, setSelectedResorts, setHasInitialized]);
 
     // Weather data hook — keeps the selection's forecasts loaded within the Fetch budget
-    const { allWeatherData, loading: weatherLoading, queuedCount, queuedCalls, createLoadingController, cancelLoading } = useWeatherData(selectedResorts);
+    const { allWeatherData, loading: weatherLoading, error: weatherError, queuedCount, queuedCalls, createLoadingController, cancelLoading } = useWeatherData(selectedResorts);
 
     // Block UI while the Starter resort is picked, and if there is NO cached data at all,
     // but not through a rate-limit pause (that can last until tomorrow; the home page
@@ -666,6 +666,18 @@ function App(): JSX.Element {
     ]);
 
     const isTruncated = effectiveDisplayLimit > 0 && selectedResorts.length > effectiveDisplayLimit;
+
+    // Forecasts failed to load and nothing cached — error state
+    if (!allWeatherData && weatherError) {
+        return (
+            <div className="min-h-screen p-4 sm:p-6 md:p-8 flex items-center justify-center bg-theme-background transition-colors duration-300 overflow-x-hidden">
+                <div className="text-center">
+                    <div className="text-xl font-semibold text-theme-textSecondary">{t('error.loadingWeatherData')}</div>
+                    <div className="mt-2 text-sm text-theme-textSecondary opacity-75">{t('error.tryRefreshing')}</div>
+                </div>
+            </div>
+        );
+    }
 
     // Show loading state
     if (loading) {
