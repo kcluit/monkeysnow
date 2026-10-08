@@ -348,6 +348,12 @@ async function importResorts() {
   // 5. Build Resort entries
   const resorts = {};
   for (const [slug, area] of areaOf) {
+    // Excluded and unplaced areas stay in the registry too, so they keep their slug if they return
+    registry[slug] = {
+      ...registry[slug],
+      sources: area.sources,
+      ...(area.wikidata ? { wikidata: area.wikidata } : {}),
+    };
     const o = overrideFor(slug);
     if (o.exclude) continue;
     const p = area.properties;
