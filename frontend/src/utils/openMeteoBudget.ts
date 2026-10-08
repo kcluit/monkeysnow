@@ -188,7 +188,9 @@ export async function fetchWeatherApiWithinBudget(
     for (;;) {
         await acquireBudget(weight, priority, signal);
         try {
-            return await fetchWeatherApi(OPEN_METEO_FORECAST_URL, params, 3, 0.2, 2, { signal });
+            // retries = 1 turns off the SDK's own retries on 5xx, which would bypass the budget;
+            // callers retry server errors themselves
+            return await fetchWeatherApi(OPEN_METEO_FORECAST_URL, params, 1, 0.2, 2, { signal });
         } catch (error) {
             const window = rateLimitWindowOf(error);
             if (!window || signal?.aborted) throw error;
