@@ -964,21 +964,6 @@ export const VARIABLE_CONFIGS: Map<WeatherVariable, VariableConfig> = new Map([
   }],
 ]);
 
-// Default selected models - all seamless models
-export const DEFAULT_MODELS: WeatherModel[] = [
-  'icon_seamless',
-  'gfs_seamless',
-  'gem_seamless',
-  'meteofrance_seamless',
-  'metno_seamless',
-  'knmi_seamless',
-  'jma_seamless',
-  'ukmo_seamless',
-  'dmi_seamless',
-  'meteoswiss_icon_seamless',
-  'kma_seamless',
-];
-
 // Default selected variables
 export const DEFAULT_VARIABLES: WeatherVariable[] = [
   'temperature_2m',
