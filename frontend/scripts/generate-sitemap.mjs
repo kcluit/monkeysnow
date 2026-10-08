@@ -22,27 +22,9 @@ const STATIC_ROUTES = [
   { path: '/privacy', changefreq: 'yearly',  priority: '0.2' },
 ];
 
-// Continent -> Country -> [Province] -> Resort; some countries skip the province level
-const isResort = (value) => Boolean(value) && typeof value === 'object' && value.bot !== undefined;
-
 async function readResortIds() {
-  const locations = JSON.parse(await readFile(LOCATIONS_PATH, 'utf-8'));
-
-  const ids = [];
-  for (const continent of Object.values(locations)) {
-    for (const country of Object.values(continent)) {
-      for (const [key, value] of Object.entries(country)) {
-        if (isResort(value)) {
-          ids.push(key);
-        } else if (value && typeof value === 'object') {
-          for (const [resortId, resort] of Object.entries(value)) {
-            if (isResort(resort)) ids.push(resortId);
-          }
-        }
-      }
-    }
-  }
-  return ids;
+  const { resorts } = JSON.parse(await readFile(RESORTS_PATH, 'utf-8'));
+  return Object.keys(resorts);
 }
 
 function buildSitemapXml(resortIds) {
