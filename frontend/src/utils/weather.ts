@@ -105,7 +105,8 @@ export function processResortData(
             id: resortName,
             name: resortName.replace(/-/g, ' '),
             elevation: formatElevation(elevationData.metadata.elevation, unitSystem),
-            days
+            days,
+            fetchedAt: resortData.fetchedAt
         };
     } catch (err) {
         console.error(`Error processing resort data for ${resortName}:`, err);

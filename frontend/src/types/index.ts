@@ -158,6 +158,7 @@ export interface ProcessedResortData {
     name: string;
     elevation: string;
     days: DayForecast[];
+    fetchedAt?: number; // epoch ms, from ResortData
 }
 
 // Snow totals

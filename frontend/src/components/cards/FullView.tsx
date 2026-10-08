@@ -31,9 +31,11 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
                     <h2 className="text-2xl font-bold text-theme-textPrimary">{resort.name}</h2>
                     <p className="text-sm font-medium text-theme-accent">{elevationLabel}Elevation: {resort.elevation}</p>
                 </div>
-                <div className="text-xs font-medium text-theme-textSecondary">
-                    Last updated: {new Date().toLocaleTimeString()}
-                </div>
+                {resort.fetchedAt !== undefined && (
+                    <div className="text-xs font-medium text-theme-textSecondary">
+                        Last updated: {new Date(resort.fetchedAt).toLocaleTimeString()}
+                    </div>
+                )}
             </div>
 
             <div className="overflow-x-auto -mx-5 px-5">
