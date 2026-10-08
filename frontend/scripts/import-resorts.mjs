@@ -443,7 +443,9 @@ async function importResorts() {
     if (!registry[slug]) report.staleOverrides.push(`\`${slug}\` is not a known slug`);
   }
   for (const pair of reviewed) {
-    if (pair.split(/ [>=] /).some(slug => !resorts[slug])) report.staleOverrides.push(`reviewed pair \`${pair}\` names a Resort that is gone`);
+    if (pair.split(/ [>=] /).some(slug => slug !== '*' && !resorts[slug])) {
+      report.staleOverrides.push(`reviewed pair \`${pair}\` names a Resort that is gone`);
+    }
   }
 
   // 9. Countries, and whether each is split into Regions
