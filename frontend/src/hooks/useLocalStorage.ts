@@ -15,15 +15,15 @@ export function useLocalStorage<T>(key: string, defaultValue: T): [T, (value: Se
 
   const setStoredValue = useCallback((newValue: SetValue<T>): void => {
     setValue(prev => {
+      // Allow value to be a function so we have the same API as useState
+      const valueToStore = newValue instanceof Function ? newValue(prev) : newValue;
       try {
-        // Allow value to be a function so we have the same API as useState
-        const valueToStore = newValue instanceof Function ? newValue(prev) : newValue;
         window.localStorage.setItem(key, JSON.stringify(valueToStore));
-        return valueToStore;
       } catch (error) {
+        // Storage blocked or full: the change still applies, for this visit only
         console.warn(`Error setting localStorage key "${key}":`, error);
-        return prev;
       }
+      return valueToStore;
     });
   }, [key]);
 

@@ -16,9 +16,13 @@ declare global {
 function isMockModeEnabled(): boolean {
   if (typeof window === 'undefined') return false;
   if (window.__USE_MOCK_DATA) return true;
-  if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('__USE_MOCK_DATA') === 'true') {
-    window.__USE_MOCK_DATA = true; // Sync to window for consistency
-    return true;
+  try {
+    if (sessionStorage.getItem('__USE_MOCK_DATA') === 'true') {
+      window.__USE_MOCK_DATA = true; // Sync to window for consistency
+      return true;
+    }
+  } catch {
+    // Reading sessionStorage throws when the browser blocks site data
   }
   return false;
 }
