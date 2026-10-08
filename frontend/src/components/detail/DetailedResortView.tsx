@@ -190,20 +190,42 @@ export function DetailedResortView({
         }
     }, [selectedVariables, setSelectedVariables]);
 
+    // Only fetch Preferred models whose Coverage includes the point being forecast
+    const coveringModels = useMemo(
+        () => inCatalogueOrder(
+            preferredModels.filter((model) =>
+                isKnownModel(model) && coversPoint(model, effectiveCoords.lat, effectiveCoords.lon)
+            )
+        ),
+        [preferredModels, effectiveCoords.lat, effectiveCoords.lon]
+    );
+
     // Fetch weather data using effective coordinates
-    const { data, timezoneInfo, loading, error, refetch } = useDetailedWeatherData({
+    const { data, unavailableModels, timezoneInfo, loading, error, refetch } = useDetailedWeatherData({
         latitude: effectiveCoords.lat,
         longitude: effectiveCoords.lon,
         elevation: effectiveElevation,
-        models: selectedModels,
+        models: coveringModels,
         variables: selectedVariables,
         forecastDays,
         enabled: true,
     });
 
+    // Drop models that came back empty and Clones, leaving the Comparison models
+    const { comparisonModels, dropped } = useMemo(
+        () => resolveComparisonModels(coveringModels, data, unavailableModels),
+        [coveringModels, data, unavailableModels]
+    );
+
+    const modelAvailability = useMemo(() => ({
+        point: effectiveCoords,
+        droppedModels: dropped,
+        shownModelCount: comparisonModels.length,
+    }), [effectiveCoords, dropped, comparisonModels.length]);
+
     // During a rate-limit pause, say how many models are still waiting instead of a bare spinner
     const pause = useBudgetPause();
-    const pendingModels = Math.max(0, selectedModels.length - (data?.size ?? 0));
+    const pendingModels = Math.max(0, coveringModels.length - (data?.size ?? 0) - unavailableModels.size);
 
     return (
         <div>
