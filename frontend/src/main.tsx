@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { HierarchyProvider } from './contexts/HierarchyContext'
 import { MAX_SELECTED_RESORTS } from './hooks/useResortHierarchy'
+import { resolveResortId } from './data/resortLocations'
 import './style.css'
 
 // Main app wrapper
