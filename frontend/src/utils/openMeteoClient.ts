@@ -188,7 +188,8 @@ export async function fetchOpenMeteoData(
   };
 
   try {
-    const responses = await fetchWeatherApi(OPEN_METEO_URL, params);
+    // Detail-view requests go ahead of the main page's queue in the Fetch budget
+    const responses = await fetchWeatherApiWithinBudget(params, 'detail');
     const result = new Map<WeatherModel, HourlyDataPoint[]>();
 
     // Extract timezone info from first response
