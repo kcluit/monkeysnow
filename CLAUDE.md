@@ -15,7 +15,7 @@ Domain terms (Selection, Selection cap, Fetch budget, Rate limit, Freshness wind
 npm run dev
 ```
 
-### Build (regenerates `frontend/public/sitemap.xml` from `locations.json`, then type-checks and builds)
+### Build (regenerates `frontend/public/sitemap.xml` from `resorts.json`, then type-checks and builds)
 ```bash
 npm run build
 ```
@@ -27,14 +27,14 @@ npm run build
 - `frontend/` - Vite + React + TypeScript + Tailwind (the only workspace)
 
 ### Resort Data
-- `frontend/src/data/locations.json` - every resort's bot/mid/top elevations and coordinates, nested Continent -> Country -> [Province] -> Resort
-- `frontend/src/data/resortLocations.ts` - flattens it (`RESORT_LOCATIONS`) and builds the picker hierarchy (`RESORT_HIERARCHY`)
+- `frontend/src/data/resorts/resorts.json` - every Resort's name, country, Region, coordinates and bot/mid/top elevations, generated from OpenSkiData by `npm run import-resorts` (see docs/adr/0004-resort-list-from-openskidata.md), which also decides which countries are split into Regions
+- `frontend/src/data/resortLocations.ts` - indexes it (`RESORT_LOCATIONS`) and builds the picker hierarchy Continent -> Country -> [Region] -> Resort (`RESORT_HIERARCHY`)
 - `useHierarchyData` / `HierarchyContext` expose the hierarchy, resort IDs and display names
 
 ### Saved locations
 - `utils/savedLocations.ts` - Custom locations a visitor named and kept, in this browser's localStorage only; in the Selection they are `saved:<key>` IDs, and their detail view is `/location/<key>`
 - They have one elevation, which `resortForecast.ts` fetches and copies into all three bands; their Card model comes from the nearest Resort's country, stored when saved
-- `useHierarchyData` lists them first in the picker under a "Custom" node (type `custom`)
+- `useHierarchyData` lists them first in the picker under a "Saved locations" node (type `custom`)
 
 ### Fetching from Open-Meteo (see docs/adr/0001-fetch-forecasts-from-the-browser.md)
 - `utils/openMeteoBudget.ts` - every forecast request goes through `fetchWeatherApiWithinBudget()`: a per-tab Fetch budget of 550 calls per rolling minute, at most 2 requests in flight, detail-view requests first, and a pause until the window resets when Open-Meteo returns a 429
@@ -58,7 +58,7 @@ npm run build
 - Three view modes: default, full, compact (cards in `components/cards/`)
 - Theming via CSS custom properties, themes in `types/themes.ts`
 - UI strings in `locales/en.ts` (keys typed in `types/i18n.ts`); `interpolate()` fills `{placeholders}`
-- Resort selection modal uses tree structure from `useResortHierarchy` hook
+- Resort picker (`components/ResortSelectionModal/ResortSelectionGridModal.tsx`) opens with continents open and the rest closed; its search (`utils/resortSearch.ts`) matches names, Regions and countries, ignoring accents, punctuation and word order; `useResortHierarchy` holds the draft Selection being edited and the search term
 
 ### Type System (`frontend/src/types/`)
 - `index.ts` - Core types: `AllWeatherData`, `ResortData`, `ProcessedResortData`, `DayForecast`, `Period`
