@@ -1,6 +1,15 @@
 import type { WeatherModel, WeatherVariable, TimezoneInfo, AggregationType } from './openMeteo';
 import type { UnitSystem } from '../utils/unitConversion';
 import type { UtilityBarStyle, ModelLineOpacity } from './index';
+import type { DroppedModel } from '../utils/comparisonModels';
+
+/** Where the detail view is forecasting, and which fetched models were dropped there */
+export interface ModelAvailabilityContext {
+    point: { lat: number; lon: number };
+    droppedModels: ReadonlyMap<WeatherModel, DroppedModel>;
+    /** How many Comparison models are drawn at this point */
+    shownModelCount: number;
+}
 
 // Elevation selection can be a preset type or a custom number
 export type ElevationSelection = 'base' | 'mid' | 'top' | number;
