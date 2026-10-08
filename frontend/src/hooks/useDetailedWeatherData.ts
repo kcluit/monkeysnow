@@ -15,6 +15,8 @@ export interface UseDetailedWeatherDataProps {
 
 export interface UseDetailedWeatherDataReturn {
     data: Map<WeatherModel, HourlyDataPoint[]> | null;
+    /** Models Open-Meteo refused for this point, e.g. "No data is available for this location" */
+    unavailableModels: ReadonlySet<WeatherModel>;
     timezoneInfo: TimezoneInfo | null;
     loading: boolean;
     error: Error | null;
