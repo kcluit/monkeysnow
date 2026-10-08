@@ -366,11 +366,12 @@ async function importResorts() {
     const { name, aka } = splitName(p.name);
     const bot = Math.round(p.statistics?.minElevation ?? NaN);
     const top = Math.round(p.statistics?.maxElevation ?? NaN);
+    const region = o.region ?? place?.localized?.en?.region;
     const entry = {
       name: o.name ?? name,
       ...(aka.length || o.name ? { aka: o.name ? [name, ...aka] : aka } : {}),
       country,
-      region: o.region ?? place?.localized?.en?.region ?? null,
+      ...(region ? { region } : {}),
       loc: area.loc,
       bot: o.bot ?? bot,
       mid: o.mid ?? Math.round(((o.bot ?? bot) + (o.top ?? top)) / 2),
