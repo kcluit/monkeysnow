@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { fetchResortForecasts, groupIntoRequests, resortCallWeight } from '../utils/resortForecast';
+import { isTransientError } from '../utils/openMeteoBudget';
 import { idbGet, idbSet } from '../utils/indexedDB';
 import type { AllWeatherData, ResortData, UseWeatherDataReturn } from '../types';
 
