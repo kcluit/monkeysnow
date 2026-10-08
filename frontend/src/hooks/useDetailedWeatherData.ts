@@ -6,175 +6,209 @@ import type { WeatherModel, WeatherVariable, HourlyDataPoint, TimezoneInfo } fro
 export interface UseDetailedWeatherDataProps {
     latitude: number;
     longitude: number;
-    elevation: number;
+    /** Height to forecast for; left out for a Custom location, which is forecast at its own ground elevation */
+    elevation?: number;
     models: WeatherModel[];
     variables: WeatherVariable[];
-    forecastDays?: number;
-    enabled?: boolean;
+    forecastDays: number;
 }
 
 export interface UseDetailedWeatherDataReturn {
-    data: Map<WeatherModel, HourlyDataPoint[]> | null;
+    /** Hourly forecasts by model; can include models that are no longer asked for */
+    data: ReadonlyMap<WeatherModel, HourlyDataPoint[]>;
     /** Models Open-Meteo refused for this point, e.g. "No data is available for this location" */
     unavailableModels: ReadonlySet<WeatherModel>;
+    /** Models still being fetched, including any waiting on the Fetch budget */
+    loadingModels: ReadonlySet<WeatherModel>;
     timezoneInfo: TimezoneInfo | null;
-    loading: boolean;
-    error: Error | null;
-    refetch: () => void;
+    /** The elevation Open-Meteo forecast for, known once the first model has arrived */
+    elevation: number | null;
 }
 
 // Retry configuration
 const INITIAL_RETRY_DELAY_MS = 1000;
 const MAX_RETRY_DELAY_MS = 30000;
 
+interface ModelRequest {
+    variables: ReadonlySet<WeatherVariable>;
+    controller: AbortController;
+}
+
+/** The forecasts for one point, elevation and length; changing any of them starts a new session. */
+interface Session {
+    key: string;
+    /** Variables already in the data for each model */
+    fetched: Map<WeatherModel, ReadonlySet<WeatherVariable>>;
+    inFlight: Map<WeatherModel, ModelRequest>;
+    unavailable: Set<WeatherModel>;
+}
+
+interface ForecastState {
+    data: ReadonlyMap<WeatherModel, HourlyDataPoint[]>;
+    unavailable: ReadonlySet<WeatherModel>;
+    loading: ReadonlySet<WeatherModel>;
+    timezoneInfo: TimezoneInfo | null;
+    elevation: number | null;
+}
+
+const covers = (have: ReadonlySet<WeatherVariable> | undefined, want: WeatherVariable[]): boolean =>
+    have !== undefined && want.every((variable) => have.has(variable));
+
+function without<T>(set: ReadonlySet<T>, item: T): ReadonlySet<T> {
+    const next = new Set(set);
+    next.delete(item);
+    return next;
+}
+
+const sleep = (ms: number, signal: AbortSignal) =>
+    new Promise<void>((resolve) => {
+        const timer = setTimeout(resolve, ms);
+        signal.addEventListener('abort', () => { clearTimeout(timer); resolve(); }, { once: true });
+    });
+
+function abortSession(session: Session): void {
+    session.inFlight.forEach((request) => request.controller.abort());
+    session.inFlight.clear();
+}
+
+/**
+ * Keeps the detail view's forecasts loaded, one request per Forecast model.
+ * Changing the point, elevation or forecast length starts over. Editing the models
+ * or variables fetches only what's missing, so charts already drawn stay on screen,
+ * and removing or reordering them costs no requests.
+ */
 export function useDetailedWeatherData({
     latitude,
     longitude,
     elevation,
     models,
     variables,
-    forecastDays = 14,
-    enabled = true,
+    forecastDays,
 }: UseDetailedWeatherDataProps): UseDetailedWeatherDataReturn {
-    const [data, setData] = useState<Map<WeatherModel, HourlyDataPoint[]> | null>(null);
-    const [unavailableModels, setUnavailableModels] = useState<ReadonlySet<WeatherModel>>(new Set());
-    const [timezoneInfo, setTimezoneInfo] = useState<TimezoneInfo | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<Error | null>(null);
-    const [refetchTrigger, setRefetchTrigger] = useState(0);
+    const [state, setState] = useState<ForecastState>(() => ({
+        data: new Map(),
+        unavailable: new Set(),
+        // Loading from the first paint, so the page never flashes an empty state
+        loading: new Set(variables.length > 0 ? models : []),
+        timezoneInfo: null,
+        elevation: null,
+    }));
+    const sessionRef = useRef<Session | null>(null);
 
-    // Track the previous params to detect changes
-    const prevParamsRef = useRef<string>('');
-
-    // Create a stable key from the parameters
-    const paramsKey = JSON.stringify({
-        latitude,
-        longitude,
-        elevation,
-        models: [...models].sort(),
-        variables: [...variables].sort(),
-        forecastDays,
-        refetchTrigger // Include refetch trigger in key to force effect re-run
-    });
+    const forecastKey = JSON.stringify([latitude, longitude, elevation ?? null, forecastDays]);
+    // Sorted, so reordering models or variables changes nothing
+    const modelsKey = [...models].sort().join(',');
+    const variablesKey = [...variables].sort().join(',');
 
     useEffect(() => {
-        if (!enabled) {
-            return;
+        let session = sessionRef.current;
+        if (!session || session.key !== forecastKey) {
+            if (session) abortSession(session);
+            session = { key: forecastKey, fetched: new Map(), inFlight: new Map(), unavailable: new Set() };
+            sessionRef.current = session;
+            setState({ data: new Map(), unavailable: new Set(), loading: new Set(), timezoneInfo: null, elevation: null });
         }
+        const current = session;
 
-        if (models.length === 0 || variables.length === 0) {
-            setData(null);
-            setUnavailableModels(new Set());
-            setTimezoneInfo(null);
-            setLoading(false);
-            setError(null);
-            return;
-        }
-
-        // Skip if params haven't changed
-        if (paramsKey === prevParamsRef.current) {
-            return;
-        }
-        prevParamsRef.current = paramsKey;
-
-        let cancelled = false;
-        // Aborting drops requests still waiting on the Fetch budget (e.g. through a rate-limit pause)
-        const controller = new AbortController();
-        let timezoneSet = false; // Track if timezone has been captured
-
-        // Initialize with empty map
-        setData(new Map());
-        setUnavailableModels(new Set());
-        setTimezoneInfo(null); // Reset timezone on new fetch
-        setLoading(true);
-        setError(null);
-
-        async function fetchModelWithRetry(model: WeatherModel) {
+        async function fetchModel(model: WeatherModel, request: ModelRequest) {
+            const { signal } = request.controller;
             let retryDelay = INITIAL_RETRY_DELAY_MS;
 
-            while (!cancelled) {
+            for (;;) {
                 try {
                     const result = await fetchOpenMeteoData(
                         latitude,
                         longitude,
                         elevation,
                         [model], // Fetch just this model
-                        variables,
+                        [...request.variables],
                         forecastDays,
                         'auto',
-                        controller.signal
+                        signal
                     );
+                    if (signal.aborted) return;
 
-                    if (!cancelled) {
-                        // Store timezone from first successful response (any model)
-                        if (!timezoneSet && result.timezoneInfo) {
-                            timezoneSet = true;
-                            setTimezoneInfo(result.timezoneInfo);
-                        }
-
-                        setData(prevData => {
-                            const newData = new Map(prevData || []);
-                            const modelData = result.data.get(model);
-                            if (modelData) {
-                                newData.set(model, modelData);
-                            }
-                            return newData;
-                        });
-                    }
-                    // Success - exit the retry loop
+                    current.inFlight.delete(model);
+                    current.fetched.set(model, request.variables);
+                    setState((s) => ({
+                        // A model with no hourly data is kept as empty, so it's dropped as having no data here
+                        data: new Map(s.data).set(model, result.data.get(model) ?? []),
+                        unavailable: s.unavailable,
+                        loading: without(s.loading, model),
+                        timezoneInfo: s.timezoneInfo ?? result.timezoneInfo,
+                        elevation: s.elevation ?? result.elevation,
+                    }));
                     return;
                 } catch (err) {
-                    if (cancelled) return;
+                    if (signal.aborted) return;
 
                     // Bad requests (e.g. a regional model with no data here) won't succeed on retry,
                     // and each retry spends the user's Open-Meteo quota
                     if (!isTransientError(err)) {
                         console.warn(`Model ${model} unavailable:`, err instanceof Error ? err.message : err);
-                        setUnavailableModels(prev => new Set(prev).add(model));
+                        current.inFlight.delete(model);
+                        current.unavailable.add(model);
+                        setState((s) => ({
+                            ...s,
+                            unavailable: new Set(s.unavailable).add(model),
+                            loading: without(s.loading, model),
+                        }));
                         return;
                     }
 
                     console.error(`Failed to fetch model ${model}, retrying in ${retryDelay}ms...`, err);
 
                     // Wait before retrying with exponential backoff
-                    await new Promise(resolve => setTimeout(resolve, retryDelay));
+                    await sleep(retryDelay, signal);
+                    if (signal.aborted) return;
                     retryDelay = Math.min(retryDelay * 2, MAX_RETRY_DELAY_MS);
                 }
             }
         }
 
-        async function fetchAll() {
-            // Create an array of promises for parallel fetching with retry
-            const promises = models.map((model) => fetchModelWithRetry(model));
-
-            // Wait for all to settle (finish)
-            await Promise.allSettled(promises);
-
-            if (!cancelled) {
-                setLoading(false);
+        // Stop fetching models that are no longer asked for, freeing their place in the Fetch budget
+        const wanted = new Set(models);
+        for (const [model, request] of current.inFlight) {
+            if (!wanted.has(model)) {
+                request.controller.abort();
+                current.inFlight.delete(model);
             }
         }
 
-        fetchAll();
+        if (variables.length > 0) {
+            for (const model of models) {
+                if (
+                    current.unavailable.has(model) ||
+                    covers(current.fetched.get(model), variables) ||
+                    covers(current.inFlight.get(model)?.variables, variables)
+                ) {
+                    continue;
+                }
+                // Fetch every variable again; a model already drawn keeps its data until this arrives
+                current.inFlight.get(model)?.controller.abort();
+                const request: ModelRequest = { variables: new Set(variables), controller: new AbortController() };
+                current.inFlight.set(model, request);
+                void fetchModel(model, request);
+            }
+        }
 
-        return () => {
-            cancelled = true;
-            controller.abort();
-            // Reset prevParamsRef so re-mount triggers fresh fetch (fixes React StrictMode double-invoke)
-            prevParamsRef.current = '';
-        };
-    }, [paramsKey, enabled, latitude, longitude, elevation, models, variables, forecastDays]);
+        setState((s) => ({ ...s, loading: new Set(current.inFlight.keys()) }));
+        // The sorted keys stand in for the models and variables arrays, so a new array with
+        // the same members (a reorder, or an edit undone before closing a modal) refetches nothing
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [forecastKey, modelsKey, variablesKey]);
 
-    const refetch = () => {
-        setRefetchTrigger(prev => prev + 1);
-    };
+    // Requests still waiting on the Fetch budget are dropped when the view goes away
+    useEffect(() => () => {
+        if (sessionRef.current) abortSession(sessionRef.current);
+        sessionRef.current = null;
+    }, []);
 
     return {
-        data,
-        unavailableModels,
-        timezoneInfo,
-        loading,
-        error,
-        refetch,
+        data: state.data,
+        unavailableModels: state.unavailable,
+        loadingModels: state.loading,
+        timezoneInfo: state.timezoneInfo,
+        elevation: state.elevation,
     };
 }

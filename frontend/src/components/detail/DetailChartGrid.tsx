@@ -11,6 +11,7 @@ import type { DetailChartGridProps } from '../../types/detailView';
 
 export function DetailChartGrid({
     data,
+    timeAxis,
     selectedModels,
     selectedVariables,
     selectedAggregations,
@@ -20,7 +21,6 @@ export function DetailChartGrid({
     showPercentileFill,
     modelLineOpacity,
     unitSystem,
-    timezoneInfo,
     isChartLocked,
     isLoading,
     onToggleVariable,
@@ -33,6 +33,7 @@ export function DetailChartGrid({
                 <WeatherChart
                     key={variable}
                     data={data}
+                    timeAxis={timeAxis}
                     selectedModels={selectedModels}
                     selectedAggregations={selectedAggregations}
                     aggregationColors={aggregationColors}
@@ -42,7 +43,6 @@ export function DetailChartGrid({
                     modelLineOpacity={modelLineOpacity}
                     variable={variable}
                     unitSystem={unitSystem}
-                    timezoneInfo={timezoneInfo}
                     isChartLocked={isChartLocked}
                     isLoading={isLoading}
                     onToggleVisibility={

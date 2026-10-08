@@ -122,6 +122,8 @@ export function getAllResortNames(): string[] {
 export interface FetchOpenMeteoDataResult {
   data: Map<WeatherModel, HourlyDataPoint[]>;
   timezoneInfo: TimezoneInfo | null;
+  /** The elevation Open-Meteo forecast for: the one asked for, or its own ground elevation for the point */
+  elevation: number | null;
 }
 
 // Expand variables to include overlay variables for any base variables that have overlays
@@ -138,11 +140,12 @@ function expandVariablesWithOverlays(variables: WeatherVariable[]): WeatherVaria
   return Array.from(expanded);
 }
 
-// Fetch weather data from Open-Meteo for multiple models
+// Fetch weather data from Open-Meteo for multiple models.
+// Without an elevation, Open-Meteo forecasts at its own ground elevation for the point.
 export async function fetchOpenMeteoData(
   latitude: number,
   longitude: number,
-  elevation: number,
+  elevation: number | undefined,
   models: WeatherModel[],
   variables: WeatherVariable[],
   forecastDays: number = 14,
@@ -157,13 +160,15 @@ export async function fetchOpenMeteoData(
     console.log('[MOCK MODE] Generating mock data for', models.length, 'models');
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 100));
-    return generateMockData(models, expandedVariables, forecastDays);
+    if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+    return { ...generateMockData(models, expandedVariables, forecastDays), elevation: elevation ?? 1650 };
   }
 
   const params = {
     latitude,
     longitude,
-    elevation,
+    // Left out rather than undefined, which the SDK would send as the text "undefined"
+    ...(elevation !== undefined ? { elevation } : {}),
     hourly: expandedVariables,
     models,
     forecast_days: forecastDays,
@@ -175,14 +180,19 @@ export async function fetchOpenMeteoData(
     const responses = await fetchWeatherApiWithinBudget(params, 'detail', signal);
     const result = new Map<WeatherModel, HourlyDataPoint[]>();
 
-    // Extract timezone info from first response
+    // Extract timezone info and elevation from first response
     let timezoneInfo: TimezoneInfo | null = null;
+    let reportedElevation: number | null = null;
     if (responses.length > 0) {
       const firstResponse = responses[0];
       const tz = firstResponse.timezone();
       const tzAbbr = firstResponse.timezoneAbbreviation();
       if (tz && tzAbbr) {
         timezoneInfo = { timezone: tz, timezoneAbbreviation: tzAbbr };
+      }
+      const responseElevation = firstResponse.elevation();
+      if (Number.isFinite(responseElevation)) {
+        reportedElevation = Math.round(responseElevation);
       }
     }
 
@@ -227,7 +237,7 @@ export async function fetchOpenMeteoData(
       result.set(modelId, dataPoints);
     }
 
-    return { data: result, timezoneInfo };
+    return { data: result, timezoneInfo, elevation: reportedElevation };
   } catch (error) {
     // Aborts are expected when the view changes before a request goes out
     if ((error as Error).name !== 'AbortError') {

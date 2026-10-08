@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
 import { CommandInput } from './CommandInput';
 import { CommandList } from './CommandList';
+import { useOverlay } from '../../hooks/useOverlay';
 import type { UseCommandPaletteReturn } from '../../types';
 
 interface CommandPaletteProps {
@@ -22,18 +22,8 @@ export function CommandPalette({ palette, hideIcons }: CommandPaletteProps): JSX
     canGoBack,
   } = palette;
 
-  // Prevent body scroll when open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
+  // Lock page scroll while open; Esc goes back a level, or closes
+  useOverlay(isOpen, goBack);
 
   if (!isOpen) {
     return null;

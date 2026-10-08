@@ -6,22 +6,19 @@
  */
 
 import type uPlot from 'uplot';
-import type { SeriesConfig } from '../types';
+import type { ChartConfig } from '../types';
 import { colorWithOpacity } from '../utils/colorUtils';
 
 export interface BandFillPluginOptions {
-    /** Series configurations that include band data */
-    series: SeriesConfig[];
+    /** Latest chart configuration; its band series are drawn */
+    getConfig: () => ChartConfig;
 }
 
 export function createBandFillPlugin(options: BandFillPluginOptions): uPlot.Plugin {
-    const bandSeries = options.series.filter((s) => s.type === 'band' && s.bandData);
-
-    if (bandSeries.length === 0) {
-        return { hooks: {} };
-    }
+    const { getConfig } = options;
 
     function draw(u: uPlot) {
+        const bandSeries = getConfig().series.filter((s) => s.type === 'band' && s.bandData);
         const ctx = u.ctx;
 
         ctx.save();

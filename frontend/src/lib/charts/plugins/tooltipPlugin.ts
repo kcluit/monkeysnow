@@ -9,12 +9,12 @@ import type uPlot from 'uplot';
 import type { ChartConfig } from '../types';
 
 export interface TooltipPluginOptions {
-    /** Chart configuration for accessing series metadata */
-    config: ChartConfig;
+    /** Latest chart configuration, for labels and series metadata */
+    getConfig: () => ChartConfig;
 }
 
 export function createTooltipPlugin(options: TooltipPluginOptions): uPlot.Plugin {
-    const { config } = options;
+    const { getConfig } = options;
 
     let tooltip: HTMLDivElement | null = null;
     let over: HTMLElement | null = null;
@@ -40,6 +40,8 @@ export function createTooltipPlugin(options: TooltipPluginOptions): uPlot.Plugin
             hideTooltip();
             return;
         }
+
+        const config = getConfig();
 
         // Get x-axis label (prefer tooltipLabels for full date+time display)
         const xLabel = config.xAxis.tooltipLabels?.[idx] || config.xAxis.data[idx] || '';
@@ -90,6 +92,7 @@ export function createTooltipPlugin(options: TooltipPluginOptions): uPlot.Plugin
             init: [
                 (u: uPlot) => {
                     over = u.over;
+                    const config = getConfig();
 
                     // Create tooltip element
                     tooltip = document.createElement('div');

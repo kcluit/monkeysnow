@@ -1,7 +1,14 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { isOverlayOpen } from './useOverlay';
 import type { Command, UseCommandPaletteReturn } from '../types';
 
 type PendingNav = { commandId: string } | null;
+
+/** Whether a key press is going into a text field rather than to the page. */
+function isTypingInField(target: EventTarget | null): boolean {
+  return target instanceof HTMLElement &&
+    (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
+}
 
 /**
  * Hook for managing command palette state with lazy command generation.
@@ -140,46 +147,49 @@ export function useCommandPalette(
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Open palette with Escape or Ctrl+Shift+P
       if (!isOpen) {
-        if (e.key === 'Escape' || e.key === 'Tab' || ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toUpperCase() === 'P')) {
+        // Ctrl/Cmd+Shift+P opens the palette from anywhere. Esc and Tab only do when nothing
+        // else is open and the visitor isn't typing in a field: inside a modal, Esc closes
+        // that modal and Tab moves focus as usual.
+        const isShortcut = (e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toUpperCase() === 'P';
+        const isQuickKey = (e.key === 'Escape' || e.key === 'Tab') && !isOverlayOpen() && !isTypingInField(e.target);
+        if (isShortcut || isQuickKey) {
           e.preventDefault();
           openPalette();
-          return;
         }
         return;
       }
 
-      // Handle palette navigation when open
+      // Handle palette navigation when open; Esc reaches goBack as the topmost overlay
       switch (e.key) {
-        case 'Escape':
-          e.preventDefault();
-          goBack();
-          break;
         case 'ArrowUp':
-          e.preventDefault();
           navigateUp();
           break;
         case 'ArrowDown':
-          e.preventDefault();
           navigateDown();
           break;
         case 'Enter':
-          e.preventDefault();
           selectCurrent();
           break;
         case 'Backspace':
           // If search is empty, go back
           if (searchQuery === '' && commandStack.length > 0) {
-            e.preventDefault();
             goBack();
+            break;
           }
-          break;
+          return;
+        default:
+          return;
       }
+      // Handled here only, so a modal under the palette doesn't act on the same key
+      e.preventDefault();
+      e.stopImmediatePropagation();
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    // While open, listen in the capture phase to get keys before anything beneath the palette
+    const capture = isOpen;
+    window.addEventListener('keydown', handleKeyDown, capture);
+    return () => window.removeEventListener('keydown', handleKeyDown, capture);
   }, [
     isOpen,
     openPalette,

@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { DetailUtilityBarProps } from '../../types/detailView';
-import { useModelHierarchy } from '../../hooks/useModelHierarchy';
 import { useVariableSelection } from '../../hooks/useVariableSelection';
-import { ModelSelectionGridModal } from '../ModelSelectionModal';
 import { VariableSelectionModal } from '../VariableSelectionModal';
 import { CompactDetailUtilityBar } from './CompactDetailUtilityBar';
 import { Icon } from '../Icon';
@@ -20,20 +18,12 @@ export function DetailUtilityBar(props: DetailUtilityBarProps): JSX.Element {
 function LargeDetailUtilityBar({
     onBack,
     unitSystem,
-    selectedModels,
-    setSelectedModels,
+    shownModelCount,
+    preferredModelCount,
+    aggregationCount,
+    onOpenModels,
     selectedVariables,
     setSelectedVariables,
-    selectedAggregations,
-    setSelectedAggregations,
-    aggregationColors,
-    setAggregationColors,
-    hideAggregationMembers,
-    setHideAggregationMembers,
-    showMinMaxFill,
-    setShowMinMaxFill,
-    showPercentileFill,
-    setShowPercentileFill,
     elevationSelection,
     setElevationSelection,
     resolvedElevation,
@@ -44,24 +34,13 @@ function LargeDetailUtilityBar({
     setIsChartLocked,
     fixedElevation,
     customLocation,
+    customElevation,
     onResetCustomLocation,
-    isLoadingElevation,
-    modelAvailability,
 }: DetailUtilityBarProps): JSX.Element {
     const [showElevationDropdown, setShowElevationDropdown] = useState(false);
     const [showForecastDropdown, setShowForecastDropdown] = useState(false);
     const [showCustomElevationInput, setShowCustomElevationInput] = useState(false);
     const [customElevationValue, setCustomElevationValue] = useState('');
-
-    // Model hierarchy hook for modal
-    const modelHierarchy = useModelHierarchy({
-        selectedModels,
-        onModelsChange: setSelectedModels,
-        selectedAggregations,
-        onAggregationsChange: setSelectedAggregations,
-        aggregationColors,
-        onAggregationColorsChange: setAggregationColors,
-    });
 
     // Variable selection hook for modal
     const variableSelection = useVariableSelection({
@@ -109,10 +88,9 @@ function LargeDetailUtilityBar({
 
     // Get model button text: Comparison models shown here / Preferred models
     const getModelButtonText = (): string => {
-        const modelCount = `${modelAvailability.shownModelCount}/${selectedModels.length}`;
-        const aggCount = selectedAggregations.length;
-        if (aggCount > 0) {
-            return `Models (${modelCount} + ${aggCount})`;
+        const modelCount = `${shownModelCount}/${preferredModelCount}`;
+        if (aggregationCount > 0) {
+            return `Models (${modelCount} + ${aggregationCount})`;
         }
         return `Models (${modelCount})`;
     };
@@ -130,7 +108,7 @@ function LargeDetailUtilityBar({
 
             {/* Model Selection Button - Opens Modal */}
             <button
-                onClick={modelHierarchy.openModal}
+                onClick={onOpenModels}
                 className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-background border border-theme-border hover:bg-theme-secondary transition-colors"
             >
                 <Icon icon={icons.controls} className="text-theme-textSecondary" />
@@ -256,10 +234,10 @@ function LargeDetailUtilityBar({
                 <>
                     <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-secondary border border-theme-border">
                         <span className="text-sm text-theme-textSecondary">Elevation:</span>
-                        {isLoadingElevation || customLocation.elevation === null ? (
+                        {customElevation === null ? (
                             <span className="text-sm text-theme-textPrimary font-medium animate-pulse">Loading...</span>
                         ) : (
-                            <span className="text-sm text-theme-textPrimary font-medium">{formatElevation(customLocation.elevation, unitSystem)}</span>
+                            <span className="text-sm text-theme-textPrimary font-medium">{formatElevation(customElevation, unitSystem)}</span>
                         )}
                     </div>
                     <button
@@ -339,18 +317,6 @@ function LargeDetailUtilityBar({
             >
                 <span className="text-lg">{isChartLocked ? '🔒' : '🔓'}</span>
             </button>
-
-            {/* Model Selection Modal */}
-            <ModelSelectionGridModal
-                hierarchy={modelHierarchy}
-                modelAvailability={modelAvailability}
-                hideAggregationMembers={hideAggregationMembers}
-                onToggleHideMembers={() => setHideAggregationMembers(!hideAggregationMembers)}
-                showMinMaxFill={showMinMaxFill}
-                onToggleMinMaxFill={() => setShowMinMaxFill(!showMinMaxFill)}
-                showPercentileFill={showPercentileFill}
-                onTogglePercentileFill={() => setShowPercentileFill(!showPercentileFill)}
-            />
 
             {/* Variable Selection Modal */}
             <VariableSelectionModal selection={variableSelection} />

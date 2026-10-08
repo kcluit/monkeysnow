@@ -12,6 +12,7 @@ import { CapNotice } from './CapNotice';
 import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
 import { nodeMatchesSearch } from '../../hooks/useHierarchyData';
+import { useOverlay } from '../../hooks/useOverlay';
 
 interface ResortSelectionGridModalProps {
   hierarchy: UseResortHierarchyReturn;
@@ -445,35 +446,8 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
     }
   }, [isOpen]);
 
-  // Prevent body scroll when open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
-
-  // Handle keyboard events - use capture phase to intercept before hook's handler
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        e.stopImmediatePropagation(); // Prevent hook's handler from also firing
-        closeModal();
-      }
-    };
-
-    // Use capture phase to handle before the hook's bubbling handler
-    window.addEventListener('keydown', handleKeyDown, true);
-    return () => window.removeEventListener('keydown', handleKeyDown, true);
-  }, [isOpen, closeModal]);
+  // Lock page scroll while open, and close on Esc (ahead of the hook's own Escape handling)
+  useOverlay(isOpen, closeModal);
 
   if (!isOpen) {
     return null;

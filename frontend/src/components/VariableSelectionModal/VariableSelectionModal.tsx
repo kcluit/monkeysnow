@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState, useMemo } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -17,6 +17,7 @@ import {
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { VariableDraggableItem } from './VariableDraggableItem';
 import { VariableCategorySectionDraggable } from './VariableCategorySectionDraggable';
+import { useOverlay } from '../../hooks/useOverlay';
 import type { UseVariableSelectionReturn } from '../../hooks/useVariableSelection';
 
 interface VariableSelectionModalProps {
@@ -125,32 +126,8 @@ export function VariableSelectionModal({
     })).filter(cat => cat.variables.length > 0);
   }, [filteredVariables, orderedCategories]);
 
-  // Prevent body scroll when open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
-
-  // Handle keyboard events
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        closeModal();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, closeModal]);
+  // Lock page scroll while open, and close on Esc
+  useOverlay(isOpen, closeModal);
 
   if (!isOpen) {
     return null;

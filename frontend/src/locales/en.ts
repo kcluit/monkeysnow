@@ -127,4 +127,7 @@ export const en: Translations = {
     'detail.loadingForecast': 'Loading forecast data...',
     'detail.errorLoadingForecast': 'Error loading forecast data',
     'detail.back': 'Back',
+    'detail.noModelCovers': 'None of your preferred models cover this area.',
+    'detail.noModelHasData': 'None of your preferred models have data here.',
+    'detail.chooseModels': 'Choose models',
 };

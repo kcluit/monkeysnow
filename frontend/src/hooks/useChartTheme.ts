@@ -29,7 +29,12 @@ export function useChartTheme(): ChartTheme {
       clearTimeout(timeoutRef.current);
     }
     timeoutRef.current = setTimeout(() => {
-      setTheme(getUPlotTheme());
+      // Keep the same object when no color changed, so charts don't rebuild their configs
+      setTheme((current) => {
+        const next = getUPlotTheme();
+        const unchanged = (Object.keys(next) as (keyof ChartTheme)[]).every((key) => next[key] === current[key]);
+        return unchanged ? current : next;
+      });
     }, DEBOUNCE_DELAY);
   }, []);
 

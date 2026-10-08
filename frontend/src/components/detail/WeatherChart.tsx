@@ -8,6 +8,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useChartTheme } from '../../hooks/useChartTheme';
+import { useFullscreenView } from '../../hooks/useFullscreenView';
 import { UPlotChart } from '../../lib/charts';
 import { setChartZoomSyncExclusion } from '../../lib/charts/chartRegistry';
 import { buildWeatherChartConfig } from '../../utils/chartBuilder';
@@ -20,8 +21,16 @@ import type { ChartDisplayType } from '../../types/chartSettings';
 interface WeatherChartComponentProps extends WeatherChartProps {
 }
 
+// Marks the history entry pushed on entering fullscreen, so Back leaves fullscreen instead of the page
+const FULLSCREEN_HISTORY_KEY = 'chartFullscreen';
+
+// Space a fullscreen chart leaves for its padding, header and legend
+const FULLSCREEN_CHROME_PX = 160;
+const MIN_CHART_HEIGHT = 200;
+
 export function WeatherChart({
     data,
+    timeAxis,
     selectedModels,
     selectedAggregations,
     aggregationColors,
@@ -31,7 +40,6 @@ export function WeatherChart({
     modelLineOpacity,
     variable,
     unitSystem,
-    timezoneInfo,
     isChartLocked,
     isLoading,
     onToggleVisibility,
@@ -79,12 +87,26 @@ export function WeatherChart({
         100 // percentage
     );
 
-    // Fullscreen state
-    const [isFullscreen, setIsFullscreen] = useState(false);
+    // Fullscreen fills the window: Esc and Back leave it, and the page behind can't scroll
+    const { isFullscreen, enterFullscreen, exitFullscreen } = useFullscreenView(FULLSCREEN_HISTORY_KEY);
 
-    // Sync zoom exclusion setting to registry
+    // A fullscreen chart is as tall as the window allows; the Height setting applies inline
+    const [viewportHeight, setViewportHeight] = useState(() => window.innerHeight);
+    useEffect(() => {
+        if (!isFullscreen) return;
+        const updateHeight = () => setViewportHeight(window.innerHeight);
+        updateHeight();
+        window.addEventListener('resize', updateHeight);
+        return () => window.removeEventListener('resize', updateHeight);
+    }, [isFullscreen]);
+    const displayHeight = isFullscreen
+        ? Math.max(MIN_CHART_HEIGHT, viewportHeight - FULLSCREEN_CHROME_PX)
+        : chartHeight;
+
+    // Sync zoom exclusion setting to registry; it outlives the chart being rebuilt, but not this component
     useEffect(() => {
         setChartZoomSyncExclusion(variable, zoomSyncExcluded);
+        return () => setChartZoomSyncExclusion(variable, false);
     }, [variable, zoomSyncExcluded]);
 
     // Settings modal state
@@ -98,6 +120,7 @@ export function WeatherChart({
         return buildWeatherChartConfig(
             {
                 data,
+                timeAxis,
                 selectedModels: providingModels,
                 selectedAggregations,
                 aggregationColors,
@@ -107,7 +130,6 @@ export function WeatherChart({
                 modelLineOpacity,
                 variable,
                 unitSystem,
-                timezoneInfo,
                 isChartLocked,
                 location,
             },
@@ -116,11 +138,12 @@ export function WeatherChart({
                 chartTypeOverride: chartType,
                 showAccumulation,
                 showOverlays,
-                customHeight: chartHeight,
+                customHeight: displayHeight,
             }
         );
     }, [
         data,
+        timeAxis,
         providingModels,
         selectedAggregations,
         aggregationColors,
@@ -130,14 +153,13 @@ export function WeatherChart({
         modelLineOpacity,
         variable,
         unitSystem,
-        timezoneInfo,
         isChartLocked,
         location,
         theme,
         chartType,
         showAccumulation,
         showOverlays,
-        chartHeight,
+        displayHeight,
     ]);
 
     // Handle no data
@@ -219,7 +241,7 @@ export function WeatherChart({
                     <button
                         type="button"
                         className="weather-chart-btn"
-                        onClick={() => setIsFullscreen(!isFullscreen)}
+                        onClick={isFullscreen ? exitFullscreen : enterFullscreen}
                         title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
                     >
                         <svg

@@ -18,20 +18,26 @@ import {
 
 /**
  * Generate a structural key for comparison.
- * Only changes to structural properties should trigger a chart rebuild.
+ * Only changes to structural properties should trigger a chart rebuild. Anything else
+ * is applied to the existing chart, whose axes and plugins read the latest config
+ * whenever they draw.
  */
 function getStructuralKey(config: ChartConfig): string {
     return JSON.stringify({
         type: config.type,
         xAxisType: config.xAxis.type,
+        // A longer or shorter axis needs fresh zoom bounds
+        xLength: config.xAxis.data.length,
         seriesIds: config.series.map(s => s.id),
         seriesTypes: config.series.map(s => s.type),
         seriesColors: config.series.map(s => s.color),
+        // Line styles are baked into the uPlot series when the chart is built
+        seriesOpacity: config.series.map(s => s.opacity ?? 1),
         seriesYAxisIndex: config.series.map(s => s.yAxisIndex ?? 0),
         hasBandData: config.series.map(s => !!s.bandData),
         hasSecondaryAxis: !!config.yAxisSecondary,
+        hasElevationLines: !!config.elevationLines,
         dataZoomEnabled: config.dataZoom?.enabled ?? false,
-        height: config.height,
         // Theme affects colors
         themeAccent: config.theme.accent,
         themeBackground: config.theme.background,
@@ -174,86 +180,49 @@ function formatYAxisValue(value: number, scaleMin: number, scaleMax: number): st
     return decimals === 0 ? Math.round(value).toString() : value.toFixed(decimals);
 }
 
+/** Tick spacing in hours; up to a day they divide 24, so ticks land on the same clock hours each day. */
+const NICE_INCREMENTS = [1, 2, 3, 4, 6, 8, 12, 24, 48, 72, 96];
+
 /**
- * Create a custom splits function that generates evenly-spaced ticks aligned to midnight.
- * This ensures ticks are at consistent intervals (e.g., 12am, 6am, 12pm, 6pm) starting from midnight.
+ * Splits for the hourly x axis, placed on local clock hours: every `incr` hours from
+ * midnight, or every few midnights for multi-day spacing on narrow screens. Reading
+ * each point's hour, rather than counting 24 points a day, keeps the day ticks on
+ * midnight across daylight-saving changes.
  */
-function createMidnightAlignedSplitsFunction(midnightIndices: number[], dataLength: number) {
-    return (_u: uPlot, _axisIdx: number, scaleMin: number, scaleMax: number, foundIncr: number, _foundSpace: number) => {
-        // Snap the increment to a "nice" hour interval that divides 24 evenly
-        // Valid intervals: 1, 2, 3, 4, 6, 8, 12, 24 hours
-        // Extended with multi-day intervals for mobile/narrow views with many days
-        const niceIntervals = [1, 2, 3, 4, 6, 8, 12, 24, 48, 72, 96];
-        let incr = Math.max(1, Math.round(foundIncr));
-
-        // Find the smallest "nice" interval that's >= the calculated increment
-        for (const nice of niceIntervals) {
-            if (nice >= incr) {
-                incr = nice;
-                break;
-            }
-        }
-        // If increment is larger than 96, snap to nearest multiple of 24
-        if (incr > 96) incr = Math.ceil(incr / 24) * 24;
-
+function createClockAlignedSplits(getConfig: () => ChartConfig) {
+    return (_u: uPlot, _axisIdx: number, scaleMin: number, scaleMax: number, foundIncr: number): number[] => {
+        const { data, hours = [], midnightIndices = [] } = getConfig().xAxis;
+        const wanted = Math.max(1, Math.round(foundIncr));
+        const incr = NICE_INCREMENTS.find((nice) => nice >= wanted) ?? Math.ceil(wanted / 24) * 24;
+        const first = Math.max(0, Math.ceil(scaleMin));
+        const last = Math.min(data.length - 1, Math.floor(scaleMax));
         const splits: number[] = [];
 
-        // For multi-day increments (>24h), only place ticks at midnights
         if (incr >= 48) {
             const dayStep = Math.round(incr / 24);
-            // Find first midnight at or after scaleMin
-            let startIdx = midnightIndices.length; // default: no midnights in range
-            for (let i = 0; i < midnightIndices.length; i++) {
-                if (midnightIndices[i] >= scaleMin) {
-                    startIdx = i;
-                    break;
-                }
-            }
-            for (let i = startIdx; i < midnightIndices.length; i += dayStep) {
-                const idx = midnightIndices[i];
-                if (idx > scaleMax || idx >= dataLength) break;
-                if (idx >= scaleMin) {
-                    splits.push(idx);
-                }
+            const visibleMidnights = midnightIndices.filter((i) => i >= first && i <= last);
+            for (let k = 0; k < visibleMidnights.length; k += dayStep) {
+                splits.push(visibleMidnights[k]);
             }
             return splits;
         }
 
-        // Find the first midnight at or before scaleMin
-        let firstMidnight = 0;
-        for (const midnightIdx of midnightIndices) {
-            if (midnightIdx <= scaleMin) {
-                firstMidnight = midnightIdx;
-            } else {
-                break;
-            }
-        }
-
-        // Generate ticks starting from the first midnight, aligned to the interval
-        // Calculate the offset from firstMidnight to the first tick >= scaleMin
-        const offsetFromMidnight = Math.ceil((scaleMin - firstMidnight) / incr) * incr;
-        let start = firstMidnight + offsetFromMidnight;
-
-        for (let i = start; i <= scaleMax && i < dataLength; i += incr) {
-            if (i >= scaleMin) {
+        for (let i = first; i <= last; i++) {
+            // The hour repeated when clocks go back gets a single tick
+            if (hours[i] % incr === 0 && (i === 0 || hours[i - 1] !== hours[i])) {
                 splits.push(i);
             }
         }
-
         return splits;
     };
 }
 
 /**
- * Build uPlot axes configuration.
+ * Build uPlot axes configuration. Labels come from the latest config, so a data
+ * update with new time labels doesn't need a rebuild.
  */
-function buildUPlotAxes(config: ChartConfig): uPlot.Axis[] {
+function buildUPlotAxes(config: ChartConfig, getConfig: () => ChartConfig): uPlot.Axis[] {
     const { xAxis, yAxisSecondary, theme } = config;
-
-    // Create custom splits function if midnight indices are provided
-    const xAxisSplits = xAxis.midnightIndices && xAxis.midnightIndices.length > 0
-        ? createMidnightAlignedSplitsFunction(xAxis.midnightIndices, xAxis.data.length)
-        : undefined;
 
     const axes: uPlot.Axis[] = [
         {
@@ -262,16 +231,11 @@ function buildUPlotAxes(config: ChartConfig): uPlot.Axis[] {
             grid: { show: true, stroke: theme.gridColor, width: 1 },
             ticks: { show: true, stroke: theme.gridColor, size: 5 },
             border: { show: true, stroke: theme.textSecondary, width: 2 },
-            splits: xAxisSplits,
-            values: (_u, vals) =>
-                vals.map((v) => {
-                    const idx = Math.round(v);
-                    // Ensure index is within bounds
-                    if (idx < 0 || idx >= xAxis.data.length) {
-                        return '';
-                    }
-                    return xAxis.data[idx] || '';
-                }),
+            splits: xAxis.hours ? createClockAlignedSplits(getConfig) : undefined,
+            values: (_u, vals) => {
+                const labels = getConfig().xAxis.data;
+                return vals.map((v) => labels[Math.round(v)] ?? '');
+            },
             gap: 8,
             // Multi-day tick skipping handles narrow screens, no rotation needed
             size: 40,
@@ -405,6 +369,9 @@ export class ChartManager {
     private unsubscribeZoom: (() => void) | null = null;
     private isApplyingExternalZoom: boolean = false;
 
+    /** Axes and plugins call this while drawing; a chart only exists once a config has been set. */
+    private readonly getConfig = (): ChartConfig => this.currentConfig!;
+
     constructor(container: HTMLElement, chartId: string) {
         this.container = container;
         this.chartId = chartId;
@@ -436,18 +403,18 @@ export class ChartManager {
         }
 
         const newStructuralKey = getStructuralKey(config);
-        const isStructuralChange = newStructuralKey !== this.structuralKey;
+        // Set first: axes and plugins read it while the chart redraws below
+        this.currentConfig = config;
 
-        if (isStructuralChange) {
-            console.log('[ChartManager] Structural change - rebuilding chart');
+        if (newStructuralKey !== this.structuralKey) {
             this.rebuildChart(config, newStructuralKey);
         } else if (this.chart) {
+            if (this.chart.height !== config.height) {
+                this.chart.setSize({ width: this.container.offsetWidth, height: config.height });
+            }
             // Data-only change - use setData with resetScales=false to preserve zoom
-            const data = transformToUPlotData(config);
-            this.chart.setData(data, false);
+            this.chart.setData(transformToUPlotData(config), false);
         }
-
-        this.currentConfig = config;
     }
 
     /**
@@ -469,18 +436,17 @@ export class ChartManager {
     private createChart(config: ChartConfig): void {
         const width = this.container.offsetWidth;
         if (width === 0) {
-            // Container not ready yet, wait for resize
-            console.log('[ChartManager] Container width is 0, waiting for resize');
+            // Container not ready yet; handleResize creates the chart once it has a width
             return;
         }
 
         // Validate we have data to display
         if (config.xAxis.data.length === 0 || config.series.length === 0) {
-            console.log('[ChartManager] No data to display, skipping chart creation');
             return;
         }
 
         const { dataZoom, series } = config;
+        const getConfig = this.getConfig;
 
         // Build plugins
         const plugins: uPlot.Plugin[] = [];
@@ -495,31 +461,23 @@ export class ChartManager {
             plugins.push(createTouchPlugin({ onZoom: onZoomChange }));
         }
 
-        const bandSeries = series.filter((s) => s.type === 'band' && s.bandData);
-        if (bandSeries.length > 0) {
-            plugins.push(createBandFillPlugin({ series: bandSeries }));
+        if (series.some((s) => s.type === 'band' && s.bandData)) {
+            plugins.push(createBandFillPlugin({ getConfig }));
         }
 
         // Box & whisker plugin - draws ensemble spread visualization
-        const boxWhiskerSeries = series.filter((s) => s.type === 'boxwhisker' && s.boxWhiskerData);
-        if (boxWhiskerSeries.length > 0) {
-            plugins.push(createBoxWhiskerPlugin({ series: boxWhiskerSeries }));
+        if (series.some((s) => s.type === 'boxwhisker' && s.boxWhiskerData)) {
+            plugins.push(createBoxWhiskerPlugin({ getConfig }));
         }
 
         // Heatmap plugin - draws hour-of-day matrix visualization
-        const heatmapSeries = series.find((s) => s.type === 'heatmap' && s.heatmapData);
-        if (heatmapSeries && heatmapSeries.heatmapData) {
-            const allValues = heatmapSeries.heatmapData.values.flat().filter((v): v is number => v !== null && Number.isFinite(v));
-            if (allValues.length > 0) {
-                const valueRange: [number, number] = [Math.min(...allValues), Math.max(...allValues)];
-                plugins.push(createHeatmapPlugin({ series: heatmapSeries, valueRange, theme: config.theme }));
-            }
+        if (series.some((s) => s.type === 'heatmap' && s.heatmapData)) {
+            plugins.push(createHeatmapPlugin({ getConfig }));
         }
 
         // Wind arrow plugin - draws directional arrows on wind speed charts
-        const windArrowSeries = series.find((s) => s.windArrowData);
-        if (windArrowSeries) {
-            plugins.push(createWindArrowPlugin({ series: windArrowSeries }));
+        if (series.some((s) => s.windArrowData)) {
+            plugins.push(createWindArrowPlugin({ getConfig }));
         }
 
         // Zero axis plugin - draws bold line at y=0 for charts that cross zero
@@ -527,15 +485,7 @@ export class ChartManager {
 
         // Elevation lines plugin - draws horizontal lines for base/mid/top elevations on freezing level charts
         if (config.elevationLines) {
-            plugins.push(createElevationLinesPlugin({
-                theme: config.theme,
-                elevations: {
-                    base: config.elevationLines.base,
-                    mid: config.elevationLines.mid,
-                    top: config.elevationLines.top,
-                },
-                unit: config.elevationLines.unit,
-            }));
+            plugins.push(createElevationLinesPlugin({ getConfig }));
         }
 
         // Series focus plugin - highlights series on cursor proximity or legend hover
@@ -543,11 +493,11 @@ export class ChartManager {
         plugins.push(seriesFocus.plugin);
 
         // Tooltip plugin - shows values at cursor position
-        plugins.push(createTooltipPlugin({ config }));
+        plugins.push(createTooltipPlugin({ getConfig }));
 
         // Legend plugin - interactive series toggle with focus integration
         plugins.push(createLegendPlugin({
-            config,
+            getConfig,
             onSeriesHover: seriesFocus.handleLegendHover,
         }));
 
@@ -556,7 +506,7 @@ export class ChartManager {
             width,
             height: config.height,
             series: buildUPlotSeries(config),
-            axes: buildUPlotAxes(config),
+            axes: buildUPlotAxes(config, getConfig),
             scales: buildUPlotScales(config),
             plugins,
             cursor: {
@@ -575,12 +525,6 @@ export class ChartManager {
         // Create chart
         const data = transformToUPlotData(config);
         this.chart = new uPlot(opts, data, this.container);
-
-        console.log('[ChartManager] Chart created', {
-            width,
-            height: config.height,
-            seriesCount: series.length,
-        });
     }
 
     /**
@@ -631,8 +575,6 @@ export class ChartManager {
      */
     destroy(): void {
         if (this.isDestroyed) return;
-
-        console.log('[ChartManager] Destroying');
 
         this.isDestroyed = true;
 

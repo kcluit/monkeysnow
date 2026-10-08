@@ -7,15 +7,11 @@
  */
 
 import type uPlot from 'uplot';
-import type { SeriesConfig, ChartTheme } from '../types';
+import type { ChartConfig } from '../types';
 
 export interface HeatmapPluginOptions {
-    /** Series configuration with heatmapData */
-    series: SeriesConfig;
-    /** Min/max values for color scaling */
-    valueRange: [number, number];
-    /** Theme for colors */
-    theme: ChartTheme;
+    /** Latest chart configuration; its heatmap series is drawn, coloured across its own value range */
+    getConfig: () => ChartConfig;
 }
 
 /**
@@ -56,14 +52,25 @@ function getHeatmapColor(normalized: number): string {
 }
 
 export function createHeatmapPlugin(options: HeatmapPluginOptions): uPlot.Plugin {
-    const { series, valueRange, theme } = options;
-
-    if (!series.heatmapData) {
-        return { hooks: {} };
-    }
+    const { getConfig } = options;
 
     function draw(u: uPlot) {
-        if (!series.heatmapData) return;
+        const { series: allSeries, theme } = getConfig();
+        const heatmapData = allSeries.find((s) => s.type === 'heatmap' && s.heatmapData)?.heatmapData;
+        if (!heatmapData) return;
+
+        const { dates, values } = heatmapData;
+        let minVal = Infinity;
+        let maxVal = -Infinity;
+        for (const row of values) {
+            for (const value of row) {
+                if (value === null || !Number.isFinite(value)) continue;
+                minVal = Math.min(minVal, value);
+                maxVal = Math.max(maxVal, value);
+            }
+        }
+        if (minVal > maxVal) return; // no values to colour
+        const range = maxVal - minVal;
 
         const ctx = u.ctx;
         ctx.save();
@@ -72,10 +79,6 @@ export function createHeatmapPlugin(options: HeatmapPluginOptions): uPlot.Plugin
         ctx.beginPath();
         ctx.rect(u.bbox.left, u.bbox.top, u.bbox.width, u.bbox.height);
         ctx.clip();
-
-        const { dates, values } = series.heatmapData;
-        const [minVal, maxVal] = valueRange;
-        const range = maxVal - minVal;
 
         // Calculate cell dimensions
         const numDates = dates.length;

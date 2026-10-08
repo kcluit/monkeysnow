@@ -7,29 +7,23 @@
  */
 
 import type uPlot from 'uplot';
-import type { ChartTheme } from '../types';
+import type { ChartConfig } from '../types';
 
 export interface ElevationLinesPluginOptions {
-    /** Theme for color extraction */
-    theme: ChartTheme;
-    /** Elevation values to draw lines for (already in display units - meters or feet) */
-    elevations: {
-        base: number;
-        mid: number;
-        top: number;
-    };
-    /** Unit string for labels (m or ft) */
-    unit: string;
+    /** Latest chart configuration; lines come from its elevationLines (already in display units) */
+    getConfig: () => ChartConfig;
     /** Line width (default: 1) */
     lineWidth?: number;
 }
 
 export function createElevationLinesPlugin(options: ElevationLinesPluginOptions): uPlot.Plugin {
-    const { theme, elevations, unit, lineWidth = 1 } = options;
+    const { getConfig, lineWidth = 1 } = options;
 
     function draw(u: uPlot) {
+        const { elevationLines, theme } = getConfig();
         const yScale = u.scales.y;
-        if (!yScale) return;
+        if (!yScale || !elevationLines) return;
+        const { unit, ...elevations } = elevationLines;
 
         const ctx = u.ctx;
         ctx.save();
