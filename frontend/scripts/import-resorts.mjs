@@ -123,6 +123,15 @@ function liftCount(statistics) {
   return Object.values(statistics?.lifts?.byType ?? {}).reduce((n, t) => n + (t.count ?? 0), 0);
 }
 
+/** A URL slug for a name, without generic endings: "Big White Ski Resort" -> big-white. */
+function slugForName(name) {
+  const slug = slugify(name);
+  const trimmed = slug
+    .replace(/^skigebiet-/, '')
+    .replace(/-(ski-(resort|area|centre|center|hill|station|park)|mountain-resort|ski-and-snowboard-resort|resort)$/, '');
+  return trimmed || slug;
+}
+
 /** OpenSkiData joins localized names with ", "; show the first Latin-script one and keep the rest searchable. */
 function splitName(raw) {
   const variants = raw.split(', ').map(v => v.trim()).filter(Boolean);
