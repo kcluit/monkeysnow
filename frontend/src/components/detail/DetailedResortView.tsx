@@ -184,6 +184,10 @@ export function DetailedResortView({
         enabled: true,
     });
 
+    // During a rate-limit pause, say how many models are still waiting instead of a bare spinner
+    const pause = useBudgetPause();
+    const pendingModels = Math.max(0, selectedModels.length - (data?.size ?? 0));
+
     return (
         <div>
             {/* Resort Map */}
