@@ -129,9 +129,11 @@ const toSlug = text => slugify(text, { allowedChars: 'a-zA-Z0-9' });
 /** A URL slug for a name, without generic endings: "Big White Ski Resort" -> big-white. */
 function slugForName(name) {
   const slug = toSlug(name);
-  const trimmed = slug
-    .replace(/^skigebiet-/, '')
-    .replace(/-(ski-(resort|area|centre|center|hill|station|park)|mountain-resort|ski-and-snowboard-resort|resort)$/, '');
+  let trimmed = slug.replace(/^skigebiet-/, '');
+  for (let previous; previous !== trimmed;) {
+    previous = trimmed;
+    trimmed = trimmed.replace(/-(ski-(resort|area|centre|center|hill|station|park)|mountain-resort|ski-and-snowboard-resort|resort)$/, '');
+  }
   return trimmed || slug;
 }
 
