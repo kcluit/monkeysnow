@@ -4,6 +4,11 @@ import { useLanguage } from '../hooks/useLanguage';
 import { interpolate } from '../locales';
 import { FETCH_BUDGET_PER_MINUTE } from '../utils/openMeteoBudget';
 
+const NOUN_KEYS = {
+    resorts: ['fetchStatus.resort', 'fetchStatus.resorts'],
+    models: ['fetchStatus.model', 'fetchStatus.models'],
+} as const;
+
 interface FetchStatusProps {
     /** How many things are still waiting to load */
     count: number;
