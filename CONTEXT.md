@@ -7,8 +7,12 @@ Ski resort weather forecasts with snow-quality estimates, fetched from Open-Mete
 ### Resorts
 
 **Resort**:
-A ski area with a fixed location, identified by a slug ID such as `Big-White`.
+A ski area with a fixed location, identified by a permanent slug such as `big-white` that never changes once given, even if the area is renamed.
 _Avoid_: location, mountain, spot
+
+**Region**:
+An administrative area inside a country, such as a state, province, canton or prefecture, used to group **Resorts** for picking. Only countries with many **Resorts** are split into Regions.
+_Avoid_: province, state (as the general term)
 
 **Elevation band**:
 One of a **Resort**'s three forecast heights: base (`bot`), mid or top.
