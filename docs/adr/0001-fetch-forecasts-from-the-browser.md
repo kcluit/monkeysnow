@@ -4,4 +4,4 @@ We removed the Express backend that pre-fetched forecasts for every Resort once 
 
 ## Consequences
 
-Each Resort costs about 3–4 calls (three **Elevation bands**, plus a separate freezing-level call where the regional model lacks one). That is what drives the **Selection cap** of 300, the per-tab **Fetch budget**, the three-hour **Freshness window**, and pausing until the window resets when a **Rate limit** is hit. Anyone tempted to raise the cap or shorten the window should redo that arithmetic against the daily limit first.
+Each Resort costs 3–4 calls: one per **Elevation band**, plus a separate freezing-level call everywhere except GFS regions. That is what drives the **Selection cap** of 300, the per-tab **Fetch budget**, the three-hour **Freshness window**, and pausing until the window resets when a **Rate limit** is hit. Anyone tempted to raise the cap or shorten the window should redo that arithmetic against the daily limit first.
