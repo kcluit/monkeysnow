@@ -1287,6 +1287,21 @@ input[type="checkbox"] {
     margin-left: 8px;
 }
 
+.resort-selection-cap-notice {
+    margin-left: auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--textSecondary);
+    font-size: 11px;
+}
+
+.resort-selection-cap-notice + .resort-grid-clear-btn,
+.resort-selection-cap-notice + .resort-selection-count {
+    margin-left: 8px;
+}
+
 /* Rainbow mode for resort selection */
 .rainbow-mode .resort-checkbox.checked,
 .rainbow-mode .resort-checkbox.indeterminate {
@@ -2645,7 +2660,7 @@ input[type="checkbox"] {
     min-height: 0;
 }
 
-/* Resort map expand/collapse */
+/* Resort map expand/collapse and fullscreen */
 .resort-map-container {
     height: 200px;
     transition: height 0.3s ease;
@@ -2659,11 +2674,34 @@ input[type="checkbox"] {
     height: 500px;
 }
 
-.resort-map-expand-btn {
+.resort-map-frame {
+    position: relative;
+    height: 100%;
+}
+
+/* Covers the browser window, like .weather-chart-fullscreen */
+.resort-map-fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    height: auto;
+    background: var(--background, #1c1c1e);
+}
+
+.resort-map-fullscreen .leaflet-container {
+    border-radius: 0;
+}
+
+.resort-map-controls {
     position: absolute;
     bottom: 8px;
     left: 8px;
     z-index: 1000;
+    display: flex;
+    gap: 6px;
+}
+
+.resort-map-btn {
     width: 28px;
     height: 28px;
     display: flex;
