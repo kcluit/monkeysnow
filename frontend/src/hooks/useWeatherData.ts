@@ -101,6 +101,7 @@ export function useWeatherData(selectedResorts: string[]): UseWeatherDataReturn 
             if (signal.aborted) return;
             mergeForecasts(fresh);
             writeCachedForecasts(fresh);
+            setError(null);
             break;
           } catch (err) {
             if (signal.aborted) return;
