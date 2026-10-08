@@ -34,6 +34,7 @@ export function CompactDetailUtilityBar({
     customLocation,
     onResetCustomLocation,
     isLoadingElevation,
+    modelAvailability,
 }: DetailUtilityBarProps): JSX.Element {
     // Model hierarchy hook for modal
     const modelHierarchy = useModelHierarchy({
