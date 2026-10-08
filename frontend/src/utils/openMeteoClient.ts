@@ -247,7 +247,10 @@ export async function fetchOpenMeteoData(
 
     return { data: result, timezoneInfo };
   } catch (error) {
-    console.error('Error fetching Open-Meteo data:', error);
+    // Aborts are expected when the view changes before a request goes out
+    if ((error as Error).name !== 'AbortError') {
+      console.error('Error fetching Open-Meteo data:', error);
+    }
     throw error;
   }
 }
