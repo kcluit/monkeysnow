@@ -175,6 +175,7 @@ export function CompactDetailUtilityBar({
             {/* Model Selection Modal */}
             <ModelSelectionGridModal
                 hierarchy={modelHierarchy}
+                modelAvailability={modelAvailability}
                 hideAggregationMembers={hideAggregationMembers}
                 onToggleHideMembers={() => setHideAggregationMembers(!hideAggregationMembers)}
                 showMinMaxFill={showMinMaxFill}
