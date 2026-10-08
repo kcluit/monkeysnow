@@ -29,6 +29,9 @@ interface DetailedResortViewPropsWithUnits extends DetailedResortViewProps {
     onBack: () => void;
 }
 
+// Keys whose saved values were dropped by moving to a new key (docs/adr/0003, docs/adr/0005)
+const RETIRED_STORAGE_KEYS = ['detailSelectedModels', 'detailPreferredModels', 'detailSelectedAggregations'];
+
 // Default aggregation colors
 const DEFAULT_AGGREGATION_COLORS: Record<AggregationType, string> = {
     median: aggregationOptions.find(a => a.id === 'median')?.defaultColor ?? '#a855f7',
@@ -50,14 +53,14 @@ export function DetailedResortView({
     onBack,
 }: DetailedResortViewPropsWithUnits): JSX.Element {
     // The visitor's Preferred models: one list for every Resort, starting as the Recommended models.
-    // A new key wipes the old 'detailSelectedModels' lists once (docs/adr/0003).
+    // New keys wipe saved model lists and Aggregations once (docs/adr/0003, docs/adr/0005).
     const [preferredModels, setPreferredModels] = useLocalStorage<WeatherModel[]>(
-        'detailPreferredModels',
+        'detailPreferredModelsV2',
         RECOMMENDED_MODELS
     );
     useEffect(() => {
         try {
-            localStorage.removeItem('detailSelectedModels');
+            for (const key of RETIRED_STORAGE_KEYS) localStorage.removeItem(key);
         } catch {
             // Storage unavailable; nothing to clean up
         }
@@ -69,10 +72,10 @@ export function DetailedResortView({
         DEFAULT_VARIABLES
     );
 
-    // State for selected aggregations (median, mean)
+    // State for selected aggregations - none by default, since two models have no useful median (docs/adr/0005)
     const [selectedAggregations, setSelectedAggregations] = useLocalStorage<AggregationType[]>(
-        'detailSelectedAggregations',
-        ['median', 'mean']
+        'detailSelectedAggregationsV2',
+        []
     );
 
     // State for aggregation colors (user configurable)

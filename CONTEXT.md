@@ -91,7 +91,7 @@ A visitor's own list of **Forecast models**, one list for every **Resort**. Ever
 _Avoid_: selected models, default models, **Selection** (that is **Resorts**)
 
 **Recommended models**:
-The **Preferred models** a visitor starts with, covering every part of the world at once and chosen so that no model repeats another **Provider**'s numbers for part of its forecast.
+The **Preferred models** a visitor starts with: two global **Forecast models** from different **Providers**, so every **Resort** and **Custom location** opens on two forecasts that never copy each other.
 _Avoid_: default models, defaults
 
 **Comparison models**:
