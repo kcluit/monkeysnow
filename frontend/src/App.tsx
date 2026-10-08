@@ -32,6 +32,7 @@ import { useHideBorders } from './hooks/useHideBorders';
 import { useShowDate } from './hooks/useShowDate';
 import { useResortHierarchy, MAX_SELECTED_RESORTS } from './hooks/useResortHierarchy';
 import { FetchStatus } from './components/FetchStatus';
+import { useBudgetPause } from './hooks/useBudgetPause';
 import { interpolate } from './locales';
 import { useUnitSystem } from './hooks/useUnitSystem';
 import { useIsMobile } from './hooks/useIsMobile';
