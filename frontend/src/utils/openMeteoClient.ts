@@ -1,11 +1,7 @@
-import { fetchWeatherApi } from 'openmeteo';
 import type { WeatherModel, WeatherVariable, HourlyDataPoint, TimezoneInfo } from '../types/openMeteo';
 import { getOverlayVariablesFor, hasOverlays } from './chartConfigurations';
-
-// Import locations from backend
-import locationsData from '../../../backend/locations.json';
-
-const OPEN_METEO_URL = 'https://api.open-meteo.com/v1/forecast';
+import { fetchWeatherApiWithinBudget } from './openMeteoBudget';
+import { RESORT_LOCATIONS, type ResortLocation } from '../data/resortLocations';
 
 // DEV MODE: Enable mock data for performance testing
 // Set window.__USE_MOCK_DATA = true in browser console to enable
