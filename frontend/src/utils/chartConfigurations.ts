@@ -1096,6 +1096,14 @@ export interface OverlayConfig {
 // Overlay configurations - maps base variables to their overlay levels
 export const OVERLAY_CONFIGS: OverlayConfig[] = [
   {
+    baseVariable: 'temperature_80m',
+    overlays: [
+      { variable: 'temperature_120m', label: '120m', color: '#e11d48', opacity: 0.7 },
+      { variable: 'temperature_180m', label: '180m', color: '#be123c', opacity: 0.6 },
+    ],
+    description: 'altitude levels',
+  },
+  {
     baseVariable: 'wind_speed_10m',
     overlays: [
       { variable: 'wind_speed_80m', label: '80m', color: '#22c55e', opacity: 0.7 },
