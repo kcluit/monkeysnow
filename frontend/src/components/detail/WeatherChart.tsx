@@ -172,7 +172,7 @@ export function WeatherChart({
                     </div>
                 </div>
                 <div className="weather-chart-no-data">
-                    <p>No data available</p>
+                    <p>{emptyMessage}</p>
                 </div>
             </div>
         );
