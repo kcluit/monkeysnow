@@ -139,17 +139,17 @@ function App(): JSX.Element {
     const { t, language, setLanguage, availableLanguages } = useLanguage();
     const isMobile = useIsMobile();
 
-    // Hierarchy data from backend (resort list, display names)
+    // Hierarchy data bundled with the app (resort list, display names)
     const { skiResorts, getDisplayName, loading: hierarchyLoading } = useHierarchy();
-
-    // Weather data hook
-    const { allWeatherData, loading: weatherLoading, fetchResorts, createLoadingController, cancelLoading } = useWeatherData();
-
-    // Only block UI if NO cached data at all
-    const loading = (!allWeatherData && weatherLoading) || (!allWeatherData && hierarchyLoading);
 
     // Local storage state
     const [selectedResorts, setSelectedResorts] = useLocalStorage<string[]>('selectedResorts', defaultSelectedResorts);
+
+    // Weather data hook — keeps the selection's forecasts loaded within the Fetch budget
+    const { allWeatherData, loading: weatherLoading, queuedCount, queuedCalls, createLoadingController, cancelLoading } = useWeatherData(selectedResorts);
+
+    // Only block UI if NO cached data at all
+    const loading = (!allWeatherData && weatherLoading) || (!allWeatherData && hierarchyLoading);
     const [selectedElevation, setSelectedElevation] = useLocalStorage<ElevationLevel>('selectedElevation', defaultElevation);
     const [selectedSort, setSelectedSort] = useLocalStorage<SortOption>('selectedSort', defaultSort);
     const [selectedSortDay, setSelectedSortDay] = useLocalStorage<SortDay>('selectedSortDay', defaultSortDay);
