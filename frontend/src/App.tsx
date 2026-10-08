@@ -184,17 +184,11 @@ function App(): JSX.Element {
         }
     }, [hierarchyLoading, skiResorts, hasInitialized, setSelectedResorts, setHasInitialized]);
 
-    // Initial page load fetch — fetch selected resorts once on mount
-    const initialFetchDone = useRef(false);
-    useEffect(() => {
-        if (!initialFetchDone.current && selectedResorts.length > 0) {
-            initialFetchDone.current = true;
-            fetchResorts(selectedResorts);
-        }
-    }, [selectedResorts, fetchResorts]);
-
     // Banner dismissal state
     const [bannerDismissed, setBannerDismissed] = useLocalStorage<boolean>('bannerDismissed', false);
+
+    // Set by main.tsx when a selection saved under the old cap was trimmed
+    const [selectionTrimmed, setSelectionTrimmed] = useLocalStorage<boolean>('selectionTrimmed', false);
 
     // Track whether the resort modal has ever been opened (for first-visit empty draft)
     const [hasOpenedResortModal, setHasOpenedResortModal] = useLocalStorage<boolean>('hasOpenedResortModal', false);
