@@ -11,7 +11,7 @@ Any entry in OpenSkiData, the open dataset behind OpenSkiMap, whether operating,
 _Avoid_: resort (for one that hasn't passed the filter)
 
 **Resort**:
-A named, operating downhill **Ski area** with at least one lift and a known elevation range, identified by a permanent slug such as `big-white` that never changes once given, even if the area is renamed.
+A named, operating downhill **Ski area** with at least one lift and a known elevation range, identified by a slug such as `big-white`. The slug never changes by accident, even if the area is renamed; when it is changed deliberately, every earlier slug keeps working.
 _Avoid_: location, mountain, spot
 
 **Region**:
