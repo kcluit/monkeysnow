@@ -105,10 +105,9 @@ export const en: Translations = {
     'units.imperial': 'Imperial (°F, in, mph)',
 
     // Loading and Error states
-    'loading.weatherData': 'Coming back next winter... ❄️',
+    'loading.weatherData': 'Loading weather data...',
     'error.loadingWeatherData': 'Error loading weather data',
     'error.tryRefreshing': 'Please try refreshing the page',
-    'error.offSeason': 'Coming back next winter... ❄️',
 
     // Empty states
     'empty.selectResorts': 'Select resorts to view forecasts',
