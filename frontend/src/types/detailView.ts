@@ -126,6 +126,7 @@ export interface DetailChartGridProps {
     unitSystem: UnitSystem;
     timezoneInfo?: TimezoneInfo;
     isChartLocked?: boolean;
+    isLoading?: boolean;
     onToggleVariable?: (variable: WeatherVariable) => void;
     /** Location elevations for freezing level chart reference lines */
     location?: {
