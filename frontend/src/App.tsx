@@ -664,6 +664,7 @@ function App(): JSX.Element {
             <div className="min-h-screen p-4 sm:p-6 md:p-8 flex items-center justify-center bg-theme-background transition-colors duration-300 overflow-x-hidden">
                 <div className="text-center">
                     <div className="text-xl font-semibold text-theme-textSecondary">{t('loading.weatherData')}</div>
+                    <FetchStatus count={queuedCount} calls={queuedCalls} things="resorts" className="mt-2 text-sm text-theme-textSecondary" />
                 </div>
             </div>
         );
