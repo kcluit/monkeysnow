@@ -1019,6 +1019,11 @@ export const ALL_VARIABLES: WeatherVariable[] = [
   'cloud_cover_mid',
   'cloud_cover_high',
   'visibility',
+  'cloud_cover_2m',
+  'cloud_base',
+  'cloud_top',
+  'convective_cloud_base',
+  'convective_cloud_top',
   // Solar & Radiation
   'shortwave_radiation',
   'direct_radiation',
