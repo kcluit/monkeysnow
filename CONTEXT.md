@@ -6,8 +6,12 @@ Ski resort weather forecasts with snow-quality estimates, fetched from Open-Mete
 
 ### Resorts
 
+**Ski area**:
+Any entry in OpenSkiData, the open dataset behind OpenSkiMap, whether operating, abandoned, nordic-only or unnamed. Most are not **Resorts**.
+_Avoid_: resort (for one that hasn't passed the filter)
+
 **Resort**:
-A ski area with a fixed location, identified by a permanent slug such as `big-white` that never changes once given, even if the area is renamed.
+A named, operating downhill **Ski area** with at least one lift and a known elevation range, identified by a permanent slug such as `big-white` that never changes once given, even if the area is renamed.
 _Avoid_: location, mountain, spot
 
 **Region**:
