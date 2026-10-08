@@ -161,44 +161,26 @@ function estimateHourlySnow(tempC: number, humidity: number, snowfallCm: number)
 
 // --- Model selection ---
 
-// Country-to-model mapping
+// Card model by ISO country code
 const COUNTRY_MODELS: Record<string, string> = {
-    'Canada': 'gem_seamless',
-    'USA': 'gfs_seamless',
-    'Japan': 'jma_seamless',
-    // DWD ICON Seamless — Central Europe & Alps
-    'Germany': 'dwd_icon_seamless',
-    'Austria': 'dwd_icon_seamless',
-    'Switzerland': 'dwd_icon_seamless',
-    'Liechtenstein': 'dwd_icon_seamless',
-    'Italy': 'dwd_icon_seamless',
-    'Slovenia': 'dwd_icon_seamless',
-    'France': 'dwd_icon_seamless',
+    CA: 'gem_seamless',
+    US: 'gfs_seamless',
+    JP: 'jma_seamless',
     // MET Norway Nordic Seamless — Scandinavia & Nordics
-    'Norway': 'metno_seamless',
-    'Sweden': 'metno_seamless',
-    'Finland': 'metno_seamless',
-    'Iceland': 'metno_seamless',
+    NO: 'metno_seamless',
+    SE: 'metno_seamless',
+    FI: 'metno_seamless',
+    IS: 'metno_seamless',
     // DMI Seamless — Denmark & Greenland
-    'Denmark': 'dmi_seamless',
+    DK: 'dmi_seamless',
 };
-const DEFAULT_MODEL = 'gfs_seamless';
+// Rest of Europe, Alps included: ICON's European model covers the whole continent
+const EUROPE_MODEL = 'dwd_icon_seamless';
+// Everywhere else: ECMWF IFS at 9 km, the strongest global model Open-Meteo serves.
+// KMA (Korea) and BOM (Australia) returned no data at resorts when this was chosen.
+const DEFAULT_MODEL = 'ecmwf_ifs';
 
-// Country-to-freezing-level-model mapping
-const FREEZING_LEVEL_MODELS: Record<string, string> = {
-    'Germany': 'icon_seamless',
-    'Austria': 'icon_seamless',
-    'Switzerland': 'icon_seamless',
-    'Liechtenstein': 'icon_seamless',
-    'Italy': 'icon_seamless',
-    'Slovenia': 'icon_seamless',
-    'France': 'icon_seamless',
-    'Norway': 'icon_seamless',
-    'Sweden': 'icon_seamless',
-    'Finland': 'icon_seamless',
-    'Iceland': 'icon_seamless',
-    'Denmark': 'icon_seamless',
-};
+const EUROPE_FREEZING_MODEL = 'icon_seamless';
 const DEFAULT_FREEZING_MODEL = 'gfs_seamless';
 
 /**
