@@ -31,6 +31,11 @@ const customLocationIcon = L.divIcon({
     popupAnchor: [0, -12],
 });
 
+// Marks the history entry pushed on entering fullscreen, so Back closes the map instead of leaving the page
+const FULLSCREEN_HISTORY_KEY = 'resortMapFullscreen';
+
+type MapSize = 'small' | 'expanded' | 'fullscreen';
+
 interface ResortMapProps {
     lat: number;
     lon: number;
