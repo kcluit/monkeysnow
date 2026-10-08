@@ -49,7 +49,18 @@ export const VARIABLE_CATEGORIES: VariableCategory[] = [
   {
     id: 'clouds',
     name: 'Clouds & Visibility',
-    variables: ['cloud_cover', 'cloud_cover_low', 'cloud_cover_mid', 'cloud_cover_high', 'visibility'],
+    variables: [
+      'cloud_cover',
+      'cloud_cover_low',
+      'cloud_cover_mid',
+      'cloud_cover_high',
+      'visibility',
+      'cloud_cover_2m',
+      'cloud_base',
+      'cloud_top',
+      'convective_cloud_base',
+      'convective_cloud_top',
+    ],
   },
   {
     id: 'radiation',
