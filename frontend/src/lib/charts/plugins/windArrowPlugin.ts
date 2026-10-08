@@ -6,7 +6,7 @@
  * Wind direction uses meteorological convention (direction wind is coming FROM).
  */
 
-import type uPlot from 'uplot';
+import uPlot from 'uplot';
 import type { ChartConfig } from '../types';
 
 export interface WindArrowPluginOptions {
@@ -35,6 +35,8 @@ export function createWindArrowPlugin(options: WindArrowPluginOptions): uPlot.Pl
 
         const { direction } = series.windArrowData;
         const color = series.color;
+        // The canvas is in device pixels: arrows keep their CSS size on high-density screens
+        const pxRatio = uPlot.pxRatio;
 
         // Draw arrows at the bottom third of the chart
         const arrowY = u.bbox.top + u.bbox.height * 0.85;
@@ -52,7 +54,7 @@ export function createWindArrowPlugin(options: WindArrowPluginOptions): uPlot.Pl
             // Arrow points in direction wind is going TO (opposite of FROM)
             const angleRad = ((dir + 180) * Math.PI) / 180;
 
-            drawArrow(ctx, x, arrowY, angleRad, arrowSize, color);
+            drawArrow(ctx, x, arrowY, angleRad, arrowSize * pxRatio, 2 * pxRatio, color);
         }
 
         ctx.restore();
@@ -71,7 +73,8 @@ export function createWindArrowPlugin(options: WindArrowPluginOptions): uPlot.Pl
  * @param x - X position
  * @param y - Y position
  * @param angle - Direction in radians (0 = right, increases clockwise)
- * @param size - Arrow size in pixels
+ * @param size - Arrow size in canvas pixels
+ * @param lineWidth - Shaft width in canvas pixels
  * @param color - Arrow color
  */
 function drawArrow(
@@ -80,6 +83,7 @@ function drawArrow(
     y: number,
     angle: number,
     size: number,
+    lineWidth: number,
     color: string
 ): void {
     ctx.save();
@@ -93,7 +97,7 @@ function drawArrow(
 
     ctx.strokeStyle = color;
     ctx.fillStyle = color;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = lineWidth;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 

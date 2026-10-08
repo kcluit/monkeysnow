@@ -552,6 +552,8 @@ export class ChartManager {
      */
     private applyExternalZoom(min: number, max: number): void {
         if (!this.chart || this.isDestroyed) return;
+        // A heatmap's x axis is days, not the hours the other charts zoom over
+        if (this.currentConfig?.type === 'heatmap') return;
 
         this.isApplyingExternalZoom = true;
         try {

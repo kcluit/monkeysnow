@@ -6,7 +6,7 @@
  * charts and other metrics where zero is a meaningful threshold.
  */
 
-import type uPlot from 'uplot';
+import uPlot from 'uplot';
 import type { ChartTheme } from '../types';
 
 export interface ZeroAxisPluginOptions {
@@ -46,9 +46,9 @@ export function createZeroAxisPlugin(options: ZeroAxisPluginOptions): uPlot.Plug
         const left = u.bbox.left;
         const width = u.bbox.width;
 
-        // Draw bold zero line in accent color (matching X/Y axis borders)
+        // Draw bold zero line in accent color (matching X/Y axis borders), in CSS px like uPlot's own lines
         ctx.strokeStyle = theme.textSecondary;
-        ctx.lineWidth = lineWidth;
+        ctx.lineWidth = lineWidth * uPlot.pxRatio;
         ctx.beginPath();
         ctx.moveTo(left, y);
         ctx.lineTo(left + width, y);

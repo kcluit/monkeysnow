@@ -17,59 +17,62 @@ export interface BandFillPluginOptions {
 export function createBandFillPlugin(options: BandFillPluginOptions): uPlot.Plugin {
     const { getConfig } = options;
 
-    function draw(u: uPlot) {
-        const bandSeries = getConfig().series.filter((s) => s.type === 'band' && s.bandData);
+    // uPlot fires drawSeries after each series, so each band is drawn in its own turn, under the lines after it
+    function draw(u: uPlot, seriesIdx: number) {
+        const series = getConfig().series[seriesIdx - 1];
+        if (series?.type !== 'band' || !series.bandData) return;
         const ctx = u.ctx;
 
         ctx.save();
 
-        for (const series of bandSeries) {
-            if (!series.bandData) continue;
+        // Clip to chart area, which a zoomed-in band would otherwise spill out of
+        ctx.beginPath();
+        ctx.rect(u.bbox.left, u.bbox.top, u.bbox.width, u.bbox.height);
+        ctx.clip();
 
-            const { upper, lower } = series.bandData;
-            const fillOpacity = series.fillOpacity ?? 0.1;
-            const fillColor = colorWithOpacity(series.color, fillOpacity);
+        const { upper, lower } = series.bandData;
+        const fillOpacity = series.fillOpacity ?? 0.1;
+        const fillColor = colorWithOpacity(series.color, fillOpacity);
 
-            ctx.fillStyle = fillColor;
+        ctx.fillStyle = fillColor;
 
-            const pathPoints: Array<{ x: number; yUpper: number; yLower: number }> = [];
+        const pathPoints: Array<{ x: number; yUpper: number; yLower: number }> = [];
 
-            // Collect valid points
-            for (let i = 0; i < upper.length; i++) {
-                const upperVal = upper[i];
-                const lowerVal = lower[i];
+        // Collect valid points
+        for (let i = 0; i < upper.length; i++) {
+            const upperVal = upper[i];
+            const lowerVal = lower[i];
 
-                // Skip null/undefined/NaN values
-                if (upperVal === null || lowerVal === null ||
-                    !Number.isFinite(upperVal) || !Number.isFinite(lowerVal)) {
-                    // Draw accumulated path if any
-                    if (pathPoints.length > 0) {
-                        drawBandPath(ctx, pathPoints);
-                        pathPoints.length = 0;
-                    }
-                    continue;
+            // Skip null/undefined/NaN values
+            if (upperVal === null || lowerVal === null ||
+                !Number.isFinite(upperVal) || !Number.isFinite(lowerVal)) {
+                // Draw accumulated path if any
+                if (pathPoints.length > 0) {
+                    drawBandPath(ctx, pathPoints);
+                    pathPoints.length = 0;
                 }
-
-                const x = u.valToPos(i, 'x', true);
-                const yUpper = u.valToPos(upperVal, 'y', true);
-                const yLower = u.valToPos(lowerVal, 'y', true);
-
-                // Skip if positions are invalid (NaN or Infinity)
-                if (!Number.isFinite(x) || !Number.isFinite(yUpper) || !Number.isFinite(yLower)) {
-                    if (pathPoints.length > 0) {
-                        drawBandPath(ctx, pathPoints);
-                        pathPoints.length = 0;
-                    }
-                    continue;
-                }
-
-                pathPoints.push({ x, yUpper, yLower });
+                continue;
             }
 
-            // Draw remaining path
-            if (pathPoints.length > 0) {
-                drawBandPath(ctx, pathPoints);
+            const x = u.valToPos(i, 'x', true);
+            const yUpper = u.valToPos(upperVal, 'y', true);
+            const yLower = u.valToPos(lowerVal, 'y', true);
+
+            // Skip if positions are invalid (NaN or Infinity)
+            if (!Number.isFinite(x) || !Number.isFinite(yUpper) || !Number.isFinite(yLower)) {
+                if (pathPoints.length > 0) {
+                    drawBandPath(ctx, pathPoints);
+                    pathPoints.length = 0;
+                }
+                continue;
             }
+
+            pathPoints.push({ x, yUpper, yLower });
+        }
+
+        // Draw remaining path
+        if (pathPoints.length > 0) {
+            drawBandPath(ctx, pathPoints);
         }
 
         ctx.restore();
