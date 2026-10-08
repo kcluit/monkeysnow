@@ -82,9 +82,11 @@ function ResortDetailRoute({
     modelLineOpacity: ModelLineOpacity;
     getDisplayName: (id: string) => string;
 }): JSX.Element | null {
-    const { resortId } = useParams<{ resortId: string }>();
+    const { resortId: requestedId } = useParams<{ resortId: string }>();
     const navigate = useNavigate();
 
+    // Earlier slugs and pre-OpenSkiData IDs (e.g. /resort/Big-White) redirect to the current slug
+    const resortId = requestedId ? resolveResortId(requestedId) : null;
     const location = resortId ? getResortLocation(resortId) : null;
     const displayName = resortId ? getDisplayName(resortId) : '';
 
