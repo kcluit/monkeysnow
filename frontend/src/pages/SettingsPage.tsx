@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { Icon } from '../components/Icon';
 import { icons } from '../constants/icons';
 import type { Theme } from '../types/themes';
@@ -134,6 +135,69 @@ function OptionButton({ label, isSelected, onClick, icon, onHover, onHoverEnd }:
     );
 }
 
+interface ThemePickerProps {
+    themes: Theme[];
+    currentThemeId: string;
+    setTheme: (id: string) => void;
+    applyTheme: (theme: Theme) => void;
+    resetThemePreview: () => void;
+}
+
+// Searchable, scrolling list of themes, each button painted in its own colours
+function ThemePicker({ themes, currentThemeId, setTheme, applyTheme, resetThemePreview }: ThemePickerProps): JSX.Element {
+    const [query, setQuery] = useState('');
+    const listRef = useRef<HTMLDivElement>(null);
+    const needle = query.trim().toLowerCase();
+    const shownThemes = needle ? themes.filter(t => t.name.toLowerCase().includes(needle)) : themes;
+
+    // Keep the current theme in view (it is restored from storage after the first render)
+    useEffect(() => {
+        const list = listRef.current;
+        const selected = list?.querySelector<HTMLElement>('.selected');
+        if (!list || !selected) return;
+        const outOfView = selected.offsetTop < list.scrollTop
+            || selected.offsetTop + selected.offsetHeight > list.scrollTop + list.clientHeight;
+        if (outOfView) {
+            list.scrollTop = selected.offsetTop - (list.clientHeight - selected.offsetHeight) / 2;
+        }
+    }, [currentThemeId]);
+
+    return (
+        <>
+            <input
+                type="text"
+                className="settings-search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search themes..."
+                aria-label="Search themes"
+                autoComplete="off"
+                spellCheck={false}
+            />
+            <div ref={listRef} className="settings-options-grid settings-theme-list" onMouseLeave={resetThemePreview}>
+                {shownThemes.map(t => (
+                    <button
+                        key={t.id}
+                        onClick={() => setTheme(t.id)}
+                        onMouseEnter={() => applyTheme(t)}
+                        onMouseLeave={resetThemePreview}
+                        className={`settings-option-btn ${currentThemeId === t.id ? 'selected' : ''}`}
+                        style={{ background: t.colors.background, color: t.colors.accent }}
+                        title={t.name}
+                    >
+                        <span className="settings-option-icon" style={{ color: t.colors.textSecondary }}>
+                            <Icon icon={t.isDark ? icons.dark : icons.light} />
+                        </span>
+                        <span className="settings-theme-name">{t.name}</span>
+                        {currentThemeId === t.id && <Icon icon={icons.check} className="settings-check-icon" />}
+                    </button>
+                ))}
+                {shownThemes.length === 0 && <p className="settings-theme-empty">No themes match "{query.trim()}"</p>}
+            </div>
+        </>
+    );
+}
+
 interface ToggleProps {
     label: string;
     isEnabled: boolean;
@@ -223,19 +287,13 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
 
                 {/* Appearance Section */}
                 <SettingSection title="Theme" icon={icons.theme}>
-                    <div className="settings-options-grid" onMouseLeave={resetThemePreview}>
-                        {availableThemes.map(t => (
-                            <OptionButton
-                                key={t.id}
-                                label={t.name}
-                                isSelected={currentThemeId === t.id}
-                                onClick={() => setTheme(t.id)}
-                                icon={t.isDark ? icons.dark : icons.light}
-                                onHover={() => applyTheme(t)}
-                                onHoverEnd={resetThemePreview}
-                            />
-                        ))}
-                    </div>
+                    <ThemePicker
+                        themes={availableThemes}
+                        currentThemeId={currentThemeId}
+                        setTheme={setTheme}
+                        applyTheme={applyTheme}
+                        resetThemePreview={resetThemePreview}
+                    />
                 </SettingSection>
 
                 <SettingSection title="Font" icon={icons.font}>
