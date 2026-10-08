@@ -1,6 +1,7 @@
 import { calculateSnowTotals } from '../../utils/weather';
 import { formatSnow } from '../../utils/unitConversion';
 import { getTemperatureStyle } from './cardUtils';
+import { isSavedLocationId } from '../../utils/savedLocations';
 import type { CardProps } from '../../types';
 
 function getWeatherEmoji(condition: string): string {
@@ -16,7 +17,9 @@ function getWeatherEmoji(condition: string): string {
 
 export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max', showDate = false, unitSystem = 'metric', onResortClick, selectedElevation = 'bot' }: CardProps): JSX.Element {
     const totals = calculateSnowTotals(resort);
-    const elevationLabel = selectedElevation === 'bot' ? 'Base' : selectedElevation === 'mid' ? 'Mid' : 'Peak';
+    // A Saved location has one elevation, whichever band is selected
+    const elevationLabel = isSavedLocationId(resort.id) ? ''
+        : selectedElevation === 'bot' ? 'Base ' : selectedElevation === 'mid' ? 'Mid ' : 'Peak ';
 
     return (
         <div
@@ -26,7 +29,7 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
             <div className="flex justify-between items-center mb-4">
                 <div>
                     <h2 className="text-2xl font-bold text-theme-textPrimary">{resort.name}</h2>
-                    <p className="text-sm font-medium text-theme-accent">{elevationLabel} Elevation: {resort.elevation}</p>
+                    <p className="text-sm font-medium text-theme-accent">{elevationLabel}Elevation: {resort.elevation}</p>
                 </div>
                 <div className="text-xs font-medium text-theme-textSecondary">
                     Last updated: {new Date().toLocaleTimeString()}

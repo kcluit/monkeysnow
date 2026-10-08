@@ -1,10 +1,13 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
 import { RESORT_HIERARCHY } from '../data/resortLocations';
 import type { ContinentData } from '../data/resortLocations';
+import { useSavedLocations } from './useSavedLocations';
+import type { SavedLocation } from '../utils/savedLocations';
 
 export type { ContinentData, CountryData, ProvinceData, ResortInfo } from '../data/resortLocations';
 
-export type HierarchyNodeType = 'continent' | 'country' | 'province' | 'resort';
+/** 'custom' is the group of Saved locations, listed before the continents; its children are 'resort' nodes. */
+export type HierarchyNodeType = 'custom' | 'continent' | 'country' | 'province' | 'resort';
 
 export interface HierarchyNode {
   id: string;
@@ -100,6 +103,23 @@ function buildDisplayNames(hierarchy: ContinentData[]): Map<string, string> {
   return names;
 }
 
+/** The picker's Custom group: Saved locations by name, straight under it with no Country or Region. */
+function buildCustomNode(savedLocations: SavedLocation[]): HierarchyNode {
+  return {
+    id: 'custom',
+    name: 'Custom',
+    type: 'custom',
+    children: [...savedLocations]
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((location): HierarchyNode => ({
+        id: `resort-${location.id}`,
+        name: location.name,
+        type: 'resort',
+        resortId: location.id,
+      })),
+  };
+}
+
 // The hierarchy is bundled with the app, so everything derived from it is built once.
 const HIERARCHY_TREE = buildHierarchyTree(RESORT_HIERARCHY);
 const RESORT_ALIASES = buildResortAliases(RESORT_HIERARCHY);
@@ -122,14 +142,24 @@ export function useHierarchyData(): UseHierarchyDataReturn {
     try { localStorage.removeItem('hierarchyCache'); } catch { /* ignore */ }
   }, []);
 
+  const savedLocations = useSavedLocations();
+
+  const hierarchyTree = useMemo(
+    () => [buildCustomNode(savedLocations), ...HIERARCHY_TREE],
+    [savedLocations]
+  );
+
   const getDisplayName = useCallback(
-    (resortId: string) => DISPLAY_NAMES.get(resortId) ?? resortId.replace(/-/g, ' '),
-    []
+    (resortId: string) =>
+      DISPLAY_NAMES.get(resortId)
+      ?? savedLocations.find((location) => location.id === resortId)?.name
+      ?? resortId.replace(/-/g, ' '),
+    [savedLocations]
   );
 
   return {
     hierarchy: RESORT_HIERARCHY,
-    hierarchyTree: HIERARCHY_TREE,
+    hierarchyTree,
     resortAliases: RESORT_ALIASES,
     skiResorts: SKI_RESORTS,
     getDisplayName,

@@ -31,6 +31,7 @@ export function CompactDetailUtilityBar({
     setForecastDays,
     isChartLocked,
     setIsChartLocked,
+    fixedElevation,
     customLocation,
     onResetCustomLocation,
     isLoadingElevation,
@@ -111,8 +112,12 @@ export function CompactDetailUtilityBar({
 
                     <span className="compact-bar-separator">|</span>
 
-                    {/* Elevation */}
-                    {!customLocation ? (
+                    {/* Elevation - a Saved location has only its own */}
+                    {!customLocation && fixedElevation !== undefined ? (
+                        <span className="compact-bar-text text-theme-accent">
+                            {formatElevation(fixedElevation, unitSystem)}
+                        </span>
+                    ) : !customLocation ? (
                         <button
                             onClick={cycleElevation}
                             className="compact-bar-text text-theme-textSecondary hover:text-theme-accent transition-colors"

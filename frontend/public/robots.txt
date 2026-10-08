@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+# Saved locations exist only in the browser that saved them
+Disallow: /location/
 
 Sitemap: https://monkeysnow.com/sitemap.xml

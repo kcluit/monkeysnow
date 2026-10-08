@@ -154,6 +154,36 @@ export const RESORT_LOCATIONS: ReadonlyMap<string, ResortLocation> = buildLocati
 
 export const RESORT_HIERARCHY: ContinentData[] = buildHierarchy();
 
+/** The continent a country's Resorts are grouped under, or null for a country with no Resorts. */
+export function continentOfCountry(country: string): string | null {
+    return rawCountries[country]?.continent ?? null;
+}
+
+const EARTH_RADIUS_KM = 6371;
+
+/** Great-circle (haversine) distance. */
+function distanceKm(aLat: number, aLon: number, bLat: number, bLon: number): number {
+    const toRad = (deg: number) => (deg * Math.PI) / 180;
+    const dLat = toRad(bLat - aLat);
+    const dLon = toRad(bLon - aLon);
+    const h = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(aLat)) * Math.cos(toRad(bLat)) * Math.sin(dLon / 2) ** 2;
+    return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(h));
+}
+
+/** The slug of the Resort nearest to a point. */
+export function nearestResortId(lat: number, lon: number): string {
+    let nearest = '';
+    let nearestKm = Infinity;
+    for (const [id, { loc }] of RESORT_LOCATIONS) {
+        const km = distanceKm(lat, lon, loc[0], loc[1]);
+        if (km < nearestKm) {
+            nearest = id;
+            nearestKm = km;
+        }
+    }
+    return nearest;
+}
+
 // Earlier slugs and pre-OpenSkiData IDs (e.g. "Big-White", "Big Sky") that still resolve
 const normalizeId = (id: string) => id.trim().toLowerCase().replace(/\s+/g, '-');
 const ALIASES = new Map(Object.entries(resortData.aliases as unknown as Record<string, string>));

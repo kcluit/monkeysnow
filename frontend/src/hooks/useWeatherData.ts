@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { fetchResortForecasts, groupIntoRequests, resortCallWeight } from '../utils/resortForecast';
+import { fetchResortForecasts, groupIntoRequests, isForecastCurrent, resortCallWeight } from '../utils/resortForecast';
 import { isTransientError } from '../utils/openMeteoBudget';
-import { idbGet, idbSet } from '../utils/indexedDB';
+import { idbDelete, idbGet, idbSet } from '../utils/indexedDB';
+import { useSavedLocations } from './useSavedLocations';
 import type { AllWeatherData, ResortData, UseWeatherDataReturn } from '../types';
 
 /** How long a fetched forecast is trusted before it is refetched in the background. */
@@ -57,6 +58,18 @@ function writeCachedForecasts(forecasts: Record<string, ResortData>): void {
   });
 }
 
+/** Forgets a deleted Saved location's cached forecast. */
+export function deleteCachedForecast(resortId: string): void {
+  idbDelete(`resort:${resortId}`).catch(() => {
+    // IndexedDB unavailable — silently ignore
+  });
+}
+
+/** Leaves out forecasts fetched at a Saved location's elevation from before it was edited. */
+function currentOnly(forecasts: Record<string, ResortData>): Record<string, ResortData> {
+  return Object.fromEntries(Object.entries(forecasts).filter(([id, data]) => isForecastCurrent(id, data)));
+}
+
 /**
  * Keeps forecasts for the Selection loaded: cached forecasts show immediately,
  * missing ones are fetched first, stale ones are refreshed in the background,
@@ -74,15 +87,20 @@ export function useWeatherData(selectedResorts: string[]): UseWeatherDataReturn 
   const selectionRef = useRef(selectedResorts);
   selectionRef.current = selectedResorts;
   const loadingController = useRef<AbortController | null>(null);
+  const syncRef = useRef<(selection: string[]) => Promise<void>>();
 
-  const mergeForecasts = useCallback((forecasts: Record<string, ResortData>) => {
-    if (Object.keys(forecasts).length === 0) return;
-    dataRef.current = { ...dataRef.current, ...forecasts };
+  const publishForecasts = useCallback(() => {
     const latest = Math.max(0, ...Object.values(dataRef.current).map((d) => d.fetchedAt ?? 0));
     const stamp = latest ? new Date(latest).toISOString() : '';
     setAllWeatherData({ updatedAt: stamp, data: dataRef.current });
     setUpdatedAt(stamp || null);
   }, []);
+
+  const mergeForecasts = useCallback((forecasts: Record<string, ResortData>) => {
+    if (Object.keys(forecasts).length === 0) return;
+    dataRef.current = { ...dataRef.current, ...forecasts };
+    publishForecasts();
+  }, [publishForecasts]);
 
   const publishOutstanding = useCallback((queue: FetchQueue) => {
     setOutstanding([...queue.pending.flat(), ...queue.inFlight]);
@@ -95,11 +113,14 @@ export function useWeatherData(selectedResorts: string[]): UseWeatherDataReturn 
       for (let group = queue.pending.shift(); group; group = queue.pending.shift()) {
         group.forEach((id) => queue.inFlight.add(id));
         publishOutstanding(queue);
+        let editedWhileFetching = false;
 
         for (let attempt = 1; attempt <= MAX_ATTEMPTS && !signal.aborted; attempt++) {
           try {
-            const fresh = await fetchResortForecasts(group, 'main', signal);
+            const fetched = await fetchResortForecasts(group, 'main', signal);
             if (signal.aborted) return;
+            const fresh = currentOnly(fetched);
+            editedWhileFetching = Object.keys(fresh).length < Object.keys(fetched).length;
             mergeForecasts(fresh);
             writeCachedForecasts(fresh);
             setError(null);
@@ -117,6 +138,8 @@ export function useWeatherData(selectedResorts: string[]): UseWeatherDataReturn 
 
         group.forEach((id) => queue.inFlight.delete(id));
         publishOutstanding(queue);
+        // A Saved location's elevation changed mid-fetch; fetch it again at the new one
+        if (editedWhileFetching) void syncRef.current?.(selectionRef.current);
       }
     } finally {
       queue.running--;
@@ -130,10 +153,17 @@ export function useWeatherData(selectedResorts: string[]): UseWeatherDataReturn 
     if (!queue) return;
     const run = ++queue.syncRun;
 
+    // A Saved location whose elevation was edited needs a new forecast
+    const current = currentOnly(dataRef.current);
+    if (Object.keys(current).length < Object.keys(dataRef.current).length) {
+      dataRef.current = current;
+      publishForecasts();
+    }
+
     // Another tab may have fetched these already; take anything newer from IndexedDB first
     const now = Date.now();
     const notFresh = selection.filter((id) => !isFresh(dataRef.current[id], now));
-    const cached = await readCachedForecasts(notFresh);
+    const cached = currentOnly(await readCachedForecasts(notFresh));
     if (queue.controller.signal.aborted || run !== queue.syncRun) return;
 
     const newer: Record<string, ResortData> = {};
@@ -160,7 +190,8 @@ export function useWeatherData(selectedResorts: string[]): UseWeatherDataReturn 
       void runWorker(queue);
     }
     publishOutstanding(queue);
-  }, [mergeForecasts, publishOutstanding, runWorker]);
+  }, [mergeForecasts, publishForecasts, publishOutstanding, runWorker]);
+  syncRef.current = sync;
 
   // Create this mount's queue; aborting it on unmount drops anything still waiting for budget
   useEffect(() => {
@@ -188,7 +219,8 @@ export function useWeatherData(selectedResorts: string[]): UseWeatherDataReturn 
     };
   }, [sync]);
 
-  // Re-queue whenever the selection changes
+  // Re-queue whenever the selection changes, or a Saved location is edited
+  const savedLocations = useSavedLocations();
   const isFirstSelection = useRef(true);
   useEffect(() => {
     if (isFirstSelection.current) {
@@ -196,7 +228,7 @@ export function useWeatherData(selectedResorts: string[]): UseWeatherDataReturn 
       return;
     }
     void sync(selectedResorts);
-  }, [selectedResorts, sync]);
+  }, [selectedResorts, savedLocations, sync]);
 
   // Selected resorts that have no forecast yet and are waiting on the Fetch budget
   const queuedIds = useMemo(() => {

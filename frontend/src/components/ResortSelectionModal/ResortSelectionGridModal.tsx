@@ -100,16 +100,18 @@ const ResortItem = memo(function ResortItem({
   isSelected,
   onToggle,
   hideIcons,
+  icon = icons.resort,
 }: {
   node: HierarchyNode;
   isSelected: boolean;
   onToggle: () => void;
   hideIcons?: boolean;
+  icon?: typeof icons.resort;
 }) {
   return (
     <label className="resort-grid-item" onClick={(e) => { e.preventDefault(); onToggle(); }}>
       <Checkbox state={isSelected ? 'all' : 'none'} onClick={(e) => { e.stopPropagation(); onToggle(); }} />
-      {!hideIcons && <span className="resort-grid-item-icon"><Icon icon={icons.resort} /></span>}
+      {!hideIcons && <span className="resort-grid-item-icon"><Icon icon={icon} /></span>}
       <span className="resort-grid-item-name">{node.name}</span>
     </label>
   );
@@ -329,13 +331,34 @@ const ContinentColumn = memo(function ContinentColumn({
           <Icon icon={isExpanded ? icons.caretDown : icons.caretRight} />
         </button>
         <Checkbox state={selectionState} onClick={(e) => { e.stopPropagation(); handleHeaderClick(); }} />
-        {!hideIcons && <span className="resort-grid-header-icon"><Icon icon={icons.continent} /></span>}
+        {!hideIcons && <span className="resort-grid-header-icon"><Icon icon={node.type === 'custom' ? icons.custom : icons.continent} /></span>}
         <span className="resort-grid-continent-name">{node.name}</span>
         <span className="resort-grid-count">
           {selectedCount}/{resortsUnder.length}
         </span>
       </div>
-      {isExpanded && node.children && (
+      {/* The Custom group lists Saved locations directly, with no Country or Region */}
+      {isExpanded && node.type === 'custom' && node.children && (
+        node.children.length === 0 ? (
+          <div className="resort-grid-custom-hint">
+            Click any resort's map in its forecast view to save a location here.
+          </div>
+        ) : (
+          <div className="resort-grid-resorts">
+            {node.children.map(location => (
+              <ResortItem
+                key={location.id}
+                node={location}
+                isSelected={location.resortId ? selectedResorts.includes(location.resortId) : false}
+                onToggle={() => location.resortId && onToggleResort(location.resortId)}
+                hideIcons={hideIcons}
+                icon={icons.custom}
+              />
+            ))}
+          </div>
+        )
+      )}
+      {isExpanded && node.type !== 'custom' && node.children && (
         <div className="resort-grid-countries">
           {node.children.map(country => (
             <CountrySection

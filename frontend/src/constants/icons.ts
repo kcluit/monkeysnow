@@ -50,6 +50,7 @@ import {
   faEarthAmericas,
   faFlag,
   faLocationDot,
+  faMapPin,
   // Navigation icons
   faHouse,
   faCircleInfo,
@@ -135,6 +136,7 @@ export const icons = {
   continent: faEarthAmericas,
   country: faFlag,
   province: faLocationDot,
+  custom: faMapPin, // the Custom group of Saved locations
   // resort is already defined above (faPersonSkiing)
 
   // Provider icons (model selection)

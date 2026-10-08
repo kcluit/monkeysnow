@@ -5,6 +5,7 @@ import App from './App'
 import { HierarchyProvider } from './contexts/HierarchyContext'
 import { MAX_SELECTED_RESORTS } from './hooks/useResortHierarchy'
 import { resolveResortId } from './data/resortLocations'
+import { getSavedLocation, isSavedLocationId } from './utils/savedLocations'
 import './style.css'
 
 // Main app wrapper
@@ -21,6 +22,10 @@ function Root(): JSX.Element {
 // Rewrite saved resort IDs to current slugs before rendering. Earlier slugs and
 // pre-OpenSkiData IDs (e.g. "Big-White") resolve through the aliases in
 // data/resorts/resorts.json; IDs that no longer name a Resort are dropped.
+// Saved locations keep their IDs, unless they were deleted (e.g. in another tab).
+const currentId = (id: string): string | null =>
+    isSavedLocationId(id) ? (getSavedLocation(id) ? id : null) : resolveResortId(id);
+
 const migrateResortIds = () => {
     try {
         const stored = localStorage.getItem('selectedResorts');
@@ -28,7 +33,7 @@ const migrateResortIds = () => {
 
         const selectedResorts: string[] = JSON.parse(stored);
         const current = [...new Set(
-            selectedResorts.map(resolveResortId).filter((id): id is string => id !== null)
+            selectedResorts.map(currentId).filter((id): id is string => id !== null)
         )];
 
         if (current.length !== selectedResorts.length || current.some((id, i) => id !== selectedResorts[i])) {

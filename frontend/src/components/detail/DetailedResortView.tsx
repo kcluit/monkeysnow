@@ -6,7 +6,10 @@ import { useBudgetPause } from '../../hooks/useBudgetPause';
 import { FetchStatus } from '../FetchStatus';
 import { DetailUtilityBar } from './DetailUtilityBar';
 import { DetailChartGrid } from './DetailChartGrid';
+import { SavedLocationDialog } from './SavedLocationDialog';
 import { ResortMap } from '../map/ResortMap';
+import { suggestedName, updateSavedLocation, type SavedLocationInput } from '../../utils/savedLocations';
+import { MAX_SELECTED_RESORTS } from '../../hooks/useResortHierarchy';
 import { DEFAULT_VARIABLES } from '../../utils/chartConfigurations';
 import {
     aggregationOptions,
@@ -27,6 +30,13 @@ interface DetailedResortViewPropsWithUnits extends DetailedResortViewProps {
     utilityBarStyle: import('../../types').UtilityBarStyle;
     modelLineOpacity: ModelLineOpacity;
     onBack: () => void;
+    /** Keeps the Custom location being shown as a new Saved location */
+    onSaveLocation: (input: SavedLocationInput) => void;
+    /** Deletes this view's Saved location */
+    onDeleteSavedLocation?: (id: string) => void;
+    /** Set right after saving, when the Selection was already full */
+    selectionWasFull?: boolean;
+    onDismissSelectionWasFull?: () => void;
 }
 
 // Keys whose saved values were dropped by moving to a new key (docs/adr/0003, docs/adr/0005)
@@ -46,11 +56,16 @@ export function DetailedResortView({
     resortId: _resortId,
     resortName,
     location,
+    savedLocation,
     unitSystem,
     showUtilityBar,
     utilityBarStyle,
     modelLineOpacity,
     onBack,
+    onSaveLocation,
+    onDeleteSavedLocation,
+    selectionWasFull = false,
+    onDismissSelectionWasFull,
 }: DetailedResortViewPropsWithUnits): JSX.Element {
     // The visitor's Preferred models: one list for every Resort, starting as the Recommended models.
     // New keys wipe saved model lists and Aggregations once (docs/adr/0003, docs/adr/0005).
@@ -110,6 +125,10 @@ export function DetailedResortView({
 
     // Resolve the elevation selection to an actual number based on current resort
     const resolvedElevation = useMemo(() => {
+        // A Saved location is only ever forecast at its own elevation
+        if (savedLocation) {
+            return savedLocation.elevation;
+        }
         if (typeof elevationSelection === 'number') {
             return elevationSelection;
         }
@@ -119,7 +138,7 @@ export function DetailedResortView({
             case 'top': return location.topElevation;
             default: return location.midElevation;
         }
-    }, [elevationSelection, location.baseElevation, location.midElevation, location.topElevation]);
+    }, [savedLocation, elevationSelection, location.baseElevation, location.midElevation, location.topElevation]);
 
     // State for forecast days - default to 14
     const [forecastDays, setForecastDays] = useLocalStorage<number>(
@@ -133,9 +152,11 @@ export function DetailedResortView({
         false
     );
 
-    // Custom location state (temporary - NOT persisted to localStorage)
+    // Custom location state (temporary - NOT persisted unless saved as a Saved location)
     const [customLocation, setCustomLocation] = useState<CustomLocation | null>(null);
     const [isLoadingElevation, setIsLoadingElevation] = useState(false);
+    // The 0 m fallback below is fine to forecast at for a moment, but never to save
+    const [elevationLookupFailed, setElevationLookupFailed] = useState(false);
 
     // Elevation fetch hook
     const { fetchElevation } = useElevationFetch();
@@ -145,6 +166,7 @@ export function DetailedResortView({
         // Set custom location immediately with null elevation
         setCustomLocation({ lat, lon, elevation: null });
         setIsLoadingElevation(true);
+        setElevationLookupFailed(false);
 
         try {
             const elevation = await fetchElevation(lat, lon);
@@ -160,6 +182,7 @@ export function DetailedResortView({
             // Fall back to 0m elevation on error
             setCustomLocation({ lat, lon, elevation: 0 });
             setIsLoadingElevation(false);
+            setElevationLookupFailed(true);
         }
     }, [fetchElevation]);
 
@@ -167,6 +190,11 @@ export function DetailedResortView({
     const handleResetCustomLocation = useCallback(() => {
         setCustomLocation(null);
     }, []);
+
+    // Save and Edit dialogs, and the in-page confirmation before deleting a Saved location
+    const [dialog, setDialog] = useState<'save' | 'edit' | null>(null);
+    const [confirmingDelete, setConfirmingDelete] = useState(false);
+    const closeDialog = useCallback(() => setDialog(null), []);
 
     // Compute effective coordinates for weather data
     const effectiveCoords = useMemo(() => {
@@ -253,17 +281,71 @@ export function DetailedResortView({
                         {customLocation ? 'Custom Location' : resortName}
                     </h1>
                     {customLocation && (
+                        <>
+                            <button
+                                onClick={() => setDialog('save')}
+                                className="px-3 py-1 text-sm rounded-lg bg-theme-secondary hover:bg-theme-cardBg transition-colors text-theme-accent"
+                            >
+                                Save location
+                            </button>
+                            <button
+                                onClick={handleResetCustomLocation}
+                                className="px-3 py-1 text-sm rounded-lg bg-theme-secondary hover:bg-theme-cardBg transition-colors text-theme-accent flex items-center gap-2"
+                            >
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                <span>Reset to {resortName}</span>
+                            </button>
+                        </>
+                    )}
+                    {savedLocation && !customLocation && (confirmingDelete ? (
+                        <div className="flex items-center gap-2 text-sm" role="alert">
+                            <span className="text-theme-textSecondary">Delete {savedLocation.name}?</span>
+                            <button
+                                onClick={() => onDeleteSavedLocation?.(savedLocation.id)}
+                                className="px-3 py-1 rounded-lg bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 transition-colors text-red-500"
+                            >
+                                Delete
+                            </button>
+                            <button
+                                onClick={() => setConfirmingDelete(false)}
+                                className="px-3 py-1 rounded-lg bg-theme-secondary hover:bg-theme-cardBg transition-colors text-theme-textSecondary"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    ) : (
+                        <>
+                            <button
+                                onClick={() => setDialog('edit')}
+                                className="px-3 py-1 text-sm rounded-lg bg-theme-secondary hover:bg-theme-cardBg transition-colors text-theme-accent"
+                            >
+                                Edit
+                            </button>
+                            <button
+                                onClick={() => setConfirmingDelete(true)}
+                                className="px-3 py-1 text-sm rounded-lg bg-theme-secondary hover:bg-theme-cardBg transition-colors text-red-500"
+                            >
+                                Delete
+                            </button>
+                        </>
+                    ))}
+                </div>
+                {selectionWasFull && (
+                    <div className="flex items-center gap-3 mt-2 text-sm text-theme-textSecondary" role="status">
+                        <span>Saved, but not added to the main page: {MAX_SELECTED_RESORTS} resort maximum reached.</span>
                         <button
-                            onClick={handleResetCustomLocation}
-                            className="px-3 py-1 text-sm rounded-lg bg-theme-secondary hover:bg-theme-cardBg transition-colors text-theme-accent flex items-center gap-2"
+                            onClick={onDismissSelectionWasFull}
+                            className="shrink-0 p-1 rounded-md hover:bg-theme-border transition-colors hover:text-theme-textPrimary"
+                            aria-label="Dismiss notice"
                         >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
-                            <span>Reset to {resortName}</span>
                         </button>
-                    )}
-                </div>
+                    </div>
+                )}
                 <div className="flex items-center gap-4 text-sm text-theme-textSecondary flex-wrap">
                     {customLocation ? (
                         <>
@@ -274,6 +356,12 @@ export function DetailedResortView({
                             ) : (
                                 <span>Elevation: {formatElevation(customLocation.elevation, unitSystem)}</span>
                             )}
+                        </>
+                    ) : savedLocation ? (
+                        <>
+                            <span>Lat: {savedLocation.lat.toFixed(4)}</span>
+                            <span>Lon: {savedLocation.lon.toFixed(4)}</span>
+                            <span>Elevation: {formatElevation(savedLocation.elevation, unitSystem)}</span>
                         </>
                     ) : (
                         <>
@@ -318,6 +406,7 @@ export function DetailedResortView({
                         location={location}
                         isChartLocked={isChartLocked}
                         setIsChartLocked={setIsChartLocked}
+                        fixedElevation={savedLocation?.elevation}
                         customLocation={customLocation}
                         onResetCustomLocation={handleResetCustomLocation}
                         isLoadingElevation={isLoadingElevation}
@@ -400,6 +489,36 @@ export function DetailedResortView({
                         Select models and variables to view forecast
                     </div>
                 </div>
+            )}
+
+            {dialog === 'save' && customLocation && (
+                <SavedLocationDialog
+                    title="Save location"
+                    submitLabel="Save"
+                    initialName={suggestedName(customLocation.lat, customLocation.lon)}
+                    initialElevation={elevationLookupFailed ? null : customLocation.elevation}
+                    isLoadingElevation={isLoadingElevation}
+                    unitSystem={unitSystem}
+                    onSubmit={({ name, elevation }) => {
+                        setDialog(null);
+                        onSaveLocation({ name, elevation, lat: customLocation.lat, lon: customLocation.lon });
+                    }}
+                    onCancel={closeDialog}
+                />
+            )}
+            {dialog === 'edit' && savedLocation && (
+                <SavedLocationDialog
+                    title="Edit location"
+                    submitLabel="Save"
+                    initialName={savedLocation.name}
+                    initialElevation={savedLocation.elevation}
+                    unitSystem={unitSystem}
+                    onSubmit={(changes) => {
+                        setDialog(null);
+                        updateSavedLocation(savedLocation.id, changes);
+                    }}
+                    onCancel={closeDialog}
+                />
             )}
         </div>
     );

@@ -66,6 +66,7 @@ export const ResortTreeNode = memo(function ResortTreeNode({
   const getIcon = (): IconDefinition | undefined => {
     if (hideIcons) return undefined;
     switch (node.type) {
+      case 'custom': return icons.custom;
       case 'continent': return icons.continent;
       case 'country': return icons.country;
       case 'province': return icons.province;

@@ -7,15 +7,13 @@
  */
 
 import { matchPath } from 'react-router-dom';
-import { RESORT_LOCATIONS, resolveResortId } from '../data/resortLocations';
+import { RESORT_LOCATIONS, nearestResortId, resolveResortId } from '../data/resortLocations';
 
 /** Served by frontend/netlify/edge-functions/geo.ts; absent under plain `vite`. */
 const GEO_URL = '/api/geo';
 
 /** How long a first visit waits for the visitor's location before going random. */
 const LOCATE_TIMEOUT_MS = 3_000;
-
-const EARTH_RADIUS_KM = 6371;
 
 interface Coordinates {
     latitude: number;
@@ -29,7 +27,7 @@ export async function pickStarterResort(landingPath: string, signal: AbortSignal
     if (landedOnResort) return landedOnResort;
 
     const visitor = await locateVisitor(signal);
-    return visitor ? nearestResort(visitor) : randomResort();
+    return visitor ? nearestResortId(visitor.latitude, visitor.longitude) : randomResort();
 }
 
 /** Where the visitor appears to be, or null if that isn't known within the timeout. */
@@ -52,29 +50,7 @@ async function locateVisitor(signal: AbortSignal): Promise<Coordinates | null> {
     }
 }
 
-function nearestResort(visitor: Coordinates): string {
-    let nearest = '';
-    let nearestKm = Infinity;
-    for (const [id, { loc }] of RESORT_LOCATIONS) {
-        const km = distanceKm(visitor, { latitude: loc[0], longitude: loc[1] });
-        if (km < nearestKm) {
-            nearest = id;
-            nearestKm = km;
-        }
-    }
-    return nearest;
-}
-
 function randomResort(): string {
     const ids = [...RESORT_LOCATIONS.keys()];
     return ids[Math.floor(Math.random() * ids.length)];
-}
-
-/** Great-circle (haversine) distance. */
-function distanceKm(a: Coordinates, b: Coordinates): number {
-    const toRad = (deg: number) => (deg * Math.PI) / 180;
-    const dLat = toRad(b.latitude - a.latitude);
-    const dLon = toRad(b.longitude - a.longitude);
-    const h = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a.latitude)) * Math.cos(toRad(b.latitude)) * Math.sin(dLon / 2) ** 2;
-    return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(h));
 }
