@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { shouldAutoFocusSearch } from '../../utils/autoFocus';
 
 interface CommandInputProps {
   value: string;
@@ -17,9 +18,9 @@ export function CommandInput({
 }: CommandInputProps): JSX.Element {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-focus on mount
+  // Auto-focus on mount, unless that would open a phone's keyboard
   useEffect(() => {
-    if (inputRef.current) {
+    if (inputRef.current && shouldAutoFocusSearch()) {
       inputRef.current.focus();
     }
   }, []);

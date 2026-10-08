@@ -324,6 +324,15 @@ input[type="checkbox"] {
     accent-color: var(--accent);
 }
 
+/* iPhone Safari zooms the page into any text field under 16px when it is focused, and stays zoomed */
+@media (pointer: coarse) {
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+}
+
 .resort-card {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -951,6 +960,8 @@ input[type="checkbox"] {
     border-radius: 0;
     color: var(--textSecondary, #a1a1a6);
     cursor: grab;
+    /* A touch drag on a handle reorders instead of scrolling the list (dnd-kit's PointerSensor) */
+    touch-action: none;
     transition: all 0.15s ease;
     flex-shrink: 0;
     opacity: 0.5;
@@ -996,6 +1007,7 @@ input[type="checkbox"] {
     padding: 2px;
     color: var(--textSecondary, #a1a1a6);
     cursor: grab;
+    touch-action: none;
     opacity: 0;
     transition: opacity 0.15s ease;
     background: none;

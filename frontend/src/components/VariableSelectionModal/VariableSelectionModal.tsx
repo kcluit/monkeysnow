@@ -18,6 +18,7 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { VariableDraggableItem } from './VariableDraggableItem';
 import { VariableCategorySectionDraggable } from './VariableCategorySectionDraggable';
 import { useOverlay } from '../../hooks/useOverlay';
+import { shouldAutoFocusSearch } from '../../utils/autoFocus';
 import type { UseVariableSelectionReturn } from '../../hooks/useVariableSelection';
 
 interface VariableSelectionModalProps {
@@ -162,7 +163,7 @@ export function VariableSelectionModal({
             placeholder="Search variables..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            autoFocus
+            autoFocus={shouldAutoFocusSearch()}
           />
         </div>
 
