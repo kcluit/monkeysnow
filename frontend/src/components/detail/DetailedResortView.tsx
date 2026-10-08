@@ -329,11 +329,19 @@ export function DetailedResortView({
                         onToggleVariable={toggleVariable}
                         location={location}
                     />
-                    {loading && (
+                    {loading && (pause ? (
+                        <FetchStatus
+                            count={pendingModels}
+                            calls={pendingModels}
+                            things="models"
+                            onlyWhenLimited
+                            className="text-center py-2 text-sm text-theme-textSecondary"
+                        />
+                    ) : (
                         <div className="text-center py-2 text-sm text-theme-textSecondary animate-pulse">
                             Loading additional model data...
                         </div>
-                    )}
+                    ))}
                 </>
             )}
 
