@@ -1,6 +1,7 @@
 import type { Theme } from './themes';
 import type { UnitSystem as UnitSystemType } from '../utils/unitConversion';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import type { WeatherModel } from './openMeteo';
 
 // Unit system
 export type UnitSystem = UnitSystemType;
@@ -59,7 +60,6 @@ export type ViewMode = 'default' | 'full' | 'compact';
 export type UtilityBarStyle = 'compact' | 'large';
 export type TemperatureMetric = 'max' | 'min' | 'avg' | 'median';
 export type SnowfallEstimateMode = 'model' | 'totalPrecip';
-export type WeatherModelSetting = 'auto';
 export type ResortDisplayLimit = 'auto' | number;
 export type ModelLineOpacity = 'auto' | 0.05 | 0.1 | 0.2 | 0.35 | 0.5 | 1;
 export type SnowQuality = 'rain' | 'sleet/mix' | 'wet_snow' | 'powder' | 'dry_snow';
@@ -107,6 +107,8 @@ export interface ResortData {
     mid: ElevationForecast;
     top: ElevationForecast;
     fetchedAt?: number; // epoch ms; missing on forecasts cached from the old backend
+    /** The Card model it was fetched from; missing on forecasts cached before it was recorded */
+    model?: WeatherModel;
 }
 
 export interface AllWeatherData {
@@ -159,6 +161,8 @@ export interface ProcessedResortData {
     elevation: string;
     days: DayForecast[];
     fetchedAt?: number; // epoch ms, from ResortData
+    /** Label of the Card model it came from, e.g. "NOAA HRRR" */
+    model: string;
 }
 
 // Snow totals

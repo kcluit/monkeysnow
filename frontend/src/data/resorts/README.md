@@ -4,7 +4,7 @@ The Resort list MonkeySnow bundles, generated from [OpenSkiData](https://openski
 
 Data from OpenSkiData / OpenSkiMap.org, © OpenStreetMap contributors (ODbL), Skimap.org, Who's On First, © Mapterhorn.
 
-The files in this folder (`resorts.json`, `registry.json`, `overrides.json`) form a derivative database and are licensed under the [Open Database License (ODbL) 1.0](https://opendatacommons.org/licenses/odbl/1-0/). They are not covered by MonkeySnow's EULA. See [ADR 0004](../../../../docs/adr/0004-resort-list-from-openskidata.md) for why the list is built this way.
+The files in this folder (`resorts.json`, `registry.json`, `overrides.json`) form a derivative database and are licensed under the [Open Database License (ODbL) 1.0](https://opendatacommons.org/licenses/odbl/1-0/). They are not covered by MonkeySnow's code license (AGPL-3.0). See [ADR 0004](../../../../docs/adr/0004-resort-list-from-openskidata.md) for why the list is built this way.
 
 ## Files
 

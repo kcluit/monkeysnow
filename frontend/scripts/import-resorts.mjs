@@ -39,8 +39,11 @@ const DOWNLOAD_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 export const ATTRIBUTION =
   'Data from OpenSkiData / OpenSkiMap.org, © OpenStreetMap contributors (ODbL), Skimap.org, Who\'s On First, © Mapterhorn';
 
-/** Countries with more Resorts than this are split into Regions in the resort picker. */
+/** Countries with more Resorts than this are split into Regions in the resort picker... */
 const MIN_RESORTS_FOR_REGIONS = 30;
+
+/** ...as long as their Regions hold at least this many Resorts on average; the UK's 30 counties, mostly one Resort each, don't help anyone pick. */
+const MIN_RESORTS_PER_REGION = 3;
 
 /** Distance within which a Resort whose source IDs all changed upstream is still recognised by name. */
 const RENAMED_SOURCE_MATCH_KM = 2;
@@ -476,7 +479,11 @@ async function importResorts() {
 
   // 9. Countries, and whether each is split into Regions
   const counts = {};
-  for (const r of Object.values(resorts)) counts[r.country] = (counts[r.country] ?? 0) + 1;
+  const regionNames = {}; // country -> Set of its Regions; Resorts without one share "Other", as in the picker
+  for (const r of Object.values(resorts)) {
+    counts[r.country] = (counts[r.country] ?? 0) + 1;
+    (regionNames[r.country] ??= new Set()).add(r.region ?? 'Other');
+  }
   const countryNames = new Map();
   for (const area of allAreas) {
     const place = area.properties.places?.[0];
@@ -487,7 +494,8 @@ async function importResorts() {
     countries[code] = {
       name: countryNames.get(code) ?? previous.countries?.[code]?.name ?? code,
       continent: CONTINENT_BY_COUNTRY.get(code),
-      regions: counts[code] > MIN_RESORTS_FOR_REGIONS,
+      regions: counts[code] > MIN_RESORTS_FOR_REGIONS
+        && counts[code] / regionNames[code].size >= MIN_RESORTS_PER_REGION,
     };
   }
 

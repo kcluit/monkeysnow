@@ -105,8 +105,11 @@ export interface DetailUtilityBarProps {
     fixedElevation?: number;
     // Custom location state (temporary unless saved)
     customLocation: CustomLocation | null;
-    /** The Custom location's ground elevation, once the forecast has reported it */
+    /** The Custom location's Ground elevation, once a forecast has reported it */
+    groundElevation: number | null;
+    /** The Custom location's Custom elevation, or null while it is forecast at its Ground elevation */
     customElevation: number | null;
+    setCustomElevation: (elevation: number | null) => void;
     onResetCustomLocation: () => void;
     utilityBarStyle: UtilityBarStyle;
 }

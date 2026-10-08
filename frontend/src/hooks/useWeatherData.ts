@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { fetchResortForecasts, groupIntoRequests, isForecastCurrent, resortCallWeight } from '../utils/resortForecast';
+import { fetchResortForecasts, groupIntoRequests, isForecastCurrent, isOnCardModel, resortCallWeight } from '../utils/resortForecast';
 import { isTransientError } from '../utils/openMeteoBudget';
 import { idbDelete, idbGet, idbSet } from '../utils/indexedDB';
 import { useSavedLocations } from './useSavedLocations';
+import { useCountryModels } from './useCountryModels';
 import type { AllWeatherData, ResortData, UseWeatherDataReturn } from '../types';
 
 /** How long a fetched forecast is trusted before it is refetched in the background. */
@@ -26,8 +27,15 @@ interface FetchQueue {
   controller: AbortController;
 }
 
-const isFresh = (entry: ResortData | undefined, now: number): boolean =>
-  Boolean(entry?.fetchedAt && now - entry.fetchedAt < FRESHNESS_WINDOW_MS);
+/** Fresh: fetched within the Freshness window, from the Card model the resort has now. */
+const isFresh = (id: string, entry: ResortData | undefined, now: number): boolean =>
+  Boolean(entry?.fetchedAt && now - entry.fetchedAt < FRESHNESS_WINDOW_MS && isOnCardModel(id, entry));
+
+/** A forecast from the resort's Card model beats one from another model; otherwise the newer one wins. */
+function isBetter(id: string, a: ResortData, b: ResortData): boolean {
+  const onCardModel = Number(isOnCardModel(id, a)) - Number(isOnCardModel(id, b));
+  return onCardModel > 0 || (onCardModel === 0 && (a.fetchedAt ?? 0) > (b.fetchedAt ?? 0));
+}
 
 const sleep = (ms: number, signal: AbortSignal) =>
   new Promise<void>((resolve) => {
@@ -120,7 +128,8 @@ export function useWeatherData(selectedResorts: string[]): UseWeatherDataReturn 
             const fetched = await fetchResortForecasts(group, 'main', signal);
             if (signal.aborted) return;
             const fresh = currentOnly(fetched);
-            editedWhileFetching = Object.keys(fresh).length < Object.keys(fetched).length;
+            editedWhileFetching = Object.keys(fresh).length < Object.keys(fetched).length
+              || Object.entries(fresh).some(([id, data]) => !isOnCardModel(id, data));
             mergeForecasts(fresh);
             writeCachedForecasts(fresh);
             setError(null);
@@ -138,7 +147,7 @@ export function useWeatherData(selectedResorts: string[]): UseWeatherDataReturn 
 
         group.forEach((id) => queue.inFlight.delete(id));
         publishOutstanding(queue);
-        // A Saved location's elevation changed mid-fetch; fetch it again at the new one
+        // A Saved location's elevation or a Country model changed mid-fetch; fetch it again
         if (editedWhileFetching) void syncRef.current?.(selectionRef.current);
       }
     } finally {
@@ -162,14 +171,14 @@ export function useWeatherData(selectedResorts: string[]): UseWeatherDataReturn 
 
     // Another tab may have fetched these already; take anything newer from IndexedDB first
     const now = Date.now();
-    const notFresh = selection.filter((id) => !isFresh(dataRef.current[id], now));
+    const notFresh = selection.filter((id) => !isFresh(id, dataRef.current[id], now));
     const cached = currentOnly(await readCachedForecasts(notFresh));
     if (queue.controller.signal.aborted || run !== queue.syncRun) return;
 
     const newer: Record<string, ResortData> = {};
     for (const [id, entry] of Object.entries(cached)) {
       const current = dataRef.current[id];
-      if (!current || (entry.fetchedAt ?? 0) > (current.fetchedAt ?? 0)) newer[id] = entry;
+      if (!current || isBetter(id, entry, current)) newer[id] = entry;
     }
     mergeForecasts(newer);
 
@@ -179,7 +188,8 @@ export function useWeatherData(selectedResorts: string[]): UseWeatherDataReturn 
       if (queue.inFlight.has(id)) continue;
       const entry = dataRef.current[id];
       if (!entry) missing.push(id);
-      else if (!isFresh(entry, now)) stale.push(id);
+      // Includes forecasts from a model the card no longer uses: they stay on show until replaced
+      else if (!isFresh(id, entry, now)) stale.push(id);
     }
 
     // Never-loaded resorts first, so empty slots fill before cached cards refresh
@@ -219,8 +229,9 @@ export function useWeatherData(selectedResorts: string[]): UseWeatherDataReturn 
     };
   }, [sync]);
 
-  // Re-queue whenever the selection changes, or a Saved location is edited
+  // Re-queue whenever the selection changes, a Saved location is edited, or a Country model changes
   const savedLocations = useSavedLocations();
+  const countryModels = useCountryModels();
   const isFirstSelection = useRef(true);
   useEffect(() => {
     if (isFirstSelection.current) {
@@ -228,7 +239,7 @@ export function useWeatherData(selectedResorts: string[]): UseWeatherDataReturn 
       return;
     }
     void sync(selectedResorts);
-  }, [selectedResorts, savedLocations, sync]);
+  }, [selectedResorts, savedLocations, countryModels, sync]);
 
   // Selected resorts that have no forecast yet and are waiting on the Fetch budget
   const queuedIds = useMemo(() => {

@@ -15,15 +15,23 @@ A named, operating downhill **Ski area** with at least one lift and a known elev
 _Avoid_: location, mountain, spot
 
 **Region**:
-An administrative area inside a country, such as a state, province, canton or prefecture, used to group **Resorts** for picking. Only countries with many **Resorts** are split into Regions.
+An administrative area inside a country, such as a state, province, canton or prefecture, used to group **Resorts** for picking. A country is split into Regions only when it has many **Resorts** and its Regions each hold several; the rest list their **Resorts** directly.
 _Avoid_: province, state (as the general term)
 
 **Elevation band**:
 One of a **Resort**'s three forecast heights: base (`bot`), mid or top.
 _Avoid_: level, elevation (when meaning the band rather than a height in metres)
 
+**Ground elevation**:
+The height of the terrain at a point, as Open-Meteo knows it. A **Custom location** is forecast at its Ground elevation unless the visitor types a **Custom elevation**.
+_Avoid_: default elevation, terrain height
+
+**Custom elevation**:
+A height the visitor types to be forecast at, in place of an **Elevation band** on a **Resort** or the **Ground elevation** of a **Custom location**. On a **Custom location** it belongs to that one point: picking another point, or leaving it, goes back to the **Ground elevation**.
+_Avoid_: manual elevation, override
+
 **Custom location**:
-A point a visitor picks on the map of a **Resort** or a **Saved location**, forecast at its own ground elevation in place of the one they picked it from. It is not kept unless the visitor saves it as a new **Saved location**; an existing **Saved location** never moves.
+A point a visitor picks on the map of a **Resort** or a **Saved location**, forecast at its **Ground elevation** (or a **Custom elevation**) in place of the one they picked it from. It is not kept unless the visitor saves it as a new **Saved location**; an existing **Saved location** never moves.
 _Avoid_: pin, spot, point, location (on its own)
 
 **Saved location**:
@@ -91,8 +99,16 @@ A **Forecast model** whose numbers at the point being forecast are identical to 
 _Avoid_: duplicate
 
 **Card model**:
-The single **Forecast model** behind a card on the main page, chosen by the country of the **Resort**, or for a **Saved location**, of the **Resort** nearest to it.
+The single **Forecast model** behind a card on the main page. It is the visitor's **Country model** for the **Resort**'s country (for a **Saved location**, the country of the **Resort** nearest to it) wherever that model covers the point and has data there, and otherwise the **Recommended card model**.
 _Avoid_: default model, primary model
+
+**Recommended card model**:
+The **Forecast model** monkeysnow picks for each country's cards until a visitor chooses a **Country model**. Shown as "Auto".
+_Avoid_: default card model, auto model
+
+**Country model**:
+A **Forecast model** a visitor has chosen for the cards of every **Resort** in one country, in place of its **Recommended card model**. It may cover only part of the country.
+_Avoid_: model override, country setting
 
 **Forecast horizon**:
 How many days ahead a forecast is asked for: fourteen on the main page, and whatever the visitor picks in the detail view. A card shows fewer days when its **Card model**'s **Range** ends sooner.

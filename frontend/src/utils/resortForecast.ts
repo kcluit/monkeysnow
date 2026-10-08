@@ -10,9 +10,11 @@
  */
 
 import { RESORT_LOCATIONS, continentOfCountry } from '../data/resortLocations';
-import { fetchWeatherApiWithinBudget, type FetchPriority } from './openMeteoBudget';
+import { fetchWeatherApiWithinBudget, isNoDataError, type FetchPriority } from './openMeteoBudget';
+import { cardModelAt, markGap, recommendedCardModel } from './cardModels';
 import { getSavedLocation, isSavedLocationId } from './savedLocations';
 import type { DayData, ElevationForecast, PeriodData, ResortData, SnowQuality } from '../types';
+import type { WeatherModel } from '../types/openMeteo';
 
 type ApiResponse = Awaited<ReturnType<typeof fetchWeatherApiWithinBudget>>[number];
 
@@ -167,29 +169,10 @@ function estimateHourlySnow(tempC: number, humidity: number, snowfallCm: number)
     };
 }
 
-// --- Model selection ---
+// --- Model selection (Card models themselves are picked in cardModels.ts) ---
 
-// Card model by ISO country code
-const COUNTRY_MODELS: Record<string, string> = {
-    CA: 'gem_seamless',
-    US: 'gfs_seamless',
-    JP: 'jma_seamless',
-    // MET Norway Nordic Seamless — Scandinavia & Nordics
-    NO: 'metno_seamless',
-    SE: 'metno_seamless',
-    FI: 'metno_seamless',
-    IS: 'metno_seamless',
-    // DMI Seamless — Denmark & Greenland
-    DK: 'dmi_seamless',
-};
-// Rest of Europe, Alps included: ICON's European model covers the whole continent
-const EUROPE_MODEL = 'dwd_icon_seamless';
-// Everywhere else: ECMWF IFS at 9 km, the strongest global model Open-Meteo serves.
-// KMA (Korea) and BOM (Australia) returned no data at resorts when this was chosen.
-const DEFAULT_MODEL = 'ecmwf_ifs';
-
-const EUROPE_FREEZING_MODEL = 'icon_seamless';
-const DEFAULT_FREEZING_MODEL = 'gfs_seamless';
+const EUROPE_FREEZING_MODEL: WeatherModel = 'dwd_icon_seamless';
+const DEFAULT_FREEZING_MODEL: WeatherModel = 'ncep_gfs_seamless';
 
 /**
  * Main models whose freezing level is taken from the main request, saving a call per resort.
@@ -197,7 +180,7 @@ const DEFAULT_FREEZING_MODEL = 'gfs_seamless';
  * the freezing level by at most a few tens of metres, but for ICON in the Alps by up to
  * 400 m, so ICON keeps its own request at the resort's terrain elevation.
  */
-const MODELS_WITH_FREEZING_LEVEL = new Set(['gfs_seamless']);
+const MODELS_WITH_FREEZING_LEVEL = new Set<WeatherModel>(['ncep_gfs_seamless']);
 
 /** Where a member of the Selection is forecast, and the country that picks its Card model. */
 interface ForecastPoint {
@@ -234,25 +217,42 @@ function forecastPointOf(id: string): ForecastPoint | null {
 }
 
 interface RequestPlan {
-    model: string;
-    freezingModel: string | null; // null when the main model provides the freezing level
+    model: WeatherModel;
+    freezingModel: WeatherModel | null; // null when the main model provides the freezing level
+    /** Whether `model` is the visitor's Country model rather than the Recommended card model */
+    isCountryModel: boolean;
 }
 
-function planFor(point: ForecastPoint | null): RequestPlan {
+function planFor(resortId: string, point: ForecastPoint | null): RequestPlan {
     const inEurope = point?.continent === 'Europe';
-    const model = (point && COUNTRY_MODELS[point.country]) ?? (inEurope ? EUROPE_MODEL : DEFAULT_MODEL);
+    const recommended = recommendedCardModel(point?.country ?? '');
+    const model = point ? cardModelAt(resortId, point.country, point.lat, point.lon) : recommended;
     return {
         model,
         freezingModel: MODELS_WITH_FREEZING_LEVEL.has(model)
             ? null
             : inEurope ? EUROPE_FREEZING_MODEL : DEFAULT_FREEZING_MODEL,
+        isCountryModel: model !== recommended,
     };
 }
 
 /** Open-Meteo calls one Resort or Saved location costs: one per elevation, plus one for a separate freezing level. */
 export function resortCallWeight(resortId: string): number {
     const point = forecastPointOf(resortId);
-    return (point?.elevations.length ?? 3) + (planFor(point).freezingModel ? 1 : 0);
+    return (point?.elevations.length ?? 3) + (planFor(resortId, point).freezingModel ? 1 : 0);
+}
+
+/**
+ * The Forecast model a forecast came from. Forecasts cached before they recorded it
+ * all came from the Recommended card model.
+ */
+export function forecastModelOf(resortId: string, data: ResortData): WeatherModel {
+    return data.model ?? recommendedCardModel(forecastPointOf(resortId)?.country ?? '');
+}
+
+/** Whether a forecast came from the Card model this member of the Selection has now. */
+export function isOnCardModel(resortId: string, data: ResortData): boolean {
+    return forecastModelOf(resortId, data) === planFor(resortId, forecastPointOf(resortId)).model;
 }
 
 /**
@@ -273,7 +273,7 @@ export function groupIntoRequests(resortIds: string[]): string[][] {
     for (const id of resortIds) {
         const point = forecastPointOf(id);
         if (!point) continue;
-        const plan = planFor(point);
+        const plan = planFor(id, point);
         const key = `${plan.model}|${plan.freezingModel}`;
         const group = groups.get(key) ?? [];
         group.push(id);
@@ -510,6 +510,9 @@ function processLocation(mainResp: ApiResponse | undefined, freezing: FreezingSe
  * Fetches one request group from groupIntoRequests(): all three Elevation bands
  * for each resort, or the one elevation of a Saved location, spent against the
  * Fetch budget. Resorts whose data comes back incomplete are left out.
+ *
+ * Where a Country model turns out to have no data, those resorts are fetched again
+ * from their Recommended card model, and remembered so later fetches go straight there.
  */
 export async function fetchResortForecasts(
     resortIds: string[],
@@ -522,7 +525,45 @@ export async function fetchResortForecasts(
     });
     if (resorts.length === 0) return {};
 
-    const { model, freezingModel } = planFor(resorts[0].point);
+    const plan = planFor(resorts[0].id, resorts[0].point);
+    let result: Record<string, ResortData>;
+    try {
+        result = await fetchGroup(resorts, plan, priority, signal);
+    } catch (error) {
+        // Open-Meteo refuses the whole request when the model has no data at any one point
+        // in it, and Coverage boxes are drawn generously: halve the group until it's found
+        if (!plan.isCountryModel || !isNoDataError(error)) throw error;
+        if (resorts.length === 1) {
+            markGap(plan.model, resorts[0].id);
+            return fetchResortForecasts([resorts[0].id], priority, signal);
+        }
+        const ids = resorts.map(r => r.id);
+        const half = Math.ceil(ids.length / 2);
+        const [first, second] = await Promise.all([
+            fetchResortForecasts(ids.slice(0, half), priority, signal),
+            fetchResortForecasts(ids.slice(half), priority, signal),
+        ]);
+        return { ...first, ...second };
+    }
+
+    // Nothing but empty hours means no data there either
+    if (plan.isCountryModel) {
+        const empty = resorts.map(r => r.id).filter(id => result[id] && Object.keys(result[id].mid.forecast).length === 0);
+        empty.forEach(id => markGap(plan.model, id));
+        // Their Recommended card models may differ (a Country model can be chosen in several countries)
+        for (const group of groupIntoRequests(empty)) {
+            Object.assign(result, await fetchResortForecasts(group, priority, signal));
+        }
+    }
+    return result;
+}
+
+async function fetchGroup(
+    resorts: { id: string; point: ForecastPoint }[],
+    { model, freezingModel }: RequestPlan,
+    priority: FetchPriority,
+    signal?: AbortSignal
+): Promise<Record<string, ResortData>> {
     const lats = resorts.map(r => r.point.lat);
     const lons = resorts.map(r => r.point.lon);
 
@@ -578,7 +619,7 @@ export async function fetchResortForecasts(
 
         // A Saved location's one forecast stands in for all three bands
         const [bot, mid = bot, top = bot] = bands;
-        result[id] = { bot, mid, top, fetchedAt };
+        result[id] = { bot, mid, top, fetchedAt, model };
     });
 
     return result;

@@ -6,6 +6,6 @@ Slugs live in a committed registry keyed on upstream OpenStreetMap, Skimap.org a
 
 ## Consequences
 
-- The bundled list is a derivative database under the ODbL. It must stay openly available with attribution (About page, `resorts/README.md`), and the EULA carves it out. Hand overrides become part of it.
+- The bundled list is a derivative database under the ODbL. It must stay openly available with attribution (About page, `resorts/README.md`), and the code license (AGPL-3.0, see the README) carves it out. Hand overrides become part of it.
 - Card models are keyed by ISO country code. Countries without one of their own use ICON in Europe and ECMWF IFS elsewhere.
 - About 1% of Resorts contain other Resorts, such as lift-pass networks like Dolomiti Superski, and some upstream duplicates slip through. The report lists them; a human decides.

@@ -31,6 +31,8 @@ export interface ModelInfo {
   ai?: boolean;
   /** Served by Open-Meteo but not yet documented */
   experimental?: boolean;
+  /** Open-Meteo doesn't serve a variable a main-page card needs, so it can't be a Country model */
+  noCards?: boolean;
 }
 
 export interface AggregationInfo {
@@ -150,8 +152,8 @@ export const modelProviders: ProviderData[] = [
     name: 'NOAA (USA)',
     models: [
       { id: 'ncep_gfs_seamless', name: 'GFS Seamless', label: 'GFS Seamless', color: '#f59e0b', description: 'GFS, with HRRR over the US, 16 days', resolution: '3-13km', coverage: 'global', recommended: true },
-      { id: 'ncep_aigfs025', name: 'AIGFS', label: 'NOAA AIGFS', color: '#b45309', description: 'AI model, global, 16 days', resolution: '25km', coverage: 'global', ai: true },
-      { id: 'ncep_hgefs025_ensemble_mean', name: 'HGEFS Mean', label: 'NOAA HGEFS Mean', color: '#fcd34d', description: 'Hybrid AI ensemble mean, global, 10 days', resolution: '25km', coverage: 'global', ai: true },
+      { id: 'ncep_aigfs025', name: 'AIGFS', label: 'NOAA AIGFS', color: '#b45309', description: 'AI model, global, 16 days', resolution: '25km', coverage: 'global', ai: true, noCards: true },
+      { id: 'ncep_hgefs025_ensemble_mean', name: 'HGEFS Mean', label: 'NOAA HGEFS Mean', color: '#fcd34d', description: 'Hybrid AI ensemble mean, global, 10 days', resolution: '25km', coverage: 'global', ai: true, noCards: true },
       { id: 'ncep_gfs_global', name: 'GFS', label: 'NOAA GFS', color: '#d97706', description: 'Global, 16 days', resolution: '13km', coverage: 'global' },
       { id: 'ncep_nam_conus', name: 'NAM', label: 'NOAA NAM', color: '#ea580c', description: 'US, 2.5 days', resolution: '3km', coverage: US },
       { id: 'ncep_hrrr_conus', name: 'HRRR', label: 'NOAA HRRR', color: '#c2410c', description: 'US, 2 days', resolution: '3km', coverage: US },
@@ -191,7 +193,7 @@ export const modelProviders: ProviderData[] = [
       { id: 'meteofrance_arpege_world', name: 'ARPEGE World', label: 'ARPEGE World', color: '#7c3aed', description: 'Global, 4 days', resolution: '25km', coverage: 'global' },
       { id: 'meteofrance_arpege_europe', name: 'ARPEGE Europe', label: 'ARPEGE Europe', color: '#6d28d9', description: 'Europe, 4 days', resolution: '10km', coverage: ARPEGE_EUROPE },
       { id: 'meteofrance_arome_france', name: 'AROME France', label: 'AROME France', color: '#5b21b6', description: 'France and Alps, 2 days', resolution: '2.5km', coverage: AROME_FRANCE },
-      { id: 'meteofrance_arome_france_hd', name: 'AROME France HD', label: 'AROME France HD', color: '#4c1d95', description: 'France and Alps, 2 days, no snowfall', resolution: '1.5km', coverage: AROME_FRANCE },
+      { id: 'meteofrance_arome_france_hd', name: 'AROME France HD', label: 'AROME France HD', color: '#4c1d95', description: 'France and Alps, 2 days, no snowfall', resolution: '1.5km', coverage: AROME_FRANCE, noCards: true },
     ],
   },
   {

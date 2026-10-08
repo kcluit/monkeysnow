@@ -23,7 +23,9 @@ export function CompactDetailUtilityBar({
     setIsChartLocked,
     fixedElevation,
     customLocation,
+    groundElevation,
     customElevation,
+    setCustomElevation,
     onResetCustomLocation,
 }: DetailUtilityBarProps): JSX.Element {
     // Variable selection hook for modal
@@ -103,11 +105,20 @@ export function CompactDetailUtilityBar({
                         >
                             {getElevationText()}
                         </button>
+                    ) : customElevation !== null ? (
+                        // A Custom elevation can only be typed in the large bar; here a click goes back to Ground
+                        <button
+                            onClick={() => setCustomElevation(null)}
+                            title="Forecast at the ground elevation again"
+                            className="compact-bar-text text-theme-accent hover:text-theme-textPrimary transition-colors"
+                        >
+                            {formatElevation(customElevation, unitSystem)}
+                        </button>
                     ) : (
                         <span className="compact-bar-text text-theme-accent">
-                            {customElevation === null
+                            {groundElevation === null
                                 ? '...'
-                                : formatElevation(customElevation, unitSystem)}
+                                : formatElevation(groundElevation, unitSystem)}
                         </span>
                     )}
 

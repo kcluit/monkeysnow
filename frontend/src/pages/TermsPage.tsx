@@ -43,6 +43,27 @@ export function TermsPage(): JSX.Element {
                     The service is provided "as is" without warranty of any kind, express or implied.
                 </p>
                 <p>
+                    Its{' '}
+                    <a
+                        href="https://github.com/kcluit/monkeysnow"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="about-link"
+                    >
+                        source code
+                    </a>
+                    {' '}is licensed under the{' '}
+                    <a
+                        href="https://www.gnu.org/licenses/agpl-3.0.html"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="about-link"
+                    >
+                        GNU Affero General Public License v3.0
+                    </a>
+                    . These terms cover this hosted service.
+                </p>
+                <p>
                     You may use this service for personal, non-commercial purposes. You agree not to
                     misuse the service or interfere with its normal operation.
                 </p>

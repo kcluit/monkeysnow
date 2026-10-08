@@ -207,6 +207,11 @@ export function isTransientError(error: unknown): boolean {
     return /internal server error|bad gateway|service unavailable|gateway timeout|overloaded/i.test(message);
 }
 
+/** Open-Meteo's 400 for a model asked about a point outside its own area. */
+export function isNoDataError(error: unknown): boolean {
+    return error instanceof Error && /no data is available/i.test(error.message);
+}
+
 /** Open-Meteo's "Too many concurrent requests": worth a quick retry, not a pause. */
 function isConcurrencyLimit(error: unknown): boolean {
     return error instanceof Error && /too many concurrent/i.test(error.message);
