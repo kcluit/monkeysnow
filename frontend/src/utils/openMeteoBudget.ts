@@ -2,10 +2,11 @@
  * Fetch budget: how many Open-Meteo calls this tab allows itself per minute.
  *
  * Open-Meteo's free tier rate-limits each IP address (600 calls/min, 5,000/hr,
- * 10,000/day), and one HTTP request can count as many calls. Every forecast
+ * 10,000/day), and one HTTP request can count as many calls. It also serves one
+ * request per IP at a time and rejects a sixth concurrent one. Every forecast
  * request in the app goes through fetchWeatherApiWithinBudget() so a large
- * selection never bursts past the per-minute limit. When Open-Meteo rate-limits
- * us anyway (shared IP, several tabs), all fetching pauses until that window
+ * selection never bursts past either limit. When Open-Meteo rate-limits us
+ * anyway (shared IP, several tabs), all fetching pauses until that window
  * resets. See docs/adr/0001-fetch-forecasts-from-the-browser.md.
  */
 
@@ -17,6 +18,15 @@ export const OPEN_METEO_FORECAST_URL = 'https://api.open-meteo.com/v1/forecast';
 export const FETCH_BUDGET_PER_MINUTE = 550;
 
 const WINDOW_MS = 60_000;
+
+/**
+ * Requests in flight at once. Open-Meteo runs one request per IP at a time and
+ * queues up to four more, so two keeps its queue busy and leaves room for other tabs.
+ */
+const MAX_IN_FLIGHT = 2;
+
+/** Wait before retrying a request Open-Meteo turned away for too much concurrency. */
+const CONCURRENCY_RETRY_MS = 2_000;
 
 /** Detail-view requests are granted before main-page requests. */
 export type FetchPriority = 'detail' | 'main';
@@ -31,7 +41,7 @@ export interface BudgetPause {
 interface Waiter {
     weight: number;
     priority: FetchPriority;
-    resolve: () => void;
+    resolve: (release: () => void) => void;
     reject: (reason: unknown) => void;
     signal?: AbortSignal;
     onAbort?: () => void;
@@ -39,6 +49,7 @@ interface Waiter {
 
 const spent: { at: number; weight: number }[] = [];
 const waiters: Waiter[] = [];
+let inFlight = 0;
 let pause: BudgetPause | null = null;
 let timer: ReturnType<typeof setTimeout> | null = null;
 const pauseListeners = new Set<() => void>();
@@ -91,6 +102,7 @@ function pump(): void {
     }
 
     for (let waiter = nextWaiter(); waiter; waiter = nextWaiter()) {
+        if (inFlight >= MAX_IN_FLIGHT) return; // release() pumps again
         const used = spentInWindow(now);
         // A request heavier than the whole budget still goes through once the window is empty
         if (used > 0 && used + waiter.weight > FETCH_BUDGET_PER_MINUTE) {
@@ -100,12 +112,22 @@ function pump(): void {
         waiters.splice(waiters.indexOf(waiter), 1);
         if (waiter.onAbort) waiter.signal?.removeEventListener('abort', waiter.onAbort);
         spent.push({ at: now, weight: waiter.weight });
-        waiter.resolve();
+        inFlight++;
+        let released = false;
+        waiter.resolve(() => {
+            if (released) return;
+            released = true;
+            inFlight--;
+            pump();
+        });
     }
 }
 
-/** Resolves once `weight` calls fit in the budget and Open-Meteo isn't rate-limiting us. */
-export function acquireBudget(weight: number, priority: FetchPriority, signal?: AbortSignal): Promise<void> {
+/**
+ * Resolves once `weight` calls fit in the budget, a request slot is free and
+ * Open-Meteo isn't rate-limiting us. Call the returned release() when the request ends.
+ */
+export function acquireBudget(weight: number, priority: FetchPriority, signal?: AbortSignal): Promise<() => void> {
     return new Promise((resolve, reject) => {
         if (signal?.aborted) {
             reject(new DOMException('Aborted', 'AbortError'));
@@ -170,8 +192,24 @@ export function rateLimitWindowOf(error: unknown): RateLimitWindow | null {
     const message = error instanceof Error ? error.message : '';
     if (/daily|monthly/i.test(message)) return 'day';
     if (/hourly/i.test(message)) return 'hour';
-    if (/minutely|limit exceeded|too many requests|too many concurrent/i.test(message)) return 'minute';
+    if (/minutely|limit exceeded|too many requests/i.test(message)) return 'minute';
     return null;
+}
+
+/**
+ * Whether retrying a failed request could help: network failures and server errors.
+ * Open-Meteo answers bad requests (e.g. "No data is available for this location")
+ * with a 400 whose reason the SDK throws as-is; retrying those only burns budget.
+ */
+export function isTransientError(error: unknown): boolean {
+    if (error instanceof TypeError) return true; // fetch() network failure
+    const message = error instanceof Error ? error.message : '';
+    return /internal server error|bad gateway|service unavailable|gateway timeout|overloaded/i.test(message);
+}
+
+/** Open-Meteo's "Too many concurrent requests": worth a quick retry, not a pause. */
+function isConcurrencyLimit(error: unknown): boolean {
+    return error instanceof Error && /too many concurrent/i.test(error.message);
 }
 
 /**
@@ -186,15 +224,24 @@ export async function fetchWeatherApiWithinBudget(
     const weight = callWeight(params);
 
     for (;;) {
-        await acquireBudget(weight, priority, signal);
+        const release = await acquireBudget(weight, priority, signal);
+        let retryAfterMs = 0;
         try {
             // retries = 1 turns off the SDK's own retries on 5xx, which would bypass the budget;
             // callers retry server errors themselves
             return await fetchWeatherApi(OPEN_METEO_FORECAST_URL, params, 1, 0.2, 2, { signal });
         } catch (error) {
-            const window = rateLimitWindowOf(error);
-            if (!window || signal?.aborted) throw error;
-            reportRateLimit(window);
+            if (signal?.aborted) throw error;
+            if (isConcurrencyLimit(error)) {
+                retryAfterMs = CONCURRENCY_RETRY_MS;
+            } else {
+                const window = rateLimitWindowOf(error);
+                if (!window) throw error;
+                reportRateLimit(window);
+            }
+        } finally {
+            release();
         }
+        if (retryAfterMs) await new Promise(resolve => setTimeout(resolve, retryAfterMs));
     }
 }
