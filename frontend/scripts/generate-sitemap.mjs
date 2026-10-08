@@ -12,7 +12,7 @@ import { dirname, join } from 'path';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = join(__dirname, '..', 'public');
 const SITEMAP_PATH = join(PUBLIC_DIR, 'sitemap.xml');
-const LOCATIONS_PATH = join(__dirname, '..', 'src', 'data', 'locations.json');
+const RESORTS_PATH = join(__dirname, '..', 'src', 'data', 'resorts', 'resorts.json');
 const SITE_URL = 'https://monkeysnow.com';
 
 const STATIC_ROUTES = [
