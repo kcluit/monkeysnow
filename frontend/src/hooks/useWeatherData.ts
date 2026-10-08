@@ -152,8 +152,8 @@ export function useWeatherData(selectedResorts: string[]): UseWeatherDataReturn 
 
     // Never-loaded resorts first, so empty slots fill before cached cards refresh
     queue.pending = [...groupIntoRequests(missing), ...groupIntoRequests(stale)];
-    while (queue.running < CONCURRENT_REQUESTS && queue.running < queue.pending.length + queue.running) {
-      if (queue.pending.length === 0) break;
+    // Each worker takes its first group synchronously, so this starts at most one worker per group
+    while (queue.running < CONCURRENT_REQUESTS && queue.pending.length > 0) {
       queue.running++;
       void runWorker(queue);
     }
