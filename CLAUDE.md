@@ -38,6 +38,10 @@ npm run build
 - `utils/openMeteoClient.ts` + `hooks/useDetailedWeatherData.ts` - the multi-model detail view
 - The Selection cap is `MAX_SELECTED_RESORTS` (300) in `hooks/useResortHierarchy.ts`
 
+### First visit (see docs/adr/0002-locate-first-time-visitors-with-a-netlify-edge-function.md)
+- `utils/starterResort.ts` picks the Starter resort: the resort page landed on, else the nearest to the visitor, else random
+- The visitor's location comes from `frontend/netlify/edge-functions/geo.ts` at `/api/geo`, the only server-side code; under plain `vite` it is absent, so dev always falls back to random
+
 ### Frontend Data Flow
 1. `useWeatherData(selectedResorts)` loads forecasts into `AllWeatherData` and reports queued resorts
 2. `processResortData()` in `utils/weather.ts` transforms them into `ProcessedResortData` for display
