@@ -13,7 +13,7 @@ const STALENESS_CHECK_MS = 5 * 60 * 1000;
 /** Requests in flight at once; the Fetch budget decides when each may start. */
 const CONCURRENT_REQUESTS = 3;
 
-/** Attempts per request group for errors other than rate limits (those wait out the pause instead). */
+/** Attempts per request group for network and server errors (rate limits wait out the pause instead). */
 const MAX_ATTEMPTS = 3;
 
 // One queue per mount, so StrictMode's double mount can't mix up two queues
