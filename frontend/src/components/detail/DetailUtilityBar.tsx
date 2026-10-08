@@ -45,6 +45,7 @@ function LargeDetailUtilityBar({
     customLocation,
     onResetCustomLocation,
     isLoadingElevation,
+    modelAvailability,
 }: DetailUtilityBarProps): JSX.Element {
     const [showElevationDropdown, setShowElevationDropdown] = useState(false);
     const [showForecastDropdown, setShowForecastDropdown] = useState(false);
