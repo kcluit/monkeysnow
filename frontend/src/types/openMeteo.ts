@@ -163,7 +163,16 @@ export type WeatherVariable =
   | 'lifted_index'
   | 'convective_inhibition'
   | 'freezing_level_height'
-  | 'weather_code';
+  | 'weather_code'
+  // Upper air & surface
+  | 'temperature_80m'
+  | 'temperature_120m'
+  | 'temperature_180m'
+  | 'total_column_integrated_water_vapour'
+  | 'k_index'
+  | 'updraft'
+  | 'surface_temperature'
+  | 'skin_temperature';
 
 // Raw response from Open-Meteo API
 export interface OpenMeteoHourlyData {
