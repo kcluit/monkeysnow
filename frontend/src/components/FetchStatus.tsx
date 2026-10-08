@@ -33,7 +33,8 @@ export function FetchStatus({ count, calls, things, onlyWhenLimited = false, cla
 
     if (count === 0 || (onlyWhenLimited && !pause)) return null;
 
-    const noun = t(`fetchStatus.${count === 1 ? things.slice(0, -1) as 'resort' | 'model' : things}`);
+    const [singular, plural] = NOUN_KEYS[things];
+    const noun = t(count === 1 ? singular : plural);
     const loadMs = Math.ceil(calls / FETCH_BUDGET_PER_MINUTE) * 60_000;
     const formatEta = (ms: number) => {
         const minutes = Math.max(1, Math.ceil(ms / 60_000));
