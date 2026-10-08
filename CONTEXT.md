@@ -99,8 +99,16 @@ A **Forecast model** whose numbers at the point being forecast are identical to 
 _Avoid_: duplicate
 
 **Card model**:
-The single **Forecast model** behind a card on the main page, chosen by the country of the **Resort**, or for a **Saved location**, of the **Resort** nearest to it.
+The single **Forecast model** behind a card on the main page. It is the visitor's **Country model** for the **Resort**'s country (for a **Saved location**, the country of the **Resort** nearest to it) wherever that model covers the point and has data there, and otherwise the **Recommended card model**.
 _Avoid_: default model, primary model
+
+**Recommended card model**:
+The **Forecast model** monkeysnow picks for each country's cards until a visitor chooses a **Country model**. Shown as "Auto".
+_Avoid_: default card model, auto model
+
+**Country model**:
+A **Forecast model** a visitor has chosen for the cards of every **Resort** in one country, in place of its **Recommended card model**. It may cover only part of the country.
+_Avoid_: model override, country setting
 
 **Forecast horizon**:
 How many days ahead a forecast is asked for: fourteen on the main page, and whatever the visitor picks in the detail view. A card shows fewer days when its **Card model**'s **Range** ends sooner.
