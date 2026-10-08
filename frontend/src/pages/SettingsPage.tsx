@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Icon } from '../components/Icon';
 import { icons } from '../constants/icons';
 import { isFullscreenSupported } from '../hooks/useFullscreen';
+import { useCardModelsSummary } from '../components/CardModelsModal';
 import type { Theme } from '../types/themes';
 import type { Font } from '../types/fonts';
 import type { Language } from '../types/i18n';
@@ -13,7 +14,6 @@ import type {
     ViewMode,
     TemperatureMetric,
     SnowfallEstimateMode,
-    WeatherModelSetting,
     UtilityBarStyle,
     UnitSystem,
     ResortDisplayLimit,
@@ -70,8 +70,7 @@ export interface SettingsPageProps {
     setSelectedTemperatureMetric: (m: TemperatureMetric) => void;
     snowfallEstimateMode: SnowfallEstimateMode;
     setSnowfallEstimateMode: (m: SnowfallEstimateMode) => void;
-    weatherModel: WeatherModelSetting;
-    setWeatherModel: (m: WeatherModelSetting) => void;
+    openCardModels: () => void;
     // Utility bar
     showUtilityBar: boolean;
     setShowUtilityBar: (show: boolean) => void;
@@ -244,7 +243,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
         viewMode, setViewMode,
         selectedTemperatureMetric, setSelectedTemperatureMetric,
         snowfallEstimateMode, setSnowfallEstimateMode,
-        weatherModel, setWeatherModel,
+        openCardModels,
         showUtilityBar, setShowUtilityBar,
         utilityBarStyle, setUtilityBarStyle,
         unitSystem, setUnitSystem,
@@ -253,6 +252,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
         modelLineOpacity, setModelLineOpacity,
         openResortSelector,
     } = props;
+    const cardModelsSummary = useCardModelsSummary();
 
     return (
         <div className="settings-page">
@@ -432,9 +432,10 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                         </div>
                     </div>
                     <div className="settings-subsection">
-                        <span className="settings-subsection-label">Weather model</span>
+                        <span className="settings-subsection-label">Card models by country</span>
                         <div className="settings-options-row">
-                            <OptionButton label="Auto" isSelected={weatherModel === 'auto'} onClick={() => setWeatherModel('auto')} />
+                            <OptionButton label="Choose…" icon={icons.weatherModel} isSelected={false} onClick={openCardModels} />
+                            <span className="self-center text-sm text-theme-textSecondary">{cardModelsSummary}</span>
                         </div>
                     </div>
                 </SettingSection>

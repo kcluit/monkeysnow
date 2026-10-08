@@ -18,6 +18,7 @@ const CompactCard = lazy(() => import('./components/cards/CompactCard').then(m =
 const DetailedResortView = lazy(() => import('./components/detail/DetailedResortView').then(m => ({ default: m.DetailedResortView })));
 import { FPSCounter } from './components/FPSCounter';
 import { ResortSelectionGridModal } from './components/ResortSelectionModal';
+import { CardModelsModal } from './components/CardModelsModal';
 import { useWeatherData, deleteCachedForecast } from './hooks/useWeatherData';
 import { useSavedLocations } from './hooks/useSavedLocations';
 import { useLocalStorage } from './hooks/useLocalStorage';
@@ -72,7 +73,6 @@ import type {
     ViewMode,
     TemperatureMetric,
     SnowfallEstimateMode,
-    WeatherModelSetting,
     UtilityBarStyle,
     ResortDisplayLimit,
     ModelLineOpacity
@@ -273,7 +273,6 @@ function App(): JSX.Element {
     const [viewMode, setViewMode] = useLocalStorage<ViewMode>('viewMode', 'default');
     const [selectedTemperatureMetric, setSelectedTemperatureMetric] = useLocalStorage<TemperatureMetric>('temperatureMetric', defaultTemperatureMetric);
     const [snowfallEstimateMode, setSnowfallEstimateMode] = useLocalStorage<SnowfallEstimateMode>('snowfallEstimateMode', 'model');
-    const [weatherModel, setWeatherModel] = useLocalStorage<WeatherModelSetting>('weatherModel', 'auto');
     const [chartZoomSyncEnabled, setChartZoomSyncEnabled] = useLocalStorage<boolean>('chartZoomSync', true);
     const [unitSystem, setUnitSystem] = useUnitSystem();
     const [resortDisplayLimit, setResortDisplayLimit] = useLocalStorage<ResortDisplayLimit>('resortDisplayLimit', 'auto');
@@ -293,6 +292,11 @@ function App(): JSX.Element {
         selectedResorts,
         onResortsChange: setSelectedResorts,
     });
+
+    // Card models by country
+    const [isCardModelsOpen, setCardModelsOpen] = useState(false);
+    const openCardModels = useCallback(() => setCardModelsOpen(true), []);
+    const closeCardModels = useCallback(() => setCardModelsOpen(false), []);
 
     // Open resort modal and auto-dismiss the banner
     const openResortModalAndDismissBanner = useCallback(() => {
@@ -333,7 +337,7 @@ function App(): JSX.Element {
         viewMode, setViewMode,
         selectedTemperatureMetric, setSelectedTemperatureMetric,
         snowfallEstimateMode, setSnowfallEstimateMode,
-        weatherModel, setWeatherModel,
+        openCardModels,
         showUtilityBar, setShowUtilityBar,
         utilityBarStyle, setUtilityBarStyle,
         unitSystem, setUnitSystem,
@@ -541,8 +545,7 @@ function App(): JSX.Element {
             setSelectedTemperatureMetric,
             snowfallEstimateMode,
             setSnowfallEstimateMode,
-            weatherModel,
-            setWeatherModel,
+            openCardModels,
             showUtilityBar,
             setShowUtilityBar,
             utilityBarStyle,
@@ -962,8 +965,7 @@ function App(): JSX.Element {
         setSelectedTemperatureMetric,
         snowfallEstimateMode,
         setSnowfallEstimateMode,
-        weatherModel,
-        setWeatherModel,
+        openCardModels,
         showUtilityBar,
         setShowUtilityBar,
         utilityBarStyle,
@@ -997,6 +999,9 @@ function App(): JSX.Element {
 
             {/* Resort Selection Grid Modal */}
             <ResortSelectionGridModal hierarchy={resortHierarchy} hideIcons={isHideIconsEnabled} />
+
+            {/* Card models by country */}
+            <CardModelsModal isOpen={isCardModelsOpen} onClose={closeCardModels} selectedResorts={selectedResorts} />
 
             {/* FPS Counter */}
             <FPSCounter fps={fps} isVisible={isFPSEnabled} />

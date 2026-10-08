@@ -38,7 +38,8 @@ npm run build
 
 ### Fetching from Open-Meteo (see docs/adr/0001-fetch-forecasts-from-the-browser.md)
 - `utils/openMeteoBudget.ts` - every forecast request goes through `fetchWeatherApiWithinBudget()`: a per-tab Fetch budget of 550 calls per rolling minute, at most 2 requests in flight, detail-view requests first, and a pause until the window resets when Open-Meteo returns a 429
-- `utils/resortForecast.ts` - fetches all three elevation bands for groups of up to 25 resorts sharing a model (chosen by country), and turns hourly data into AM/PM/NIGHT periods with the wet-bulb / Kuchera snow estimation
+- `utils/resortForecast.ts` - fetches all three elevation bands for groups of up to 25 resorts sharing a Card model, and turns hourly data into AM/PM/NIGHT periods with the wet-bulb / Kuchera snow estimation
+- `utils/cardModels.ts` - picks each card's Card model: the visitor's Country model (localStorage, set in `components/CardModelsModal/`) where it covers the point, else the country's Recommended card model (see docs/adr/0006)
 - `hooks/useWeatherData.ts` - keeps the Selection's forecasts loaded: IndexedDB cache first, never-loaded resorts before stale ones, 3-hour Freshness window, re-checked every 5 minutes
 - `utils/openMeteoClient.ts` + `hooks/useDetailedWeatherData.ts` - the multi-model detail view
 - The Selection cap is `MAX_SELECTED_RESORTS` (300) in `hooks/useResortHierarchy.ts`

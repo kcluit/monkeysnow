@@ -21,6 +21,8 @@ import {
     formatElevation,
     formatFreezingLevel
 } from './unitConversion';
+import { forecastModelOf } from './resortForecast';
+import { getModelInfo } from '../data/modelHierarchy';
 
 export function processResortData(
     allData: AllWeatherData,
@@ -101,12 +103,14 @@ export function processResortData(
             return null;
         }
 
+        const model = forecastModelOf(resortName, resortData);
         return {
             id: resortName,
             name: resortName.replace(/-/g, ' '),
             elevation: formatElevation(elevationData.metadata.elevation, unitSystem),
             days,
-            fetchedAt: resortData.fetchedAt
+            fetchedAt: resortData.fetchedAt,
+            model: getModelInfo(model)?.label ?? model
         };
     } catch (err) {
         console.error(`Error processing resort data for ${resortName}:`, err);

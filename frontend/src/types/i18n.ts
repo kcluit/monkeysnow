@@ -130,6 +130,18 @@ export interface Translations {
     'detail.noModelCovers': string;
     'detail.noModelHasData': string;
     'detail.chooseModels': string;
+
+    // Card models by country
+    'cardModels.search': string;
+    'cardModels.everywhere': string;
+    'cardModels.yourSelection': string;
+    'cardModels.auto': string;
+    'cardModels.covers': string;
+    'cardModels.noCountries': string;
+    'cardModels.resetAll': string;
+    'cardModels.autoEverywhere': string;
+    'cardModels.changedOne': string;
+    'cardModels.changedMany': string;
 }
 
 /**
@@ -279,6 +291,18 @@ export const TranslationsSchema = z.object({
     'detail.noModelCovers': z.string(),
     'detail.noModelHasData': z.string(),
     'detail.chooseModels': z.string(),
+
+    // Card models by country
+    'cardModels.search': z.string(),
+    'cardModels.everywhere': z.string(),
+    'cardModels.yourSelection': z.string(),
+    'cardModels.auto': z.string(),
+    'cardModels.covers': z.string(),
+    'cardModels.noCountries': z.string(),
+    'cardModels.resetAll': z.string(),
+    'cardModels.autoEverywhere': z.string(),
+    'cardModels.changedOne': z.string(),
+    'cardModels.changedMany': z.string(),
 }) satisfies z.ZodType<Translations>;
 
 /**

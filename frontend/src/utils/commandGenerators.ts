@@ -3,7 +3,7 @@
  * Generates commands with checkmarks based on current state.
  */
 
-import type { Command, ElevationLevel, SortOption, SortDay, SortDayData, ViewMode, TemperatureMetric, SnowfallEstimateMode, WeatherModelSetting, UtilityBarStyle, UnitSystem, ResortDisplayLimit, ModelLineOpacity } from '../types';
+import type { Command, ElevationLevel, SortOption, SortDay, SortDayData, ViewMode, TemperatureMetric, SnowfallEstimateMode, UtilityBarStyle, UnitSystem, ResortDisplayLimit, ModelLineOpacity } from '../types';
 import type { Language } from '../types/i18n';
 import { icons } from '../constants/icons';
 
@@ -31,8 +31,7 @@ export interface ControlCommandParams {
   snowfallEstimateMode: SnowfallEstimateMode;
   setSnowfallEstimateMode: (m: SnowfallEstimateMode) => void;
   // Weather Model
-  weatherModel: WeatherModelSetting;
-  setWeatherModel: (m: WeatherModelSetting) => void;
+  openCardModels: () => void;
   // Utility Bar visibility
   showUtilityBar: boolean;
   setShowUtilityBar: (show: boolean) => void;
@@ -304,23 +303,6 @@ export function generateSnowfallEstimateCommands(
 }
 
 /**
- * Generate weather model submenu commands with checkmarks.
- */
-export function generateWeatherModelCommands(
-  weatherModel: WeatherModelSetting,
-  setWeatherModel: (m: WeatherModelSetting) => void
-): Command[] {
-  return [
-    {
-      id: 'weathermodel-auto',
-      name: 'Auto',
-      icon: weatherModel === 'auto' ? icons.check : undefined,
-      action: () => setWeatherModel('auto'),
-    },
-  ];
-}
-
-/**
  * Generate unit system submenu commands with checkmarks.
  */
 export function generateUnitSystemCommands(
@@ -488,13 +470,10 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
       ),
     },
     {
-      id: 'weather-model',
-      name: 'Weather model',
+      id: 'card-models',
+      name: 'Card models by country',
       icon: icons.weatherModel,
-      subCommands: generateWeatherModelCommands(
-        params.weatherModel,
-        params.setWeatherModel
-      ),
+      action: params.openCardModels,
     },
     {
       id: 'utility-bar',
