@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from 'react';
+import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useNavigate, useParams, Link } from 'react-router-dom';
 import { Header } from './components/Header';
 import { PageMeta } from './components/PageMeta';
@@ -150,8 +150,10 @@ function App(): JSX.Element {
     // Weather data hook — keeps the selection's forecasts loaded within the Fetch budget
     const { allWeatherData, loading: weatherLoading, queuedCount, queuedCalls, createLoadingController, cancelLoading } = useWeatherData(selectedResorts);
 
-    // Only block UI if NO cached data at all
-    const loading = (!allWeatherData && weatherLoading) || (!allWeatherData && hierarchyLoading);
+    // Only block UI if NO cached data at all, and not through a rate-limit pause
+    // (that can last until tomorrow; the home page explains it in its status row)
+    const fetchPause = useBudgetPause();
+    const loading = !fetchPause && ((!allWeatherData && weatherLoading) || (!allWeatherData && hierarchyLoading));
     const [selectedElevation, setSelectedElevation] = useLocalStorage<ElevationLevel>('selectedElevation', defaultElevation);
     const [selectedSort, setSelectedSort] = useLocalStorage<SortOption>('selectedSort', defaultSort);
     const [selectedSortDay, setSelectedSortDay] = useLocalStorage<SortDay>('selectedSortDay', defaultSortDay);
