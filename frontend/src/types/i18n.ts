@@ -259,6 +259,20 @@ export const TranslationsSchema = z.object({
     // Empty states
     'empty.selectResorts': z.string(),
 
+    // Fetch status
+    'fetchStatus.queued': z.string(),
+    'fetchStatus.limitReached': z.string(),
+    'fetchStatus.limitReachedTomorrow': z.string(),
+    'fetchStatus.etaMinutes': z.string(),
+    'fetchStatus.etaHours': z.string(),
+    'fetchStatus.resort': z.string(),
+    'fetchStatus.resorts': z.string(),
+    'fetchStatus.model': z.string(),
+    'fetchStatus.models': z.string(),
+
+    // Selection
+    'selection.trimmed': z.string(),
+
     // Detail View
     'detail.loadingForecast': z.string(),
     'detail.errorLoadingForecast': z.string(),
