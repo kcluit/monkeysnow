@@ -121,7 +121,7 @@ export function WeatherChart({
         );
     }, [
         data,
-        selectedModels,
+        providingModels,
         selectedAggregations,
         aggregationColors,
         hideAggregationMembers,
