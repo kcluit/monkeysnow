@@ -148,6 +148,8 @@ export interface WeatherChartProps {
     unitSystem: UnitSystem;
     timezoneInfo?: TimezoneInfo;
     isChartLocked?: boolean;
+    /** Whether more models may still arrive (so an empty chart isn't final yet) */
+    isLoading?: boolean;
     onToggleVisibility?: () => void;
     /** Location elevations for freezing level chart reference lines */
     location?: {
