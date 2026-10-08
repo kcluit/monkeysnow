@@ -59,7 +59,8 @@ function read(): SavedLocation[] {
     }
 }
 
-let savedLocations: SavedLocation[] = read();
+// Read on first use rather than on import, so main.tsx's one-off reset of stored data runs first
+let savedLocations: SavedLocation[] | null = null;
 const listeners = new Set<() => void>();
 
 const notify = () => listeners.forEach((listener) => listener());
@@ -83,11 +84,12 @@ window.addEventListener('storage', (e) => {
 });
 
 export function getSavedLocations(): SavedLocation[] {
+    savedLocations ??= read();
     return savedLocations;
 }
 
 export function getSavedLocation(id: string): SavedLocation | undefined {
-    return savedLocations.find((location) => location.id === id);
+    return getSavedLocations().find((location) => location.id === id);
 }
 
 export function subscribeSavedLocations(listener: () => void): () => void {
@@ -113,14 +115,14 @@ export function saveLocation({ name, lat, lon, elevation }: SavedLocationInput):
     // The nearest Resort's country, found once here, picks the Card model from now on
     const nearest = RESORT_LOCATIONS.get(nearestResortId(lat, lon));
     const location: SavedLocation = { id: newId(), name, lat, lon, elevation, country: nearest?.country ?? '' };
-    write([...savedLocations, location]);
+    write([...getSavedLocations(), location]);
     return location;
 }
 
 export function updateSavedLocation(id: string, changes: Pick<SavedLocation, 'name' | 'elevation'>): void {
-    write(savedLocations.map((location) => (location.id === id ? { ...location, ...changes } : location)));
+    write(getSavedLocations().map((location) => (location.id === id ? { ...location, ...changes } : location)));
 }
 
 export function deleteSavedLocation(id: string): void {
-    write(savedLocations.filter((location) => location.id !== id));
+    write(getSavedLocations().filter((location) => location.id !== id));
 }

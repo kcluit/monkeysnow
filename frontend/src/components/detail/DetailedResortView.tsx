@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useDetailedWeatherData } from '../../hooks/useDetailedWeatherData';
 import { useElevationFetch } from '../../hooks/useElevationFetch';
@@ -39,9 +39,6 @@ interface DetailedResortViewPropsWithUnits extends DetailedResortViewProps {
     onDismissSelectionWasFull?: () => void;
 }
 
-// Keys whose saved values were dropped by moving to a new key (docs/adr/0003, docs/adr/0005)
-const RETIRED_STORAGE_KEYS = ['detailSelectedModels', 'detailPreferredModels', 'detailSelectedAggregations'];
-
 // Default aggregation colors
 const DEFAULT_AGGREGATION_COLORS: Record<AggregationType, string> = {
     median: aggregationOptions.find(a => a.id === 'median')?.defaultColor ?? '#a855f7',
@@ -73,13 +70,6 @@ export function DetailedResortView({
         'detailPreferredModelsV2',
         RECOMMENDED_MODELS
     );
-    useEffect(() => {
-        try {
-            for (const key of RETIRED_STORAGE_KEYS) localStorage.removeItem(key);
-        } catch {
-            // Storage unavailable; nothing to clean up
-        }
-    }, []);
 
     // State for selected variables - default selection
     const [selectedVariables, setSelectedVariables] = useLocalStorage<WeatherVariable[]>(

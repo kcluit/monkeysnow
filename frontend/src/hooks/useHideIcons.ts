@@ -7,27 +7,15 @@ export interface UseHideIconsReturn {
 }
 
 const STORAGE_KEY = 'hideIconsEnabled';
-const OLD_STORAGE_KEY = 'hideEmojiEnabled'; // For migration
 
 export function useHideIcons(): UseHideIconsReturn {
   const [isHideIconsEnabled, setIsHideIconsEnabled] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Initialize from localStorage (with migration from old key)
+  // Initialize from localStorage
   useEffect(() => {
     try {
-      let saved = localStorage.getItem(STORAGE_KEY);
-
-      // Migrate from old key if new key doesn't exist
-      if (saved === null) {
-        const oldSaved = localStorage.getItem(OLD_STORAGE_KEY);
-        if (oldSaved !== null) {
-          saved = oldSaved;
-          localStorage.setItem(STORAGE_KEY, oldSaved);
-          localStorage.removeItem(OLD_STORAGE_KEY);
-        }
-      }
-
+      const saved = localStorage.getItem(STORAGE_KEY);
       if (saved !== null) {
         const enabled = saved === 'true';
         setIsHideIconsEnabled(enabled);

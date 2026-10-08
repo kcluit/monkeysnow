@@ -61,7 +61,7 @@ How long a fetched forecast is trusted before it becomes **stale** and is refetc
 _Avoid_: TTL, cache expiry, refresh interval
 
 **Queued resort**:
-A **Resort** or **Saved location** in the **Selection** whose forecast is waiting for **Fetch budget** to free up.
+A **Resort** or **Saved location** in the **Selection** that has no forecast yet and is waiting for, or in the middle of, its fetch. A **Resort** whose **stale** forecast is being refreshed is not queued; its card stays on show.
 _Avoid_: pending resort, loading resort
 
 ### Forecast models
