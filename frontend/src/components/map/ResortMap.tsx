@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -63,11 +63,20 @@ function MapResizeHandler(): null {
     return null;
 }
 
+// A double-click or double-tap zooms the map, so a click only counts once no second one follows this soon
+const DOUBLE_CLICK_MS = 300;
+
 // Inner component to handle map click events
 function MapClickHandler({ onClick }: { onClick: (lat: number, lon: number) => void }): null {
+    const pendingClick = useRef<number | undefined>(undefined);
+    useEffect(() => () => window.clearTimeout(pendingClick.current), []);
     useMapEvents({
         click: (e) => {
-            onClick(e.latlng.lat, e.latlng.lng);
+            window.clearTimeout(pendingClick.current);
+            pendingClick.current = window.setTimeout(() => onClick(e.latlng.lat, e.latlng.lng), DOUBLE_CLICK_MS);
+        },
+        dblclick: () => {
+            window.clearTimeout(pendingClick.current);
         },
     });
     return null;
