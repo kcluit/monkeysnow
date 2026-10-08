@@ -2692,6 +2692,11 @@ input[type="checkbox"] {
     border-radius: 0;
 }
 
+/* Keep the map credits clear of the size buttons in the bottom-left corner when they wrap on narrow screens */
+.resort-map-frame .leaflet-bottom.leaflet-right {
+    left: 76px;
+}
+
 .resort-map-controls {
     position: absolute;
     bottom: 8px;
