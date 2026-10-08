@@ -281,7 +281,29 @@ async function importResorts() {
     vanished: [], unplaced: [], nested: [], duplicates: [], nonLatin: [], staleOverrides: [], newSlugs: [],
   };
 
-  // 1. Read every ski area once
+  // 1. Read every ski area once, and where its operating lifts stand
+  const lifts = parseCsv(liftsText).filter(l => l.status === 'operating');
+  const liftPlaces = new Map(); // area id -> Map("country" and "country|region" -> lift count)
+  for (const lift of lifts) {
+    const country = lift.countries.split(';')[0];
+    const region = lift.regions.split(';')[0];
+    for (const areaId of lift.ski_area_ids.split(';')) {
+      if (!areaId) continue;
+      const counts = liftPlaces.get(areaId) ?? new Map();
+      for (const key of [country, `${country}|${region}`]) counts.set(key, (counts.get(key) ?? 0) + 1);
+      liftPlaces.set(areaId, counts);
+    }
+  }
+  /** Border areas list every place they touch; use the one most of their lifts stand in. */
+  const mainPlace = area => {
+    const places = area.properties.places ?? [];
+    const counts = liftPlaces.get(area.id);
+    if (places.length < 2 || !counts) return places[0];
+    const score = ({ localized: { en } = {} }) =>
+      (counts.get(en?.country) ?? 0) * 10_000 + (counts.get(`${en?.country}|${en?.region}`) ?? 0);
+    return [...places].sort((a, b) => score(b) - score(a))[0];
+  };
+
   const allAreas = JSON.parse(geojsonText).features.map(f => {
     const p = f.properties;
     return {
