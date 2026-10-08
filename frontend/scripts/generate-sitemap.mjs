@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
- * Generates frontend/public/sitemap.xml from the bundled resort locations
- * (src/data/locations.json). Run as part of the build step.
+ * Generates frontend/public/sitemap.xml from the bundled Resorts
+ * (src/data/resorts/resorts.json). Run as part of the build step.
+ * Only current slugs are listed; old IDs redirect to them in the app.
  */
 
 import { readFile, writeFile, mkdir } from 'fs/promises';
