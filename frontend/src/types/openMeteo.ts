@@ -91,6 +91,20 @@ export type WeatherVariable =
   | 'showers'
   | 'snowfall'
   | 'snow_depth'
+  // Snow
+  | 'snowfall_height'
+  | 'snowfall_water_equivalent'
+  | 'snow_depth_water_equivalent'
+  | 'snow_density'
+  // Precipitation type & hazards
+  | 'precipitation_type'
+  | 'hail'
+  | 'lightning_potential'
+  | 'thunderstorm_probability'
+  | 'snowfall_probability'
+  | 'freezing_rain_probability'
+  | 'ice_pellets_probability'
+  | 'rain_probability'
   // Wind (base level)
   | 'wind_speed_10m'
   | 'wind_gusts_10m'
