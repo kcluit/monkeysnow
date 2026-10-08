@@ -69,7 +69,8 @@ export function CompactDetailUtilityBar({
     return (
         <>
             <div className="compact-utility-bar mb-6 flex justify-center">
-                <div className="compact-utility-bar-inner inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-theme-secondary">
+                {/* Wraps on phones, where the separators would dangle at line ends */}
+                <div className="compact-utility-bar-inner inline-flex flex-wrap justify-center max-w-full items-center gap-x-3 sm:gap-x-2 gap-y-1 px-4 py-2 rounded-lg bg-theme-secondary">
                     {/* Back */}
                     <button
                         onClick={onBack}
@@ -78,7 +79,7 @@ export function CompactDetailUtilityBar({
                         Back
                     </button>
 
-                    <span className="compact-bar-separator">|</span>
+                    <span className="compact-bar-separator hidden sm:inline">|</span>
 
                     {/* Models - opens modal */}
                     <button
@@ -88,7 +89,7 @@ export function CompactDetailUtilityBar({
                         {getModelButtonText()}
                     </button>
 
-                    <span className="compact-bar-separator">|</span>
+                    <span className="compact-bar-separator hidden sm:inline">|</span>
 
                     {/* Elevation - a Saved location has only its own */}
                     {!customLocation && fixedElevation !== undefined ? (
@@ -110,7 +111,7 @@ export function CompactDetailUtilityBar({
                         </span>
                     )}
 
-                    <span className="compact-bar-separator">|</span>
+                    <span className="compact-bar-separator hidden sm:inline">|</span>
 
                     {/* Forecast Days - cycle */}
                     <button
@@ -120,7 +121,7 @@ export function CompactDetailUtilityBar({
                         {forecastDays}d
                     </button>
 
-                    <span className="compact-bar-separator">|</span>
+                    <span className="compact-bar-separator hidden sm:inline">|</span>
 
                     {/* Variables - opens modal */}
                     <button
@@ -130,7 +131,7 @@ export function CompactDetailUtilityBar({
                         Variables ({selectedVariables.length})
                     </button>
 
-                    <span className="compact-bar-separator">|</span>
+                    <span className="compact-bar-separator hidden sm:inline">|</span>
 
                     {/* Lock Toggle */}
                     <button
@@ -143,7 +144,7 @@ export function CompactDetailUtilityBar({
                     {/* Reset location button when custom location active */}
                     {customLocation && (
                         <>
-                            <span className="compact-bar-separator">|</span>
+                            <span className="compact-bar-separator hidden sm:inline">|</span>
                             <button
                                 onClick={onResetCustomLocation}
                                 className="compact-bar-text text-red-500 hover:text-red-400 transition-colors"

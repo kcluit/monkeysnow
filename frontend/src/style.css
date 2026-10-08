@@ -454,12 +454,20 @@ input[type="checkbox"] {
         pointer-events: none;
     }
 
+    /* Shrink the logo on narrow phones so the nav icons beside it stay on screen */
     .logo-text {
-        margin-left: 1.5em;
+        font-size: min(2rem, calc((100vw - 9rem) / 7.75));
     }
 
     .header-content {
         gap: 0.25rem;
+    }
+}
+
+/* Room for the snowflake, which hangs left of the text, wherever the page margin is too narrow for it */
+@media screen and (max-width: 1343px) {
+    .logo-text {
+        margin-left: 1.5em;
     }
 }
 
@@ -1542,9 +1550,12 @@ input[type="checkbox"] {
     color: var(--textSecondary);
 }
 
+/* Long names wrap rather than running out of their card on narrow screens */
 .resort-grid-item-name {
     font-size: 12px;
     color: var(--textPrimary, #f5f5f7);
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
 /* Shown in the Custom group until a location is saved */
@@ -1984,6 +1995,8 @@ input[type="checkbox"] {
 
 .model-grid-items .resort-grid-item {
     padding: 6px 8px;
+    /* Tags and coverage notes move to a second line when the row is too narrow for them */
+    flex-wrap: wrap;
 }
 
 .model-grid-items .model-color-dot {
@@ -3005,6 +3018,7 @@ input[type="checkbox"] {
 /* Contact button */
 .about-contact-links {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.75rem;
     margin-top: 0.5rem;
 }

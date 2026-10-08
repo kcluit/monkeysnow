@@ -47,9 +47,9 @@ export function UtilityBar({
 
   return (
     <div className="mb-8 flex flex-col gap-4">
-      {/* Row 1: Resort Selection + Elevation (always visible) */}
+      {/* Row 1: Resort Selection + Elevation (always visible; on phones each takes a full row) */}
       <div className="flex flex-wrap gap-4 items-center justify-between">
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap md:flex-nowrap items-center gap-4 w-full md:w-auto">
           {/* Resort Selection Button - Opens Modal */}
           <button
             onClick={() => {
@@ -66,13 +66,13 @@ export function UtilityBar({
           </button>
 
           {/* Elevation Selection - Inline buttons */}
-          <div className="inline-flex items-center gap-1 bg-theme-background border border-theme-border rounded-lg px-3 py-2 shadow-sm">
+          <div className="flex md:inline-flex w-full md:w-auto items-center gap-1 bg-theme-background border border-theme-border rounded-lg px-3 py-2 shadow-sm">
             <span className="text-sm text-theme-textPrimary mr-1.5">Elevation:</span>
             {(['bot', 'mid', 'top'] as const).map((level) => (
               <button
                 key={level}
                 onClick={() => setSelectedElevation(level)}
-                className={`px-2 py-0.5 text-sm rounded transition-colors duration-200 ${
+                className={`flex-1 md:flex-initial px-2 py-0.5 text-sm rounded transition-colors duration-200 ${
                   selectedElevation === level
                     ? 'text-theme-accent font-medium'
                     : 'text-theme-textSecondary hover:text-theme-textPrimary'
