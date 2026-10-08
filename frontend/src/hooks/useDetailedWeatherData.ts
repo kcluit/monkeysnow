@@ -120,6 +120,13 @@ export function useDetailedWeatherData({
                 } catch (err) {
                     if (cancelled) return;
 
+                    // Bad requests (e.g. a regional model with no data here) won't succeed on retry,
+                    // and each retry spends the user's Open-Meteo quota
+                    if (!isTransientError(err)) {
+                        console.warn(`Model ${model} unavailable:`, err instanceof Error ? err.message : err);
+                        return;
+                    }
+
                     console.error(`Failed to fetch model ${model}, retrying in ${retryDelay}ms...`, err);
 
                     // Wait before retrying with exponential backoff
