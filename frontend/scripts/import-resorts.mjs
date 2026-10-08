@@ -489,12 +489,25 @@ async function importResorts() {
 }
 
 function formatReport(report, doc, resorts) {
-  const section = (title, intro, items) => items.length
-    ? `## ${title} (${items.length})\n\n${intro}\n\n${items.map(i => `- ${i}`).join('\n')}\n`
+  const section = (title, intro, items, count = items.length) => count
+    ? `## ${title} (${count})\n\n${intro}\n\n${items.map(i => `- ${i}`).join('\n')}\n`
     : `## ${title}\n\nNothing to review.\n`;
-  const nested = report.nested
-    .sort((a, b) => b.parentLifts - a.parentLifts)
-    .map(n => `\`${n.pair}\`: ${resorts[n.parent].name} (${n.parentLifts} lifts) contains ${resorts[n.child].name} (${n.childLifts} lifts)`);
+
+  const childrenOf = new Map();
+  for (const n of report.nested) childrenOf.set(n.parent, [...(childrenOf.get(n.parent) ?? []), n]);
+  const nested = [...childrenOf.values()]
+    .sort((a, b) => b[0].parentLifts - a[0].parentLifts)
+    .map(children => {
+      const { parent, parentLifts } = children[0];
+      const list = children
+        .sort((a, b) => b.childLifts - a.childLifts)
+        .map(c => `${resorts[c.child].name} \`${c.child}\` (${c.childLifts === parentLifts ? 'same lifts' : `${c.childLifts} lifts`})`)
+        .join(', ');
+      return `**${resorts[parent].name}** \`${parent}\` (${parentLifts} lifts) contains ${list}`;
+    });
+  const newSlugs = report.newSlugs.length > 200
+    ? [`${report.newSlugs.length} new slugs (list omitted)`]
+    : report.newSlugs.map(s => `\`${s}\``);
 
   return `# Resort import report
 
@@ -502,12 +515,12 @@ OpenSkiData build of ${doc.dataTimestamp}: ${Object.keys(doc.resorts).length} Re
 Everything below needs a human decision; fixes go in \`overrides.json\` (see README.md).
 
 ${section('Vanished upstream', 'These Resorts are no longer in OpenSkiData and are kept with their last-known data. Exclude each one that is really gone; fix the rest upstream in OpenStreetMap.', report.vanished)}
-${section('Resorts containing other Resorts', 'Lift-pass networks and duplicates share lifts with the areas inside them. Exclude the parent or the child, or add the quoted pair to `reviewedPairs` to keep both.', nested)}
+${section('Resorts containing other Resorts', 'Lift-pass networks and duplicates share lifts with the areas inside them. Exclude the parent or the children, or keep both by adding `"parent > child"` (or `"parent > *"` for all of a parent\'s current children) to `reviewedPairs`.', nested, report.nested.length)}
 ${section('Duplicate names in one Region', 'Usually one ski area split in two upstream. Exclude one, or add the quoted pair to `reviewedPairs`.', report.duplicates.map(p => `\`${p}\``))}
 ${section('Not placed', 'Left out: give each a `country` (and `region`) override, or exclude it.', report.unplaced)}
 ${section('Overrides that point at nothing', 'Remove or fix these entries in `overrides.json`.', report.staleOverrides)}
 ${section('No Latin-script name', 'Shown as-is. Add a `name` override for any you care about, then `--rename` its slug if you like.', report.nonLatin)}
-${section('New slugs this run', 'First seen in this import.', report.newSlugs.length > 200 ? [`${report.newSlugs.length} new slugs (list omitted)`] : report.newSlugs.map(s => `\`${s}\``))}`;
+${section('New slugs this run', 'First seen in this import.', newSlugs, report.newSlugs.length)}`;
 }
 
 const args = process.argv.slice(2);
