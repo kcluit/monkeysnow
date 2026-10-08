@@ -141,7 +141,13 @@ export function WeatherChart({
     ]);
 
     // Handle no data
-    if (!chartConfig) {
+    if (!chartConfig || providingModels.length === 0) {
+        let emptyMessage = 'No data available';
+        if (isLoading) {
+            emptyMessage = 'Waiting for models...';
+        } else if (loadedModelCount > 0) {
+            emptyMessage = `None of the models here provide ${variableConfig.label}`;
+        }
         return (
             <div className="weather-chart weather-chart-empty">
                 <div className="weather-chart-header">
