@@ -70,13 +70,13 @@ _Avoid_: duplicate
 The single **Forecast model** behind a **Resort**'s card on the main page, chosen by the **Resort**'s country.
 _Avoid_: default model, primary model
 
-**Comparison models**:
-The **Forecast models** drawn side by side in a **Resort**'s detail view.
-_Avoid_: selected models, **Selection** (that is **Resorts**), model selection
+**Preferred models**:
+A visitor's own list of **Forecast models**, one list for every **Resort**. Out of the box it is every region's recommended models combined.
+_Avoid_: selected models, default models, **Selection** (that is **Resorts**)
 
-**Default comparison models**:
-The **Comparison models** a visitor gets before choosing their own. They depend on where the **Resort** is, contain only models whose **Coverage** includes it, and have no **Clones**.
-_Avoid_: default models
+**Comparison models**:
+The **Preferred models** whose **Coverage** includes a **Resort**, minus **Clones**. These are the models drawn side by side in that **Resort**'s detail view.
+_Avoid_: selected models, model selection
 
 **Aggregation**:
 A line computed hour by hour across the **Comparison models**: median, mean, min, max, or the 25th or 75th percentile.
