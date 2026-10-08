@@ -65,6 +65,8 @@ export function createTooltipPlugin(options: TooltipPluginOptions): uPlot.Plugin
         }
 
         tooltip.innerHTML = content;
+        // Shown before measuring: a hidden tooltip measures 0 wide, so it wouldn't flip away from the edge
+        showTooltip();
 
         // Position tooltip
         const rect = over!.getBoundingClientRect();
@@ -81,10 +83,9 @@ export function createTooltipPlugin(options: TooltipPluginOptions): uPlot.Plugin
             tooltipTop = top - tooltipRect.height - 10;
         }
 
-        tooltip.style.left = tooltipLeft + 'px';
-        tooltip.style.top = tooltipTop + 'px';
-
-        showTooltip();
+        // A plot narrower than twice the tooltip (phones) has room on neither side: keep it inside
+        tooltip.style.left = Math.max(0, tooltipLeft) + 'px';
+        tooltip.style.top = Math.max(0, tooltipTop) + 'px';
     }
 
     return {

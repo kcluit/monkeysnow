@@ -7,6 +7,9 @@ import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
 import { formatElevation } from '../../utils/unitConversion';
 
+/** The Elevation menu's width in px (w-48) */
+const ELEVATION_MENU_WIDTH = 192;
+
 export function DetailUtilityBar(props: DetailUtilityBarProps): JSX.Element {
     if (props.utilityBarStyle === 'compact') {
         return <CompactDetailUtilityBar {...props} />;
@@ -38,6 +41,7 @@ function LargeDetailUtilityBar({
     onResetCustomLocation,
 }: DetailUtilityBarProps): JSX.Element {
     const [showElevationDropdown, setShowElevationDropdown] = useState(false);
+    const [elevationMenuOpensLeft, setElevationMenuOpensLeft] = useState(false);
     const [showForecastDropdown, setShowForecastDropdown] = useState(false);
     const [showCustomElevationInput, setShowCustomElevationInput] = useState(false);
     const [customElevationValue, setCustomElevationValue] = useState('');
@@ -126,7 +130,10 @@ function LargeDetailUtilityBar({
             ) : !customLocation ? (
                 <div className="relative" data-dropdown>
                     <button
-                        onClick={() => {
+                        onClick={(e) => {
+                            // On a phone the button can end its row at the screen's edge: the menu then opens leftwards
+                            const { left } = e.currentTarget.getBoundingClientRect();
+                            setElevationMenuOpensLeft(left + ELEVATION_MENU_WIDTH > document.documentElement.clientWidth);
                             setShowElevationDropdown(!showElevationDropdown);
                             setShowForecastDropdown(false);
                         }}
@@ -144,7 +151,7 @@ function LargeDetailUtilityBar({
                         </svg>
                     </button>
                     {showElevationDropdown && (
-                        <div className="absolute left-0 z-20 mt-1 w-48 bg-theme-background rounded-lg shadow-lg border border-theme-border p-1">
+                        <div className={`absolute ${elevationMenuOpensLeft ? 'right-0' : 'left-0'} z-20 mt-1 w-48 bg-theme-background rounded-lg shadow-lg border border-theme-border p-1`}>
                             {[
                                 { label: 'Base', selectionType: 'base' as const, displayValue: location.baseElevation },
                                 { label: 'Mid', selectionType: 'mid' as const, displayValue: location.midElevation },

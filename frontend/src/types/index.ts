@@ -132,6 +132,10 @@ export interface Period {
     snow: string;
     rain: string;
     wind: string;
+    /** The same amounts in metric and unrounded, for adding up and comparing */
+    snowCm: number;
+    rainMm: number;
+    windKmh: number;
     condition: string;
     snowQuality: SnowQuality | null;
     snowToLiquidRatio: number;
@@ -154,6 +158,7 @@ export interface ProcessedResortData {
     name: string;
     elevation: string;
     days: DayForecast[];
+    fetchedAt?: number; // epoch ms, from ResortData
 }
 
 // Snow totals
@@ -164,7 +169,11 @@ export interface SnowTotals {
 
 // Day stats for DefaultCard
 export interface DayStats {
+    /** °C, rounded like the periods' temperatures, for colouring */
     maxTemp: number;
+    /** The temperature as shown, in the user's units */
+    temp: string;
+    /** Metric: cm, mm and km/h */
     snow: number;
     rain: number;
     wind: number;

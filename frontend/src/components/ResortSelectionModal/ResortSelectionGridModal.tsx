@@ -13,6 +13,7 @@ import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
 import { nodeMatchesSearch } from '../../hooks/useHierarchyData';
 import { useOverlay } from '../../hooks/useOverlay';
+import { shouldAutoFocusSearch } from '../../utils/autoFocus';
 
 interface ResortSelectionGridModalProps {
   hierarchy: UseResortHierarchyReturn;
@@ -439,9 +440,9 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
     });
   }, []);
 
-  // Auto-focus input on open
+  // Auto-focus input on open, unless that would open a phone's keyboard
   useEffect(() => {
-    if (isOpen && inputRef.current) {
+    if (isOpen && inputRef.current && shouldAutoFocusSearch()) {
       inputRef.current.focus();
     }
   }, [isOpen]);

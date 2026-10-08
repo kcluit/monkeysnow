@@ -24,7 +24,7 @@ import { useLocalStorage } from './hooks/useLocalStorage';
 import { useResortFiltering } from './hooks/useResortFiltering';
 import { useTheme } from './hooks/useTheme';
 import { useFont } from './hooks/useFont';
-import { useFullscreen } from './hooks/useFullscreen';
+import { useFullscreen, isFullscreenSupported } from './hooks/useFullscreen';
 import { useFPSCounter } from './hooks/useFPSCounter';
 import { useCommandPalette } from './hooks/useCommandPalette';
 import { useRainbowText } from './hooks/useRainbowText';
@@ -537,7 +537,8 @@ function App(): JSX.Element {
             setModelLineOpacity,
         });
 
-        return [...baseCommands, ...controlCommands];
+        // No Fullscreen command where the page can't go fullscreen (iPhone)
+        return [...baseCommands.filter((command) => command.id !== 'fullscreen' || isFullscreenSupported), ...controlCommands];
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, commandDeps);
 
@@ -959,12 +960,12 @@ function App(): JSX.Element {
 
     return (
         <div className="min-h-screen bg-theme-background transition-colors duration-300 overflow-x-hidden">
-            {/* Open-Meteo Attribution */}
+            {/* Open-Meteo Attribution - pinned on wide screens; on phones it scrolls away instead of covering the cards */}
             <a
                 href="https://github.com/open-meteo/open-meteo"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="fixed top-2 right-2 text-xs text-theme-textSecondary hover:text-theme-textPrimary underline transition-colors z-10"
+                className="absolute md:fixed top-2 right-2 text-xs text-theme-textSecondary hover:text-theme-textPrimary underline transition-colors z-10"
             >
                 Weather data by Open-Meteo.com
             </a>
@@ -1082,8 +1083,8 @@ function App(): JSX.Element {
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
 
-            {/* Footer */}
-            <footer className="fixed bottom-2 left-0 right-0 px-4 text-xs text-theme-textSecondary z-10 flex items-center justify-evenly">
+            {/* Footer - pinned on wide screens; on phones it ends the page instead of covering the cards */}
+            <footer className="md:fixed md:bottom-2 left-0 right-0 px-4 pb-6 md:pb-0 text-xs text-theme-textSecondary z-10 flex flex-wrap items-center justify-evenly gap-x-3 gap-y-2">
                 <a
                     href="https://github.com/kcluit/monkeysnow"
                     target="_blank"

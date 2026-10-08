@@ -1,8 +1,8 @@
 import { useRef, useState, useEffect, useCallback, MouseEvent } from 'react';
 import { webcamUrls } from '../../utils/constants';
 import { calculateSnowTotals } from '../../utils/weather';
-import { calculateDayStats, formatWeatherText, getTemperatureStyle, getSnowClass, getWindClass } from './cardUtils';
-import { formatTemp, formatSnow, formatRain, formatWind } from '../../utils/unitConversion';
+import { calculateDayStats, formatWeatherText, getTemperatureStyle, getSnowClass, getWindClass, showsAmount } from './cardUtils';
+import { formatSnow, formatRain, formatWind } from '../../utils/unitConversion';
 import type { CardProps } from '../../types';
 
 export function DefaultCard({ resort, temperatureMetric = 'max', showDate = false, unitSystem = 'metric', onResortClick }: CardProps): JSX.Element {
@@ -105,8 +105,10 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
                 <div ref={scrollContainerRef} className="scroll-container overflow-x-auto hide-scrollbar">
                     <div className="flex gap-3 pb-2" style={{ width: 'max-content' }}>
                         {resort.days.map((day, dayIndex) => {
-                            const dayStats = calculateDayStats(day, temperatureMetric);
+                            const dayStats = calculateDayStats(day, temperatureMetric, unitSystem);
                             const weatherText = formatWeatherText(day.periods);
+                            const snowText = formatSnow(dayStats.snow, unitSystem);
+                            const rainText = formatRain(dayStats.rain, unitSystem);
                             return (
                                 <div key={dayIndex} className="w-[180px]">
                                     <div className="flex items-center gap-1 mb-1">
@@ -124,22 +126,22 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
                                                         className={`text-2xl font-bold ${tempStyle.className || ''}`}
                                                         style={tempStyle.style}
                                                     >
-                                                        {formatTemp(dayStats.maxTemp, unitSystem)}
+                                                        {dayStats.temp}
                                                     </div>
                                                 );
                                             })()}
-                                            {dayStats.snow > 0 ? (
-                                                <div className={`text-sm font-bold ${getSnowClass(dayStats.snow, unitSystem)}`}>
-                                                    {formatSnow(dayStats.snow, unitSystem)} snow
+                                            {showsAmount(snowText) ? (
+                                                <div className={`text-sm font-bold ${getSnowClass(dayStats.snow)}`}>
+                                                    {snowText} snow
                                                 </div>
-                                            ) : dayStats.rain > 0 ? (
+                                            ) : showsAmount(rainText) ? (
                                                 <div className="text-sm font-bold text-theme-textSecondary">
-                                                    {formatRain(dayStats.rain, unitSystem)} rain
+                                                    {rainText} rain
                                                 </div>
                                             ) : null}
                                         </div>
                                         <div className="text-sm text-theme-textPrimary mt-1 font-medium truncate" title={weatherText}>{weatherText}</div>
-                                        <div className={`text-xs font-medium ${getWindClass(dayStats.wind, unitSystem)} mt-1`}>
+                                        <div className={`text-xs font-medium ${getWindClass(dayStats.wind)} mt-1`}>
                                             {formatWind(dayStats.wind, unitSystem)} wind
                                         </div>
                                         <div className="mt-2 pt-2 border-t border-theme-border">

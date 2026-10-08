@@ -315,6 +315,54 @@ interface HourData {
 
 const periodOf = (hour: number): Period => hour < 12 ? 'AM' : (hour < 18 ? 'PM' : 'NIGHT');
 
+const offsetFormatters = new Map<string, Intl.DateTimeFormat | null>();
+
+/** The time zone's UTC offset in seconds at `epochSeconds`, or null for a zone this browser doesn't know. */
+function utcOffsetAt(timeZone: string, epochSeconds: number): number | null {
+    let formatter = offsetFormatters.get(timeZone);
+    if (formatter === undefined) {
+        try {
+            formatter = new Intl.DateTimeFormat('en-US', {
+                timeZone, hourCycle: 'h23',
+                year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric',
+            });
+        } catch {
+            formatter = null;
+        }
+        offsetFormatters.set(timeZone, formatter);
+    }
+    if (!formatter) return null;
+    const part = (parts: Intl.DateTimeFormatPart[], type: string) => Number(parts.find(p => p.type === type)?.value);
+    const parts = formatter.formatToParts(new Date(epochSeconds * 1000));
+    const wallClockAsUtc = Date.UTC(part(parts, 'year'), part(parts, 'month') - 1, part(parts, 'day'),
+        part(parts, 'hour'), part(parts, 'minute'), part(parts, 'second')) / 1000;
+    return wallClockAsUtc - epochSeconds;
+}
+
+/**
+ * The local wall-clock time of an hour of the forecast, as a Date to read with getUTC*.
+ * The response carries the UTC offset of its first hour only; when clocks change before
+ * the last hour (a daylight-saving switch), the hours from the switch on take the new offset.
+ */
+function localClockOf(response: ApiResponse, firstHour: number, lastHour: number): (epochSeconds: number) => Date {
+    const startOffset = response.utcOffsetSeconds();
+    const timeZone = response.timezone();
+    const endOffset = timeZone ? utcOffsetAt(timeZone, lastHour) : null;
+    if (!timeZone || endOffset === null || endOffset === startOffset) {
+        return (t) => new Date((t + startOffset) * 1000);
+    }
+
+    // Find the first hour on the new offset
+    let before = firstHour;
+    let after = lastHour;
+    while (after - before > 3600) {
+        const middle = before + Math.floor((after - before) / 7200) * 3600;
+        if (utcOffsetAt(timeZone, middle) === startOffset) before = middle;
+        else after = middle;
+    }
+    return (t) => new Date((t + (t < after ? startOffset : endOffset)) * 1000);
+}
+
 /** Processes a single location's hourly data into AM/PM/NIGHT periods per local date. */
 function processLocation(mainResp: ApiResponse | undefined, freezing: FreezingSeries | null): Record<string, DayData> | null {
     const hourly = mainResp?.hourly();
@@ -322,7 +370,6 @@ function processLocation(mainResp: ApiResponse | undefined, freezing: FreezingSe
         console.warn('Skipping location: missing response or hourly data');
         return null;
     }
-    const utcOffset = mainResp.utcOffsetSeconds();
 
     const windSpeed = hourly.variables(0)!.valuesArray()!;
     const windDir = hourly.variables(1)!.valuesArray()!;
@@ -339,10 +386,14 @@ function processLocation(mainResp: ApiResponse | undefined, freezing: FreezingSe
     const startTime = Number(hourly.time());
     const interval = hourly.interval();
     const length = (Number(hourly.timeEnd()) - startTime) / interval;
+    const localTime = localClockOf(mainResp, startTime, startTime + (length - 1) * interval);
 
     // Group Hourly Data
     for (let i = 0; i < length; i++) {
-        const dateObj = new Date((startTime + i * interval + utcOffset) * 1000);
+        // Hours past the model's range come back as NaN: leave them out, or their periods would read as zeros
+        if (!Number.isFinite(temp[i])) continue;
+
+        const dateObj = localTime(startTime + i * interval);
         const dateKey = dateObj.toISOString().split('T')[0];
 
         if (!dailyChunks[dateKey]) {
@@ -369,9 +420,9 @@ function processLocation(mainResp: ApiResponse | undefined, freezing: FreezingSe
     // Group Freezing Data (Hourly)
     if (freezing) {
         for (let i = 0; i < freezing.values.length; i++) {
-            const dateObj = new Date((freezing.timeStart + i * freezing.interval + utcOffset) * 1000);
+            const dateObj = localTime(freezing.timeStart + i * freezing.interval);
             const dateKey = dateObj.toISOString().split('T')[0];
-            if (dailyChunks[dateKey]) {
+            if (dailyChunks[dateKey] && Number.isFinite(freezing.values[i])) {
                 dailyChunks[dateKey][periodOf(dateObj.getUTCHours())].freezingData.push(freezing.values[i]);
             }
         }

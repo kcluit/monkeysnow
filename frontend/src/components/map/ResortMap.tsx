@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -63,11 +63,20 @@ function MapResizeHandler(): null {
     return null;
 }
 
+// A double-click or double-tap zooms the map, so a click only counts once no second one follows this soon
+const DOUBLE_CLICK_MS = 300;
+
 // Inner component to handle map click events
 function MapClickHandler({ onClick }: { onClick: (lat: number, lon: number) => void }): null {
+    const pendingClick = useRef<number | undefined>(undefined);
+    useEffect(() => () => window.clearTimeout(pendingClick.current), []);
     useMapEvents({
         click: (e) => {
-            onClick(e.latlng.lat, e.latlng.lng);
+            window.clearTimeout(pendingClick.current);
+            pendingClick.current = window.setTimeout(() => onClick(e.latlng.lat, e.latlng.lng), DOUBLE_CLICK_MS);
+        },
+        dblclick: () => {
+            window.clearTimeout(pendingClick.current);
         },
     });
     return null;
@@ -106,18 +115,11 @@ export function ResortMap({
                     className={`h-full rounded-xl shadow-lg ${className}`}
                     style={{ zIndex: 0 }}
                 >
-                    {/* Plain OpenStreetMap base map. OpenSkiMap looks better, but its terms forbid other sites using its tiles. */}
+                    {/* Plain OpenStreetMap map. OpenSkiMap looks better, but its terms forbid other sites using its tiles;
+                        OpenSnowMap's ski run and lift overlay was tried and dropped for how it looked. */}
                     <TileLayer
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                         url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-
-                    {/* Ski runs (coloured by difficulty) and lifts, drawn over the base map */}
-                    <TileLayer
-                        attribution='&copy; <a href="https://www.opensnowmap.org">OpenSnowMap</a> (<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>)'
-                        url="https://tiles.opensnowmap.org/pistes/{z}/{x}/{y}.png"
-                        minZoom={9}
-                        maxZoom={18}
                     />
 
                     {/* Resize handler to invalidate map on expand/collapse and fullscreen */}

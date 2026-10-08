@@ -11,6 +11,7 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
 import { useOverlay } from '../../hooks/useOverlay';
+import { shouldAutoFocusSearch } from '../../utils/autoFocus';
 import {
   buildModelHierarchyTree,
   getModelsUnderNode,
@@ -500,9 +501,9 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
     });
   }, []);
 
-  // Auto-focus input on open
+  // Auto-focus input on open, unless that would open a phone's keyboard
   useEffect(() => {
-    if (isOpen && inputRef.current) {
+    if (isOpen && inputRef.current && shouldAutoFocusSearch()) {
       inputRef.current.focus();
     }
   }, [isOpen]);

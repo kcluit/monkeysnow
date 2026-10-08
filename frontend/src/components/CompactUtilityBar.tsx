@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { UtilityBarProps, SortDay, ElevationLevel, SortOption, ViewMode } from '../types';
 import { getSortDayData, getSortDayText } from '../utils/sortDayHelpers';
+import { isAscendingOrder } from '../hooks/useResortFiltering';
 import { MobileSortModal } from './MobileSortModal';
 
 interface ExtendedCompactUtilityBarProps extends UtilityBarProps {
@@ -74,16 +75,16 @@ export function CompactUtilityBar({
 
     return (
         <div className="compact-utility-bar mb-8 flex justify-center">
-            <div className="compact-utility-bar-inner inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-theme-secondary">
-                {/* Select Resorts */}
+            <div className="compact-utility-bar-inner inline-flex flex-wrap justify-center max-w-full items-center gap-x-2 gap-y-1 px-4 py-2 rounded-lg bg-theme-secondary">
+                {/* Select Resorts - its own line on phones, where the bar is too wide for one */}
                 <button
                     onClick={() => openResortModal()}
-                    className="compact-bar-text text-theme-textSecondary hover:text-theme-textPrimary hover:font-bold transition-colors"
+                    className="compact-bar-text basis-full sm:basis-auto text-theme-textSecondary hover:text-theme-textPrimary hover:font-bold transition-colors"
                 >
                     Select Resorts ({selectedResorts.length})
                 </button>
 
-                <span className="compact-bar-separator">|</span>
+                <span className="compact-bar-separator hidden sm:inline">|</span>
 
                 {/* Elevation - Three inline text options */}
                 <div className="inline-flex items-center gap-2">
@@ -189,7 +190,7 @@ export function CompactUtilityBar({
                         onClick={() => setIsReversed(!isReversed)}
                         className="compact-bar-text text-theme-textSecondary hover:text-theme-accent transition-colors"
                     >
-                        {isReversed ? 'Descending' : 'Ascending'}
+                        {isAscendingOrder(selectedSort, isReversed) ? 'Ascending' : 'Descending'}
                     </button>
                 </div>
 

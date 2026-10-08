@@ -1,6 +1,6 @@
 import { calculateSnowTotals } from '../../utils/weather';
 import { formatSnow } from '../../utils/unitConversion';
-import { getTemperatureStyle } from './cardUtils';
+import { getTemperatureStyle, getWindClass, showsAmount } from './cardUtils';
 import { isSavedLocationId } from '../../utils/savedLocations';
 import type { CardProps } from '../../types';
 
@@ -31,9 +31,11 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
                     <h2 className="text-2xl font-bold text-theme-textPrimary">{resort.name}</h2>
                     <p className="text-sm font-medium text-theme-accent">{elevationLabel}Elevation: {resort.elevation}</p>
                 </div>
-                <div className="text-xs font-medium text-theme-textSecondary">
-                    Last updated: {new Date().toLocaleTimeString()}
-                </div>
+                {resort.fetchedAt !== undefined && (
+                    <div className="text-xs font-medium text-theme-textSecondary">
+                        Last updated: {new Date(resort.fetchedAt).toLocaleTimeString()}
+                    </div>
+                )}
             </div>
 
             <div className="overflow-x-auto -mx-5 px-5">
@@ -75,11 +77,10 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
                                             <div className="grid grid-cols-3 gap-4">
                                                 {day.periods.map((period, index) => {
                                                     const tempStyleResult = getTemperatureStyle(period.tempMax);
-                                                    const snowAmount = parseFloat(period.snow) || 0;
-                                                    const windSpeed = parseFloat(period.wind) || 0;
+                                                    const hasSnow = showsAmount(period.snow);
 
-                                                    const snowStyleObj = snowAmount > 0 ? (
-                                                        snowAmount >= 5 ? {
+                                                    const snowStyleObj = hasSnow ? (
+                                                        period.snowCm >= 5 ? {
                                                             background: 'var(--specialColor)',
                                                             WebkitBackgroundClip: 'text' as const,
                                                             backgroundClip: 'text' as const,
@@ -105,13 +106,13 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
                                                             </div>
                                                             <div className="flex flex-col gap-[32px] text-sm w-full">
                                                                 <div
-                                                                    className={`font-semibold ${snowAmount === 0 ? 'text-theme-textSecondary' : ''}`}
+                                                                    className={`font-semibold ${hasSnow ? '' : 'text-theme-textSecondary'}`}
                                                                     style={snowStyleObj}
                                                                 >
                                                                     {period.snow}
                                                                 </div>
                                                                 <div className="text-theme-textSecondary font-semibold">{period.rain}</div>
-                                                                <div className={`font-semibold ${windSpeed >= 20 ? 'text-theme-accent' : 'text-theme-textSecondary'}`}>{period.wind}</div>
+                                                                <div className={`font-semibold ${getWindClass(period.windKmh)}`}>{period.wind}</div>
                                                                 <div className="text-theme-textSecondary font-semibold">{period.condition}</div>
                                                             </div>
                                                         </div>

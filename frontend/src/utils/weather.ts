@@ -105,7 +105,8 @@ export function processResortData(
             id: resortName,
             name: resortName.replace(/-/g, ' '),
             elevation: formatElevation(elevationData.metadata.elevation, unitSystem),
-            days
+            days,
+            fetchedAt: resortData.fetchedAt
         };
     } catch (err) {
         console.error(`Error processing resort data for ${resortName}:`, err);
@@ -198,6 +199,9 @@ function createPeriodFromData(data: PeriodData, label: string, temperatureMetric
         snow: formatSnow(snowValue, unitSystem),
         rain: formatRain(rainValue, unitSystem),
         wind: formatWind(data.wind_speed ?? 0, unitSystem),
+        snowCm: snowValue,
+        rainMm: rainValue,
+        windKmh: data.wind_speed ?? 0,
         condition: getWeatherDescription(data.weather_code ?? 0),
         snowQuality: effectiveQuality,
         snowToLiquidRatio: data.snow_to_liquid_ratio ?? 0
@@ -323,13 +327,10 @@ export function calculateSnowTotals(resort: ProcessedResortData | null): SnowTot
     const next3Days = resort.days.slice(0, 3);
     const next7Days = resort.days.slice(0, 7);
 
+    // In cm, which formatSnow converts for display
     const calculate = (days: DayForecast[]): number => {
         return days.reduce((total, day) => {
-            const dayTotal = day.periods.reduce((daySum, period) => {
-                const snowValue = period.snow.toString().replace(/[^\d.-]/g, '');
-                const snow = parseFloat(snowValue) || 0;
-                return daySum + snow;
-            }, 0);
+            const dayTotal = day.periods.reduce((daySum, period) => daySum + period.snowCm, 0);
             return total + dayTotal;
         }, 0);
     };

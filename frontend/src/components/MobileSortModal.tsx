@@ -1,5 +1,6 @@
 import { createPortal } from 'react-dom';
 import { useOverlay } from '../hooks/useOverlay';
+import { isAscendingOrder } from '../hooks/useResortFiltering';
 import type { SortOption, SortDay, SortDayData } from '../types';
 
 interface MobileSortModalProps {
@@ -30,6 +31,8 @@ export function MobileSortModal({
   useOverlay(isOpen, onClose);
 
   if (!isOpen) return null;
+
+  const ascending = isAscendingOrder(selectedSort, isReversed);
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -96,19 +99,19 @@ export function MobileSortModal({
             </div>
           </div>
 
-          {/* Order */}
+          {/* Order - picking the other direction reverses the sort's own one */}
           <div className="sort-filter-section">
             <h3 className="sort-filter-section-title">Order</h3>
             <div className="sort-filter-options-grid sort-filter-options-2col">
               <button
-                onClick={() => setIsReversed(false)}
-                className={`sort-filter-option ${!isReversed ? 'selected' : ''}`}
+                onClick={() => ascending && setIsReversed(!isReversed)}
+                className={`sort-filter-option ${!ascending ? 'selected' : ''}`}
               >
                 Descending
               </button>
               <button
-                onClick={() => setIsReversed(true)}
-                className={`sort-filter-option ${isReversed ? 'selected' : ''}`}
+                onClick={() => !ascending && setIsReversed(!isReversed)}
+                className={`sort-filter-option ${ascending ? 'selected' : ''}`}
               >
                 Ascending
               </button>

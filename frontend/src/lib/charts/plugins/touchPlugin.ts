@@ -4,6 +4,7 @@
  * Provides touch gesture support for charts:
  * - Pinch zoom: Two-finger pinch to zoom in/out centered on focal point
  * - Pan: Single-finger drag to pan horizontally
+ * - Scroll: A mostly vertical single-finger swipe is left to the browser, so the page scrolls
  * - Tap: Single tap to show tooltip, tap elsewhere to hide
  *
  * Works alongside mouse-based zoomPlugin for hybrid desktop/mobile support.
@@ -25,6 +26,19 @@ interface TouchPoint {
 // Track which chart currently has an active tooltip (for tap-outside clearing)
 let activeTooltipChart: uPlot | null = null;
 
+function hideActiveTooltip(): void {
+    activeTooltipChart?.setCursor({ left: -10, top: -10 });
+    activeTooltipChart = null;
+    document.removeEventListener('touchstart', onDocumentTouchStart);
+}
+
+// A touch anywhere outside the chart showing a tapped tooltip hides it
+function onDocumentTouchStart(e: TouchEvent): void {
+    if (activeTooltipChart && !activeTooltipChart.over.contains(e.target as Node)) {
+        hideActiveTooltip();
+    }
+}
+
 export function createTouchPlugin(options: TouchPluginOptions = {}): uPlot.Plugin {
     const { onZoom } = options;
 
@@ -45,9 +59,9 @@ export function createTouchPlugin(options: TouchPluginOptions = {}): uPlot.Plugi
                     }
                 };
 
-                // Gesture state
+                // Gesture state; 'scroll' is a vertical swipe that the browser is scrolling the page with
                 const activeTouches = new Map<number, TouchPoint>();
-                let gestureType: 'none' | 'tap' | 'pan' | 'pinch' = 'none';
+                let gestureType: 'none' | 'tap' | 'pan' | 'pinch' | 'scroll' = 'none';
                 let hasMoved = false;
 
                 // Tap state
@@ -102,6 +116,9 @@ export function createTouchPlugin(options: TouchPluginOptions = {}): uPlot.Plugi
                         activeTouches.set(touch.identifier, toPoint(touch));
                     }
 
+                    // The page is scrolling: further fingers join the scroll rather than starting a pinch
+                    if (gestureType === 'scroll') return;
+
                     const touchCount = activeTouches.size;
 
                     if (touchCount === 1) {
@@ -126,13 +143,14 @@ export function createTouchPlugin(options: TouchPluginOptions = {}): uPlot.Plugi
                         gestureType = 'none';
                     }
 
-                    if (gestureType !== 'none') {
+                    // Not for a single finger: until it moves, it may be a vertical swipe that has to scroll the page
+                    if (gestureType === 'pinch') {
                         e.preventDefault();
                     }
                 };
 
                 const onTouchMove = (e: TouchEvent) => {
-                    if (gestureType === 'none') return;
+                    if (gestureType === 'none' || gestureType === 'scroll') return;
 
                     // Update tracked positions
                     for (let i = 0; i < e.changedTouches.length; i++) {
@@ -150,8 +168,13 @@ export function createTouchPlugin(options: TouchPluginOptions = {}): uPlot.Plugi
                         const dy = touch.clientY - tapStartY;
                         const dist = Math.sqrt(dx * dx + dy * dy);
 
-                        if (dist > TAP_THRESHOLD_PX) {
+                        if (!hasMoved && dist > TAP_THRESHOLD_PX) {
                             hasMoved = true;
+                            // Mostly vertical (or already scrolling): leave it to the browser (touch-action: pan-y) to scroll the page
+                            if (gestureType === 'tap' && (Math.abs(dy) > Math.abs(dx) || !e.cancelable)) {
+                                gestureType = 'scroll';
+                                return;
+                            }
                             gestureType = 'pan';
                         }
 
@@ -232,10 +255,13 @@ export function createTouchPlugin(options: TouchPluginOptions = {}): uPlot.Plugi
                 };
 
                 const onTouchEnd = (e: TouchEvent) => {
-                    if (gestureType === 'none') {
+                    if (gestureType === 'none' || gestureType === 'scroll') {
                         // Remove ended touches even if no gesture
                         for (let i = 0; i < e.changedTouches.length; i++) {
                             activeTouches.delete(e.changedTouches[i].identifier);
+                        }
+                        if (activeTouches.size === 0) {
+                            resetState();
                         }
                         return;
                     }
@@ -244,15 +270,11 @@ export function createTouchPlugin(options: TouchPluginOptions = {}): uPlot.Plugi
                     if ((gestureType === 'tap') && !hasMoved && activeTouches.size <= e.changedTouches.length) {
                         const tapDuration = Date.now() - tapStartTime;
                         if (tapDuration < TAP_TIMEOUT_MS) {
-                            // Clear tooltip on previous chart if different
-                            if (activeTooltipChart && activeTooltipChart !== u) {
-                                activeTooltipChart.setCursor({ left: -10, top: -10 });
-                            }
-
                             const left = tapStartX - rect.left;
                             const top = tapStartY - rect.top;
                             u.setCursor({ left, top });
                             activeTooltipChart = u;
+                            document.addEventListener('touchstart', onDocumentTouchStart, { passive: true });
                         }
                     }
 
@@ -287,8 +309,8 @@ export function createTouchPlugin(options: TouchPluginOptions = {}): uPlot.Plugi
                 const resizeObserver = new ResizeObserver(syncRect);
                 resizeObserver.observe(over);
 
-                // Set touch-action on the over element to prevent browser gestures
-                over.style.touchAction = 'none';
+                // The browser keeps vertical scrolling only; pinches and horizontal drags are handled here
+                over.style.touchAction = 'pan-y';
 
                 over.addEventListener('touchstart', onTouchStart, { passive: false });
                 over.addEventListener('touchmove', onTouchMove, { passive: false });
@@ -305,6 +327,7 @@ export function createTouchPlugin(options: TouchPluginOptions = {}): uPlot.Plugi
                     resetState();
                     if (activeTooltipChart === u) {
                         activeTooltipChart = null;
+                        document.removeEventListener('touchstart', onDocumentTouchStart);
                     }
                 };
             }],
