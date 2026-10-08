@@ -98,7 +98,7 @@ export function WeatherChart({
         return buildWeatherChartConfig(
             {
                 data,
-                selectedModels,
+                selectedModels: providingModels,
                 selectedAggregations,
                 aggregationColors,
                 hideAggregationMembers,
