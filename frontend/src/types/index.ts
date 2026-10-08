@@ -106,6 +106,7 @@ export interface ResortData {
     bot: ElevationForecast;
     mid: ElevationForecast;
     top: ElevationForecast;
+    fetchedAt?: number; // epoch ms; missing on forecasts cached from the old backend
 }
 
 export interface AllWeatherData {
