@@ -7,7 +7,7 @@
  */
 
 import { matchPath } from 'react-router-dom';
-import { RESORT_LOCATIONS } from '../data/resortLocations';
+import { RESORT_LOCATIONS, resolveResortId } from '../data/resortLocations';
 
 /** Served by frontend/netlify/edge-functions/geo.ts; absent under plain `vite`. */
 const GEO_URL = '/api/geo';
