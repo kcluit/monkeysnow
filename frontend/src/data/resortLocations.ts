@@ -1,27 +1,34 @@
 /**
- * Resort locations bundled with the app.
+ * Resorts bundled with the app.
  *
- * locations.json nests resorts as Continent -> Country -> [Province] -> Resort.
- * Some countries (most of Europe) skip the province level. This module flattens
- * it for lookups and reshapes it into the hierarchy the resort picker renders.
+ * resorts/resorts.json is generated from OpenSkiData by scripts/import-resorts.mjs
+ * (see resorts/README.md). This module indexes it for lookups, resolves earlier
+ * slugs and pre-OpenSkiData IDs to current ones, and reshapes it into the
+ * Continent -> Country -> Region hierarchy the resort picker renders.
  */
 
-import locationsData from './locations.json';
+import resortData from './resorts/resorts.json';
 
 export interface ResortLocation {
     displayName: string;
+    /** The Resort's other names, often in the local script; searchable but not shown. */
+    aka?: string[];
     bot: number;
     mid: number;
     top: number;
     loc: [number, number]; // [lat, lon]
-    country: string;
+    country: string; // ISO 3166-1 alpha-2, e.g. "CA"
+    continent: string;
+    region?: string;
 }
 
 export interface ResortInfo {
     id: string;
     displayName: string;
+    aka?: string[];
 }
 
+/** A Region, or for a country too small to split, one implicit group named after the country. */
 export interface ProvinceData {
     id: string;
     name: string;
@@ -40,15 +47,30 @@ export interface ContinentData {
     countries: CountryData[];
 }
 
-type RawResort = Omit<ResortLocation, 'country'>;
-type RawCountry = Record<string, RawResort | Record<string, RawResort>>;
-type RawLocations = Record<string, Record<string, RawCountry>>;
-
-const rawLocations = locationsData as unknown as RawLocations;
-
-function isResort(value: unknown): value is RawResort {
-    return Boolean(value) && typeof value === 'object' && (value as RawResort).bot !== undefined;
+interface RawResort {
+    name: string;
+    aka?: string[];
+    country: string;
+    region?: string;
+    loc: number[];
+    bot: number;
+    mid: number;
+    top: number;
 }
+
+interface RawCountry {
+    name: string;
+    continent: string;
+    regions: boolean;
+}
+
+const rawCountries = resortData.countries as Record<string, RawCountry>;
+const rawResorts = resortData.resorts as Record<string, RawResort>;
+
+const CONTINENT_ORDER = ['North America', 'Europe', 'Asia', 'Oceania', 'South America', 'Africa'];
+
+/** Attribution OpenSkiData's licence (ODbL) requires wherever Resort data is shown. */
+export const RESORT_DATA_ATTRIBUTION: string = resortData.attribution;
 
 /**
  * Converts a name to a URL-friendly slug ID.
@@ -58,76 +80,95 @@ function toSlugId(name: string): string {
     return name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 }
 
+const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name);
+
 function buildLocationMap(): Map<string, ResortLocation> {
     const map = new Map<string, ResortLocation>();
-
-    for (const continentData of Object.values(rawLocations)) {
-        for (const [countryName, countryData] of Object.entries(continentData)) {
-            for (const [key, value] of Object.entries(countryData)) {
-                if (isResort(value)) {
-                    map.set(key, { ...value, country: countryName });
-                } else if (value && typeof value === 'object') {
-                    for (const [resortId, resortData] of Object.entries(value)) {
-                        if (isResort(resortData)) {
-                            map.set(resortId, { ...resortData, country: countryName });
-                        }
-                    }
-                }
-            }
-        }
+    for (const [id, r] of Object.entries(rawResorts)) {
+        map.set(id, {
+            displayName: r.name,
+            ...(r.aka ? { aka: r.aka } : {}),
+            bot: r.bot,
+            mid: r.mid,
+            top: r.top,
+            loc: [r.loc[0], r.loc[1]],
+            country: r.country,
+            continent: rawCountries[r.country].continent,
+            ...(r.region ? { region: r.region } : {}),
+        });
     }
-
     return map;
 }
 
 function buildHierarchy(): ContinentData[] {
-    const hierarchy: ContinentData[] = [];
+    const continents = new Map<string, ContinentData>();
+    const countries = new Map<string, CountryData>();
+    const provinces = new Map<string, ProvinceData>();
 
-    for (const [continentName, continentData] of Object.entries(rawLocations)) {
-        const continent: ContinentData = { id: toSlugId(continentName), name: continentName, countries: [] };
+    for (const [id, r] of Object.entries(rawResorts)) {
+        const country = rawCountries[r.country];
 
-        for (const [countryName, countryData] of Object.entries(continentData)) {
-            const country: CountryData = { id: toSlugId(countryName), name: countryName, provinces: [] };
-
-            for (const [key, value] of Object.entries(countryData)) {
-                if (isResort(value)) {
-                    // 3-level: resort sits directly under the country, so give it an implicit province
-                    let province = country.provinces.find(p => p.id === toSlugId(countryName));
-                    if (!province) {
-                        province = { id: toSlugId(countryName), name: countryName, resorts: [] };
-                        country.provinces.push(province);
-                    }
-                    province.resorts.push({ id: key, displayName: value.displayName || key.replace(/-/g, ' ') });
-                } else if (value && typeof value === 'object') {
-                    // 4-level: entry is a province containing resorts
-                    const province: ProvinceData = { id: toSlugId(key), name: key, resorts: [] };
-                    for (const [resortId, resortData] of Object.entries(value)) {
-                        if (isResort(resortData)) {
-                            province.resorts.push({
-                                id: resortId,
-                                displayName: resortData.displayName || resortId.replace(/-/g, ' '),
-                            });
-                        }
-                    }
-                    if (province.resorts.length > 0) {
-                        country.provinces.push(province);
-                    }
-                }
-            }
-
-            if (country.provinces.length > 0) {
-                continent.countries.push(country);
-            }
+        let continent = continents.get(country.continent);
+        if (!continent) {
+            continent = { id: toSlugId(country.continent), name: country.continent, countries: [] };
+            continents.set(country.continent, continent);
         }
 
-        if (continent.countries.length > 0) {
-            hierarchy.push(continent);
+        let countryNode = countries.get(r.country);
+        if (!countryNode) {
+            countryNode = { id: toSlugId(country.name), name: country.name, provinces: [] };
+            countries.set(r.country, countryNode);
+            continent.countries.push(countryNode);
         }
+
+        // Small countries get one implicit group named after the country
+        const provinceName = country.regions ? r.region ?? 'Other' : country.name;
+        const provinceKey = `${r.country}|${provinceName}`;
+        let province = provinces.get(provinceKey);
+        if (!province) {
+            const provinceId = country.regions ? `${countryNode.id}-${toSlugId(provinceName)}` : countryNode.id;
+            province = { id: provinceId, name: provinceName, resorts: [] };
+            provinces.set(provinceKey, province);
+            countryNode.provinces.push(province);
+        }
+
+        province.resorts.push({ id, displayName: r.name, ...(r.aka ? { aka: r.aka } : {}) });
     }
 
+    const hierarchy = [...continents.values()].sort(
+        (a, b) => CONTINENT_ORDER.indexOf(a.name) - CONTINENT_ORDER.indexOf(b.name)
+    );
+    for (const continent of hierarchy) {
+        continent.countries.sort(byName);
+        for (const country of continent.countries) {
+            country.provinces.sort(byName);
+            for (const province of country.provinces) {
+                province.resorts.sort((a, b) => a.displayName.localeCompare(b.displayName));
+            }
+        }
+    }
     return hierarchy;
 }
 
 export const RESORT_LOCATIONS: ReadonlyMap<string, ResortLocation> = buildLocationMap();
 
 export const RESORT_HIERARCHY: ContinentData[] = buildHierarchy();
+
+// Earlier slugs and pre-OpenSkiData IDs (e.g. "Big-White", "Big Sky") that still resolve
+const normalizeId = (id: string) => id.trim().toLowerCase().replace(/\s+/g, '-');
+const ALIASES = new Map(Object.entries(resortData.aliases as Record<string, string>));
+const NORMALIZED_ALIASES = new Map([...ALIASES].map(([alias, slug]) => [normalizeId(alias), slug]));
+
+/**
+ * The current slug for a Resort ID, an earlier slug or a pre-OpenSkiData ID,
+ * or null if it names no Resort. Exact matches win over case-insensitive ones,
+ * so an old ID never resolves to a different Resort that now has its lowercase form.
+ */
+export function resolveResortId(id: string): string | null {
+    if (RESORT_LOCATIONS.has(id)) return id;
+    const alias = ALIASES.get(id);
+    if (alias) return alias;
+    const normalized = normalizeId(id);
+    if (RESORT_LOCATIONS.has(normalized)) return normalized;
+    return NORMALIZED_ALIASES.get(normalized) ?? null;
+}
