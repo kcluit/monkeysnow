@@ -18,7 +18,7 @@ interface ResortTreeNodeProps {
   selectedResorts: string[];
   onNavigate: (node: HierarchyNode) => void;
   onHover: (index: number) => void;
-  onToggleAll: (node: HierarchyNode, select: boolean) => void;
+  onToggleAll: (node: HierarchyNode) => void;
   hideIcons?: boolean;
 }
 
@@ -56,11 +56,9 @@ export const ResortTreeNode = memo(function ResortTreeNode({
     if (isResort) {
       onNavigate(node); // Toggle single resort
     } else {
-      // Toggle all resorts in this category
-      const shouldSelect = selectionState !== 'all';
-      onToggleAll(node, shouldSelect);
+      onToggleAll(node); // Toggle all resorts in this category
     }
-  }, [isResort, node, selectionState, onNavigate, onToggleAll]);
+  }, [isResort, node, onNavigate, onToggleAll]);
 
   // Get icon based on node type
   const getIcon = (): IconDefinition | undefined => {
