@@ -103,6 +103,9 @@ function ResortDetailRoute({
     if (!resortId || !location) {
         return <Navigate to="/" replace />;
     }
+    if (resortId !== requestedId) {
+        return <Navigate to={`/resort/${resortId}`} replace />;
+    }
 
     const resortLocation = {
         lat: location.loc[0],
