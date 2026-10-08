@@ -256,8 +256,10 @@ const ProviderSection = memo(function ProviderSection({
   onToggleMinMaxFill,
   showPercentileFill,
   onTogglePercentileFill,
+  modelAvailability,
 }: {
   node: ModelHierarchyNode;
+  modelAvailability: ModelAvailabilityContext;
   expandedNodes: Set<string>;
   onToggleExpand: (id: string) => void;
   selectedModels: WeatherModel[];
