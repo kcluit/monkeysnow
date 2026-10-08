@@ -370,6 +370,7 @@ export function DetailedResortView({
                         unitSystem={unitSystem}
                         timezoneInfo={timezoneInfo ?? undefined}
                         isChartLocked={isChartLocked}
+                        isLoading={loading}
                         onToggleVariable={toggleVariable}
                         location={location}
                     />
