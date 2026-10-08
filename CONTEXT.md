@@ -83,8 +83,12 @@ The single **Forecast model** behind a **Resort**'s card on the main page, chose
 _Avoid_: default model, primary model
 
 **Preferred models**:
-A visitor's own list of **Forecast models**, one list for every **Resort**. Out of the box it holds the recommended models for every part of the world at once.
+A visitor's own list of **Forecast models**, one list for every **Resort**. Every visitor starts with the **Recommended models**.
 _Avoid_: selected models, default models, **Selection** (that is **Resorts**)
+
+**Recommended models**:
+The **Preferred models** a visitor starts with, covering every part of the world at once and chosen so that no model repeats another **Provider**'s numbers for part of its forecast.
+_Avoid_: default models, defaults
 
 **Comparison models**:
 The **Preferred models** whose **Coverage** includes the point being forecast (a **Resort** or a **Custom location**), minus **Clones**. These are the models drawn side by side in the detail view.
