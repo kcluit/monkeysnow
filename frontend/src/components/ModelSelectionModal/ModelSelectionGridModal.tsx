@@ -594,6 +594,7 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
                 <ProviderSection
                   key={provider.id}
                   node={provider}
+                  modelAvailability={modelAvailability}
                   expandedNodes={expandedNodes}
                   onToggleExpand={handleToggleExpand}
                   selectedModels={selectedModels}
