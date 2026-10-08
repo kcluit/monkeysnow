@@ -1047,69 +1047,13 @@ export const ALL_VARIABLES: WeatherVariable[] = [
   'convective_inhibition',
   'freezing_level_height',
   'weather_code',
-];
-
-// All available models (in display order)
-export const ALL_MODELS: WeatherModel[] = [
-  'best_match',
-  // ECMWF
-  'ecmwf_ifs',
-  'ecmwf_ifs025',
-  'ecmwf_aifs025_single',
-  // ICON
-  'icon_seamless',
-  'icon_global',
-  'icon_eu',
-  'icon_d2',
-  // GFS
-  'gfs_seamless',
-  'gfs_global',
-  'gfs_hrrr',
-  'gfs_graphcast025',
-  // GEM
-  'gem_seamless',
-  'gem_global',
-  'gem_regional',
-  'gem_hrdps_continental',
-  'gem_hrdps_west',
-  // Meteo-France
-  'meteofrance_seamless',
-  'meteofrance_arpege_world',
-  'meteofrance_arpege_europe',
-  'meteofrance_arome_france',
-  'meteofrance_arome_france_hd',
-  // MetNo
-  'metno_seamless',
-  'metno_nordic',
-  // KNMI
-  'knmi_seamless',
-  'knmi_harmonie_arome_europe',
-  'knmi_harmonie_arome_netherlands',
-  // JMA
-  'jma_seamless',
-  'jma_msm',
-  'jma_gsm',
-  // UKMO
-  'ukmo_seamless',
-  'ukmo_global_deterministic_10km',
-  'ukmo_uk_deterministic_2km',
-  // DMI
-  'dmi_seamless',
-  'dmi_harmonie_arome_europe',
-  // MeteoSwiss
-  'meteoswiss_icon_seamless',
-  'meteoswiss_icon_ch1',
-  'meteoswiss_icon_ch2',
-  // KMA
-  'kma_seamless',
-  'kma_gdps',
-  'kma_ldps',
-  // Other
-  'cma_grapes_global',
-  'bom_access_global',
-  'ncep_nbm_conus',
-  'ncep_nam_conus',
-  'italia_meteo_arpae_icon_2i',
+  'k_index',
+  'updraft',
+  // Upper air & surface
+  'temperature_80m',
+  'total_column_integrated_water_vapour',
+  'surface_temperature',
+  'skin_temperature',
 ];
 
 // Get model config with fallback
