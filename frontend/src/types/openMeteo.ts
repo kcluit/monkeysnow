@@ -1,69 +1,75 @@
 // Open-Meteo API types
 
-// Weather models available from Open-Meteo (all 46 models)
+// Forecast models served by Open-Meteo's /v1/forecast, by their documented IDs.
+// The catalogue (names, Coverage, Recommended models) lives in data/modelHierarchy.ts.
 export type WeatherModel =
   | 'best_match'
   // ECMWF
   | 'ecmwf_ifs'
   | 'ecmwf_ifs025'
   | 'ecmwf_aifs025_single'
-  // ICON (DWD Germany)
-  | 'icon_seamless'
-  | 'icon_global'
-  | 'icon_eu'
-  | 'icon_d2'
-  // GFS (NOAA USA)
-  | 'gfs_seamless'
-  | 'gfs_global'
-  | 'gfs_hrrr'
-  | 'gfs_graphcast025'
-  // GEM (Canada)
-  | 'gem_seamless'
-  | 'gem_global'
-  | 'gem_regional'
-  | 'gem_hrdps_continental'
-  | 'gem_hrdps_west'
-  // Meteo-France
+  // NOAA (USA)
+  | 'ncep_gfs_seamless'
+  | 'ncep_gfs_global'
+  | 'ncep_aigfs025'
+  | 'ncep_hgefs025_ensemble_mean'
+  | 'ncep_nam_conus'
+  | 'ncep_hrrr_conus'
+  | 'ncep_nbm_conus'
+  // DWD (Germany)
+  | 'dwd_icon_seamless'
+  | 'dwd_icon_global'
+  | 'dwd_icon_global_native'
+  | 'dwd_icon_eu'
+  | 'dwd_icon_d2'
+  | 'dwd_icon_d2_native'
+  // ECCC (Canada)
+  | 'cmc_gem_seamless'
+  | 'cmc_gem_gdps'
+  | 'cmc_gem_rdps'
+  | 'cmc_gem_hrdps'
+  | 'cmc_gem_hrdps_west'
+  // Météo-France
   | 'meteofrance_seamless'
+  | 'meteofrance_arpege_seamless'
+  | 'meteofrance_arome_seamless'
   | 'meteofrance_arpege_world'
   | 'meteofrance_arpege_europe'
   | 'meteofrance_arome_france'
   | 'meteofrance_arome_france_hd'
-  // MetNo (Norway)
-  | 'metno_seamless'
-  | 'metno_nordic'
+  // UK Met Office
+  | 'ukmo_seamless'
+  | 'ukmo_global_deterministic_10km'
+  | 'ukmo_uk_deterministic_2km'
+  // JMA (Japan)
+  | 'jma_seamless'
+  | 'jma_gsm'
+  | 'jma_msm'
   // KNMI (Netherlands)
   | 'knmi_seamless'
   | 'knmi_harmonie_arome_europe'
   | 'knmi_harmonie_arome_netherlands'
-  // JMA (Japan)
-  | 'jma_seamless'
-  | 'jma_msm'
-  | 'jma_gsm'
-  // UKMO (UK Met Office)
-  | 'ukmo_seamless'
-  | 'ukmo_global_deterministic_10km'
-  | 'ukmo_uk_deterministic_2km'
   // DMI (Denmark)
   | 'dmi_seamless'
   | 'dmi_harmonie_arome_europe'
+  // MET Norway
+  | 'metno_seamless'
+  | 'metno_nordic'
   // MeteoSwiss
   | 'meteoswiss_icon_seamless'
-  | 'meteoswiss_icon_ch1'
   | 'meteoswiss_icon_ch2'
-  // KMA (Korea)
-  | 'kma_seamless'
-  | 'kma_gdps'
-  | 'kma_ldps'
+  | 'meteoswiss_icon_ch1'
+  // GeoSphere Austria
+  | 'geosphere_seamless'
+  | 'geosphere_arome_austria'
+  // CHMI (Czechia)
+  | 'chmi_aladin_seamless'
+  | 'chmi_aladin_central_europe_2km'
+  | 'chmi_aladin_cz_1km'
+  // ItaliaMeteo
+  | 'italia_meteo_arpae_icon_2i'
   // CMA (China)
-  | 'cma_grapes_global'
-  // BOM (Australia)
-  | 'bom_access_global'
-  // NCEP
-  | 'ncep_nbm_conus'
-  | 'ncep_nam_conus'
-  // Italia Meteo
-  | 'italia_meteo_arpae_icon_2i';
+  | 'cma_grapes_global';
 
 // Aggregation types for model ensemble
 export type AggregationType = 'median' | 'mean' | 'min' | 'max' | 'p25' | 'p75';
