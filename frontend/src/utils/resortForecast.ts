@@ -197,13 +197,14 @@ interface RequestPlan {
 }
 
 function planFor(resortId: string): RequestPlan {
-    const country = RESORT_LOCATIONS.get(resortId)?.country ?? '';
-    const model = COUNTRY_MODELS[country] ?? DEFAULT_MODEL;
+    const resort = RESORT_LOCATIONS.get(resortId);
+    const inEurope = resort?.continent === 'Europe';
+    const model = (resort && COUNTRY_MODELS[resort.country]) ?? (inEurope ? EUROPE_MODEL : DEFAULT_MODEL);
     return {
         model,
         freezingModel: MODELS_WITH_FREEZING_LEVEL.has(model)
             ? null
-            : FREEZING_LEVEL_MODELS[country] ?? DEFAULT_FREEZING_MODEL,
+            : inEurope ? EUROPE_FREEZING_MODEL : DEFAULT_FREEZING_MODEL,
     };
 }
 
