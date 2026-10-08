@@ -145,6 +145,7 @@ export function useDetailedWeatherData({
 
         return () => {
             cancelled = true;
+            controller.abort();
             // Reset prevParamsRef so re-mount triggers fresh fetch (fixes React StrictMode double-invoke)
             prevParamsRef.current = '';
         };
