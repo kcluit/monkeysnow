@@ -359,7 +359,7 @@ export function DetailedResortView({
                 <>
                     <DetailChartGrid
                         data={data}
-                        selectedModels={selectedModels}
+                        selectedModels={comparisonModels}
                         selectedVariables={selectedVariables}
                         selectedAggregations={selectedAggregations}
                         aggregationColors={aggregationColors}
