@@ -43,3 +43,41 @@ _Avoid_: TTL, cache expiry, refresh interval
 **Queued resort**:
 A **Resort** in the **Selection** whose forecast is waiting for **Fetch budget** to free up.
 _Avoid_: pending resort, loading resort
+
+### Forecast models
+
+**Forecast model**:
+One numerical weather model that Open-Meteo serves forecasts from, such as ECMWF IFS or HRRR.
+_Avoid_: weather model (in prose), source
+
+**Provider**:
+The forecasting agency that runs one or more **Forecast models**, such as ECMWF, NOAA or DWD.
+_Avoid_: vendor, agency
+
+**Coverage**:
+The area a **Forecast model** produces its own forecasts for. Outside it, a model returns nothing, nulls, or another model's numbers.
+_Avoid_: domain, region (when meaning a model's area)
+
+**Seamless model**:
+A **Forecast model** that blends a **Provider**'s high-resolution regional model with a coarser global one, switching by location.
+_Avoid_: combined model, blend
+
+**Clone**:
+A **Forecast model** whose numbers at a **Resort** are identical to another model's because the **Resort** is outside its **Coverage** and it falls back to that model.
+_Avoid_: duplicate
+
+**Card model**:
+The single **Forecast model** behind a **Resort**'s card on the main page, chosen by the **Resort**'s country.
+_Avoid_: default model, primary model
+
+**Comparison models**:
+The **Forecast models** drawn side by side in a **Resort**'s detail view.
+_Avoid_: selected models, **Selection** (that is **Resorts**), model selection
+
+**Default comparison models**:
+The **Comparison models** a visitor gets before choosing their own. They depend on where the **Resort** is, contain only models whose **Coverage** includes it, and have no **Clones**.
+_Avoid_: default models
+
+**Aggregation**:
+A line computed hour by hour across the **Comparison models**: median, mean, min, max, or the 25th or 75th percentile.
+_Avoid_: ensemble, consensus
