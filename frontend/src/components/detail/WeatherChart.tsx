@@ -33,10 +33,22 @@ export function WeatherChart({
     unitSystem,
     timezoneInfo,
     isChartLocked,
+    isLoading,
     onToggleVisibility,
     location,
 }: WeatherChartComponentProps): JSX.Element {
     const variableConfig = getVariableConfig(variable);
+
+    // Many variables come from only a few models; draw just the ones that provide this one
+    const providingModels = useMemo(() => {
+        const variables = [variable, ...getOverlayVariablesFor(variable)];
+        return selectedModels.filter((model) =>
+            data.get(model)?.some((point) =>
+                variables.some((v) => typeof point[v] === 'number' && Number.isFinite(point[v]))
+            )
+        );
+    }, [data, selectedModels, variable]);
+    const loadedModelCount = selectedModels.filter((model) => data.has(model)).length;
 
     // Chart settings from localStorage
     const [chartType, setChartType] = useLocalStorage<ChartDisplayType>(
