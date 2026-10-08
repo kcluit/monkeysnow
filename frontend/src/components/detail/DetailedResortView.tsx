@@ -319,6 +319,7 @@ export function DetailedResortView({
                         onResetCustomLocation={handleResetCustomLocation}
                         isLoadingElevation={isLoadingElevation}
                         utilityBarStyle={utilityBarStyle}
+                        modelAvailability={modelAvailability}
                     />
                 </div>
             )}
