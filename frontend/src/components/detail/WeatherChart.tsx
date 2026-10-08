@@ -208,6 +208,11 @@ export function WeatherChart({
                             {variableConfig.description}
                         </span>
                     )}
+                    {providingModels.length < loadedModelCount && (
+                        <span className="weather-chart-description">
+                            {providingModels.length} of {loadedModelCount} models provide this
+                        </span>
+                    )}
                 </div>
                 <div className="weather-chart-actions">
                     {/* Fullscreen toggle button */}
