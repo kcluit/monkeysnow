@@ -1,8 +1,5 @@
 import type { DayForecast, Period, DayStats, TemperatureMetric, UnitSystem } from '../../types';
-
-// Conversion constants for back-converting imperial to metric for threshold checks
-const INCHES_TO_CM = 2.54;
-const MPH_TO_KMH = 1.609344;
+import { formatTempWithRounding } from '../../utils/unitConversion';
 
 /**
  * Formats weather text from periods (combines AM/PM conditions intelligently)
@@ -34,25 +31,17 @@ export function formatWeatherText(periods: Period[]): string {
  * For avg: returns average of all period averages
  * For median: returns average of all period medians
  *
- * Note: Returns values in the current unit system (parsed from formatted strings).
- * Temperature is from raw metric values, but snow/wind are parsed from formatted strings.
+ * Snow, rain and wind stay metric (cm, mm, km/h) for formatSnow, formatRain and formatWind
+ * to convert once; the temperature is converted before it is rounded, as the periods' are.
  */
-export function calculateDayStats(day: DayForecast, temperatureMetric: TemperatureMetric = 'max'): DayStats {
+export function calculateDayStats(day: DayForecast, temperatureMetric: TemperatureMetric = 'max', unitSystem: UnitSystem = 'metric'): DayStats {
     const periods = day.periods;
-    if (!periods.length) return { maxTemp: 0, snow: 0, rain: 0, wind: 0 };
+    if (!periods.length) return { maxTemp: 0, temp: formatTempWithRounding(0, unitSystem, 'round'), snow: 0, rain: 0, wind: 0 };
 
     let aggregatedTemp = 0;
-    let totalSnow = 0;
-    let totalRain = 0;
 
-    // Get PM wind or fallback to available wind
-    let wind = 0;
-    const pmPeriod = periods.find(p => p.time === 'PM');
-    if (pmPeriod) {
-        wind = parseFloat(pmPeriod.wind.replace(/[^\d.-]/g, '')) || 0;
-    } else if (periods.length > 0) {
-        wind = parseFloat(periods[0].wind.replace(/[^\d.-]/g, '')) || 0;
-    }
+    // PM wind, or the first period's when there is no PM
+    const wind = (periods.find(p => p.time === 'PM') ?? periods[0]).windKmh;
 
     // Calculate temperature based on metric
     switch (temperatureMetric) {
@@ -76,25 +65,26 @@ export function calculateDayStats(day: DayForecast, temperatureMetric: Temperatu
             aggregatedTemp = Math.max(...periods.map(p => p.tempMax));
     }
 
-    periods.forEach(period => {
-        const snowAmount = parseFloat(period.snow.replace(/[^\d.-]/g, '')) || 0;
-        totalSnow += snowAmount;
-
-        const rainAmount = parseFloat(period.rain.replace(/[^\d.-]/g, '')) || 0;
-        totalRain += rainAmount;
-    });
-
     // Round based on metric: ceil for max, floor for min, round for avg/median
-    const roundedTemp = temperatureMetric === 'max' ? Math.ceil(aggregatedTemp)
-        : temperatureMetric === 'min' ? Math.floor(aggregatedTemp)
+    const rounding = temperatureMetric === 'max' ? 'ceil' as const
+        : temperatureMetric === 'min' ? 'floor' as const
+            : 'round' as const;
+    const roundedTemp = rounding === 'ceil' ? Math.ceil(aggregatedTemp)
+        : rounding === 'floor' ? Math.floor(aggregatedTemp)
             : Math.round(aggregatedTemp);
 
     return {
         maxTemp: roundedTemp,
-        snow: Math.round(totalSnow * 10) / 10,
-        rain: Math.round(totalRain * 10) / 10,
-        wind: Math.round(wind)
+        temp: formatTempWithRounding(aggregatedTemp, unitSystem, rounding),
+        snow: periods.reduce((sum, period) => sum + period.snowCm, 0),
+        rain: periods.reduce((sum, period) => sum + period.rainMm, 0),
+        wind
     };
+}
+
+/** Whether a formatted amount such as "0.0 in" shows anything */
+export function showsAmount(formatted: string): boolean {
+    return parseFloat(formatted) > 0;
 }
 
 /**
@@ -148,11 +138,8 @@ export function getTemperatureStyle(temp: number): { className?: string; style?:
 /**
  * Gets snow amount color class (rainbow for significant amounts).
  * Thresholds are based on cm values: 20cm+ rainbow, 10cm+ apple-rainbow.
- * When in imperial mode, converts inches back to cm for threshold comparison.
  */
-export function getSnowClass(snow: number, unitSystem: UnitSystem = 'metric'): string {
-    // Convert to metric for threshold comparison if needed
-    const snowCm = unitSystem === 'imperial' ? snow * INCHES_TO_CM : snow;
+export function getSnowClass(snowCm: number): string {
     if (snowCm >= 20) return 'rainbow-text';
     if (snowCm >= 10) return 'apple-rainbow-text';
     return 'text-theme-accent';
@@ -161,10 +148,7 @@ export function getSnowClass(snow: number, unitSystem: UnitSystem = 'metric'): s
 /**
  * Gets wind color class (accent for high winds).
  * Threshold is based on km/h values: 20 km/h+ gets accent.
- * When in imperial mode, converts mph back to km/h for threshold comparison.
  */
-export function getWindClass(wind: number, unitSystem: UnitSystem = 'metric'): string {
-    // Convert to metric for threshold comparison if needed
-    const windKmh = unitSystem === 'imperial' ? wind * MPH_TO_KMH : wind;
+export function getWindClass(windKmh: number): string {
     return windKmh >= 20 ? 'text-theme-accent' : 'text-theme-textSecondary';
 }

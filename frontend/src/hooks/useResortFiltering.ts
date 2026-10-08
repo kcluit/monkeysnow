@@ -68,10 +68,7 @@ export function useResortFiltering(
 
 
     const getTotalSnow = (day: DayForecast): number => {
-      return day.periods.reduce((sum: number, period: Period) => {
-        const snow = parseFloat(period.snow) || 0;
-        return sum + snow;
-      }, 0);
+      return day.periods.reduce((sum: number, period: Period) => sum + period.snowCm, 0);
     };
 
     const getPMWind = (day: DayForecast): number => {
@@ -79,8 +76,8 @@ export function useResortFiltering(
       const nightPeriod = day.periods.find((p: Period) => p.time === 'Night');
 
       return pmPeriod !== undefined
-        ? parseFloat(pmPeriod.wind)
-        : (nightPeriod !== undefined ? parseFloat(nightPeriod.wind) : 0);
+        ? pmPeriod.windKmh
+        : (nightPeriod !== undefined ? nightPeriod.windKmh : 0);
     };
 
     const getAvgTempMultipleDays = (days: DayForecast[], numDays: number): number => {

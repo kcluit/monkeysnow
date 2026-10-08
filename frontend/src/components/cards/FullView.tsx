@@ -1,6 +1,6 @@
 import { calculateSnowTotals } from '../../utils/weather';
 import { formatSnow } from '../../utils/unitConversion';
-import { getTemperatureStyle } from './cardUtils';
+import { getTemperatureStyle, getWindClass, showsAmount } from './cardUtils';
 import { isSavedLocationId } from '../../utils/savedLocations';
 import type { CardProps } from '../../types';
 
@@ -75,11 +75,10 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
                                             <div className="grid grid-cols-3 gap-4">
                                                 {day.periods.map((period, index) => {
                                                     const tempStyleResult = getTemperatureStyle(period.tempMax);
-                                                    const snowAmount = parseFloat(period.snow) || 0;
-                                                    const windSpeed = parseFloat(period.wind) || 0;
+                                                    const hasSnow = showsAmount(period.snow);
 
-                                                    const snowStyleObj = snowAmount > 0 ? (
-                                                        snowAmount >= 5 ? {
+                                                    const snowStyleObj = hasSnow ? (
+                                                        period.snowCm >= 5 ? {
                                                             background: 'var(--specialColor)',
                                                             WebkitBackgroundClip: 'text' as const,
                                                             backgroundClip: 'text' as const,
@@ -105,13 +104,13 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
                                                             </div>
                                                             <div className="flex flex-col gap-[32px] text-sm w-full">
                                                                 <div
-                                                                    className={`font-semibold ${snowAmount === 0 ? 'text-theme-textSecondary' : ''}`}
+                                                                    className={`font-semibold ${hasSnow ? '' : 'text-theme-textSecondary'}`}
                                                                     style={snowStyleObj}
                                                                 >
                                                                     {period.snow}
                                                                 </div>
                                                                 <div className="text-theme-textSecondary font-semibold">{period.rain}</div>
-                                                                <div className={`font-semibold ${windSpeed >= 20 ? 'text-theme-accent' : 'text-theme-textSecondary'}`}>{period.wind}</div>
+                                                                <div className={`font-semibold ${getWindClass(period.windKmh)}`}>{period.wind}</div>
                                                                 <div className="text-theme-textSecondary font-semibold">{period.condition}</div>
                                                             </div>
                                                         </div>
