@@ -331,7 +331,7 @@ export function DetailedResortView({
                         Loading forecast data...
                     </div>
                     <div className="text-sm text-theme-textSecondary mt-2">
-                        Fetching from {selectedModels.length} weather model(s)
+                        Fetching from {coveringModels.length} weather model(s)
                     </div>
                 </div>
             )}
