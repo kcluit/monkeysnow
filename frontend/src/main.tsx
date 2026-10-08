@@ -17,33 +17,21 @@ function Root(): JSX.Element {
     );
 }
 
-// Migrate old resort IDs in localStorage to current resort IDs
-// This runs once on app load before rendering
+// Rewrite saved resort IDs to current slugs before rendering. Earlier slugs and
+// pre-OpenSkiData IDs (e.g. "Big-White") resolve through the aliases in
+// data/resorts/resorts.json; IDs that no longer name a Resort are dropped.
 const migrateResortIds = () => {
-    const ID_MIGRATIONS: Record<string, string> = {
-        'Ski-Smithers': 'Hudson Bay Mountain',
-        'HemlockResort': 'Sasquatch Mountain Resort',
-    };
-
     try {
         const stored = localStorage.getItem('selectedResorts');
         if (!stored) return;
 
         const selectedResorts: string[] = JSON.parse(stored);
-        let migrated = false;
+        const current = [...new Set(
+            selectedResorts.map(resolveResortId).filter((id): id is string => id !== null)
+        )];
 
-        const newSelectedResorts = selectedResorts.map((id) => {
-            if (ID_MIGRATIONS[id]) {
-                migrated = true;
-                console.log(`Migrating resort ID: ${id} -> ${ID_MIGRATIONS[id]}`);
-                return ID_MIGRATIONS[id];
-            }
-            return id;
-        });
-
-        if (migrated) {
-            localStorage.setItem('selectedResorts', JSON.stringify(newSelectedResorts));
-            console.log('Resort ID migration complete');
+        if (current.length !== selectedResorts.length || current.some((id, i) => id !== selectedResorts[i])) {
+            localStorage.setItem('selectedResorts', JSON.stringify(current));
         }
     } catch (err) {
         console.error('Error migrating resort IDs:', err);
