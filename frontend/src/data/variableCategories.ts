@@ -80,7 +80,12 @@ export const VARIABLE_CATEGORIES: VariableCategory[] = [
   {
     id: 'stability',
     name: 'Convective / Stability',
-    variables: ['cape', 'lifted_index', 'convective_inhibition', 'freezing_level_height', 'weather_code'],
+    variables: ['cape', 'lifted_index', 'convective_inhibition', 'freezing_level_height', 'weather_code', 'k_index', 'updraft'],
+  },
+  {
+    id: 'upperAir',
+    name: 'Upper Air & Surface',
+    variables: ['temperature_80m', 'total_column_integrated_water_vapour', 'surface_temperature', 'skin_temperature'],
   },
 ];
 
