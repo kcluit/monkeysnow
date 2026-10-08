@@ -64,6 +64,16 @@ export function getEnglishTranslations(): Translations {
 }
 
 /**
+ * Fill `{name}` placeholders in a translated string.
+ * @example interpolate('{count} queued', { count: 3 }) // '3 queued'
+ */
+export function interpolate(template: string, values: Record<string, string | number>): string {
+    return template.replace(/\{(\w+)\}/g, (match, name: string) =>
+        name in values ? String(values[name]) : match
+    );
+}
+
+/**
  * Detect the user's preferred language from browser settings.
  * Falls back to English if browser language is not supported.
  *
