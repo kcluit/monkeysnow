@@ -190,7 +190,7 @@ export async function fetchOpenMeteoData(
 
   try {
     // Detail-view requests go ahead of the main page's queue in the Fetch budget
-    const responses = await fetchWeatherApiWithinBudget(params, 'detail');
+    const responses = await fetchWeatherApiWithinBudget(params, 'detail', signal);
     const result = new Map<WeatherModel, HourlyDataPoint[]>();
 
     // Extract timezone info from first response
