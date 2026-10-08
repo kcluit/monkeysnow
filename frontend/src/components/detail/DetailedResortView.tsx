@@ -49,11 +49,19 @@ export function DetailedResortView({
     modelLineOpacity,
     onBack,
 }: DetailedResortViewPropsWithUnits): JSX.Element {
-    // State for selected models
-    const [selectedModels, setSelectedModels] = useLocalStorage<WeatherModel[]>(
-        'detailSelectedModels',
-        DEFAULT_MODELS
+    // The visitor's Preferred models: one list for every Resort, starting as the Recommended models.
+    // A new key wipes the old 'detailSelectedModels' lists once (docs/adr/0003).
+    const [preferredModels, setPreferredModels] = useLocalStorage<WeatherModel[]>(
+        'detailPreferredModels',
+        RECOMMENDED_MODELS
     );
+    useEffect(() => {
+        try {
+            localStorage.removeItem('detailSelectedModels');
+        } catch {
+            // Storage unavailable; nothing to clean up
+        }
+    }, []);
 
     // State for selected variables - default selection
     const [selectedVariables, setSelectedVariables] = useLocalStorage<WeatherVariable[]>(
