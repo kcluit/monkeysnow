@@ -106,18 +106,11 @@ export function ResortMap({
                     className={`h-full rounded-xl shadow-lg ${className}`}
                     style={{ zIndex: 0 }}
                 >
-                    {/* Plain OpenStreetMap base map. OpenSkiMap looks better, but its terms forbid other sites using its tiles. */}
+                    {/* Plain OpenStreetMap map. OpenSkiMap looks better, but its terms forbid other sites using its tiles;
+                        OpenSnowMap's ski run and lift overlay was tried and dropped for how it looked. */}
                     <TileLayer
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                         url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-
-                    {/* Ski runs (coloured by difficulty) and lifts, drawn over the base map */}
-                    <TileLayer
-                        attribution='&copy; <a href="https://www.opensnowmap.org">OpenSnowMap</a> (<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>)'
-                        url="https://tiles.opensnowmap.org/pistes/{z}/{x}/{y}.png"
-                        minZoom={9}
-                        maxZoom={18}
                     />
 
                     {/* Resize handler to invalidate map on expand/collapse and fullscreen */}
