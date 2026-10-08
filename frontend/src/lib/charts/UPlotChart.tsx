@@ -40,7 +40,6 @@ export function UPlotChart({
 
         // Check if chart already exists (handles StrictMode double-mount)
         if (!hasChart(container)) {
-            console.log('[UPlotChart] Initializing chart via registry');
             getOrCreateChart(container, chartKey);
         }
 
@@ -52,7 +51,6 @@ export function UPlotChart({
             // If React immediately re-mounts, the chart will still exist
             setTimeout(() => {
                 if (container && !document.body.contains(container)) {
-                    console.log('[UPlotChart] Container removed from DOM, destroying chart');
                     destroyChart(container);
                 }
             }, 0);

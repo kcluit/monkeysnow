@@ -10,20 +10,21 @@ import type uPlot from 'uplot';
 import type { ChartConfig } from '../types';
 
 export interface LegendPluginOptions {
-    /** Chart configuration for accessing series metadata */
-    config: ChartConfig;
+    /** Latest chart configuration, for series metadata */
+    getConfig: () => ChartConfig;
     /** Callback when hovering over legend items for series focus */
     onSeriesHover?: (seriesIdx: number | null) => void;
 }
 
 export function createLegendPlugin(options: LegendPluginOptions): uPlot.Plugin {
-    const { config } = options;
+    const { getConfig } = options;
 
     let legend: HTMLDivElement | null = null;
     let legendItems: HTMLDivElement[] = [];
 
     function updateLegend(u: uPlot) {
         if (!legend) return;
+        const config = getConfig();
 
         // Clear existing items
         legend.innerHTML = '';
@@ -88,7 +89,7 @@ export function createLegendPlugin(options: LegendPluginOptions): uPlot.Plugin {
 
             // Hover effect - trigger series focus
             item.addEventListener('mouseenter', () => {
-                item.style.backgroundColor = config.theme.tooltipBg;
+                item.style.backgroundColor = getConfig().theme.tooltipBg;
                 options.onSeriesHover?.(i);
             });
             item.addEventListener('mouseleave', () => {
@@ -112,7 +113,7 @@ export function createLegendPlugin(options: LegendPluginOptions): uPlot.Plugin {
                     legend.style.flexWrap = 'wrap';
                     legend.style.gap = '4px';
                     legend.style.padding = '4px 4px 0 4px';
-                    legend.style.borderTop = `1px solid ${config.theme.gridColor}`;
+                    legend.style.borderTop = `1px solid ${getConfig().theme.gridColor}`;
                     legend.style.marginTop = '0';
 
                     // Append to chart root (below canvas)

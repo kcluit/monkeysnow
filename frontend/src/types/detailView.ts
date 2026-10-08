@@ -1,7 +1,8 @@
-import type { WeatherModel, WeatherVariable, TimezoneInfo, AggregationType } from './openMeteo';
+import type { WeatherModel, WeatherVariable, AggregationType, HourlyDataPoint } from './openMeteo';
 import type { UnitSystem } from '../utils/unitConversion';
 import type { UtilityBarStyle, ModelLineOpacity } from './index';
 import type { DroppedModel } from '../utils/comparisonModels';
+import type { TimeAxis } from '../utils/timeAxis';
 
 /** Where the detail view is forecasting, and which fetched models were dropped there */
 export interface ModelAvailabilityContext {
@@ -118,7 +119,9 @@ export interface DetailUtilityBarProps {
 }
 
 export interface DetailChartGridProps {
-    data: Map<WeatherModel, import('./openMeteo').HourlyDataPoint[]>;
+    data: ReadonlyMap<WeatherModel, HourlyDataPoint[]>;
+    /** Time axis shared by every chart, or null until a model has arrived */
+    timeAxis: TimeAxis | null;
     selectedModels: WeatherModel[];
     selectedVariables: WeatherVariable[];
     selectedAggregations: AggregationType[];
@@ -128,7 +131,6 @@ export interface DetailChartGridProps {
     showPercentileFill?: boolean;
     modelLineOpacity?: ModelLineOpacity;
     unitSystem: UnitSystem;
-    timezoneInfo?: TimezoneInfo;
     isChartLocked?: boolean;
     isLoading?: boolean;
     onToggleVariable?: (variable: WeatherVariable) => void;
@@ -141,7 +143,9 @@ export interface DetailChartGridProps {
 }
 
 export interface WeatherChartProps {
-    data: Map<WeatherModel, import('./openMeteo').HourlyDataPoint[]>;
+    data: ReadonlyMap<WeatherModel, HourlyDataPoint[]>;
+    /** Time axis shared by every chart, or null until a model has arrived */
+    timeAxis: TimeAxis | null;
     selectedModels: WeatherModel[];
     selectedAggregations: AggregationType[];
     aggregationColors: Record<AggregationType, string>;
@@ -151,7 +155,6 @@ export interface WeatherChartProps {
     modelLineOpacity?: ModelLineOpacity;
     variable: WeatherVariable;
     unitSystem: UnitSystem;
-    timezoneInfo?: TimezoneInfo;
     isChartLocked?: boolean;
     /** Whether more models may still arrive (so an empty chart isn't final yet) */
     isLoading?: boolean;

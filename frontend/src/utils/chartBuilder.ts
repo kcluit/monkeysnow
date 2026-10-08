@@ -15,6 +15,7 @@ import type { ChartDisplayType } from '../types/chartSettings';
 import { getModelConfig, getVariableConfig, getOverlayConfig, hasOverlays } from './chartConfigurations';
 import { getUPlotTheme } from '../lib/charts';
 import { aggregationOptions } from '../data/modelHierarchy';
+import { axisIndexOf, type TimeAxis } from './timeAxis';
 
 /** Additional chart settings passed from WeatherChart component */
 export interface ChartBuildSettings {
@@ -26,241 +27,98 @@ export interface ChartBuildSettings {
     customHeight?: number;
 }
 
-/**
- * Get the hour of a date in the specified timezone.
- * @param date - The date to get the hour from
- * @param timezone - Optional IANA timezone string
- * @returns The hour (0-23) in the specified timezone
- */
-function getHourInTimezone(date: Date, timezone?: string): number {
-    try {
-        if (timezone) {
-            const timeStr = date.toLocaleString('en-US', {
-                timeZone: timezone,
-                hour: 'numeric',
-                hour12: false,
-            });
-            let hour = parseInt(timeStr.trim());
-            // Handle edge case where midnight might be formatted as 24
-            if (hour === 24) hour = 0;
-            return hour;
-        }
-    } catch {
-        // Fall through to default
-    }
-    return date.getHours();
-}
+/** One value per point of the time axis; null leaves a gap in the chart. */
+type Series = (number | null)[];
 
 /**
- * Format a date for display on the X-axis.
- * - At midnight (12 AM): "Wed Jan 29" (day of week + date)
- * - Other hours: "5 PM" (hour only)
- * @param date - The date to format
- * @param timezone - Optional IANA timezone string (e.g., "America/Vancouver")
+ * Each model's values for a variable, placed on the shared time axis by timestamp
+ * (models fetched hours apart can start on different days) and converted to the
+ * visitor's units. Missing and non-finite values become null.
  */
-function formatTimeLabel(date: Date, timezone?: string): string {
-    const hour = getHourInTimezone(date, timezone);
-    const isMidnight = hour === 0;
-
-    if (isMidnight) {
-        // Format as "Wed Jan 29"
-        const options: Intl.DateTimeFormatOptions = {
-            weekday: 'short',
-            month: 'short',
-            day: 'numeric',
-        };
-        if (timezone) options.timeZone = timezone;
-
-        try {
-            return date.toLocaleString('en-US', options);
-        } catch {
-            delete options.timeZone;
-            return date.toLocaleString('en-US', options);
-        }
-    } else {
-        // Format as "5 PM" (hour only)
-        const options: Intl.DateTimeFormatOptions = {
-            hour: 'numeric',
-        };
-        if (timezone) options.timeZone = timezone;
-
-        try {
-            return date.toLocaleString('en-US', options);
-        } catch {
-            delete options.timeZone;
-            return date.toLocaleString('en-US', options);
-        }
-    }
-}
-
-/**
- * Format a date for tooltip display with full date and time.
- * Format: "Tue Feb 3, 4 AM"
- * @param date - The date to format
- * @param timezone - Optional IANA timezone string (e.g., "America/Vancouver")
- */
-function formatTooltipLabel(date: Date, timezone?: string): string {
-    const options: Intl.DateTimeFormatOptions = {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-    };
-    if (timezone) options.timeZone = timezone;
-
-    try {
-        return date.toLocaleString('en-US', options);
-    } catch {
-        delete options.timeZone;
-        return date.toLocaleString('en-US', options);
-    }
-}
-
-/**
- * Transform weather data into chart series format.
- * Returns time labels, tooltip labels, midnight indices, and series data for each selected model.
- * Uses null for missing values to create gaps in charts.
- */
-function transformToChartData(
-    data: Map<WeatherModel, HourlyDataPoint[]>,
-    selectedModels: WeatherModel[],
+function extractSeries(
+    data: ReadonlyMap<WeatherModel, HourlyDataPoint[]>,
+    models: WeatherModel[],
     variable: string,
+    axis: TimeAxis,
     unitSystem: UnitSystem,
-    convertToImperial?: (value: number) => number,
-    timezone?: string
-): { timeLabels: string[]; tooltipLabels: string[]; midnightIndices: number[]; seriesData: Map<WeatherModel, (number | null)[]> } {
-    // Get time points from first available model
-    const firstModelData = data.values().next().value as HourlyDataPoint[] | undefined;
-    if (!firstModelData || firstModelData.length === 0) {
-        return { timeLabels: [], tooltipLabels: [], midnightIndices: [], seriesData: new Map() };
-    }
+    convertToImperial?: (value: number) => number
+): Map<WeatherModel, Series> {
+    const convert = unitSystem === 'imperial' ? convertToImperial : undefined;
+    const seriesData = new Map<WeatherModel, Series>();
 
-    const expectedLength = firstModelData.length;
+    for (const model of models) {
+        const points = data.get(model);
+        if (!points) continue;
 
-    // Extract time labels with timezone formatting and track midnight indices
-    const timeLabels: string[] = [];
-    const tooltipLabels: string[] = [];
-    const midnightIndices: number[] = [];
-
-    firstModelData.forEach((point, index) => {
-        const hour = getHourInTimezone(point.time, timezone);
-        if (hour === 0) {
-            midnightIndices.push(index);
-        }
-        timeLabels.push(formatTimeLabel(point.time, timezone));
-        tooltipLabels.push(formatTooltipLabel(point.time, timezone));
-    });
-
-    // Extract series data for each model
-    const seriesData = new Map<WeatherModel, (number | null)[]>();
-
-    for (const model of selectedModels) {
-        const modelData = data.get(model);
-        if (!modelData) continue;
-
-        const values = modelData.map((point) => {
+        const values: Series = new Array(axis.timestamps.length).fill(null);
+        for (const point of points) {
             const value = point[variable];
-            // Return null for missing data (creates gaps in charts)
-            // Also handle NaN values (typeof NaN === 'number' is true!)
-            if (typeof value !== 'number' || !Number.isFinite(value)) return null;
-
-            // Convert to imperial if needed
-            if (unitSystem === 'imperial' && convertToImperial) {
-                const converted = convertToImperial(value);
-                // Ensure converted value is also valid
-                return Number.isFinite(converted) ? converted : null;
-            }
-
-            return value;
-        });
-
-        // Ensure all series have the same length (pad with nulls if needed)
-        if (values.length < expectedLength) {
-            const padding = new Array(expectedLength - values.length).fill(null);
-            values.push(...padding);
-        } else if (values.length > expectedLength) {
-            values.length = expectedLength;
+            // typeof NaN === 'number', so check finiteness too
+            if (typeof value !== 'number' || !Number.isFinite(value)) continue;
+            const index = axisIndexOf(axis, point.timestamp);
+            if (index === -1) continue;
+            const converted = convert ? convert(value) : value;
+            if (Number.isFinite(converted)) values[index] = converted;
         }
-
         seriesData.set(model, values);
     }
 
-    return { timeLabels, tooltipLabels, midnightIndices, seriesData };
+    return seriesData;
 }
 
-/**
- * Calculate median of an array of numbers.
- */
-function calculateMedian(values: number[]): number {
-    if (values.length === 0) return 0;
-    const sorted = [...values].sort((a, b) => a - b);
-    const mid = Math.floor(sorted.length / 2);
-    return sorted.length % 2 === 0
-        ? (sorted[mid - 1] + sorted[mid]) / 2
-        : sorted[mid];
-}
-
-/**
- * Calculate mean of an array of numbers.
- */
-function calculateMean(values: number[]): number {
-    if (values.length === 0) return 0;
-    return values.reduce((sum, v) => sum + v, 0) / values.length;
-}
-
-/**
- * Calculate minimum of an array of numbers.
- */
-function calculateMin(values: number[]): number {
-    if (values.length === 0) return 0;
-    return Math.min(...values);
-}
-
-/**
- * Calculate maximum of an array of numbers.
- */
-function calculateMax(values: number[]): number {
-    if (values.length === 0) return 0;
-    return Math.max(...values);
-}
-
-/**
- * Calculate percentile of an array of numbers.
- * @param values - Array of numbers
- * @param percentile - Percentile to calculate (0-100)
- */
-function calculatePercentile(values: number[], percentile: number): number {
-    if (values.length === 0) return 0;
-    const sorted = [...values].sort((a, b) => a - b);
+/** Linear interpolation between the two nearest ranks of an ascending array. */
+function percentileOfSorted(sorted: number[], percentile: number): number {
     const index = (percentile / 100) * (sorted.length - 1);
     const lower = Math.floor(index);
     const upper = Math.ceil(index);
     if (lower === upper) return sorted[lower];
-    // Linear interpolation between lower and upper bounds
-    const fraction = index - lower;
-    return sorted[lower] + fraction * (sorted[upper] - sorted[lower]);
+    return sorted[lower] + (index - lower) * (sorted[upper] - sorted[lower]);
+}
+
+function statisticOf(sorted: number[], aggType: AggregationType): number {
+    switch (aggType) {
+        case 'median':
+            return percentileOfSorted(sorted, 50);
+        case 'min':
+            return sorted[0];
+        case 'max':
+            return sorted[sorted.length - 1];
+        case 'p25':
+            return percentileOfSorted(sorted, 25);
+        case 'p75':
+            return percentileOfSorted(sorted, 75);
+        case 'mean':
+        default:
+            return sorted.reduce((sum, v) => sum + v, 0) / sorted.length;
+    }
 }
 
 /**
- * Calculate aggregation value based on type.
+ * Hour-by-hour statistics across several series, each hour's values sorted once
+ * no matter how many statistics are wanted.
  */
-function calculateAggregationValue(values: number[], aggType: AggregationType): number {
-    switch (aggType) {
-        case 'median':
-            return calculateMedian(values);
-        case 'mean':
-            return calculateMean(values);
-        case 'min':
-            return calculateMin(values);
-        case 'max':
-            return calculateMax(values);
-        case 'p25':
-            return calculatePercentile(values, 25);
-        case 'p75':
-            return calculatePercentile(values, 75);
-        default:
-            return calculateMean(values);
+function computeStatistics(
+    series: Series[],
+    length: number,
+    wanted: ReadonlySet<AggregationType>
+): Map<AggregationType, Series> {
+    const result = new Map<AggregationType, Series>();
+    for (const aggType of wanted) result.set(aggType, new Array(length).fill(null));
+    if (wanted.size === 0) return result;
+
+    const values: number[] = [];
+    for (let i = 0; i < length; i++) {
+        values.length = 0;
+        for (const s of series) {
+            const v = s[i];
+            if (v !== null) values.push(v);
+        }
+        if (values.length === 0) continue;
+        values.sort((a, b) => a - b);
+        for (const aggType of wanted) result.get(aggType)![i] = statisticOf(values, aggType);
     }
+
+    return result;
 }
 
 /**
@@ -294,53 +152,66 @@ function getDefaultAggregationColor(aggType: AggregationType): string {
 }
 
 /**
- * Calculate aggregation series from model data.
+ * Aggregation lines (median, mean, ...) drawn on top of the model lines.
  */
-function calculateAggregationSeries(
-    seriesData: Map<WeatherModel, (number | null)[]>,
+function buildAggregationSeries(
+    statistics: Map<AggregationType, Series>,
     aggregations: AggregationType[],
     aggregationColors: Record<AggregationType, string>,
-    chartType: ChartType,
-    timePoints: number
+    chartType: ChartType
 ): SeriesConfig[] {
-    if (aggregations.length === 0 || seriesData.size < 2) {
-        return [];
-    }
+    return aggregations.map((aggType) => ({
+        id: aggType,
+        name: getAggregationDisplayName(aggType),
+        color: aggregationColors[aggType] ?? getDefaultAggregationColor(aggType),
+        type: chartType,
+        data: statistics.get(aggType)!,
+        lineWidth: 2, // Same width as models, distinguished by opacity
+        opacity: 1,
+        zIndex: 100, // Render on top
+    }));
+}
 
-    const allDataArrays = Array.from(seriesData.values());
-    const configs: SeriesConfig[] = [];
+/**
+ * Band fills between complementary aggregation pairs (min/max, p25/p75).
+ */
+function buildBandSeries(
+    statistics: Map<AggregationType, Series>,
+    showMinMax: boolean,
+    showPercentiles: boolean,
+    aggregationColors: Record<AggregationType, string>
+): SeriesConfig[] {
+    const bands: SeriesConfig[] = [];
 
-    for (const aggType of aggregations) {
-        const aggregatedData: (number | null)[] = [];
-
-        for (let i = 0; i < timePoints; i++) {
-            const valuesAtTime = allDataArrays
-                .map((arr) => arr[i])
-                .filter((v): v is number => v !== null && !isNaN(v));
-
-            if (valuesAtTime.length === 0) {
-                aggregatedData.push(null);
-            } else {
-                aggregatedData.push(calculateAggregationValue(valuesAtTime, aggType));
-            }
-        }
-
-        const color = aggregationColors[aggType] ?? getDefaultAggregationColor(aggType);
-        const name = getAggregationDisplayName(aggType);
-
-        configs.push({
-            id: aggType,
-            name,
-            color,
-            type: chartType,
-            data: aggregatedData,
-            lineWidth: 2, // Same width as models, distinguished by opacity
-            opacity: 1,
-            zIndex: 100, // Render on top
+    if (showMinMax) {
+        const maxData = statistics.get('max')!;
+        bands.push({
+            id: 'band_min_max',
+            name: 'Min-Max Range',
+            color: aggregationColors['max'] ?? getDefaultAggregationColor('max'),
+            type: 'band',
+            data: maxData, // Use max data for y-scale calculation
+            fillOpacity: 0.05,
+            bandData: { upper: maxData, lower: statistics.get('min')! },
+            zIndex: 1, // Render behind lines
         });
     }
 
-    return configs;
+    if (showPercentiles) {
+        const p75Data = statistics.get('p75')!;
+        bands.push({
+            id: 'band_p25_p75',
+            name: '25th-75th Percentile',
+            color: aggregationColors['p75'] ?? getDefaultAggregationColor('p75'),
+            type: 'band',
+            data: p75Data, // Use p75 data for y-scale calculation
+            fillOpacity: 0.05,
+            bandData: { upper: p75Data, lower: statistics.get('p25')! },
+            zIndex: 1, // Render behind lines
+        });
+    }
+
+    return bands;
 }
 
 /**
@@ -354,94 +225,12 @@ function calculateModelOpacity(modelCount: number): number {
 }
 
 /**
- * Build band fill series for aggregation ranges.
- * Creates band fills between complementary aggregation pairs (min/max, p25/p75).
- */
-function buildBandFillSeries(
-    seriesData: Map<WeatherModel, (number | null)[]>,
-    aggregations: AggregationType[],
-    aggregationColors: Record<AggregationType, string>,
-    timePoints: number
-): SeriesConfig[] {
-    if (aggregations.length < 2 || seriesData.size < 2) {
-        return [];
-    }
-
-    const allDataArrays = Array.from(seriesData.values());
-    const configs: SeriesConfig[] = [];
-
-    // Check for band pairs
-    const hasMinMax = aggregations.includes('min') && aggregations.includes('max');
-    const hasPercentiles = aggregations.includes('p25') && aggregations.includes('p75');
-
-    // Helper to calculate aggregation data
-    const calculateAggData = (aggType: AggregationType): (number | null)[] => {
-        const data: (number | null)[] = [];
-        for (let i = 0; i < timePoints; i++) {
-            const valuesAtTime = allDataArrays
-                .map((arr) => arr[i])
-                .filter((v): v is number => v !== null && !isNaN(v));
-            if (valuesAtTime.length === 0) {
-                data.push(null);
-            } else {
-                data.push(calculateAggregationValue(valuesAtTime, aggType));
-            }
-        }
-        return data;
-    };
-
-    // Build min-max band if both are selected
-    if (hasMinMax) {
-        const minData = calculateAggData('min');
-        const maxData = calculateAggData('max');
-        const color = aggregationColors['max'] ?? getDefaultAggregationColor('max');
-
-        configs.push({
-            id: 'band_min_max',
-            name: 'Min-Max Range',
-            color,
-            type: 'band',
-            data: maxData, // Use max data for y-scale calculation
-            fillOpacity: 0.05,
-            bandData: {
-                upper: maxData,
-                lower: minData,
-            },
-            zIndex: 1, // Render behind lines
-        });
-    }
-
-    // Build p25-p75 band if both are selected
-    if (hasPercentiles) {
-        const p25Data = calculateAggData('p25');
-        const p75Data = calculateAggData('p75');
-        const color = aggregationColors['p75'] ?? getDefaultAggregationColor('p75');
-
-        configs.push({
-            id: 'band_p25_p75',
-            name: '25th-75th Percentile',
-            color,
-            type: 'band',
-            data: p75Data, // Use p75 data for y-scale calculation
-            fillOpacity: 0.05,
-            bandData: {
-                upper: p75Data,
-                lower: p25Data,
-            },
-            zIndex: 1, // Render behind lines
-        });
-    }
-
-    return configs;
-}
-
-/**
  * Build series configurations from weather model data.
  * Skips models with no data or empty data arrays.
  * @param hideAggregationMembers - If true and aggregations are present, skip model series entirely
  */
 function buildSeriesConfigs(
-    seriesData: Map<WeatherModel, (number | null)[]>,
+    seriesData: Map<WeatherModel, Series>,
     selectedModels: WeatherModel[],
     chartType: ChartType,
     hasAggregations: boolean,
@@ -490,7 +279,7 @@ function buildSeriesConfigs(
  * This is intentional for weather data where gaps represent missing data,
  * not periods with zero precipitation.
  */
-function calculateAccumulation(values: (number | null)[]): (number | null)[] {
+function calculateAccumulation(values: Series): Series {
     let sum = 0;
     return values.map((v) => {
         if (v === null) return null;
@@ -505,7 +294,7 @@ function calculateAccumulation(values: (number | null)[]): (number | null)[] {
  * Returns multiple series (one per model) with solid lines.
  */
 function buildAccumulationSeries(
-    seriesData: Map<WeatherModel, (number | null)[]>,
+    seriesData: Map<WeatherModel, Series>,
     selectedModels: WeatherModel[]
 ): SeriesConfig[] {
     if (seriesData.size === 0) return [];
@@ -518,15 +307,12 @@ function buildAccumulationSeries(
 
         const modelConfig = getModelConfig(model);
 
-        // Calculate cumulative accumulation for this model
-        const accumulationData = calculateAccumulation(modelData);
-
         accumulationSeries.push({
             id: `accumulation_${model}`,
             name: `${modelConfig.name} (Accum)`,
             color: modelConfig.color,
             type: 'line',
-            data: accumulationData,
+            data: calculateAccumulation(modelData),
             lineWidth: 2,
             opacity: 0.9,
             zIndex: 50, // Above model series but below aggregations
@@ -543,12 +329,12 @@ function buildAccumulationSeries(
  * Shows median across models for each overlay level.
  */
 function buildOverlaySeries(
-    data: Map<WeatherModel, HourlyDataPoint[]>,
+    data: ReadonlyMap<WeatherModel, HourlyDataPoint[]>,
     selectedModels: WeatherModel[],
     baseVariable: string,
+    axis: TimeAxis,
     unitSystem: UnitSystem,
-    chartType: ChartType,
-    timezone?: string
+    chartType: ChartType
 ): SeriesConfig[] {
     const overlayConfig = getOverlayConfig(baseVariable as any);
     if (!overlayConfig) return [];
@@ -557,43 +343,17 @@ function buildOverlaySeries(
 
     for (const overlay of overlayConfig.overlays) {
         const overlayVarConfig = getVariableConfig(overlay.variable);
-
-        // Transform overlay data
-        const { seriesData } = transformToChartData(
-            data,
-            selectedModels,
-            overlay.variable,
-            unitSystem,
-            overlayVarConfig.convertToImperial,
-            timezone
-        );
-
-        // Skip if no data
+        const seriesData = extractSeries(data, selectedModels, overlay.variable, axis, unitSystem, overlayVarConfig.convertToImperial);
         if (seriesData.size === 0) continue;
 
-        // Calculate median across models for this overlay
-        const allDataArrays = Array.from(seriesData.values());
-        const timePoints = allDataArrays[0]?.length ?? 0;
-        const medianData: (number | null)[] = [];
-
-        for (let i = 0; i < timePoints; i++) {
-            const valuesAtTime = allDataArrays
-                .map((arr) => arr[i])
-                .filter((v): v is number => v !== null && !isNaN(v));
-
-            if (valuesAtTime.length === 0) {
-                medianData.push(null);
-            } else {
-                medianData.push(calculateMedian(valuesAtTime));
-            }
-        }
+        const median = computeStatistics(Array.from(seriesData.values()), axis.timestamps.length, new Set(['median']));
 
         series.push({
             id: overlay.variable,
             name: overlay.label,
             color: overlay.color,
             type: chartType,
-            data: medianData,
+            data: median.get('median')!,
             lineWidth: 2,
             opacity: overlay.opacity ?? 0.7,
             zIndex: 60, // Above models, below aggregations
@@ -604,190 +364,54 @@ function buildOverlaySeries(
 }
 
 /**
- * Calculate box-whisker data from model ensemble.
- * Computes min/Q1/median/Q3/max across all models at each time point.
+ * Hour-of-day heatmap: one column per local day, one row per hour, each cell the
+ * median across models.
  */
-function calculateBoxWhiskerData(
-    seriesData: Map<WeatherModel, (number | null)[]>,
-    timePoints: number
-): BoxWhiskerData {
-    const min: (number | null)[] = [];
-    const q1: (number | null)[] = [];
-    const median: (number | null)[] = [];
-    const q3: (number | null)[] = [];
-    const max: (number | null)[] = [];
+function buildHeatmapData(seriesData: Map<WeatherModel, Series>, axis: TimeAxis): HeatmapData {
+    const cells: number[][][] = Array.from({ length: 24 }, () => axis.days.map(() => []));
 
-    const allDataArrays = Array.from(seriesData.values());
-
-    for (let i = 0; i < timePoints; i++) {
-        const valuesAtTime = allDataArrays
-            .map((arr) => arr[i])
-            .filter((v): v is number => v !== null && Number.isFinite(v));
-
-        if (valuesAtTime.length === 0) {
-            min.push(null);
-            q1.push(null);
-            median.push(null);
-            q3.push(null);
-            max.push(null);
-        } else {
-            min.push(calculateMin(valuesAtTime));
-            q1.push(calculatePercentile(valuesAtTime, 25));
-            median.push(calculateMedian(valuesAtTime));
-            q3.push(calculatePercentile(valuesAtTime, 75));
-            max.push(calculateMax(valuesAtTime));
-        }
+    for (const values of seriesData.values()) {
+        values.forEach((value, i) => {
+            if (value !== null) cells[axis.hours[i]][axis.dayIndex[i]].push(value);
+        });
     }
 
-    return { min, q1, median, q3, max };
+    return {
+        hours: Array.from({ length: 24 }, (_, h) => h),
+        dates: axis.days,
+        values: cells.map((row) => row.map((cell) =>
+            cell.length > 0 ? percentileOfSorted(cell.sort((a, b) => a - b), 50) : null
+        )),
+    };
 }
 
 /**
- * Transform time-series data into hour-of-day heatmap format.
- * Groups data by hour (0-23) and date, computing median across models for each cell.
+ * Wind direction for the arrow overlay: the circular mean across models at each
+ * point, which handles the 0°/360° boundary correctly.
  */
-function transformToHeatmap(
-    data: Map<WeatherModel, HourlyDataPoint[]>,
+function buildWindArrowData(
+    data: ReadonlyMap<WeatherModel, HourlyDataPoint[]>,
     selectedModels: WeatherModel[],
-    variable: string,
-    unitSystem: UnitSystem,
-    convertToImperial?: (value: number) => number,
-    timezone?: string
-): HeatmapData {
-    // Get time points from first available model
-    const firstModelData = data.values().next().value as HourlyDataPoint[] | undefined;
-    if (!firstModelData || firstModelData.length === 0) {
-        return { hours: [], dates: [], values: [] };
-    }
-
-    // Group data points by date and hour
-    const dateHourMap = new Map<string, Map<number, number[]>>();
-    const dateOrder: string[] = [];
-
-    for (const point of firstModelData) {
-        const date = new Date(point.time);
-
-        // Apply timezone if provided
-        let dateStr: string;
-        let hour: number;
-
-        if (timezone) {
-            try {
-                const options: Intl.DateTimeFormatOptions = {
-                    timeZone: timezone,
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                };
-                dateStr = date.toLocaleDateString('en-US', options);
-                hour = parseInt(date.toLocaleString('en-US', { timeZone: timezone, hour: 'numeric', hour12: false }));
-            } catch {
-                dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                hour = date.getHours();
-            }
-        } else {
-            dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-            hour = date.getHours();
-        }
-
-        // Track date order
-        if (!dateHourMap.has(dateStr)) {
-            dateHourMap.set(dateStr, new Map());
-            dateOrder.push(dateStr);
-        }
-
-        const hourMap = dateHourMap.get(dateStr)!;
-        if (!hourMap.has(hour)) {
-            hourMap.set(hour, []);
-        }
-
-        // Collect values from all models at this time point
-        for (const model of selectedModels) {
-            const modelData = data.get(model);
-            if (!modelData) continue;
-
-            const idx = firstModelData.indexOf(point);
-            if (idx >= 0 && idx < modelData.length) {
-                const value = modelData[idx][variable];
-                if (typeof value === 'number' && Number.isFinite(value)) {
-                    let finalValue = value;
-                    if (unitSystem === 'imperial' && convertToImperial) {
-                        const converted = convertToImperial(value);
-                        if (Number.isFinite(converted)) {
-                            finalValue = converted;
-                        }
-                    }
-                    hourMap.get(hour)!.push(finalValue);
-                }
-            }
-        }
-    }
-
-    // Build the values matrix [hour][date]
-    const hours = Array.from({ length: 24 }, (_, i) => i);
-    const dates = dateOrder;
-    const values: (number | null)[][] = [];
-
-    for (let h = 0; h < 24; h++) {
-        const hourRow: (number | null)[] = [];
-        for (const dateStr of dates) {
-            const hourMap = dateHourMap.get(dateStr);
-            const cellValues = hourMap?.get(h);
-            if (cellValues && cellValues.length > 0) {
-                hourRow.push(calculateMedian(cellValues));
-            } else {
-                hourRow.push(null);
-            }
-        }
-        values.push(hourRow);
-    }
-
-    return { hours, dates, values };
-}
-
-/**
- * Extract wind direction data for wind arrow overlay.
- * Returns the median direction across all models at each time point.
- */
-function extractWindDirectionData(
-    data: Map<WeatherModel, HourlyDataPoint[]>,
-    selectedModels: WeatherModel[],
-    timePoints: number
+    axis: TimeAxis
 ): WindArrowData {
-    const direction: (number | null)[] = [];
+    const directions = Array.from(extractSeries(data, selectedModels, 'wind_direction_10m', axis, 'metric').values());
 
-    // Get time points from first available model
-    const firstModelData = data.values().next().value as HourlyDataPoint[] | undefined;
-    if (!firstModelData) {
-        return { direction: [] };
-    }
-
-    for (let i = 0; i < timePoints; i++) {
-        const directionsAtTime: number[] = [];
-
-        for (const model of selectedModels) {
-            const modelData = data.get(model);
-            if (!modelData || i >= modelData.length) continue;
-
-            const dir = modelData[i]['wind_direction_10m'];
-            if (typeof dir === 'number' && Number.isFinite(dir)) {
-                directionsAtTime.push(dir);
-            }
+    const direction: Series = axis.timestamps.map((_, i) => {
+        let x = 0;
+        let y = 0;
+        let count = 0;
+        for (const series of directions) {
+            const degrees = series[i];
+            if (degrees === null) continue;
+            const radians = degrees * Math.PI / 180;
+            x += Math.cos(radians);
+            y += Math.sin(radians);
+            count++;
         }
-
-        if (directionsAtTime.length === 0) {
-            direction.push(null);
-        } else {
-            // Use circular mean for wind directions (handles 0°/360° boundary correctly)
-            // Convert to unit vectors, average, then convert back to angle
-            const radians = directionsAtTime.map(d => d * Math.PI / 180);
-            const avgX = radians.reduce((sum, r) => sum + Math.cos(r), 0) / radians.length;
-            const avgY = radians.reduce((sum, r) => sum + Math.sin(r), 0) / radians.length;
-            let circularMean = Math.atan2(avgY, avgX) * 180 / Math.PI;
-            if (circularMean < 0) circularMean += 360; // Normalize to 0-360
-            direction.push(circularMean);
-        }
-    }
+        if (count === 0) return null;
+        const mean = Math.atan2(y / count, x / count) * 180 / Math.PI;
+        return mean < 0 ? mean + 360 : mean; // Normalize to 0-360
+    });
 
     return { direction };
 }
@@ -807,6 +431,7 @@ export function buildWeatherChartConfig(
 
     const {
         data,
+        timeAxis,
         selectedModels,
         selectedAggregations = [],
         aggregationColors = defaultAggregationColors,
@@ -816,13 +441,12 @@ export function buildWeatherChartConfig(
         modelLineOpacity = 'auto',
         variable,
         unitSystem,
-        timezoneInfo,
         isChartLocked,
         location,
     } = props;
 
     // Handle empty data
-    if (!data || data.size === 0) {
+    if (!timeAxis || timeAxis.timestamps.length === 0 || data.size === 0) {
         return null;
     }
 
@@ -831,55 +455,43 @@ export function buildWeatherChartConfig(
 
     // Use chart type override if provided, otherwise use default from config
     const chartType = (settings?.chartTypeOverride ?? variableConfig.chartType) as ChartType;
+    const timePoints = timeAxis.timestamps.length;
 
-    // Transform data with timezone
-    const { timeLabels, tooltipLabels, midnightIndices, seriesData } = transformToChartData(
-        data,
-        selectedModels,
-        variable,
-        unitSystem,
-        variableConfig.convertToImperial,
-        timezoneInfo?.timezone
-    );
-
-    // Handle no data after transformation
-    if (timeLabels.length === 0) {
-        return null;
-    }
+    const seriesData = extractSeries(data, selectedModels, variable, timeAxis, unitSystem, variableConfig.convertToImperial);
+    const allSeriesValues = Array.from(seriesData.values());
+    const multipleModels = seriesData.size > 1;
 
     // Determine if we have aggregations enabled
-    const hasAggregations = selectedAggregations.length > 0 && seriesData.size > 1;
+    const hasAggregations = selectedAggregations.length > 0 && multipleModels;
+    const showMinMax = multipleModels && showMinMaxFill && selectedAggregations.includes('min') && selectedAggregations.includes('max');
+    const showPercentiles = multipleModels && showPercentileFill && selectedAggregations.includes('p25') && selectedAggregations.includes('p75');
+    const showBoxWhisker = chartType === 'boxwhisker' && multipleModels;
+
+    // Every statistic this chart draws, computed in one pass
+    const wantedStatistics = new Set<AggregationType>();
+    if (hasAggregations) selectedAggregations.forEach((a) => wantedStatistics.add(a));
+    if (showMinMax) ['min', 'max'].forEach((a) => wantedStatistics.add(a as AggregationType));
+    if (showPercentiles) ['p25', 'p75'].forEach((a) => wantedStatistics.add(a as AggregationType));
+    if (showBoxWhisker) ['min', 'p25', 'median', 'p75', 'max'].forEach((a) => wantedStatistics.add(a as AggregationType));
+    const statistics = computeStatistics(allSeriesValues, timePoints, wantedStatistics);
 
     // Build model series (with reduced opacity if aggregations enabled, or hidden if hideAggregationMembers)
     const modelSeries = buildSeriesConfigs(seriesData, selectedModels, chartType, hasAggregations, hideAggregationMembers, modelLineOpacity);
-
-    // Build aggregation series
-    const aggregationSeries = calculateAggregationSeries(
-        seriesData,
-        selectedAggregations,
-        aggregationColors,
-        chartType,
-        timeLabels.length
-    );
-
-    // Build band fill series for aggregation ranges (e.g., min-max, p25-p75)
-    // Filter based on user toggle settings
-    const allBandSeries = buildBandFillSeries(
-        seriesData,
-        selectedAggregations,
-        aggregationColors,
-        timeLabels.length
-    );
-    const bandSeries = allBandSeries.filter(band => {
-        if (band.id === 'band_min_max' && !showMinMaxFill) return false;
-        if (band.id === 'band_p25_p75' && !showPercentileFill) return false;
-        return true;
-    });
+    const aggregationSeries = hasAggregations
+        ? buildAggregationSeries(statistics, selectedAggregations, aggregationColors, chartType)
+        : [];
+    const bandSeries = buildBandSeries(statistics, showMinMax, showPercentiles, aggregationColors);
 
     // Build box & whisker series if chart type is boxwhisker
     const boxWhiskerSeriesList: SeriesConfig[] = [];
-    if (chartType === 'boxwhisker' && seriesData.size > 1) {
-        const boxWhiskerData = calculateBoxWhiskerData(seriesData, timeLabels.length);
+    if (showBoxWhisker) {
+        const boxWhiskerData: BoxWhiskerData = {
+            min: statistics.get('min')!,
+            q1: statistics.get('p25')!,
+            median: statistics.get('median')!,
+            q3: statistics.get('p75')!,
+            max: statistics.get('max')!,
+        };
         boxWhiskerSeriesList.push({
             id: 'ensemble_boxwhisker',
             name: 'Ensemble Spread',
@@ -894,14 +506,7 @@ export function buildWeatherChartConfig(
     // Build heatmap series if chart type is heatmap
     const heatmapSeriesList: SeriesConfig[] = [];
     if (chartType === 'heatmap') {
-        const heatmapData = transformToHeatmap(
-            data,
-            selectedModels,
-            variable,
-            unitSystem,
-            variableConfig.convertToImperial,
-            timezoneInfo?.timezone
-        );
+        const heatmapData = buildHeatmapData(seriesData, timeAxis);
         if (heatmapData.dates.length > 0) {
             heatmapSeriesList.push({
                 id: 'heatmap',
@@ -940,14 +545,7 @@ export function buildWeatherChartConfig(
 
     // Add multi-level overlay series if enabled (e.g., wind at different altitudes)
     if (settings?.showOverlays && hasOverlays(variable as any) && chartType !== 'heatmap' && chartType !== 'boxwhisker') {
-        const overlaySeries = buildOverlaySeries(
-            data,
-            selectedModels,
-            variable,
-            unitSystem,
-            chartType,
-            timezoneInfo?.timezone
-        );
+        const overlaySeries = buildOverlaySeries(data, selectedModels, variable, timeAxis, unitSystem, chartType);
         if (overlaySeries.length > 0) {
             allSeries.push(...overlaySeries);
         }
@@ -955,7 +553,7 @@ export function buildWeatherChartConfig(
 
     // Add wind direction arrows for wind speed charts
     if (variable === 'wind_speed_10m' && chartType !== 'heatmap' && chartType !== 'boxwhisker') {
-        const windArrowData = extractWindDirectionData(data, selectedModels, timeLabels.length);
+        const windArrowData = buildWindArrowData(data, selectedModels, timeAxis);
         // Only add if we have direction data
         if (windArrowData.direction.some(d => d !== null)) {
             allSeries.push({
@@ -985,13 +583,15 @@ export function buildWeatherChartConfig(
         }
         : undefined;
 
+    const isHeatmap = chartType === 'heatmap';
+
     // For heatmaps, use dates as x-axis labels; otherwise use time labels
-    const xAxisData = chartType === 'heatmap' && heatmapSeriesList[0]?.heatmapData
+    const xAxisData = isHeatmap && heatmapSeriesList[0]?.heatmapData
         ? heatmapSeriesList[0].heatmapData.dates
-        : timeLabels;
+        : timeAxis.labels;
 
     // For heatmaps, adjust grid to accommodate hour labels on left
-    const gridConfig = chartType === 'heatmap'
+    const gridConfig = isHeatmap
         ? { top: 10, right: 10, bottom: 1, left: 50, containLabel: false }
         : { top: 10, right: 0, bottom: 1, left: 0, containLabel: true };
 
@@ -1011,22 +611,23 @@ export function buildWeatherChartConfig(
         xAxis: {
             type: 'category',
             data: xAxisData,
-            // Pass midnight indices for non-heatmap charts to ensure midnight ticks are always shown
-            midnightIndices: chartType !== 'heatmap' ? midnightIndices : undefined,
+            // Non-heatmap charts tick on local clock hours, with dates at midnight
+            midnightIndices: isHeatmap ? undefined : timeAxis.midnightIndices,
+            hours: isHeatmap ? undefined : timeAxis.hours,
             // Full date+time labels for tooltip display (non-heatmap only)
-            tooltipLabels: chartType !== 'heatmap' ? tooltipLabels : undefined,
+            tooltipLabels: isHeatmap ? undefined : timeAxis.tooltipLabels,
         },
         yAxis: {
             type: 'value',
-            label: chartType === 'heatmap' ? 'Hour of Day' : `${variableConfig.label} (${unit})`,
-            domain: chartType === 'heatmap' ? [0, 23] : variableConfig.yAxisDomain,
-            formatter: (value: number) => chartType === 'heatmap' ? `${Math.round(value)}:00` : `${Math.round(value)}`,
+            label: isHeatmap ? 'Hour of Day' : `${variableConfig.label} (${unit})`,
+            domain: isHeatmap ? [0, 23] : variableConfig.yAxisDomain,
+            formatter: (value: number) => isHeatmap ? `${Math.round(value)}:00` : `${Math.round(value)}`,
         },
         yAxisSecondary,
         series: allSeries,
         grid: gridConfig,
         dataZoom: {
-            enabled: !isChartLocked && chartType !== 'heatmap', // Disable zoom for heatmaps
+            enabled: !isChartLocked && !isHeatmap, // Disable zoom for heatmaps
             type: 'both',
             range: [0, 100],
         },

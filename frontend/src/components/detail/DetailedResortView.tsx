@@ -19,6 +19,7 @@ import {
     isKnownModel,
 } from '../../data/modelHierarchy';
 import { resolveComparisonModels } from '../../utils/comparisonModels';
+import { buildTimeAxis } from '../../utils/timeAxis';
 import type { DetailedResortViewProps, ElevationSelection, CustomLocation } from '../../types/detailView';
 import type { WeatherModel, WeatherVariable, AggregationType } from '../../types/openMeteo';
 import type { UnitSystem, ModelLineOpacity } from '../../types';
@@ -244,6 +245,26 @@ export function DetailedResortView({
         shownModelCount: comparisonModels.length,
     }), [effectiveCoords, dropped, comparisonModels.length]);
 
+    // One time axis for every chart, spanning the Comparison models' forecasts
+    const axisRange = useMemo(() => {
+        let start = Infinity;
+        let end = -Infinity;
+        for (const model of comparisonModels) {
+            const points = data?.get(model);
+            if (!points || points.length === 0) continue;
+            start = Math.min(start, points[0].timestamp);
+            end = Math.max(end, points[points.length - 1].timestamp);
+        }
+        return start <= end ? { start, end } : null;
+    }, [data, comparisonModels]);
+    const axisStart = axisRange?.start;
+    const axisEnd = axisRange?.end;
+    const timezone = timezoneInfo?.timezone;
+    const timeAxis = useMemo(
+        () => (axisStart !== undefined && axisEnd !== undefined ? buildTimeAxis(axisStart, axisEnd, timezone) : null),
+        [axisStart, axisEnd, timezone]
+    );
+
     // During a rate-limit pause, say how many models are still waiting instead of a bare spinner
     const pause = useBudgetPause();
     const pendingModels = Math.max(0, coveringModels.length - (data?.size ?? 0) - unavailableModels.size);
@@ -441,6 +462,7 @@ export function DetailedResortView({
                 <>
                     <DetailChartGrid
                         data={data}
+                        timeAxis={timeAxis}
                         selectedModels={comparisonModels}
                         selectedVariables={selectedVariables}
                         selectedAggregations={selectedAggregations}
@@ -450,7 +472,6 @@ export function DetailedResortView({
                         showPercentileFill={showPercentileFill}
                         modelLineOpacity={modelLineOpacity}
                         unitSystem={unitSystem}
-                        timezoneInfo={timezoneInfo ?? undefined}
                         isChartLocked={isChartLocked}
                         isLoading={loading}
                         onToggleVariable={toggleVariable}

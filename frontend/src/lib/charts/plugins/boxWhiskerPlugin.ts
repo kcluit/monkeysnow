@@ -6,28 +6,24 @@
  */
 
 import type uPlot from 'uplot';
-import type { SeriesConfig } from '../types';
+import type { ChartConfig } from '../types';
 import { colorWithOpacity } from '../utils/colorUtils';
 
 export interface BoxWhiskerPluginOptions {
-    /** Series configurations that include boxWhiskerData */
-    series: SeriesConfig[];
+    /** Latest chart configuration; its box & whisker series are drawn */
+    getConfig: () => ChartConfig;
     /** Box width as fraction of spacing (default: 0.6) */
     boxWidthFactor?: number;
 }
 
 export function createBoxWhiskerPlugin(options: BoxWhiskerPluginOptions): uPlot.Plugin {
-    const boxWhiskerSeries = options.series.filter(
-        (s) => s.type === 'boxwhisker' && s.boxWhiskerData
-    );
-
-    if (boxWhiskerSeries.length === 0) {
-        return { hooks: {} };
-    }
-
+    const { getConfig } = options;
     const boxWidthFactor = options.boxWidthFactor ?? 0.6;
 
     function draw(u: uPlot) {
+        const boxWhiskerSeries = getConfig().series.filter(
+            (s) => s.type === 'boxwhisker' && s.boxWhiskerData
+        );
         const ctx = u.ctx;
         ctx.save();
 

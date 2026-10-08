@@ -30,6 +30,7 @@ const MIN_CHART_HEIGHT = 200;
 
 export function WeatherChart({
     data,
+    timeAxis,
     selectedModels,
     selectedAggregations,
     aggregationColors,
@@ -39,7 +40,6 @@ export function WeatherChart({
     modelLineOpacity,
     variable,
     unitSystem,
-    timezoneInfo,
     isChartLocked,
     isLoading,
     onToggleVisibility,
@@ -103,9 +103,10 @@ export function WeatherChart({
         ? Math.max(MIN_CHART_HEIGHT, viewportHeight - FULLSCREEN_CHROME_PX)
         : chartHeight;
 
-    // Sync zoom exclusion setting to registry
+    // Sync zoom exclusion setting to registry; it outlives the chart being rebuilt, but not this component
     useEffect(() => {
         setChartZoomSyncExclusion(variable, zoomSyncExcluded);
+        return () => setChartZoomSyncExclusion(variable, false);
     }, [variable, zoomSyncExcluded]);
 
     // Settings modal state
@@ -119,6 +120,7 @@ export function WeatherChart({
         return buildWeatherChartConfig(
             {
                 data,
+                timeAxis,
                 selectedModels: providingModels,
                 selectedAggregations,
                 aggregationColors,
@@ -128,7 +130,6 @@ export function WeatherChart({
                 modelLineOpacity,
                 variable,
                 unitSystem,
-                timezoneInfo,
                 isChartLocked,
                 location,
             },
@@ -142,6 +143,7 @@ export function WeatherChart({
         );
     }, [
         data,
+        timeAxis,
         providingModels,
         selectedAggregations,
         aggregationColors,
@@ -151,7 +153,6 @@ export function WeatherChart({
         modelLineOpacity,
         variable,
         unitSystem,
-        timezoneInfo,
         isChartLocked,
         location,
         theme,

@@ -104,6 +104,17 @@ function ResortDetailRoute({
     const location = resortId ? getResortLocation(resortId) : null;
     const displayName = resortId ? getDisplayName(resortId) : '';
 
+    // Stable across App re-renders: every chart rebuilds its config when this object changes
+    const resortLocation = useMemo(() => location && {
+        lat: location.loc[0],
+        lon: location.loc[1],
+        baseElevation: location.bot,
+        midElevation: location.mid,
+        topElevation: location.top,
+    }, [location]);
+
+    const handleBack = useCallback(() => navigate('/'), [navigate]);
+
     usePageMeta({
         title: displayName ? `${displayName} Snow Forecast — monkeysnow` : 'monkeysnow — ski resort snow forecasts',
         description: displayName
@@ -114,22 +125,12 @@ function ResortDetailRoute({
             : 'https://monkeysnow.com/',
     });
 
-    if (!resortId || !location) {
+    if (!resortId || !resortLocation) {
         return <Navigate to="/" replace />;
     }
     if (resortId !== requestedId) {
         return <Navigate to={`/resort/${resortId}`} replace />;
     }
-
-    const resortLocation = {
-        lat: location.loc[0],
-        lon: location.loc[1],
-        baseElevation: location.bot,
-        midElevation: location.mid,
-        topElevation: location.top,
-    };
-
-    const handleBack = () => navigate('/');
 
     return (
         <Suspense fallback={<div className="text-center py-12 text-theme-textSecondary">Loading charts...</div>}>
@@ -167,6 +168,18 @@ function SavedLocationRoute({
         ? savedLocations.find((location) => location.id === savedLocationIdFromKey(locationKey))
         : undefined;
 
+    // Stable across App re-renders: every chart rebuilds its config when this object changes
+    const lat = savedLocation?.lat;
+    const lon = savedLocation?.lon;
+    const elevation = savedLocation?.elevation;
+    const viewLocation = useMemo(() => (
+        lat === undefined || lon === undefined || elevation === undefined
+            ? null
+            : { lat, lon, baseElevation: elevation, midElevation: elevation, topElevation: elevation }
+    ), [lat, lon, elevation]);
+
+    const handleBack = useCallback(() => navigate('/'), [navigate]);
+
     usePageMeta({
         title: savedLocation ? `${savedLocation.name} Snow Forecast — monkeysnow` : 'monkeysnow — ski resort snow forecasts',
         description: 'Real-time snow forecasts for ski resorts worldwide.',
@@ -174,11 +187,9 @@ function SavedLocationRoute({
     });
 
     // Another browser, or deleted
-    if (!savedLocation) {
+    if (!savedLocation || !viewLocation) {
         return <Navigate to="/" replace />;
     }
-
-    const { lat, lon, elevation } = savedLocation;
 
     return (
         <Suspense fallback={<div className="text-center py-12 text-theme-textSecondary">Loading charts...</div>}>
@@ -186,13 +197,13 @@ function SavedLocationRoute({
                 key={savedLocation.id}
                 resortId={savedLocation.id}
                 resortName={savedLocation.name}
-                location={{ lat, lon, baseElevation: elevation, midElevation: elevation, topElevation: elevation }}
+                location={viewLocation}
                 savedLocation={savedLocation}
                 unitSystem={unitSystem}
                 showUtilityBar={showUtilityBar}
                 utilityBarStyle={utilityBarStyle}
                 modelLineOpacity={modelLineOpacity}
-                onBack={() => navigate('/')}
+                onBack={handleBack}
                 onSaveLocation={onSaveLocation}
                 onDeleteSavedLocation={onDeleteSavedLocation}
                 selectionWasFull={Boolean((state as { selectionWasFull?: boolean } | null)?.selectionWasFull)}

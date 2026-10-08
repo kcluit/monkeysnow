@@ -7,11 +7,11 @@
  */
 
 import type uPlot from 'uplot';
-import type { SeriesConfig } from '../types';
+import type { ChartConfig } from '../types';
 
 export interface WindArrowPluginOptions {
-    /** Series configuration with windArrowData */
-    series: SeriesConfig;
+    /** Latest chart configuration; arrows come from its series with windArrowData */
+    getConfig: () => ChartConfig;
     /** Arrow size in pixels (default: 14) */
     arrowSize?: number;
     /** Spacing between arrows in data points (default: 6) */
@@ -19,14 +19,11 @@ export interface WindArrowPluginOptions {
 }
 
 export function createWindArrowPlugin(options: WindArrowPluginOptions): uPlot.Plugin {
-    const { series, arrowSize = 14, spacing = 6 } = options;
-
-    if (!series.windArrowData) {
-        return { hooks: {} };
-    }
+    const { getConfig, arrowSize = 14, spacing = 6 } = options;
 
     function draw(u: uPlot) {
-        if (!series.windArrowData) return;
+        const series = getConfig().series.find((s) => s.windArrowData);
+        if (!series?.windArrowData) return;
 
         const ctx = u.ctx;
         ctx.save();

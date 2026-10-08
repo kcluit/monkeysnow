@@ -114,8 +114,6 @@ export function getOrCreateChart(container: HTMLElement, chartKey?: string): Cha
     const manager = new ChartManager(container, chartId);
     charts.set(chartId, manager);
 
-    console.log(`[chartRegistry] Created chart ${chartId}`);
-
     return manager;
 }
 
@@ -140,6 +138,8 @@ export function updateChart(container: HTMLElement, config: ChartConfig): void {
 
 /**
  * Destroy a chart and remove it from the registry.
+ * Its zoom sync exclusion stays: that is the visitor's setting for the chart key,
+ * which a chart rebuilt for the same key (e.g. after a refetch) must keep.
  */
 export function destroyChart(container: HTMLElement): void {
     const chartId = container.dataset.chartId;
@@ -149,8 +149,6 @@ export function destroyChart(container: HTMLElement): void {
     if (manager) {
         manager.destroy();
         charts.delete(chartId);
-        chartSyncExclusions.delete(chartId); // Clean up exclusion state
-        console.log(`[chartRegistry] Destroyed chart ${chartId}`);
     }
 
     delete container.dataset.chartId;
