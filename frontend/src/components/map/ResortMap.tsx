@@ -81,28 +81,75 @@ export function ResortMap({
     isLoadingElevation,
 }: ResortMapProps): JSX.Element {
     const hasCustomLocation = customLocation !== null && customLocation !== undefined;
-    const [isExpanded, setIsExpanded] = useState(false);
+    const [size, setSize] = useState<MapSize>('small');
+    const isFullscreen = size === 'fullscreen';
 
     const toggleExpanded = useCallback(() => {
-        setIsExpanded(prev => !prev);
+        setSize(prev => (prev === 'small' ? 'expanded' : 'small'));
     }, []);
 
+    const enterFullscreen = useCallback(() => {
+        // Keep React Router's state on the entry so its history index stays consistent
+        window.history.pushState({ ...window.history.state, [FULLSCREEN_HISTORY_KEY]: true }, '');
+        setSize('fullscreen');
+    }, []);
+
+    const exitFullscreen = useCallback(() => {
+        setSize('expanded');
+        // Drop the entry pushed on entering, so the next Back leaves the page as normal
+        if (window.history.state?.[FULLSCREEN_HISTORY_KEY]) {
+            window.history.back();
+        }
+    }, []);
+
+    // While fullscreen: Back and Esc close the map, and the page behind it can't scroll
+    useEffect(() => {
+        if (!isFullscreen) return;
+
+        const handlePopState = () => setSize('expanded');
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') exitFullscreen();
+        };
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        window.addEventListener('popstate', handlePopState);
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.body.style.overflow = previousOverflow;
+            window.removeEventListener('popstate', handlePopState);
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isFullscreen, exitFullscreen]);
+
     return (
-        <div className={`relative resort-map-container ${isExpanded ? 'resort-map-expanded' : ''}`}>
+        // The outer box keeps the map's place in the page while the frame inside it goes fullscreen
+        <div className={`resort-map-container ${size === 'small' ? '' : 'resort-map-expanded'}`}>
+            <div className={`resort-map-frame ${isFullscreen ? 'resort-map-fullscreen' : ''}`}>
             <MapContainer
                 center={[lat, lon]}
                 zoom={11}
+                maxZoom={17}
                 scrollWheelZoom={true}
                 className={`h-full rounded-xl shadow-lg ${className}`}
                 style={{ zIndex: 0 }}
             >
+                {/* Topo base map. OpenSkiMap looks better, but its terms forbid other sites using its tiles. */}
                 <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, SRTM | &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+                    url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
+                    maxZoom={17}
                 />
 
-                {/* Resize handler to invalidate map on expand/collapse */}
-                <MapResizeHandler isExpanded={isExpanded} />
+                {/* Ski runs (coloured by difficulty) and lifts, drawn over the base map */}
+                <TileLayer
+                    attribution='&copy; <a href="https://www.opensnowmap.org">OpenSnowMap</a> (<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>)'
+                    url="https://tiles.opensnowmap.org/pistes/{z}/{x}/{y}.png"
+                    minZoom={9}
+                    maxZoom={18}
+                />
+
+                {/* Resize handler to invalidate map on expand/collapse and fullscreen */}
+                <MapResizeHandler />
 
                 {/* Click handler */}
                 {onMapClick && <MapClickHandler onClick={onMapClick} />}
