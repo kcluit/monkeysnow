@@ -24,7 +24,7 @@ import { useLocalStorage } from './hooks/useLocalStorage';
 import { useResortFiltering } from './hooks/useResortFiltering';
 import { useTheme } from './hooks/useTheme';
 import { useFont } from './hooks/useFont';
-import { useFullscreen } from './hooks/useFullscreen';
+import { useFullscreen, isFullscreenSupported } from './hooks/useFullscreen';
 import { useFPSCounter } from './hooks/useFPSCounter';
 import { useCommandPalette } from './hooks/useCommandPalette';
 import { useRainbowText } from './hooks/useRainbowText';
@@ -537,7 +537,8 @@ function App(): JSX.Element {
             setModelLineOpacity,
         });
 
-        return [...baseCommands, ...controlCommands];
+        // No Fullscreen command where the page can't go fullscreen (iPhone)
+        return [...baseCommands.filter((command) => command.id !== 'fullscreen' || isFullscreenSupported), ...controlCommands];
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, commandDeps);
 

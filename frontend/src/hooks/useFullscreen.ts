@@ -1,5 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
 
+/** False where the page can't go fullscreen, as on iPhone Safari, which only offers it for videos */
+export const isFullscreenSupported = Boolean(document.fullscreenEnabled);
+
 export interface UseFullscreenReturn {
   isFullscreen: boolean;
   toggleFullscreen: () => void;

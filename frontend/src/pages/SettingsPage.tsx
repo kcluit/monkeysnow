@@ -1,5 +1,6 @@
 import { Icon } from '../components/Icon';
 import { icons } from '../constants/icons';
+import { isFullscreenSupported } from '../hooks/useFullscreen';
 import type { Theme } from '../types/themes';
 import type { Font } from '../types/fonts';
 import type { Language } from '../types/i18n';
@@ -281,12 +282,15 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                             onToggle={setShowDateEnabled}
                             icon={icons.date}
                         />
-                        <Toggle
-                            label="Fullscreen"
-                            isEnabled={isFullscreen}
-                            onToggle={(enabled) => enabled ? enterFullscreen() : exitFullscreen()}
-                            icon={icons.fullscreen}
-                        />
+                        {/* Not offered where the page can't go fullscreen (iPhone) */}
+                        {isFullscreenSupported && (
+                            <Toggle
+                                label="Fullscreen"
+                                isEnabled={isFullscreen}
+                                onToggle={(enabled) => enabled ? enterFullscreen() : exitFullscreen()}
+                                icon={icons.fullscreen}
+                            />
+                        )}
                     </div>
                 </SettingSection>
 
