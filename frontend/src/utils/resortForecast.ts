@@ -2,8 +2,9 @@
  * Fetches Resort forecasts from Open-Meteo and shapes them into ResortData:
  * three Elevation bands, each split into AM/PM/NIGHT periods with snow estimates.
  *
- * Ported from the old Express backend so forecasts keep exactly the shape (and
- * numbers) the backend used to serve.
+ * Ported from the old Express backend so forecasts keep exactly the shape and
+ * numbers the backend used to serve. The one exception is freezing level in
+ * GFS regions; see MODELS_WITH_FREEZING_LEVEL.
  */
 
 import { RESORT_LOCATIONS } from '../data/resortLocations';
