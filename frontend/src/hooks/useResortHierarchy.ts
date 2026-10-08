@@ -184,8 +184,8 @@ export function useResortHierarchy({
   }, [currentNodes]);
 
   // Open/close modal
-  const openModal = useCallback((initialDraft?: string[]) => {
-    setDraft(initialDraft ?? selectedResorts);
+  const openModal = useCallback(() => {
+    setDraft(selectedResorts);
     setCapNotice(null);
     setIsOpen(true);
     setNavigationStack([]);
