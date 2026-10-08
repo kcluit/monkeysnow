@@ -110,6 +110,7 @@ export interface DetailUtilityBarProps {
     onResetCustomLocation: () => void;
     isLoadingElevation: boolean;
     utilityBarStyle: UtilityBarStyle;
+    modelAvailability: ModelAvailabilityContext;
 }
 
 export interface DetailChartGridProps {
