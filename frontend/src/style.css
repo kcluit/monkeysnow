@@ -481,7 +481,12 @@ input[type="checkbox"] {
     align-items: flex-start;
     justify-content: center;
     padding-top: 8vh;
+    /* dvh: the part of the screen the phone's browser bars leave visible */
+    padding-top: 8dvh;
     background: rgba(0, 0, 0, 0.6);
+    /* A modal taller than a landscape phone screen scrolls, so its buttons stay reachable */
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
 .command-palette {
@@ -1724,6 +1729,7 @@ input[type="checkbox"] {
         max-width: 95vw;
         width: 95vw;
         max-height: 90vh;
+        max-height: 90dvh;
     }
 
     .resort-grid-columns {
@@ -2113,6 +2119,7 @@ input[type="checkbox"] {
         max-width: 95vw;
         width: 95vw;
         max-height: 90vh;
+        max-height: 90dvh;
     }
 
     .model-grid-columns {
@@ -2396,6 +2403,7 @@ input[type="checkbox"] {
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4);
     overflow: hidden;
     max-height: 80vh;
+    max-height: 80dvh;
     display: flex;
     flex-direction: column;
 }
