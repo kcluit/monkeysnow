@@ -1552,6 +1552,30 @@ input[type="checkbox"] {
     margin-left: 4px;
 }
 
+/* Preferred model that isn't drawn at the current point (outside Coverage, no data, Clone) */
+.model-grid-item-unavailable {
+    opacity: 0.45;
+}
+
+.model-availability-note {
+    font-size: 9px;
+    color: var(--textTertiary, #6e6e73);
+    margin-left: 6px;
+    white-space: nowrap;
+}
+
+.model-tag {
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--textSecondary, #a1a1a6);
+    border: 1px solid var(--textTertiary, #6e6e73);
+    border-radius: 3px;
+    padding: 0 3px;
+    margin-left: 4px;
+}
+
 /* Shared styles */
 .resort-grid-toggle {
     display: flex;
