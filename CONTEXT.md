@@ -18,6 +18,10 @@ _Avoid_: location, mountain, spot
 An administrative area inside a country, such as a state, province, canton or prefecture, used to group **Resorts** for picking. Only countries with many **Resorts** are split into Regions.
 _Avoid_: province, state (as the general term)
 
+**Notable resort**:
+A **Resort** big enough, by vertical or lift count, to be the one a first-time visitor is shown.
+_Avoid_: major resort, featured resort, popular resort
+
 **Elevation band**:
 One of a **Resort**'s three forecast heights: base (`bot`), mid or top.
 _Avoid_: level, elevation (when meaning the band rather than a height in metres)
