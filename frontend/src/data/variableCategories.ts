@@ -18,6 +18,25 @@ export const VARIABLE_CATEGORIES: VariableCategory[] = [
     variables: ['precipitation', 'precipitation_probability', 'rain', 'showers', 'snowfall', 'snow_depth'],
   },
   {
+    id: 'snow',
+    name: 'Snow',
+    variables: ['snowfall_height', 'snowfall_water_equivalent', 'snow_depth_water_equivalent', 'snow_density'],
+  },
+  {
+    id: 'hazards',
+    name: 'Precip Type & Hazards',
+    variables: [
+      'precipitation_type',
+      'hail',
+      'lightning_potential',
+      'thunderstorm_probability',
+      'snowfall_probability',
+      'freezing_rain_probability',
+      'ice_pellets_probability',
+      'rain_probability',
+    ],
+  },
+  {
     id: 'wind',
     name: 'Wind',
     variables: ['wind_speed_10m', 'wind_gusts_10m', 'wind_direction_10m'],
