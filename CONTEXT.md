@@ -36,6 +36,10 @@ _Avoid_: pin, spot, point, location (on its own)
 The set of **Resorts** a visitor has chosen to see on the main page.
 _Avoid_: favourites, watchlist
 
+**Starter resort**:
+The one **Resort** a first-time visitor's **Selection** begins with. It is the **Resort** whose page they arrived on, otherwise the one nearest to where they appear to be, otherwise a random one. From then on it is an ordinary member of the **Selection**.
+_Avoid_: default resort, home resort, local resort
+
 **Selection cap**:
 The most **Resorts** a **Selection** may contain.
 _Avoid_: resort limit, max resorts
