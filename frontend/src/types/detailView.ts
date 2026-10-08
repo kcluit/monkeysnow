@@ -1,6 +1,15 @@
 import type { WeatherModel, WeatherVariable, TimezoneInfo, AggregationType } from './openMeteo';
 import type { UnitSystem } from '../utils/unitConversion';
 import type { UtilityBarStyle, ModelLineOpacity } from './index';
+import type { DroppedModel } from '../utils/comparisonModels';
+
+/** Where the detail view is forecasting, and which fetched models were dropped there */
+export interface ModelAvailabilityContext {
+    point: { lat: number; lon: number };
+    droppedModels: ReadonlyMap<WeatherModel, DroppedModel>;
+    /** How many Comparison models are drawn at this point */
+    shownModelCount: number;
+}
 
 // Elevation selection can be a preset type or a custom number
 export type ElevationSelection = 'base' | 'mid' | 'top' | number;
@@ -101,6 +110,7 @@ export interface DetailUtilityBarProps {
     onResetCustomLocation: () => void;
     isLoadingElevation: boolean;
     utilityBarStyle: UtilityBarStyle;
+    modelAvailability: ModelAvailabilityContext;
 }
 
 export interface DetailChartGridProps {
@@ -116,6 +126,7 @@ export interface DetailChartGridProps {
     unitSystem: UnitSystem;
     timezoneInfo?: TimezoneInfo;
     isChartLocked?: boolean;
+    isLoading?: boolean;
     onToggleVariable?: (variable: WeatherVariable) => void;
     /** Location elevations for freezing level chart reference lines */
     location?: {
@@ -138,6 +149,8 @@ export interface WeatherChartProps {
     unitSystem: UnitSystem;
     timezoneInfo?: TimezoneInfo;
     isChartLocked?: boolean;
+    /** Whether more models may still arrive (so an empty chart isn't final yet) */
+    isLoading?: boolean;
     onToggleVisibility?: () => void;
     /** Location elevations for freezing level chart reference lines */
     location?: {

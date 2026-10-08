@@ -995,9 +995,10 @@ export function buildWeatherChartConfig(
         ? { top: 10, right: 10, bottom: 1, left: 50, containLabel: false }
         : { top: 10, right: 0, bottom: 1, left: 0, containLabel: true };
 
-    // Build elevation lines config for freezing level chart
+    // Build elevation lines config for the freezing level and snowfall height charts
     const M_TO_FT = 3.28084;
-    const elevationLines = variable === 'freezing_level_height' && location ? {
+    const showsElevationLines = variable === 'freezing_level_height' || variable === 'snowfall_height';
+    const elevationLines = showsElevationLines && location ? {
         base: unitSystem === 'imperial' ? location.baseElevation * M_TO_FT : location.baseElevation,
         mid: unitSystem === 'imperial' ? location.midElevation * M_TO_FT : location.midElevation,
         top: unitSystem === 'imperial' ? location.topElevation * M_TO_FT : location.topElevation,

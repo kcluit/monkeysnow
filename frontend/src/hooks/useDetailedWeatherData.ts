@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { fetchOpenMeteoData } from '../utils/openMeteoClient';
+import { isTransientError } from '../utils/openMeteoBudget';
 import type { WeatherModel, WeatherVariable, HourlyDataPoint, TimezoneInfo } from '../types/openMeteo';
 
 export interface UseDetailedWeatherDataProps {
@@ -14,6 +15,8 @@ export interface UseDetailedWeatherDataProps {
 
 export interface UseDetailedWeatherDataReturn {
     data: Map<WeatherModel, HourlyDataPoint[]> | null;
+    /** Models Open-Meteo refused for this point, e.g. "No data is available for this location" */
+    unavailableModels: ReadonlySet<WeatherModel>;
     timezoneInfo: TimezoneInfo | null;
     loading: boolean;
     error: Error | null;
@@ -34,6 +37,7 @@ export function useDetailedWeatherData({
     enabled = true,
 }: UseDetailedWeatherDataProps): UseDetailedWeatherDataReturn {
     const [data, setData] = useState<Map<WeatherModel, HourlyDataPoint[]> | null>(null);
+    const [unavailableModels, setUnavailableModels] = useState<ReadonlySet<WeatherModel>>(new Set());
     const [timezoneInfo, setTimezoneInfo] = useState<TimezoneInfo | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
@@ -60,6 +64,7 @@ export function useDetailedWeatherData({
 
         if (models.length === 0 || variables.length === 0) {
             setData(null);
+            setUnavailableModels(new Set());
             setTimezoneInfo(null);
             setLoading(false);
             setError(null);
@@ -73,10 +78,13 @@ export function useDetailedWeatherData({
         prevParamsRef.current = paramsKey;
 
         let cancelled = false;
+        // Aborting drops requests still waiting on the Fetch budget (e.g. through a rate-limit pause)
+        const controller = new AbortController();
         let timezoneSet = false; // Track if timezone has been captured
 
         // Initialize with empty map
         setData(new Map());
+        setUnavailableModels(new Set());
         setTimezoneInfo(null); // Reset timezone on new fetch
         setLoading(true);
         setError(null);
@@ -92,7 +100,9 @@ export function useDetailedWeatherData({
                         elevation,
                         [model], // Fetch just this model
                         variables,
-                        forecastDays
+                        forecastDays,
+                        'auto',
+                        controller.signal
                     );
 
                     if (!cancelled) {
@@ -115,6 +125,14 @@ export function useDetailedWeatherData({
                     return;
                 } catch (err) {
                     if (cancelled) return;
+
+                    // Bad requests (e.g. a regional model with no data here) won't succeed on retry,
+                    // and each retry spends the user's Open-Meteo quota
+                    if (!isTransientError(err)) {
+                        console.warn(`Model ${model} unavailable:`, err instanceof Error ? err.message : err);
+                        setUnavailableModels(prev => new Set(prev).add(model));
+                        return;
+                    }
 
                     console.error(`Failed to fetch model ${model}, retrying in ${retryDelay}ms...`, err);
 
@@ -141,6 +159,7 @@ export function useDetailedWeatherData({
 
         return () => {
             cancelled = true;
+            controller.abort();
             // Reset prevParamsRef so re-mount triggers fresh fetch (fixes React StrictMode double-invoke)
             prevParamsRef.current = '';
         };
@@ -152,6 +171,7 @@ export function useDetailedWeatherData({
 
     return {
         data,
+        unavailableModels,
         timezoneInfo,
         loading,
         error,

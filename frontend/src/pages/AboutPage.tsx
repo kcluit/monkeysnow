@@ -207,6 +207,45 @@ export function AboutPage(): JSX.Element {
                     </a>
                 </p>
                 <p>
+                    Ski resort data from{' '}
+                    <a
+                        href="https://openskidata.org/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="about-link"
+                    >
+                        OpenSkiData
+                    </a>
+                    {' '}/ OpenSkiMap.org, ©{' '}
+                    <a
+                        href="https://www.openstreetmap.org/copyright"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="about-link"
+                    >
+                        OpenStreetMap contributors
+                    </a>
+                    {' '}(ODbL), Skimap.org, Who's On First, © Mapterhorn. Our{' '}
+                    <a
+                        href="https://github.com/kcluit/monkeysnow/tree/main/frontend/src/data/resorts"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="about-link"
+                    >
+                        resort list
+                    </a>
+                    {' '}is available under the{' '}
+                    <a
+                        href="https://opendatacommons.org/licenses/odbl/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="about-link"
+                    >
+                        ODbL
+                    </a>
+                    .
+                </p>
+                <p>
                     Icons by{' '}
                     <a
                         href="https://fontawesome.com/"

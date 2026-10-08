@@ -8,8 +8,10 @@
 import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
 import { useHierarchy, type HierarchyNode } from '../../contexts/HierarchyContext';
 import { MAX_SELECTED_RESORTS, type UseResortHierarchyReturn } from '../../hooks/useResortHierarchy';
+import { CapNotice } from './CapNotice';
 import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
+import { nodeMatchesSearch } from '../../hooks/useHierarchyData';
 
 interface ResortSelectionGridModalProps {
   hierarchy: UseResortHierarchyReturn;
@@ -45,7 +47,7 @@ function filterHierarchy(nodes: HierarchyNode[], searchTerm: string): HierarchyN
   function filterNode(node: HierarchyNode): HierarchyNode | null {
     // If this is a resort, check if it matches
     if (node.type === 'resort') {
-      return node.name.toLowerCase().includes(query) ? node : null;
+      return nodeMatchesSearch(node, query) ? node : null;
     }
 
     // For non-resort nodes, filter children
@@ -373,11 +375,12 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
     getResortsUnderNode,
     searchTerm,
     setSearchTerm,
+    capNotice,
   } = hierarchy;
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Get hierarchy tree from context (fetched from backend)
+  // Get hierarchy tree from context
   const { hierarchyTree } = useHierarchy();
 
   // Memoize all node IDs for performance
@@ -517,6 +520,7 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
           <span className="command-hint">
             <kbd>esc</kbd> close
           </span>
+          <CapNotice notice={capNotice} />
           {selectedResorts.length > 0 && (
             <button
               className="resort-grid-clear-btn"

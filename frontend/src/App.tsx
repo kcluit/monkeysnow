@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from 'react';
-import { Routes, Route, Navigate, useNavigate, useParams, Link } from 'react-router-dom';
+import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
+import { Routes, Route, Navigate, useNavigate, useParams, useLocation, Link } from 'react-router-dom';
 import { Header } from './components/Header';
 import { PageMeta } from './components/PageMeta';
 import { usePageMeta } from './hooks/usePageMeta';
@@ -30,7 +30,10 @@ import { useRainbowText } from './hooks/useRainbowText';
 import { useHideIcons } from './hooks/useHideIcons';
 import { useHideBorders } from './hooks/useHideBorders';
 import { useShowDate } from './hooks/useShowDate';
-import { useResortHierarchy } from './hooks/useResortHierarchy';
+import { useResortHierarchy, MAX_SELECTED_RESORTS } from './hooks/useResortHierarchy';
+import { FetchStatus } from './components/FetchStatus';
+import { useBudgetPause } from './hooks/useBudgetPause';
+import { interpolate } from './locales';
 import { useUnitSystem } from './hooks/useUnitSystem';
 import { useIsMobile } from './hooks/useIsMobile';
 import { useLanguage } from './hooks/useLanguage';
@@ -42,6 +45,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { setGlobalZoomSync } from './lib/charts/chartRegistry';
 import { getSortDayData } from './utils/sortDayHelpers';
 import { getResortLocation } from './utils/openMeteoClient';
+import { resolveResortId } from './data/resortLocations';
+import { pickStarterResort } from './utils/starterResort';
 import {
     defaultSelectedResorts,
     defaultElevation,
@@ -78,9 +83,11 @@ function ResortDetailRoute({
     modelLineOpacity: ModelLineOpacity;
     getDisplayName: (id: string) => string;
 }): JSX.Element | null {
-    const { resortId } = useParams<{ resortId: string }>();
+    const { resortId: requestedId } = useParams<{ resortId: string }>();
     const navigate = useNavigate();
 
+    // Earlier slugs and pre-OpenSkiData IDs (e.g. /resort/Big-White) redirect to the current slug
+    const resortId = requestedId ? resolveResortId(requestedId) : null;
     const location = resortId ? getResortLocation(resortId) : null;
     const displayName = resortId ? getDisplayName(resortId) : '';
 
@@ -96,6 +103,9 @@ function ResortDetailRoute({
 
     if (!resortId || !location) {
         return <Navigate to="/" replace />;
+    }
+    if (resortId !== requestedId) {
+        return <Navigate to={`/resort/${resortId}`} replace />;
     }
 
     const resortLocation = {
@@ -139,17 +149,35 @@ function App(): JSX.Element {
     const { t, language, setLanguage, availableLanguages } = useLanguage();
     const isMobile = useIsMobile();
 
-    // Hierarchy data from backend (resort list, display names)
-    const { skiResorts, getDisplayName, loading: hierarchyLoading, error: hierarchyError } = useHierarchy();
-
-    // Weather data hook
-    const { allWeatherData, loading: weatherLoading, error: weatherError, fetchResorts, createLoadingController, cancelLoading } = useWeatherData();
-
-    // Only block UI if NO cached data at all
-    const loading = (!allWeatherData && weatherLoading) || (!allWeatherData && hierarchyLoading);
+    // Hierarchy data bundled with the app (resort list, display names)
+    const { skiResorts, getDisplayName, loading: hierarchyLoading } = useHierarchy();
 
     // Local storage state
     const [selectedResorts, setSelectedResorts] = useLocalStorage<string[]>('selectedResorts', defaultSelectedResorts);
+
+    // First visit: start the Selection with the Starter resort
+    const [hasInitialized, setHasInitialized] = useLocalStorage<boolean>('hasInitializedResorts', false);
+    const [landingPath] = useState(useLocation().pathname);
+
+    useEffect(() => {
+        if (hasInitialized) return;
+        const controller = new AbortController();
+        pickStarterResort(landingPath, controller.signal).then((resortId) => {
+            if (controller.signal.aborted) return;
+            setSelectedResorts([resortId]);
+            setHasInitialized(true);
+        });
+        return () => controller.abort();
+    }, [hasInitialized, landingPath, setSelectedResorts, setHasInitialized]);
+
+    // Weather data hook — keeps the selection's forecasts loaded within the Fetch budget
+    const { allWeatherData, loading: weatherLoading, error: weatherError, queuedCount, queuedCalls, createLoadingController, cancelLoading } = useWeatherData(selectedResorts);
+
+    // Block UI while the Starter resort is picked, and if there is NO cached data at all,
+    // but not through a rate-limit pause (that can last until tomorrow; the home page
+    // explains it in its status row)
+    const fetchPause = useBudgetPause();
+    const loading = !hasInitialized || (!fetchPause && ((!allWeatherData && weatherLoading) || (!allWeatherData && hierarchyLoading)));
     const [selectedElevation, setSelectedElevation] = useLocalStorage<ElevationLevel>('selectedElevation', defaultElevation);
     const [selectedSort, setSelectedSort] = useLocalStorage<SortOption>('selectedSort', defaultSort);
     const [selectedSortDay, setSelectedSortDay] = useLocalStorage<SortDay>('selectedSortDay', defaultSortDay);
@@ -173,31 +201,11 @@ function App(): JSX.Element {
     }, [chartZoomSyncEnabled]);
     const [resortData, setResortData] = useState<Map<string, ProcessedResortData>>(new Map());
 
-    // First-visit initialization: pick a random resort when hierarchy loads
-    const [hasInitialized, setHasInitialized] = useLocalStorage<boolean>('hasInitializedResorts', false);
-
-    useEffect(() => {
-        if (!hierarchyLoading && skiResorts.length > 0 && !hasInitialized) {
-            const randomIndex = Math.floor(Math.random() * skiResorts.length);
-            setSelectedResorts([skiResorts[randomIndex]]);
-            setHasInitialized(true);
-        }
-    }, [hierarchyLoading, skiResorts, hasInitialized, setSelectedResorts, setHasInitialized]);
-
-    // Initial page load fetch — fetch selected resorts once on mount
-    const initialFetchDone = useRef(false);
-    useEffect(() => {
-        if (!initialFetchDone.current && selectedResorts.length > 0) {
-            initialFetchDone.current = true;
-            fetchResorts(selectedResorts);
-        }
-    }, [selectedResorts, fetchResorts]);
-
     // Banner dismissal state
     const [bannerDismissed, setBannerDismissed] = useLocalStorage<boolean>('bannerDismissed', false);
 
-    // Track whether the resort modal has ever been opened (for first-visit empty draft)
-    const [hasOpenedResortModal, setHasOpenedResortModal] = useLocalStorage<boolean>('hasOpenedResortModal', false);
+    // Set by main.tsx when a selection saved under the old cap was trimmed
+    const [selectionTrimmed, setSelectionTrimmed] = useLocalStorage<boolean>('selectionTrimmed', false);
 
     // Resort hierarchy hook for modal
     const resortHierarchy = useResortHierarchy({
@@ -205,25 +213,11 @@ function App(): JSX.Element {
         onResortsChange: setSelectedResorts,
     });
 
-    // Fetch fresh weather data when resort selection modal closes
-    const prevModalOpen = useRef(false);
-    useEffect(() => {
-        if (prevModalOpen.current && !resortHierarchy.isOpen) {
-            fetchResorts(selectedResorts);
-        }
-        prevModalOpen.current = resortHierarchy.isOpen;
-    }, [resortHierarchy.isOpen, selectedResorts, fetchResorts]);
-
-    // Open resort modal, auto-dismiss the banner, and handle first-visit empty draft
+    // Open resort modal and auto-dismiss the banner
     const openResortModalAndDismissBanner = useCallback(() => {
-        if (!hasOpenedResortModal) {
-            resortHierarchy.openModal([]);
-            setHasOpenedResortModal(true);
-        } else {
-            resortHierarchy.openModal();
-        }
+        resortHierarchy.openModal();
         setBannerDismissed(true);
-    }, [resortHierarchy.openModal, setBannerDismissed, hasOpenedResortModal, setHasOpenedResortModal]);
+    }, [resortHierarchy.openModal, setBannerDismissed]);
 
     useEffect(() => {
         new Konami("https://monkeytype.com/");
@@ -673,8 +667,8 @@ function App(): JSX.Element {
 
     const isTruncated = effectiveDisplayLimit > 0 && selectedResorts.length > effectiveDisplayLimit;
 
-    // Backend unreachable and nothing cached — error state
-    if (!allWeatherData && (weatherError || hierarchyError)) {
+    // Forecasts failed to load and nothing cached — error state
+    if (!allWeatherData && weatherError) {
         return (
             <div className="min-h-screen p-4 sm:p-6 md:p-8 flex items-center justify-center bg-theme-background transition-colors duration-300 overflow-x-hidden">
                 <div className="text-center">
@@ -691,6 +685,7 @@ function App(): JSX.Element {
             <div className="min-h-screen p-4 sm:p-6 md:p-8 flex items-center justify-center bg-theme-background transition-colors duration-300 overflow-x-hidden">
                 <div className="text-center">
                     <div className="text-xl font-semibold text-theme-textSecondary">{t('loading.weatherData')}</div>
+                    <FetchStatus count={queuedCount} calls={queuedCalls} things="resorts" className="mt-2 text-sm text-theme-textSecondary" />
                 </div>
             </div>
         );
@@ -748,6 +743,20 @@ function App(): JSX.Element {
                 )
             )}
 
+            {/* One-time notice after an oversized selection was trimmed to the Selection cap */}
+            {selectionTrimmed && (
+                <div className="flex items-center justify-between gap-3 px-4 py-2.5 mb-6 rounded-xl bg-theme-secondary border border-theme-border text-sm text-theme-textSecondary">
+                    <span>{interpolate(t('selection.trimmed'), { max: MAX_SELECTED_RESORTS })}</span>
+                    <button
+                        onClick={() => setSelectionTrimmed(false)}
+                        className="shrink-0 p-1 rounded-md hover:bg-theme-border transition-colors text-theme-textSecondary hover:text-theme-textPrimary"
+                        aria-label="Dismiss notice"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+            )}
+
             {/* First-visit discovery banner */}
             {!bannerDismissed && skiResorts.length > 0 && selectedResorts.length > 0 && (
                 <div className="flex items-center justify-between gap-3 px-4 py-2.5 mb-6 rounded-xl bg-theme-secondary border border-theme-border text-sm text-theme-textSecondary">
@@ -778,6 +787,9 @@ function App(): JSX.Element {
                         </div>
                     ))}
                 </Suspense>
+
+                {/* Queued resorts (and rate-limit pauses) */}
+                <FetchStatus count={queuedCount} calls={queuedCalls} things="resorts" />
 
                 {isTruncated && (
                     <div className="text-center py-3 text-sm text-theme-textSecondary">

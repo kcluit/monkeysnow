@@ -1,11 +1,7 @@
-import { fetchWeatherApi } from 'openmeteo';
 import type { WeatherModel, WeatherVariable, HourlyDataPoint, TimezoneInfo } from '../types/openMeteo';
 import { getOverlayVariablesFor, hasOverlays } from './chartConfigurations';
-
-// Import locations from backend
-import locationsData from '../../../backend/locations.json';
-
-const OPEN_METEO_URL = 'https://api.open-meteo.com/v1/forecast';
+import { fetchWeatherApiWithinBudget } from './openMeteoBudget';
+import { RESORT_LOCATIONS, resolveResortId, type ResortLocation } from '../data/resortLocations';
 
 // DEV MODE: Enable mock data for performance testing
 // Set window.__USE_MOCK_DATA = true in browser console to enable
@@ -109,58 +105,12 @@ function generateMockData(
   };
 }
 
-// Location data structure from locations.json
-interface ResortLocation {
-  bot: number;
-  mid: number;
-  top: number;
-  loc: [number, number]; // [lat, lon]
-}
+const LOCATION_MAP = RESORT_LOCATIONS;
 
-// Flatten locations.json for easy lookup
-function buildLocationMap(): Map<string, ResortLocation> {
-  const map = new Map<string, ResortLocation>();
-
-  function traverse(obj: unknown, path: string[] = []): void {
-    if (obj && typeof obj === 'object' && 'loc' in obj && 'bot' in obj) {
-      // This is a resort location
-      const key = path[path.length - 1];
-      map.set(key, obj as ResortLocation);
-    } else if (obj && typeof obj === 'object') {
-      for (const [key, value] of Object.entries(obj)) {
-        traverse(value, [...path, key]);
-      }
-    }
-  }
-
-  traverse(locationsData);
-  return map;
-}
-
-const LOCATION_MAP = buildLocationMap();
-
-// Get resort location by name (API format like "Big-White")
+// Get resort location by slug ("big-white"), earlier slug or pre-OpenSkiData ID ("Big-White")
 export function getResortLocation(resortName: string): ResortLocation | null {
-  // Try direct lookup
-  if (LOCATION_MAP.has(resortName)) {
-    return LOCATION_MAP.get(resortName)!;
-  }
-
-  // Try with dashes converted from spaces
-  const dashName = resortName.replace(/\s+/g, '-');
-  if (LOCATION_MAP.has(dashName)) {
-    return LOCATION_MAP.get(dashName)!;
-  }
-
-  // Try case-insensitive lookup
-  for (const [key, value] of LOCATION_MAP.entries()) {
-    if (key.toLowerCase() === resortName.toLowerCase() ||
-        key.toLowerCase() === dashName.toLowerCase()) {
-      return value;
-    }
-  }
-
-  return null;
+  const id = resolveResortId(resortName);
+  return id ? LOCATION_MAP.get(id)! : null;
 }
 
 // Get all resort names
@@ -196,7 +146,8 @@ export async function fetchOpenMeteoData(
   models: WeatherModel[],
   variables: WeatherVariable[],
   forecastDays: number = 14,
-  timezone: string = 'auto'
+  timezone: string = 'auto',
+  signal?: AbortSignal
 ): Promise<FetchOpenMeteoDataResult> {
   // Expand variables to include overlay variables
   const expandedVariables = expandVariablesWithOverlays(variables);
@@ -220,7 +171,8 @@ export async function fetchOpenMeteoData(
   };
 
   try {
-    const responses = await fetchWeatherApi(OPEN_METEO_URL, params);
+    // Detail-view requests go ahead of the main page's queue in the Fetch budget
+    const responses = await fetchWeatherApiWithinBudget(params, 'detail', signal);
     const result = new Map<WeatherModel, HourlyDataPoint[]>();
 
     // Extract timezone info from first response
@@ -277,7 +229,10 @@ export async function fetchOpenMeteoData(
 
     return { data: result, timezoneInfo };
   } catch (error) {
-    console.error('Error fetching Open-Meteo data:', error);
+    // Aborts are expected when the view changes before a request goes out
+    if ((error as Error).name !== 'AbortError') {
+      console.error('Error fetching Open-Meteo data:', error);
+    }
     throw error;
   }
 }

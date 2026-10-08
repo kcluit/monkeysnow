@@ -14,14 +14,18 @@ import {
   buildModelHierarchyTree,
   getModelsUnderNode,
   getAggregationsUnderNode,
+  coversPoint,
   type ModelHierarchyNode,
 } from '../../data/modelHierarchy';
 import { getModelConfig } from '../../utils/chartConfigurations';
 import type { UseModelHierarchyReturn } from '../../hooks/useModelHierarchy';
 import type { WeatherModel, AggregationType } from '../../types/openMeteo';
+import type { ModelAvailabilityContext } from '../../types/detailView';
 
 interface ModelSelectionGridModalProps {
   hierarchy: UseModelHierarchyReturn;
+  /** Which models are drawn at the point being forecast, for dimming the rest */
+  modelAvailability: ModelAvailabilityContext;
   hideAggregationMembers?: boolean;
   onToggleHideMembers?: () => void;
   showMinMaxFill?: boolean;
@@ -116,20 +120,39 @@ const Checkbox = memo(function Checkbox({
   );
 });
 
+/**
+ * Why a model isn't drawn at the point being forecast, or null when it is (or would be).
+ * Models stay tickable either way: Preferred models are one list for every Resort.
+ */
+function getUnavailableReason(modelId: WeatherModel, availability: ModelAvailabilityContext): string | null {
+  const { point, droppedModels } = availability;
+  if (!coversPoint(modelId, point.lat, point.lon)) return 'Outside its coverage';
+  const dropped = droppedModels.get(modelId);
+  if (dropped?.reason === 'no-data') return 'No data here';
+  if (dropped?.reason === 'clone') return `Same as ${getModelConfig(dropped.of).name} here`;
+  return null;
+}
+
 // Model item component
 const ModelItem = memo(function ModelItem({
   node,
   isSelected,
+  unavailableReason,
   onToggle,
 }: {
   node: ModelHierarchyNode;
   isSelected: boolean;
+  unavailableReason: string | null;
   onToggle: () => void;
 }) {
   const color = node.modelId ? getModelConfig(node.modelId).color : '#6b7280';
 
   return (
-    <label className="resort-grid-item" onClick={(e) => { e.preventDefault(); onToggle(); }}>
+    <label
+      className={`resort-grid-item ${unavailableReason ? 'model-grid-item-unavailable' : ''}`}
+      onClick={(e) => { e.preventDefault(); onToggle(); }}
+      title={node.description}
+    >
       <Checkbox state={isSelected ? 'all' : 'none'} onClick={(e) => { e.stopPropagation(); onToggle(); }} />
       <span
         className="model-color-dot"
@@ -138,6 +161,11 @@ const ModelItem = memo(function ModelItem({
       <span className="resort-grid-item-name">{node.name}</span>
       {node.resolution && (
         <span className="model-resolution-label">({node.resolution})</span>
+      )}
+      {node.ai && <span className="model-tag">AI</span>}
+      {node.experimental && <span className="model-tag">Experimental</span>}
+      {unavailableReason && (
+        <span className="model-availability-note">{unavailableReason}</span>
       )}
     </label>
   );
@@ -228,8 +256,10 @@ const ProviderSection = memo(function ProviderSection({
   onToggleMinMaxFill,
   showPercentileFill,
   onTogglePercentileFill,
+  modelAvailability,
 }: {
   node: ModelHierarchyNode;
+  modelAvailability: ModelAvailabilityContext;
   expandedNodes: Set<string>;
   onToggleExpand: (id: string) => void;
   selectedModels: WeatherModel[];
@@ -320,6 +350,7 @@ const ProviderSection = memo(function ProviderSection({
                   key={child.id}
                   node={child}
                   isSelected={selectedModels.includes(child.modelId)}
+                  unavailableReason={getUnavailableReason(child.modelId, modelAvailability)}
                   onToggle={() => onToggleModel(child.modelId!)}
                 />
               );
@@ -357,6 +388,7 @@ const ProviderSection = memo(function ProviderSection({
 // Main modal component
 export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
   hierarchy,
+  modelAvailability,
   hideAggregationMembers,
   onToggleHideMembers,
   showMinMaxFill,
@@ -514,14 +546,17 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
     }
   };
 
-  // Get total selection count
+  // Get total selection count: Preferred models drawn at this point, of all Preferred models
   const getTotalCount = (): string => {
-    const modelCount = selectedModels.length;
+    const shownCount = selectedModels.filter(
+      (id) => getUnavailableReason(id, modelAvailability) === null
+    ).length;
+    const modelCount = `${shownCount} shown of ${selectedModels.length} preferred`;
     const aggCount = selectedAggregations.length;
     if (aggCount > 0) {
-      return `${modelCount} models + ${aggCount} aggregation${aggCount > 1 ? 's' : ''}`;
+      return `${modelCount} + ${aggCount} aggregation${aggCount > 1 ? 's' : ''}`;
     }
-    return `${modelCount} model${modelCount !== 1 ? 's' : ''}`;
+    return modelCount;
   };
 
   return (
@@ -562,6 +597,7 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
                 <ProviderSection
                   key={provider.id}
                   node={provider}
+                  modelAvailability={modelAvailability}
                   expandedNodes={expandedNodes}
                   onToggleExpand={handleToggleExpand}
                   selectedModels={selectedModels}
@@ -588,7 +624,7 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
         {/* Footer */}
         <div className="command-palette-footer model-grid-footer">
           <div className="model-grid-footer-note">
-            Note: The default Best Match provides the best forecast for any given location worldwide. Seamless combines all models from a given provider into a seamless prediction. Click <FontAwesomeIcon icon={faEye} /> to hide aggregation members.
+            Note: Your models apply to every resort. Dimmed ones aren't drawn here: they don't cover this point, sent no data, or repeat another model's numbers. Seamless blends a provider's models into one forecast. Click <FontAwesomeIcon icon={faEye} /> to hide aggregation members.
           </div>
           <div className="model-grid-footer-actions">
             <span className="command-hint">

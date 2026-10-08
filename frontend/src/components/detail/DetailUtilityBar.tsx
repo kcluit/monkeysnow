@@ -45,6 +45,7 @@ function LargeDetailUtilityBar({
     customLocation,
     onResetCustomLocation,
     isLoadingElevation,
+    modelAvailability,
 }: DetailUtilityBarProps): JSX.Element {
     const [showElevationDropdown, setShowElevationDropdown] = useState(false);
     const [showForecastDropdown, setShowForecastDropdown] = useState(false);
@@ -105,9 +106,9 @@ function LargeDetailUtilityBar({
         }
     };
 
-    // Get model button text
+    // Get model button text: Comparison models shown here / Preferred models
     const getModelButtonText = (): string => {
-        const modelCount = selectedModels.length;
+        const modelCount = `${modelAvailability.shownModelCount}/${selectedModels.length}`;
         const aggCount = selectedAggregations.length;
         if (aggCount > 0) {
             return `Models (${modelCount} + ${aggCount})`;
@@ -336,6 +337,7 @@ function LargeDetailUtilityBar({
             {/* Model Selection Modal */}
             <ModelSelectionGridModal
                 hierarchy={modelHierarchy}
+                modelAvailability={modelAvailability}
                 hideAggregationMembers={hideAggregationMembers}
                 onToggleHideMembers={() => setHideAggregationMembers(!hideAggregationMembers)}
                 showMinMaxFill={showMinMaxFill}

@@ -111,6 +111,20 @@ export interface Translations {
     // Empty states
     'empty.selectResorts': string;
 
+    // Fetch status ({count}, {things}, {eta} and {n} are filled in at runtime)
+    'fetchStatus.queued': string;
+    'fetchStatus.limitReached': string;
+    'fetchStatus.limitReachedTomorrow': string;
+    'fetchStatus.etaMinutes': string;
+    'fetchStatus.etaHours': string;
+    'fetchStatus.resort': string;
+    'fetchStatus.resorts': string;
+    'fetchStatus.model': string;
+    'fetchStatus.models': string;
+
+    // Selection ({max} is filled in at runtime)
+    'selection.trimmed': string;
+
     // Detail View
     'detail.loadingForecast': string;
     'detail.errorLoadingForecast': string;
@@ -244,6 +258,20 @@ export const TranslationsSchema = z.object({
 
     // Empty states
     'empty.selectResorts': z.string(),
+
+    // Fetch status
+    'fetchStatus.queued': z.string(),
+    'fetchStatus.limitReached': z.string(),
+    'fetchStatus.limitReachedTomorrow': z.string(),
+    'fetchStatus.etaMinutes': z.string(),
+    'fetchStatus.etaHours': z.string(),
+    'fetchStatus.resort': z.string(),
+    'fetchStatus.resorts': z.string(),
+    'fetchStatus.model': z.string(),
+    'fetchStatus.models': z.string(),
+
+    // Selection
+    'selection.trimmed': z.string(),
 
     // Detail View
     'detail.loadingForecast': z.string(),

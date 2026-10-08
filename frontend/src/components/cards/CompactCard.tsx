@@ -31,10 +31,10 @@ export function CompactCard({ resort, temperatureMetric = 'max', showDate = fals
         };
     }, [updateScrollState]);
 
-    const webcamUrl = webcamUrls[resort.name];
+    const webcamUrl = webcamUrls[resort.id];
 
     const handleSeymourClick = (event: MouseEvent<HTMLAnchorElement>): void => {
-        if (resort.name === "Mount Seymour") {
+        if (resort.id === "mt-seymour") {
             const newClicks = seymourClicks + 1;
             setSeymourClicks(newClicks);
 

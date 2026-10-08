@@ -1,6 +1,6 @@
 /**
  * Unit conversion utilities for metric/imperial display.
- * All conversions are from metric (backend default) to imperial.
+ * All conversions are from metric (Open-Meteo default) to imperial.
  */
 
 export type UnitSystem = 'metric' | 'imperial';

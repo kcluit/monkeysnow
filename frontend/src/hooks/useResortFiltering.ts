@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { processResortData } from '../utils/weather';
+import { RESORT_LOCATIONS } from '../data/resortLocations';
 import type {
   AllWeatherData,
   ElevationLevel,
@@ -24,8 +25,9 @@ export function useResortFiltering(
 
     const normalizedSearch = searchTerm.toLowerCase();
     return skiResorts.filter(resort => {
-      const displayName = resort.replace(/-/g, ' ').toLowerCase();
-      return displayName.includes(normalizedSearch);
+      const location = RESORT_LOCATIONS.get(resort);
+      const names = location ? [location.displayName, ...(location.aka ?? [])] : [resort.replace(/-/g, ' ')];
+      return names.some(name => name.toLowerCase().includes(normalizedSearch));
     });
   }, [skiResorts, searchTerm]);
 

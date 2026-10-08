@@ -1,17 +1,18 @@
 #!/usr/bin/env node
 /**
- * Generates frontend/public/sitemap.xml by fetching the resort hierarchy
- * from the backend API. Run as part of the build step.
+ * Generates frontend/public/sitemap.xml from the bundled Resorts
+ * (src/data/resorts/resorts.json). Run as part of the build step.
+ * Only current slugs are listed; old IDs redirect to them in the app.
  */
 
-import { writeFile, mkdir } from 'fs/promises';
+import { readFile, writeFile, mkdir } from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = join(__dirname, '..', 'public');
 const SITEMAP_PATH = join(PUBLIC_DIR, 'sitemap.xml');
-const HIERARCHY_URL = 'https://snowscraper.camdvr.org/hierarchy';
+const RESORTS_PATH = join(__dirname, '..', 'src', 'data', 'resorts', 'resorts.json');
 const SITE_URL = 'https://monkeysnow.com';
 
 const STATIC_ROUTES = [
@@ -21,27 +22,9 @@ const STATIC_ROUTES = [
   { path: '/privacy', changefreq: 'yearly',  priority: '0.2' },
 ];
 
-async function fetchResortIds() {
-  console.log(`Fetching hierarchy from ${HIERARCHY_URL}...`);
-  const response = await fetch(HIERARCHY_URL, {
-    signal: AbortSignal.timeout(15_000),
-  });
-  if (!response.ok) {
-    throw new Error(`Hierarchy API responded ${response.status}`);
-  }
-  const data = await response.json();
-
-  const ids = [];
-  for (const continent of data.continents ?? []) {
-    for (const country of continent.countries ?? []) {
-      for (const province of country.provinces ?? []) {
-        for (const resort of province.resorts ?? []) {
-          ids.push(resort.id);
-        }
-      }
-    }
-  }
-  return ids;
+async function readResortIds() {
+  const { resorts } = JSON.parse(await readFile(RESORTS_PATH, 'utf-8'));
+  return Object.keys(resorts);
 }
 
 function buildSitemapXml(resortIds) {
@@ -70,14 +53,8 @@ function buildSitemapXml(resortIds) {
 }
 
 async function main() {
-  let resortIds = [];
-  try {
-    resortIds = await fetchResortIds();
-    console.log(`Found ${resortIds.length} resorts.`);
-  } catch (err) {
-    console.warn(`Warning: Could not fetch hierarchy - ${err.message}`);
-    console.warn('Generating sitemap with static routes only.');
-  }
+  const resortIds = await readResortIds();
+  console.log(`Found ${resortIds.length} resorts.`);
 
   const xml = buildSitemapXml(resortIds);
   await mkdir(PUBLIC_DIR, { recursive: true });

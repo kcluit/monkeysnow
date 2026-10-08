@@ -4,15 +4,12 @@
   "version": "1.0.0",
   "packageManager": "npm@10.9.2",
   "workspaces": [
-    "frontend",
-    "backend"
+    "frontend"
   ],
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
-    "dev:frontend": "npm run dev -w frontend",
-    "dev:backend": "npm run dev -w backend",
-    "start:backend": "npm run start -w backend"
+    "dev:frontend": "npm run dev -w frontend"
   },
   "devDependencies": {
     "turbo": "^2.3.3"

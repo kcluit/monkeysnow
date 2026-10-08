@@ -7,6 +7,7 @@
 import { useEffect, useRef, memo } from 'react';
 import { ResortTreeNode } from './ResortTreeNode';
 import { MAX_SELECTED_RESORTS, type UseResortHierarchyReturn } from '../../hooks/useResortHierarchy';
+import { CapNotice } from './CapNotice';
 import type { HierarchyNode } from '../../data/resortHierarchy';
 
 interface ResortSelectionModalProps {
@@ -35,6 +36,7 @@ export const ResortSelectionModal = memo(function ResortSelectionModal({
     searchTerm,
     setSearchTerm,
     isSearchMode,
+    capNotice,
   } = hierarchy;
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -165,6 +167,7 @@ export const ResortSelectionModal = memo(function ResortSelectionModal({
           <span className="command-hint">
             <kbd>esc</kbd> {canGoBack ? 'back' : 'close'}
           </span>
+          <CapNotice notice={capNotice} />
           <span className="resort-selection-count">
             {selectedResorts.length} / {MAX_SELECTED_RESORTS} selected
           </span>

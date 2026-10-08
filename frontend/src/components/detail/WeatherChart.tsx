@@ -12,7 +12,7 @@ import { UPlotChart } from '../../lib/charts';
 import { setChartZoomSyncExclusion } from '../../lib/charts/chartRegistry';
 import { buildWeatherChartConfig } from '../../utils/chartBuilder';
 import { ChartSettingsModal } from './ChartSettingsModal';
-import { getVariableConfig, hasOverlays } from '../../utils/chartConfigurations';
+import { getVariableConfig, hasOverlays, getOverlayVariablesFor } from '../../utils/chartConfigurations';
 import type { WeatherChartProps } from '../../types/detailView';
 import { supportsAccumulation } from '../../types/chartSettings';
 import type { ChartDisplayType } from '../../types/chartSettings';
@@ -33,10 +33,22 @@ export function WeatherChart({
     unitSystem,
     timezoneInfo,
     isChartLocked,
+    isLoading,
     onToggleVisibility,
     location,
 }: WeatherChartComponentProps): JSX.Element {
     const variableConfig = getVariableConfig(variable);
+
+    // Many variables come from only a few models; draw just the ones that provide this one
+    const providingModels = useMemo(() => {
+        const variables = [variable, ...getOverlayVariablesFor(variable)];
+        return selectedModels.filter((model) =>
+            data.get(model)?.some((point) =>
+                variables.some((v) => typeof point[v] === 'number' && Number.isFinite(point[v]))
+            )
+        );
+    }, [data, selectedModels, variable]);
+    const loadedModelCount = selectedModels.filter((model) => data.has(model)).length;
 
     // Chart settings from localStorage
     const [chartType, setChartType] = useLocalStorage<ChartDisplayType>(
@@ -86,7 +98,7 @@ export function WeatherChart({
         return buildWeatherChartConfig(
             {
                 data,
-                selectedModels,
+                selectedModels: providingModels,
                 selectedAggregations,
                 aggregationColors,
                 hideAggregationMembers,
@@ -109,7 +121,7 @@ export function WeatherChart({
         );
     }, [
         data,
-        selectedModels,
+        providingModels,
         selectedAggregations,
         aggregationColors,
         hideAggregationMembers,
@@ -129,7 +141,13 @@ export function WeatherChart({
     ]);
 
     // Handle no data
-    if (!chartConfig) {
+    if (!chartConfig || providingModels.length === 0) {
+        let emptyMessage = 'No data available';
+        if (isLoading) {
+            emptyMessage = 'Waiting for models...';
+        } else if (loadedModelCount > 0) {
+            emptyMessage = `None of the models here provide ${variableConfig.label}`;
+        }
         return (
             <div className="weather-chart weather-chart-empty">
                 <div className="weather-chart-header">
@@ -154,7 +172,7 @@ export function WeatherChart({
                     </div>
                 </div>
                 <div className="weather-chart-no-data">
-                    <p>No data available</p>
+                    <p>{emptyMessage}</p>
                 </div>
             </div>
         );
@@ -188,6 +206,11 @@ export function WeatherChart({
                     {variableConfig.description && (
                         <span className="weather-chart-description">
                             {variableConfig.description}
+                        </span>
+                    )}
+                    {providingModels.length < loadedModelCount && (
+                        <span className="weather-chart-description">
+                            {providingModels.length} of {loadedModelCount} models provide this
                         </span>
                     )}
                 </div>

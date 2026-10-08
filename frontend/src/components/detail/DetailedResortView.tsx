@@ -1,12 +1,21 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useDetailedWeatherData } from '../../hooks/useDetailedWeatherData';
 import { useElevationFetch } from '../../hooks/useElevationFetch';
+import { useBudgetPause } from '../../hooks/useBudgetPause';
+import { FetchStatus } from '../FetchStatus';
 import { DetailUtilityBar } from './DetailUtilityBar';
 import { DetailChartGrid } from './DetailChartGrid';
 import { ResortMap } from '../map/ResortMap';
-import { DEFAULT_VARIABLES, DEFAULT_MODELS } from '../../utils/chartConfigurations';
-import { aggregationOptions } from '../../data/modelHierarchy';
+import { DEFAULT_VARIABLES } from '../../utils/chartConfigurations';
+import {
+    aggregationOptions,
+    RECOMMENDED_MODELS,
+    coversPoint,
+    inCatalogueOrder,
+    isKnownModel,
+} from '../../data/modelHierarchy';
+import { resolveComparisonModels } from '../../utils/comparisonModels';
 import type { DetailedResortViewProps, ElevationSelection, CustomLocation } from '../../types/detailView';
 import type { WeatherModel, WeatherVariable, AggregationType } from '../../types/openMeteo';
 import type { UnitSystem, ModelLineOpacity } from '../../types';
@@ -40,11 +49,19 @@ export function DetailedResortView({
     modelLineOpacity,
     onBack,
 }: DetailedResortViewPropsWithUnits): JSX.Element {
-    // State for selected models
-    const [selectedModels, setSelectedModels] = useLocalStorage<WeatherModel[]>(
-        'detailSelectedModels',
-        DEFAULT_MODELS
+    // The visitor's Preferred models: one list for every Resort, starting as the Recommended models.
+    // A new key wipes the old 'detailSelectedModels' lists once (docs/adr/0003).
+    const [preferredModels, setPreferredModels] = useLocalStorage<WeatherModel[]>(
+        'detailPreferredModels',
+        RECOMMENDED_MODELS
     );
+    useEffect(() => {
+        try {
+            localStorage.removeItem('detailSelectedModels');
+        } catch {
+            // Storage unavailable; nothing to clean up
+        }
+    }, []);
 
     // State for selected variables - default selection
     const [selectedVariables, setSelectedVariables] = useLocalStorage<WeatherVariable[]>(
@@ -173,16 +190,42 @@ export function DetailedResortView({
         }
     }, [selectedVariables, setSelectedVariables]);
 
+    // Only fetch Preferred models whose Coverage includes the point being forecast
+    const coveringModels = useMemo(
+        () => inCatalogueOrder(
+            preferredModels.filter((model) =>
+                isKnownModel(model) && coversPoint(model, effectiveCoords.lat, effectiveCoords.lon)
+            )
+        ),
+        [preferredModels, effectiveCoords.lat, effectiveCoords.lon]
+    );
+
     // Fetch weather data using effective coordinates
-    const { data, timezoneInfo, loading, error, refetch } = useDetailedWeatherData({
+    const { data, unavailableModels, timezoneInfo, loading, error, refetch } = useDetailedWeatherData({
         latitude: effectiveCoords.lat,
         longitude: effectiveCoords.lon,
         elevation: effectiveElevation,
-        models: selectedModels,
+        models: coveringModels,
         variables: selectedVariables,
         forecastDays,
         enabled: true,
     });
+
+    // Drop models that came back empty and Clones, leaving the Comparison models
+    const { comparisonModels, dropped } = useMemo(
+        () => resolveComparisonModels(coveringModels, data, unavailableModels),
+        [coveringModels, data, unavailableModels]
+    );
+
+    const modelAvailability = useMemo(() => ({
+        point: effectiveCoords,
+        droppedModels: dropped,
+        shownModelCount: comparisonModels.length,
+    }), [effectiveCoords, dropped, comparisonModels.length]);
+
+    // During a rate-limit pause, say how many models are still waiting instead of a bare spinner
+    const pause = useBudgetPause();
+    const pendingModels = Math.max(0, coveringModels.length - (data?.size ?? 0) - unavailableModels.size);
 
     return (
         <div>
@@ -250,8 +293,8 @@ export function DetailedResortView({
                     <DetailUtilityBar
                         onBack={onBack}
                         unitSystem={unitSystem}
-                        selectedModels={selectedModels}
-                        setSelectedModels={setSelectedModels}
+                        selectedModels={preferredModels}
+                        setSelectedModels={setPreferredModels}
                         selectedVariables={selectedVariables}
                         setSelectedVariables={setSelectedVariables}
                         selectedAggregations={selectedAggregations}
@@ -276,6 +319,7 @@ export function DetailedResortView({
                         onResetCustomLocation={handleResetCustomLocation}
                         isLoadingElevation={isLoadingElevation}
                         utilityBarStyle={utilityBarStyle}
+                        modelAvailability={modelAvailability}
                     />
                 </div>
             )}
@@ -287,7 +331,7 @@ export function DetailedResortView({
                         Loading forecast data...
                     </div>
                     <div className="text-sm text-theme-textSecondary mt-2">
-                        Fetching from {selectedModels.length} weather model(s)
+                        Fetching from {coveringModels.length} weather model(s)
                     </div>
                 </div>
             )}
@@ -315,7 +359,7 @@ export function DetailedResortView({
                 <>
                     <DetailChartGrid
                         data={data}
-                        selectedModels={selectedModels}
+                        selectedModels={comparisonModels}
                         selectedVariables={selectedVariables}
                         selectedAggregations={selectedAggregations}
                         aggregationColors={aggregationColors}
@@ -326,14 +370,23 @@ export function DetailedResortView({
                         unitSystem={unitSystem}
                         timezoneInfo={timezoneInfo ?? undefined}
                         isChartLocked={isChartLocked}
+                        isLoading={loading}
                         onToggleVariable={toggleVariable}
                         location={location}
                     />
-                    {loading && (
+                    {loading && (pause ? (
+                        <FetchStatus
+                            count={pendingModels}
+                            calls={pendingModels}
+                            things="models"
+                            onlyWhenLimited
+                            className="text-center py-2 text-sm text-theme-textSecondary"
+                        />
+                    ) : (
                         <div className="text-center py-2 text-sm text-theme-textSecondary animate-pulse">
                             Loading additional model data...
                         </div>
-                    )}
+                    ))}
                 </>
             )}
 

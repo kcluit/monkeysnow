@@ -8,5 +8,16 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src')
     }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        // The Resort list changes only when it is regenerated, so it gets its own
+        // chunk that stays cached across app deploys
+        manualChunks(id) {
+          if (id.replace(/\\/g, '/').endsWith('/src/data/resorts/resorts.json')) return 'resorts';
+        }
+      }
+    }
   }
 })
