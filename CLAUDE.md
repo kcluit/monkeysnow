@@ -31,6 +31,11 @@ npm run build
 - `frontend/src/data/resortLocations.ts` - flattens it (`RESORT_LOCATIONS`) and builds the picker hierarchy (`RESORT_HIERARCHY`)
 - `useHierarchyData` / `HierarchyContext` expose the hierarchy, resort IDs and display names
 
+### Saved locations
+- `utils/savedLocations.ts` - Custom locations a visitor named and kept, in this browser's localStorage only; in the Selection they are `saved:<key>` IDs, and their detail view is `/location/<key>`
+- They have one elevation, which `resortForecast.ts` fetches and copies into all three bands; their Card model comes from the nearest Resort's country, stored when saved
+- `useHierarchyData` lists them first in the picker under a "Custom" node (type `custom`)
+
 ### Fetching from Open-Meteo (see docs/adr/0001-fetch-forecasts-from-the-browser.md)
 - `utils/openMeteoBudget.ts` - every forecast request goes through `fetchWeatherApiWithinBudget()`: a per-tab Fetch budget of 550 calls per rolling minute, at most 2 requests in flight, detail-view requests first, and a pause until the window resets when Open-Meteo returns a 429
 - `utils/resortForecast.ts` - fetches all three elevation bands for groups of up to 25 resorts sharing a model (chosen by country), and turns hourly data into AM/PM/NIGHT periods with the wet-bulb / Kuchera snow estimation

@@ -42,6 +42,7 @@ function LargeDetailUtilityBar({
     location,
     isChartLocked,
     setIsChartLocked,
+    fixedElevation,
     customLocation,
     onResetCustomLocation,
     isLoadingElevation,
@@ -138,8 +139,13 @@ function LargeDetailUtilityBar({
                 </span>
             </button>
 
-            {/* Elevation Dropdown - hidden when custom location is active */}
-            {!customLocation ? (
+            {/* Elevation Dropdown - a Saved location has one elevation; hidden when custom location is active */}
+            {!customLocation && fixedElevation !== undefined ? (
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-secondary border border-theme-border">
+                    <span className="text-sm text-theme-textSecondary">Elevation:</span>
+                    <span className="text-sm text-theme-textPrimary font-medium">{formatElevation(fixedElevation, unitSystem)}</span>
+                </div>
+            ) : !customLocation ? (
                 <div className="relative" data-dropdown>
                     <button
                         onClick={() => {

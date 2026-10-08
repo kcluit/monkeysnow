@@ -1,21 +1,24 @@
 /**
  * Fetches Resort forecasts from Open-Meteo and shapes them into ResortData:
  * three Elevation bands, each split into AM/PM/NIGHT periods with snow estimates.
+ * A Saved location is fetched at its one elevation, and that forecast stands in
+ * for all three bands, so cards and sorting treat it like any Resort.
  *
  * Ported from the old Express backend so forecasts keep exactly the shape and
  * numbers the backend used to serve. The one exception is freezing level in
  * GFS regions; see MODELS_WITH_FREEZING_LEVEL.
  */
 
-import { RESORT_LOCATIONS } from '../data/resortLocations';
+import { RESORT_LOCATIONS, continentOfCountry } from '../data/resortLocations';
 import { fetchWeatherApiWithinBudget, type FetchPriority } from './openMeteoBudget';
-import type { DayData, PeriodData, ResortData, SnowQuality } from '../types';
+import { getSavedLocation, isSavedLocationId } from './savedLocations';
+import type { DayData, ElevationForecast, PeriodData, ResortData, SnowQuality } from '../types';
 
 type ApiResponse = Awaited<ReturnType<typeof fetchWeatherApiWithinBudget>>[number];
 
 const FORECAST_DAYS = 10;
 
-/** Resorts per request; 25 resorts x 3 Elevation bands = 75 locations. */
+/** Resorts per request; 25 resorts x 3 Elevation bands = at most 75 locations. */
 const RESORTS_PER_REQUEST = 25;
 
 // Order matters: processLocation reads variables by index
@@ -191,15 +194,48 @@ const DEFAULT_FREEZING_MODEL = 'gfs_seamless';
  */
 const MODELS_WITH_FREEZING_LEVEL = new Set(['gfs_seamless']);
 
+/** Where a member of the Selection is forecast, and the country that picks its Card model. */
+interface ForecastPoint {
+    lat: number;
+    lon: number;
+    /** A Resort's three Elevation bands (bot, mid, top), or a Saved location's one elevation */
+    elevations: number[];
+    country: string;
+    continent: string | null;
+}
+
+function forecastPointOf(id: string): ForecastPoint | null {
+    const resort = RESORT_LOCATIONS.get(id);
+    if (resort) {
+        return {
+            lat: resort.loc[0],
+            lon: resort.loc[1],
+            elevations: [resort.bot, resort.mid, resort.top],
+            country: resort.country,
+            continent: resort.continent,
+        };
+    }
+    const saved = getSavedLocation(id);
+    if (saved) {
+        return {
+            lat: saved.lat,
+            lon: saved.lon,
+            elevations: [saved.elevation],
+            country: saved.country,
+            continent: continentOfCountry(saved.country),
+        };
+    }
+    return null;
+}
+
 interface RequestPlan {
     model: string;
     freezingModel: string | null; // null when the main model provides the freezing level
 }
 
-function planFor(resortId: string): RequestPlan {
-    const resort = RESORT_LOCATIONS.get(resortId);
-    const inEurope = resort?.continent === 'Europe';
-    const model = (resort && COUNTRY_MODELS[resort.country]) ?? (inEurope ? EUROPE_MODEL : DEFAULT_MODEL);
+function planFor(point: ForecastPoint | null): RequestPlan {
+    const inEurope = point?.continent === 'Europe';
+    const model = (point && COUNTRY_MODELS[point.country]) ?? (inEurope ? EUROPE_MODEL : DEFAULT_MODEL);
     return {
         model,
         freezingModel: MODELS_WITH_FREEZING_LEVEL.has(model)
@@ -208,9 +244,19 @@ function planFor(resortId: string): RequestPlan {
     };
 }
 
-/** Open-Meteo calls one Resort costs: one per Elevation band, plus one for a separate freezing level. */
+/** Open-Meteo calls one Resort or Saved location costs: one per elevation, plus one for a separate freezing level. */
 export function resortCallWeight(resortId: string): number {
-    return planFor(resortId).freezingModel ? 4 : 3;
+    const point = forecastPointOf(resortId);
+    return (point?.elevations.length ?? 3) + (planFor(point).freezingModel ? 1 : 0);
+}
+
+/**
+ * Whether a forecast was fetched at the elevation this member of the Selection
+ * has now. Only a Saved location's elevation can change.
+ */
+export function isForecastCurrent(resortId: string, data: ResortData): boolean {
+    if (!isSavedLocationId(resortId)) return true;
+    return getSavedLocation(resortId)?.elevation === data.mid.metadata.elevation;
 }
 
 /**
@@ -220,8 +266,9 @@ export function resortCallWeight(resortId: string): number {
 export function groupIntoRequests(resortIds: string[]): string[][] {
     const groups = new Map<string, string[]>();
     for (const id of resortIds) {
-        if (!RESORT_LOCATIONS.has(id)) continue;
-        const plan = planFor(id);
+        const point = forecastPointOf(id);
+        if (!point) continue;
+        const plan = planFor(point);
         const key = `${plan.model}|${plan.freezingModel}`;
         const group = groups.get(key) ?? [];
         group.push(id);
@@ -405,8 +452,8 @@ function processLocation(mainResp: ApiResponse | undefined, freezing: FreezingSe
 
 /**
  * Fetches one request group from groupIntoRequests(): all three Elevation bands
- * for each resort, spent against the Fetch budget. Resorts whose data comes back
- * incomplete are left out.
+ * for each resort, or the one elevation of a Saved location, spent against the
+ * Fetch budget. Resorts whose data comes back incomplete are left out.
  */
 export async function fetchResortForecasts(
     resortIds: string[],
@@ -414,20 +461,20 @@ export async function fetchResortForecasts(
     signal?: AbortSignal
 ): Promise<Record<string, ResortData>> {
     const resorts = resortIds.flatMap(id => {
-        const location = RESORT_LOCATIONS.get(id);
-        return location ? [{ id, location }] : [];
+        const point = forecastPointOf(id);
+        return point ? [{ id, point }] : [];
     });
     if (resorts.length === 0) return {};
 
-    const { model, freezingModel } = planFor(resorts[0].id);
-    const lats = resorts.map(r => r.location.loc[0]);
-    const lons = resorts.map(r => r.location.loc[1]);
+    const { model, freezingModel } = planFor(resorts[0].point);
+    const lats = resorts.map(r => r.point.lat);
+    const lons = resorts.map(r => r.point.lon);
 
     const mainParams = {
-        // 3 points per resort (Bot, Mid, Top)
-        latitude: lats.flatMap(lat => [lat, lat, lat]),
-        longitude: lons.flatMap(lon => [lon, lon, lon]),
-        elevation: resorts.flatMap(r => [r.location.bot, r.location.mid, r.location.top]),
+        // One location per elevation: Bot, Mid and Top for a Resort, one for a Saved location
+        latitude: resorts.flatMap(r => r.point.elevations.map(() => r.point.lat)),
+        longitude: resorts.flatMap(r => r.point.elevations.map(() => r.point.lon)),
+        elevation: resorts.flatMap(r => r.point.elevations),
         hourly: freezingModel ? MAIN_VARIABLES : [...MAIN_VARIABLES, 'freezing_level_height'],
         models: model,
         forecast_days: FORECAST_DAYS,
@@ -450,34 +497,32 @@ export async function fetchResortForecasts(
 
     const fetchedAt = Date.now();
     const result: Record<string, ResortData> = {};
+    let firstResponse = 0;
 
-    resorts.forEach(({ id, location }, i) => {
-        const [lat, lon] = location.loc;
-        const respBot = mainResponses[i * 3];
-        const respMid = mainResponses[i * 3 + 1];
-        const respTop = mainResponses[i * 3 + 2];
+    resorts.forEach(({ id, point }, i) => {
+        const { lat, lon, elevations } = point;
+        const responses = mainResponses.slice(firstResponse, firstResponse + elevations.length);
+        firstResponse += elevations.length;
 
-        // One freezing level for all three bands. When it comes with the main
-        // request, the mid band's matches the location's own terrain best.
+        // One freezing level for every elevation. When it comes with the main
+        // request, the middle one's (the mid band's) matches the location's own terrain best.
         const freezing = freezingResponses
             ? freezingSeriesOf(freezingResponses[i], 0)
-            : freezingSeriesOf(respMid, FREEZING_LEVEL_INDEX);
+            : freezingSeriesOf(responses[Math.floor(responses.length / 2)], FREEZING_LEVEL_INDEX);
 
-        const forecastBot = processLocation(respBot, freezing);
-        const forecastMid = processLocation(respMid, freezing);
-        const forecastTop = processLocation(respTop, freezing);
-
-        if (!forecastBot || !forecastMid || !forecastTop) {
-            console.warn(`Incomplete data for ${id}, skipping resort`);
-            return;
+        const bands: ElevationForecast[] = [];
+        for (const [j, elevation] of elevations.entries()) {
+            const forecast = processLocation(responses[j], freezing);
+            if (!forecast) {
+                console.warn(`Incomplete data for ${id}, skipping resort`);
+                return;
+            }
+            bands.push({ metadata: { elevation, lat, lon }, forecast });
         }
 
-        result[id] = {
-            bot: { metadata: { elevation: location.bot, lat, lon }, forecast: forecastBot },
-            mid: { metadata: { elevation: location.mid, lat, lon }, forecast: forecastMid },
-            top: { metadata: { elevation: location.top, lat, lon }, forecast: forecastTop },
-            fetchedAt,
-        };
+        // A Saved location's one forecast stands in for all three bands
+        const [bot, mid = bot, top = bot] = bands;
+        result[id] = { bot, mid, top, fetchedAt };
     });
 
     return result;

@@ -18,7 +18,8 @@ const CompactCard = lazy(() => import('./components/cards/CompactCard').then(m =
 const DetailedResortView = lazy(() => import('./components/detail/DetailedResortView').then(m => ({ default: m.DetailedResortView })));
 import { FPSCounter } from './components/FPSCounter';
 import { ResortSelectionGridModal } from './components/ResortSelectionModal';
-import { useWeatherData } from './hooks/useWeatherData';
+import { useWeatherData, deleteCachedForecast } from './hooks/useWeatherData';
+import { useSavedLocations } from './hooks/useSavedLocations';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useResortFiltering } from './hooks/useResortFiltering';
 import { useTheme } from './hooks/useTheme';
@@ -48,6 +49,14 @@ import { getResortLocation } from './utils/openMeteoClient';
 import { resolveResortId } from './data/resortLocations';
 import { pickStarterResort } from './utils/starterResort';
 import {
+    deleteSavedLocation,
+    isSavedLocationId,
+    saveLocation,
+    savedLocationIdFromKey,
+    savedLocationPath,
+    type SavedLocationInput,
+} from './utils/savedLocations';
+import {
     defaultSelectedResorts,
     defaultElevation,
     defaultSort,
@@ -69,18 +78,23 @@ import type {
     ModelLineOpacity
 } from './types';
 
+interface DetailRouteProps {
+    unitSystem: 'metric' | 'imperial';
+    showUtilityBar: boolean;
+    utilityBarStyle: UtilityBarStyle;
+    modelLineOpacity: ModelLineOpacity;
+    onSaveLocation: (input: SavedLocationInput) => void;
+}
+
 // Resort Detail Page wrapper component
 function ResortDetailRoute({
     unitSystem,
     showUtilityBar,
     utilityBarStyle,
     modelLineOpacity,
+    onSaveLocation,
     getDisplayName,
-}: {
-    unitSystem: 'metric' | 'imperial';
-    showUtilityBar: boolean;
-    utilityBarStyle: UtilityBarStyle;
-    modelLineOpacity: ModelLineOpacity;
+}: DetailRouteProps & {
     getDisplayName: (id: string) => string;
 }): JSX.Element | null {
     const { resortId: requestedId } = useParams<{ resortId: string }>();
@@ -129,6 +143,61 @@ function ResortDetailRoute({
                 utilityBarStyle={utilityBarStyle}
                 modelLineOpacity={modelLineOpacity}
                 onBack={handleBack}
+                onSaveLocation={onSaveLocation}
+            />
+        </Suspense>
+    );
+}
+
+// Saved location detail page; only the browser that saved it knows the URL, so it is never indexed
+function SavedLocationRoute({
+    unitSystem,
+    showUtilityBar,
+    utilityBarStyle,
+    modelLineOpacity,
+    onSaveLocation,
+    onDeleteSavedLocation,
+}: DetailRouteProps & {
+    onDeleteSavedLocation: (id: string) => void;
+}): JSX.Element | null {
+    const { locationKey } = useParams<{ locationKey: string }>();
+    const navigate = useNavigate();
+    const { pathname, state } = useLocation();
+    const savedLocations = useSavedLocations();
+    const savedLocation = locationKey
+        ? savedLocations.find((location) => location.id === savedLocationIdFromKey(locationKey))
+        : undefined;
+
+    usePageMeta({
+        title: savedLocation ? `${savedLocation.name} Snow Forecast — monkeysnow` : 'monkeysnow — ski resort snow forecasts',
+        description: 'Real-time snow forecasts for ski resorts worldwide.',
+        canonical: 'https://monkeysnow.com/',
+    });
+
+    // Another browser, or deleted
+    if (!savedLocation) {
+        return <Navigate to="/" replace />;
+    }
+
+    const { lat, lon, elevation } = savedLocation;
+
+    return (
+        <Suspense fallback={<div className="text-center py-12 text-theme-textSecondary">Loading charts...</div>}>
+            <DetailedResortView
+                key={savedLocation.id}
+                resortId={savedLocation.id}
+                resortName={savedLocation.name}
+                location={{ lat, lon, baseElevation: elevation, midElevation: elevation, topElevation: elevation }}
+                savedLocation={savedLocation}
+                unitSystem={unitSystem}
+                showUtilityBar={showUtilityBar}
+                utilityBarStyle={utilityBarStyle}
+                modelLineOpacity={modelLineOpacity}
+                onBack={() => navigate('/')}
+                onSaveLocation={onSaveLocation}
+                onDeleteSavedLocation={onDeleteSavedLocation}
+                selectionWasFull={Boolean((state as { selectionWasFull?: boolean } | null)?.selectionWasFull)}
+                onDismissSelectionWasFull={() => navigate(pathname, { replace: true, state: null })}
             />
         </Suspense>
     );
@@ -481,7 +550,7 @@ function App(): JSX.Element {
             console.warn(`Failed to load ${resortName}:`, err);
             return false;
         }
-    }, [allWeatherData, selectedElevation, selectedTemperatureMetric, snowfallEstimateMode, unitSystem]);
+    }, [allWeatherData, selectedElevation, selectedTemperatureMetric, snowfallEstimateMode, unitSystem, getDisplayName]);
 
     // Preview theme when selecting in command palette
     useEffect(() => {
@@ -620,8 +689,23 @@ function App(): JSX.Element {
 
     // Handle resort card click to navigate to detail view
     const handleResortClick = useCallback((resortId: string): void => {
-        navigate(`/resort/${resortId}`);
+        navigate(isSavedLocationId(resortId) ? savedLocationPath(resortId) : `/resort/${resortId}`);
     }, [navigate]);
+
+    // Saving a Custom location also adds it to the Selection, unless the Selection cap is reached
+    const handleSaveLocation = useCallback((input: SavedLocationInput): void => {
+        const location = saveLocation(input);
+        const selectionWasFull = selectedResorts.length >= MAX_SELECTED_RESORTS;
+        if (!selectionWasFull) setSelectedResorts([...selectedResorts, location.id]);
+        navigate(savedLocationPath(location.id), { state: { selectionWasFull } });
+    }, [selectedResorts, setSelectedResorts, navigate]);
+
+    const handleDeleteSavedLocation = useCallback((id: string): void => {
+        navigate('/');
+        deleteSavedLocation(id);
+        deleteCachedForecast(id);
+        setSelectedResorts(prev => prev.filter(resortId => resortId !== id));
+    }, [navigate, setSelectedResorts]);
 
     // Get sorted resort data for display
     const effectiveDisplayLimit = resortDisplayLimit === 'auto'
@@ -923,7 +1007,25 @@ function App(): JSX.Element {
                             showUtilityBar={showUtilityBar}
                             utilityBarStyle={utilityBarStyle}
                             modelLineOpacity={modelLineOpacity}
+                            onSaveLocation={handleSaveLocation}
                             getDisplayName={getDisplayName}
+                        />
+                    </>
+                } />
+
+                {/* Saved location detail route */}
+                <Route path="/location/:locationKey" element={
+                    <>
+                        <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
+                            <Header font={font} />
+                        </div>
+                        <SavedLocationRoute
+                            unitSystem={unitSystem}
+                            showUtilityBar={showUtilityBar}
+                            utilityBarStyle={utilityBarStyle}
+                            modelLineOpacity={modelLineOpacity}
+                            onSaveLocation={handleSaveLocation}
+                            onDeleteSavedLocation={handleDeleteSavedLocation}
                         />
                     </>
                 } />

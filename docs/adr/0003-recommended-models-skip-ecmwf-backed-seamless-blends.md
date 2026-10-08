@@ -1,5 +1,7 @@
 # Recommended models skip ECMWF-backed Seamless models, and Preferred models are filtered by Coverage
 
+> The choice of Recommended models below is superseded by [ADR 0005](./0005-recommended-models-are-ifs-hres-and-gfs-seamless.md). The Coverage filter and Clone check still stand.
+
 The detail view used to start every visitor on all eleven **Seamless models**, everywhere. Outside their home areas several of them are **Clones** of ECMWF IFS. At Whistler, Jackson Hole and Niseko, KNMI, DMI and MET Norway all returned ECMWF's exact numbers, so the median and mean counted ECMWF three times.
 
 We now keep one **Preferred models** list per visitor and draw only the models whose **Coverage** includes the point being forecast. NOAA, DWD, ECCC, Météo-France, UKMO, JMA and MeteoSwiss stay in the **Recommended models** as Seamless models. For KNMI, DMI, MET Norway, GeoSphere and CHMI we recommend their own high-resolution model instead, because their Seamless versions fill in with ECMWF. At Chamonix, KNMI, DMI, GeoSphere and CHMI Seamless all match ECMWF IFS exactly at every hour from day 4 to day 15. Recommending them would count ECMWF five times there, even though the Clone check keeps them for their own first three days.

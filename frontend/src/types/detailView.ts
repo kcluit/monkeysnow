@@ -14,7 +14,7 @@ export interface ModelAvailabilityContext {
 // Elevation selection can be a preset type or a custom number
 export type ElevationSelection = 'base' | 'mid' | 'top' | number;
 
-// Custom location when user clicks on map (temporary, not persisted)
+// Custom location when user clicks on map (temporary unless saved as a Saved location)
 export interface CustomLocation {
     lat: number;
     lon: number;
@@ -69,6 +69,8 @@ export interface DetailedResortViewProps {
         midElevation: number;
         topElevation: number;
     };
+    /** Set when this is a Saved location's view: it has one elevation, and can be edited or deleted */
+    savedLocation?: import('../utils/savedLocations').SavedLocation;
 }
 
 export interface DetailViewHeaderProps {
@@ -105,7 +107,9 @@ export interface DetailUtilityBarProps {
     };
     isChartLocked: boolean;
     setIsChartLocked: (locked: boolean) => void;
-    // Custom location state (temporary, not persisted)
+    /** A Saved location's one elevation, shown in place of the Base/Mid/Top choice */
+    fixedElevation?: number;
+    // Custom location state (temporary unless saved)
     customLocation: import('./detailView').CustomLocation | null;
     onResetCustomLocation: () => void;
     isLoadingElevation: boolean;

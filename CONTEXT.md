@@ -23,13 +23,17 @@ One of a **Resort**'s three forecast heights: base (`bot`), mid or top.
 _Avoid_: level, elevation (when meaning the band rather than a height in metres)
 
 **Custom location**:
-A point a visitor picks on a **Resort**'s map, forecast at its own ground elevation in place of the **Resort** and its **Elevation band**. It is never saved.
+A point a visitor picks on the map of a **Resort** or a **Saved location**, forecast at its own ground elevation in place of the one they picked it from. It is not kept unless the visitor saves it as a new **Saved location**; an existing **Saved location** never moves.
 _Avoid_: pin, spot, point, location (on its own)
+
+**Saved location**:
+A **Custom location** that a visitor has named and kept. Only the browser it was saved in knows about it. It is not a **Resort**: it has one elevation, the one it was saved with, and no **Elevation bands**.
+_Avoid_: custom resort, favourite, pin
 
 ### Selection and limits
 
 **Selection**:
-The set of **Resorts** a visitor has chosen to see on the main page.
+The set of **Resorts** and **Saved locations** a visitor has chosen to see on the main page.
 _Avoid_: favourites, watchlist
 
 **Starter resort**:
@@ -37,11 +41,11 @@ The one **Resort** a first-time visitor's **Selection** begins with. It is the *
 _Avoid_: default resort, home resort, local resort
 
 **Selection cap**:
-The most **Resorts** a **Selection** may contain.
+The most **Resorts** and **Saved locations**, counted together, that a **Selection** may contain.
 _Avoid_: resort limit, max resorts
 
 **Display limit**:
-How many **Resorts** in the **Selection** are rendered as cards; it never affects what is fetched.
+How many members of the **Selection** are rendered as cards; it never affects what is fetched.
 _Avoid_: resort limit
 
 **Fetch budget**:
@@ -57,7 +61,7 @@ How long a fetched forecast is trusted before it becomes **stale** and is refetc
 _Avoid_: TTL, cache expiry, refresh interval
 
 **Queued resort**:
-A **Resort** in the **Selection** whose forecast is waiting for **Fetch budget** to free up.
+A **Resort** or **Saved location** in the **Selection** whose forecast is waiting for **Fetch budget** to free up.
 _Avoid_: pending resort, loading resort
 
 ### Forecast models
@@ -83,7 +87,7 @@ A **Forecast model** whose numbers at the point being forecast are identical to 
 _Avoid_: duplicate
 
 **Card model**:
-The single **Forecast model** behind a **Resort**'s card on the main page, chosen by the **Resort**'s country.
+The single **Forecast model** behind a card on the main page, chosen by the country of the **Resort**, or for a **Saved location**, of the **Resort** nearest to it.
 _Avoid_: default model, primary model
 
 **Preferred models**:
@@ -91,11 +95,11 @@ A visitor's own list of **Forecast models**, one list for every **Resort**. Ever
 _Avoid_: selected models, default models, **Selection** (that is **Resorts**)
 
 **Recommended models**:
-The **Preferred models** a visitor starts with, covering every part of the world at once and chosen so that no model repeats another **Provider**'s numbers for part of its forecast.
+The **Preferred models** a visitor starts with: two global **Forecast models** from different **Providers**, so every **Resort** and **Custom location** opens on two forecasts that never copy each other.
 _Avoid_: default models, defaults
 
 **Comparison models**:
-The **Preferred models** whose **Coverage** includes the point being forecast (a **Resort** or a **Custom location**), minus **Clones**. These are the models drawn side by side in the detail view.
+The **Preferred models** whose **Coverage** includes the point being forecast (a **Resort**, a **Saved location** or a **Custom location**), minus **Clones**. These are the models drawn side by side in the detail view.
 _Avoid_: selected models, model selection
 
 **Aggregation**:

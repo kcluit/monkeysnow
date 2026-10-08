@@ -37,12 +37,14 @@ export function createElevationLinesPlugin(options: ElevationLinesPluginOptions)
         const left = u.bbox.left;
         const width = u.bbox.width;
 
-        // Define elevations array with labels
-        const elevationEntries = [
-            { value: elevations.base, label: 'Base' },
-            { value: elevations.mid, label: 'Mid' },
-            { value: elevations.top, label: 'Top' },
-        ];
+        // Define elevations array with labels; a Saved location has one elevation, not three bands
+        const elevationEntries = elevations.base === elevations.mid && elevations.mid === elevations.top
+            ? [{ value: elevations.mid, label: 'Elevation' }]
+            : [
+                { value: elevations.base, label: 'Base' },
+                { value: elevations.mid, label: 'Mid' },
+                { value: elevations.top, label: 'Top' },
+            ];
 
         // Set up styles for lines and labels
         ctx.strokeStyle = theme.textSecondary;
