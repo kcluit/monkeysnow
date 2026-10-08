@@ -350,6 +350,7 @@ const ProviderSection = memo(function ProviderSection({
                   key={child.id}
                   node={child}
                   isSelected={selectedModels.includes(child.modelId)}
+                  unavailableReason={getUnavailableReason(child.modelId, modelAvailability)}
                   onToggle={() => onToggleModel(child.modelId!)}
                 />
               );
