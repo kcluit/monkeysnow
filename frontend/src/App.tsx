@@ -307,10 +307,10 @@ function App(): JSX.Element {
     // Resort filtering hook
     const { searchTerm, setSearchTerm, filteredResorts, sortResorts } = useResortFiltering(skiResorts, allWeatherData);
 
-    // Get sort day options for command palette
+    // Sort day options for the utility bars, settings and command palette
     const sortDayData = useMemo(
-        () => getSortDayData(selectedResorts, allWeatherData, processResortData, selectedElevation),
-        [selectedResorts, allWeatherData, selectedElevation]
+        () => getSortDayData(selectedResorts, allWeatherData, processResortData, selectedElevation, isShowDateEnabled),
+        [selectedResorts, allWeatherData, selectedElevation, isShowDateEnabled]
     );
 
     // Dependencies for command palette lazy generation
@@ -830,8 +830,7 @@ function App(): JSX.Element {
                         searchTerm={searchTerm}
                         setSearchTerm={setSearchTerm}
                         filteredResorts={filteredResorts}
-                        allWeatherData={allWeatherData}
-                        processResortData={processResortData}
+                        sortDayData={sortDayData}
                         cancelLoading={cancelLoading}
                         openResortModal={openResortModalAndDismissBanner}
                     />
@@ -852,8 +851,7 @@ function App(): JSX.Element {
                         searchTerm={searchTerm}
                         setSearchTerm={setSearchTerm}
                         filteredResorts={filteredResorts}
-                        allWeatherData={allWeatherData}
-                        processResortData={processResortData}
+                        sortDayData={sortDayData}
                         cancelLoading={cancelLoading}
                         openResortModal={openResortModalAndDismissBanner}
                     />

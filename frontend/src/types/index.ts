@@ -187,7 +187,8 @@ export interface SortDayOption {
 
 export interface SortDayData {
     specialOptions: SortDayOption[];
-    regularDays: DayForecast[];
+    /** The label of each day the Selection can be sorted by, today first */
+    regularDays: string[];
 }
 
 // Component props
@@ -207,12 +208,7 @@ export interface UtilityBarProps {
     searchTerm: string;
     setSearchTerm: (term: string) => void;
     filteredResorts: string[];
-    allWeatherData: AllWeatherData | null;
-    processResortData: (
-        allData: AllWeatherData,
-        resortName: string,
-        elevation: ElevationLevel
-    ) => ProcessedResortData | null;
+    sortDayData: SortDayData;
     cancelLoading: () => void;
 }
 

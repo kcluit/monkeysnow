@@ -87,13 +87,13 @@ export function MobileSortModal({
               {sortDayData.regularDays.length > 0 && (
                 <div className="sort-filter-separator" />
               )}
-              {sortDayData.regularDays.map((day, index) => (
+              {sortDayData.regularDays.map((label, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedSortDay(index)}
                   className={`sort-filter-day-option ${selectedSortDay === index ? 'selected' : ''}`}
                 >
-                  {day.name}
+                  {label}
                 </button>
               ))}
             </div>

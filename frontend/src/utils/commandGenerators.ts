@@ -134,11 +134,11 @@ export function generateSortDayCommands(
     });
   }
 
-  // Regular day options (Today, Tomorrow, etc.)
-  sortDayData.regularDays.forEach((day, index) => {
+  // One option per day, today first
+  sortDayData.regularDays.forEach((label, index) => {
     commands.push({
       id: `sortday-${index}`,
-      name: day.name,
+      name: label,
       icon: selectedSortDay === index ? icons.check : undefined,
       action: () => setSelectedSortDay(index),
     });

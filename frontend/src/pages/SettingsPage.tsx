@@ -390,10 +390,10 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                                     onClick={() => setSelectedSortDay(option.value as SortDay)}
                                 />
                             ))}
-                            {sortDayData.regularDays.map((day, index) => (
+                            {sortDayData.regularDays.map((label, index) => (
                                 <OptionButton
                                     key={index}
-                                    label={day.name}
+                                    label={label}
                                     isSelected={selectedSortDay === index}
                                     onClick={() => setSelectedSortDay(index)}
                                 />

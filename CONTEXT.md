@@ -78,6 +78,10 @@ _Avoid_: vendor, agency
 The area a **Forecast model** produces its own forecasts for. Outside it, a model returns nothing, nulls, or another model's numbers.
 _Avoid_: domain, region (when meaning a model's area)
 
+**Range**:
+How far ahead a **Forecast model** produces forecasts. Past it, the model returns nothing.
+_Avoid_: horizon (that is what we ask for), lead time
+
 **Seamless model**:
 A **Forecast model** that blends a **Provider**'s high-resolution models, which each cover part of the world, with a coarser global model (its own or ECMWF's), switching by location and forecast hour.
 _Avoid_: combined model, blend
@@ -89,6 +93,10 @@ _Avoid_: duplicate
 **Card model**:
 The single **Forecast model** behind a card on the main page, chosen by the country of the **Resort**, or for a **Saved location**, of the **Resort** nearest to it.
 _Avoid_: default model, primary model
+
+**Forecast horizon**:
+How many days ahead a forecast is asked for: fourteen on the main page, and whatever the visitor picks in the detail view. A card shows fewer days when its **Card model**'s **Range** ends sooner.
+_Avoid_: forecast days, forecast length
 
 **Preferred models**:
 A visitor's own list of **Forecast models**, one list for every **Resort**. Every visitor starts with the **Recommended models**.

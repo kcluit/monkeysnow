@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { UtilityBarProps, SortDay } from '../types';
-import { getSortDayData, getSortDayText } from '../utils/sortDayHelpers';
+import { getSortDayText } from '../utils/sortDayHelpers';
 import { isAscendingOrder } from '../hooks/useResortFiltering';
 import { MobileSortModal } from './MobileSortModal';
 
@@ -20,8 +20,7 @@ export function UtilityBar({
   setViewMode,
   isReversed,
   setIsReversed,
-  allWeatherData,
-  processResortData,
+  sortDayData,
   openResortModal
 }: ExtendedUtilityBarProps): JSX.Element {
   const [showSortMenu, setShowSortMenu] = useState(false);
@@ -43,7 +42,6 @@ export function UtilityBar({
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  const sortDayData = getSortDayData(selectedResorts, allWeatherData, processResortData, selectedElevation);
   const sortDayText = getSortDayText(selectedSortDay, sortDayData);
 
   return (
@@ -212,8 +210,9 @@ export function UtilityBar({
               </svg>
             </button>
             {showSortDayMenu && (
-              <div className="absolute top-full left-0 z-10 mt-2 w-36 bg-theme-background rounded-lg shadow-lg border border-theme-border">
-                <div className="p-2 space-y-1">
+              <div className="absolute top-full left-0 z-10 mt-2 w-max min-w-36 bg-theme-background rounded-lg shadow-lg border border-theme-border">
+                {/* A column, so the menu is as wide as its longest label rather than every button in a row */}
+                <div className="p-2 flex flex-col space-y-1">
                   {/* Special aggregate options */}
                   {sortDayData.specialOptions.map((option) => (
                     <button
@@ -235,7 +234,7 @@ export function UtilityBar({
 
                   {/* Regular day options */}
                   {sortDayData.regularDays.length > 0 ?
-                    sortDayData.regularDays.map((day, index) => (
+                    sortDayData.regularDays.map((label, index) => (
                       <button
                         key={index}
                         onClick={() => {
@@ -244,7 +243,7 @@ export function UtilityBar({
                         }}
                         className={`w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors duration-200 ${selectedSortDay === index ? 'text-theme-accent font-medium' : 'hover:bg-theme-secondary text-theme-textPrimary'}`}
                       >
-                        {day.name}
+                        {label}
                       </button>
                     )) :
                     !sortDayData.specialOptions.length && (

@@ -16,7 +16,12 @@ import type { DayData, ElevationForecast, PeriodData, ResortData, SnowQuality } 
 
 type ApiResponse = Awaited<ReturnType<typeof fetchWeatherApiWithinBudget>>[number];
 
-const FORECAST_DAYS = 10;
+/**
+ * The main page's Forecast horizon. A card shows fewer days when its Card model's
+ * Range ends sooner (ICON in Europe, GEM in Canada). Open-Meteo counts up to 14 days
+ * as one call, so this is as far as it goes without costing more of the Fetch budget.
+ */
+const FORECAST_DAYS = 14;
 
 /** Resorts per request; 25 resorts x 3 Elevation bands = at most 75 locations. */
 const RESORTS_PER_REQUEST = 25;

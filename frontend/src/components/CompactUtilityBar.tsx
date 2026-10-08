@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { UtilityBarProps, SortDay, ElevationLevel, SortOption, ViewMode } from '../types';
-import { getSortDayData, getSortDayText } from '../utils/sortDayHelpers';
+import { getSortDayText } from '../utils/sortDayHelpers';
 import { isAscendingOrder } from '../hooks/useResortFiltering';
 import { MobileSortModal } from './MobileSortModal';
 
@@ -20,8 +20,7 @@ export function CompactUtilityBar({
     setViewMode,
     isReversed,
     setIsReversed,
-    allWeatherData,
-    processResortData,
+    sortDayData,
     openResortModal
 }: ExtendedCompactUtilityBarProps): JSX.Element {
     const [showSortDayMenu, setShowSortDayMenu] = useState(false);
@@ -39,7 +38,6 @@ export function CompactUtilityBar({
         return () => document.removeEventListener('click', handleClickOutside);
     }, []);
 
-    const sortDayData = getSortDayData(selectedResorts, allWeatherData, processResortData, selectedElevation);
     const sortDayText = getSortDayText(selectedSortDay, sortDayData);
 
     // Cycle functions
@@ -138,8 +136,9 @@ export function CompactUtilityBar({
                             </svg>
                         </button>
                         {showSortDayMenu && (
-                            <div className="absolute left-0 z-10 mt-2 w-36 bg-theme-background rounded-lg shadow-lg border border-theme-border">
-                                <div className="p-2 space-y-1">
+                            <div className="absolute left-0 z-10 mt-2 w-max min-w-36 bg-theme-background rounded-lg shadow-lg border border-theme-border">
+                                {/* A column, so the menu is as wide as its longest label rather than every button in a row */}
+                                <div className="p-2 flex flex-col space-y-1">
                                     {/* Special aggregate options */}
                                     {sortDayData.specialOptions.map((option) => (
                                         <button
@@ -163,7 +162,7 @@ export function CompactUtilityBar({
                                     )}
 
                                     {/* Regular day options */}
-                                    {sortDayData.regularDays.map((day, index) => (
+                                    {sortDayData.regularDays.map((label, index) => (
                                         <button
                                             key={index}
                                             onClick={() => {
@@ -175,7 +174,7 @@ export function CompactUtilityBar({
                                                 : 'hover:bg-theme-secondary text-theme-textPrimary'
                                                 }`}
                                         >
-                                            {day.name}
+                                            {label}
                                         </button>
                                     ))}
                                 </div>
