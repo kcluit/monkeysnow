@@ -183,8 +183,15 @@ const COUNTRY_MODELS: Record<string, string> = {
 };
 const DEFAULT_MODEL = 'gfs_seamless';
 
-// Freezing level for countries whose main model doesn't provide it
+// Country-to-freezing-level-model mapping
 const FREEZING_LEVEL_MODELS: Record<string, string> = {
+    'Germany': 'icon_seamless',
+    'Austria': 'icon_seamless',
+    'Switzerland': 'icon_seamless',
+    'Liechtenstein': 'icon_seamless',
+    'Italy': 'icon_seamless',
+    'Slovenia': 'icon_seamless',
+    'France': 'icon_seamless',
     'Norway': 'icon_seamless',
     'Sweden': 'icon_seamless',
     'Finland': 'icon_seamless',
