@@ -422,8 +422,8 @@ async function importResorts() {
       if (parent === child || childLifts.size > parentLifts.size) continue;
       if (childLifts.size === parentLifts.size && parent > child) continue; // identical sets: list once
       if (![...childLifts].every(l => parentLifts.has(l))) continue;
-      const pair = `${parent} > ${child}`;
-      if (!reviewed.has(pair)) report.nested.push({ pair, parent, child, parentLifts: parentLifts.size, childLifts: childLifts.size });
+      if (reviewed.has(`${parent} > ${child}`) || reviewed.has(`${parent} > *`)) continue;
+      report.nested.push({ parent, child, parentLifts: parentLifts.size, childLifts: childLifts.size });
     }
   }
   const byNameAndRegion = new Map();
