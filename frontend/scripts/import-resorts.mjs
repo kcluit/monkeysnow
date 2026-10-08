@@ -123,9 +123,12 @@ function liftCount(statistics) {
   return Object.values(statistics?.lifts?.byType ?? {}).reduce((n, t) => n + (t.count ?? 0), 0);
 }
 
+/** Lowercase ASCII words joined by dashes; other scripts are transliterated ("太舞滑雪场" -> tai-wu-hua-xue-chang). */
+const toSlug = text => slugify(text, { allowedChars: 'a-zA-Z0-9' });
+
 /** A URL slug for a name, without generic endings: "Big White Ski Resort" -> big-white. */
 function slugForName(name) {
-  const slug = slugify(name);
+  const slug = toSlug(name);
   const trimmed = slug
     .replace(/^skigebiet-/, '')
     .replace(/-(ski-(resort|area|centre|center|hill|station|park)|mountain-resort|ski-and-snowboard-resort|resort)$/, '');
@@ -213,7 +216,7 @@ async function rename(oldSlug, newSlug) {
   if (registry[newSlug] || Object.values(registry).some(e => e.aliases?.includes(newSlug))) {
     throw new Error(`"${newSlug}" is already a slug or alias.`);
   }
-  if (newSlug !== slugify(newSlug)) throw new Error(`"${newSlug}" is not a valid slug; try "${slugify(newSlug)}".`);
+  if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(newSlug)) throw new Error(`"${newSlug}" is not a valid slug; try "${slugForName(newSlug)}".`);
 
   const entry = registry[oldSlug];
   delete registry[oldSlug];
