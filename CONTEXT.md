@@ -75,7 +75,7 @@ A **Forecast model** that blends a **Provider**'s high-resolution models, which 
 _Avoid_: combined model, blend
 
 **Clone**:
-A **Forecast model** whose numbers at a **Resort** are identical to another model's because the **Resort** is outside its **Coverage** and it falls back to that model.
+A **Forecast model** whose numbers at the point being forecast are identical to another model's, because the point is outside its **Coverage** and it falls back to that model.
 _Avoid_: duplicate
 
 **Card model**:
