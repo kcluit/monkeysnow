@@ -170,7 +170,7 @@ export function rateLimitWindowOf(error: unknown): RateLimitWindow | null {
     const message = error instanceof Error ? error.message : '';
     if (/daily|monthly/i.test(message)) return 'day';
     if (/hourly/i.test(message)) return 'hour';
-    if (/minutely|limit exceeded|too many/i.test(message)) return 'minute';
+    if (/minutely|limit exceeded|too many requests|too many concurrent/i.test(message)) return 'minute';
     return null;
 }
 
