@@ -229,7 +229,10 @@ export interface UseWeatherDataReturn {
     loading: boolean;
     error: Error | null;
     updatedAt: string | null;
-    fetchResorts: (resortNames: string[]) => Promise<void>;
+    /** Selected resorts with no forecast yet, waiting on the Fetch budget */
+    queuedCount: number;
+    /** Open-Meteo calls still needed to load the queued resorts */
+    queuedCalls: number;
     createLoadingController: () => AbortController;
     cancelLoading: () => void;
 }
