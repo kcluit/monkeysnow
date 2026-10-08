@@ -42,7 +42,7 @@ export function FetchStatus({ count, calls, things, onlyWhenLimited = false, cla
     const noun = t(count === 1 ? singular : plural);
     const loadMs = Math.ceil(calls / FETCH_BUDGET_PER_MINUTE) * 60_000;
     const formatEta = (ms: number) => {
-        const minutes = Math.max(1, Math.ceil(ms / 60_000));
+        const minutes = Math.max(1, Math.round(ms / 60_000));
         return minutes < 60
             ? interpolate(t('fetchStatus.etaMinutes'), { n: minutes })
             : interpolate(t('fetchStatus.etaHours'), { n: Math.round(minutes / 60) });
