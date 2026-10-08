@@ -2,6 +2,8 @@ import { useCallback, useMemo, useState } from 'react';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useDetailedWeatherData } from '../../hooks/useDetailedWeatherData';
 import { useElevationFetch } from '../../hooks/useElevationFetch';
+import { useBudgetPause } from '../../hooks/useBudgetPause';
+import { FetchStatus } from '../FetchStatus';
 import { DetailUtilityBar } from './DetailUtilityBar';
 import { DetailChartGrid } from './DetailChartGrid';
 import { ResortMap } from '../map/ResortMap';
