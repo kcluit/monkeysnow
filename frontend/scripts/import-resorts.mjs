@@ -346,7 +346,7 @@ async function importResorts() {
   for (const area of candidates) {
     if (slugOf.has(area)) continue;
     const place = area.properties.places?.[0];
-    const base = slugify(splitName(area.properties.name).name) || 'resort';
+    const base = slugForName(splitName(area.properties.name).name) || 'resort';
     const options = [base, `${base}-${slugify(place?.localized?.en?.region ?? '')}`, `${base}-${slugify(place?.iso3166_1Alpha2 ?? '')}`]
       .map(s => s.replace(/-+$/, ''));
     let slug = options.find(s => !taken.has(s));
