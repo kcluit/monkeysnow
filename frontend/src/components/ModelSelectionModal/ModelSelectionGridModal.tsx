@@ -120,20 +120,39 @@ const Checkbox = memo(function Checkbox({
   );
 });
 
+/**
+ * Why a model isn't drawn at the point being forecast, or null when it is (or would be).
+ * Models stay tickable either way: Preferred models are one list for every Resort.
+ */
+function getUnavailableReason(modelId: WeatherModel, availability: ModelAvailabilityContext): string | null {
+  const { point, droppedModels } = availability;
+  if (!coversPoint(modelId, point.lat, point.lon)) return 'Outside its coverage';
+  const dropped = droppedModels.get(modelId);
+  if (dropped?.reason === 'no-data') return 'No data here';
+  if (dropped?.reason === 'clone') return `Same as ${getModelConfig(dropped.of).name} here`;
+  return null;
+}
+
 // Model item component
 const ModelItem = memo(function ModelItem({
   node,
   isSelected,
+  unavailableReason,
   onToggle,
 }: {
   node: ModelHierarchyNode;
   isSelected: boolean;
+  unavailableReason: string | null;
   onToggle: () => void;
 }) {
   const color = node.modelId ? getModelConfig(node.modelId).color : '#6b7280';
 
   return (
-    <label className="resort-grid-item" onClick={(e) => { e.preventDefault(); onToggle(); }}>
+    <label
+      className={`resort-grid-item ${unavailableReason ? 'model-grid-item-unavailable' : ''}`}
+      onClick={(e) => { e.preventDefault(); onToggle(); }}
+      title={node.description}
+    >
       <Checkbox state={isSelected ? 'all' : 'none'} onClick={(e) => { e.stopPropagation(); onToggle(); }} />
       <span
         className="model-color-dot"
@@ -142,6 +161,11 @@ const ModelItem = memo(function ModelItem({
       <span className="resort-grid-item-name">{node.name}</span>
       {node.resolution && (
         <span className="model-resolution-label">({node.resolution})</span>
+      )}
+      {node.ai && <span className="model-tag">AI</span>}
+      {node.experimental && <span className="model-tag">Experimental</span>}
+      {unavailableReason && (
+        <span className="model-availability-note">{unavailableReason}</span>
       )}
     </label>
   );
