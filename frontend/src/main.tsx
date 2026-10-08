@@ -16,7 +16,7 @@ function Root(): JSX.Element {
     );
 }
 
-// Migrate old resort IDs in localStorage to new backend IDs
+// Migrate old resort IDs in localStorage to current resort IDs
 // This runs once on app load before rendering
 const migrateResortIds = () => {
     const ID_MIGRATIONS: Record<string, string> = {
@@ -49,8 +49,26 @@ const migrateResortIds = () => {
     }
 };
 
-// Run migration before rendering
+// Selections saved under the old 600-resort cap are trimmed to the current
+// Selection cap before anything is fetched. App shows a one-time notice.
+const trimOversizedSelection = () => {
+    try {
+        const stored = localStorage.getItem('selectedResorts');
+        if (!stored) return;
+
+        const selectedResorts: string[] = JSON.parse(stored);
+        if (selectedResorts.length <= MAX_SELECTED_RESORTS) return;
+
+        localStorage.setItem('selectedResorts', JSON.stringify(selectedResorts.slice(0, MAX_SELECTED_RESORTS)));
+        localStorage.setItem('selectionTrimmed', 'true');
+    } catch (err) {
+        console.error('Error trimming resort selection:', err);
+    }
+};
+
+// Run migrations before rendering
 migrateResortIds();
+trimOversizedSelection();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
