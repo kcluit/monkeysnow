@@ -7,8 +7,15 @@ import { FetchStatus } from '../FetchStatus';
 import { DetailUtilityBar } from './DetailUtilityBar';
 import { DetailChartGrid } from './DetailChartGrid';
 import { ResortMap } from '../map/ResortMap';
-import { DEFAULT_VARIABLES, DEFAULT_MODELS } from '../../utils/chartConfigurations';
-import { aggregationOptions } from '../../data/modelHierarchy';
+import { DEFAULT_VARIABLES } from '../../utils/chartConfigurations';
+import {
+    aggregationOptions,
+    RECOMMENDED_MODELS,
+    coversPoint,
+    inCatalogueOrder,
+    isKnownModel,
+} from '../../data/modelHierarchy';
+import { resolveComparisonModels } from '../../utils/comparisonModels';
 import type { DetailedResortViewProps, ElevationSelection, CustomLocation } from '../../types/detailView';
 import type { WeatherModel, WeatherVariable, AggregationType } from '../../types/openMeteo';
 import type { UnitSystem, ModelLineOpacity } from '../../types';
