@@ -73,6 +73,8 @@ export function useDetailedWeatherData({
         prevParamsRef.current = paramsKey;
 
         let cancelled = false;
+        // Aborting drops requests still waiting on the Fetch budget (e.g. through a rate-limit pause)
+        const controller = new AbortController();
         let timezoneSet = false; // Track if timezone has been captured
 
         // Initialize with empty map
