@@ -1,7 +1,7 @@
 import type { WeatherModel, WeatherVariable, HourlyDataPoint, TimezoneInfo } from '../types/openMeteo';
 import { getOverlayVariablesFor, hasOverlays } from './chartConfigurations';
 import { fetchWeatherApiWithinBudget } from './openMeteoBudget';
-import { RESORT_LOCATIONS, type ResortLocation } from '../data/resortLocations';
+import { RESORT_LOCATIONS, resolveResortId, type ResortLocation } from '../data/resortLocations';
 
 // DEV MODE: Enable mock data for performance testing
 // Set window.__USE_MOCK_DATA = true in browser console to enable
