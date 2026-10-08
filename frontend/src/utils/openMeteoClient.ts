@@ -164,7 +164,8 @@ export async function fetchOpenMeteoData(
   models: WeatherModel[],
   variables: WeatherVariable[],
   forecastDays: number = 14,
-  timezone: string = 'auto'
+  timezone: string = 'auto',
+  signal?: AbortSignal
 ): Promise<FetchOpenMeteoDataResult> {
   // Expand variables to include overlay variables
   const expandedVariables = expandVariablesWithOverlays(variables);
