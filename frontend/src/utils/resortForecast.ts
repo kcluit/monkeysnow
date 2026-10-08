@@ -200,8 +200,13 @@ const FREEZING_LEVEL_MODELS: Record<string, string> = {
 };
 const DEFAULT_FREEZING_MODEL = 'gfs_seamless';
 
-/** Main models that return freezing_level_height themselves, saving a request. */
-const MODELS_WITH_FREEZING_LEVEL = new Set(['gfs_seamless', 'dwd_icon_seamless']);
+/**
+ * Main models whose freezing level is taken from the main request, saving a call per resort.
+ * With an elevation set, Open-Meteo may pick a neighbouring grid cell: for GFS that moves
+ * the freezing level by at most a few tens of metres, but for ICON in the Alps by up to
+ * 400 m, so ICON keeps its own request at the resort's terrain elevation.
+ */
+const MODELS_WITH_FREEZING_LEVEL = new Set(['gfs_seamless']);
 
 interface RequestPlan {
     model: string;
