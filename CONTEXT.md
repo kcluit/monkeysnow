@@ -14,6 +14,10 @@ _Avoid_: location, mountain, spot
 One of a **Resort**'s three forecast heights: base (`bot`), mid or top.
 _Avoid_: level, elevation (when meaning the band rather than a height in metres)
 
+**Custom location**:
+A point a visitor picks on a **Resort**'s map, forecast at its own ground elevation in place of the **Resort** and its **Elevation band**. It is never saved.
+_Avoid_: pin, spot, point, location (on its own)
+
 ### Selection and limits
 
 **Selection**:
