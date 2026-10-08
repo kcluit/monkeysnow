@@ -106,7 +106,7 @@ export function useWeatherData(selectedResorts: string[]): UseWeatherDataReturn 
           } catch (err) {
             if (signal.aborted) return;
             console.error(`Failed to fetch ${group.length} resorts (attempt ${attempt}/${MAX_ATTEMPTS}):`, err);
-            if (attempt === MAX_ATTEMPTS) {
+            if (attempt === MAX_ATTEMPTS || !isTransientError(err)) {
               setError(err instanceof Error ? err : new Error('Unknown error'));
             } else {
               await sleep(2000 * attempt, signal);
