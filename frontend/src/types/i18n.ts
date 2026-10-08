@@ -43,6 +43,7 @@ export interface Translations {
     'command.theme': string;
     'command.font': string;
     'command.rainbowText': string;
+    'command.boldText': string;
     'command.fullscreen': string;
     'command.fpsCounter': string;
     'command.hideIcons': string;
@@ -191,6 +192,7 @@ export const TranslationsSchema = z.object({
     'command.theme': z.string(),
     'command.font': z.string(),
     'command.rainbowText': z.string(),
+    'command.boldText': z.string(),
     'command.fullscreen': z.string(),
     'command.fpsCounter': z.string(),
     'command.hideIcons': z.string(),

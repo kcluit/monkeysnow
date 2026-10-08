@@ -36,6 +36,8 @@ export interface SettingsPageProps {
     // Display toggles
     isRainbowEnabled: boolean;
     setRainbowEnabled: (enabled: boolean) => void;
+    isBoldTextEnabled: boolean;
+    setBoldTextEnabled: (enabled: boolean) => void;
     isHideIconsEnabled: boolean;
     setHideIconsEnabled: (enabled: boolean) => void;
     isHideBordersEnabled: boolean;
@@ -228,6 +230,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
         availableThemes, setTheme, currentThemeId, applyTheme, resetThemePreview,
         availableFonts, setFont, currentFontId, applyFont, resetFontPreview,
         isRainbowEnabled, setRainbowEnabled,
+        isBoldTextEnabled, setBoldTextEnabled,
         isHideIconsEnabled, setHideIconsEnabled,
         isHideBordersEnabled, setHideBordersEnabled,
         isShowDateEnabled, setShowDateEnabled,
@@ -321,6 +324,12 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                             isEnabled={isRainbowEnabled}
                             onToggle={setRainbowEnabled}
                             icon={icons.rainbow}
+                        />
+                        <Toggle
+                            label="Bold text"
+                            isEnabled={isBoldTextEnabled}
+                            onToggle={setBoldTextEnabled}
+                            icon={icons.bold}
                         />
                         <Toggle
                             label="Hide icons"

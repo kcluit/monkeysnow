@@ -11,7 +11,7 @@
     h5,
     h6 {
         font-family: var(--fontFamily, 'SF Pro Display', system-ui, sans-serif);
-        font-weight: 600;
+        font-weight: var(--weight-semibold);
     }
 }
 
@@ -22,12 +22,28 @@
     --border: transparent !important;
 }
 
+/* Font weights - every font-weight (and Tailwind's font-* classes) uses these, except the logo */
+:root {
+    --weight-normal: 400;
+    --weight-medium: 500;
+    --weight-semibold: 600;
+    --weight-bold: 700;
+}
+
+/* Bold Text Mode - Makes every weight one step heavier when enabled */
+:root.bold-text {
+    --weight-normal: 500;
+    --weight-medium: 600;
+    --weight-semibold: 700;
+    --weight-bold: 800;
+}
+
 body {
     background: var(--background);
     min-height: 100vh;
     position: relative;
     font-family: var(--fontFamily, 'SF Pro Display', system-ui, sans-serif);
-    font-weight: 400;
+    font-weight: var(--weight-normal);
     letter-spacing: -0.02em;
     transition: background-color 0.3s ease;
 }
@@ -119,7 +135,7 @@ h1.apple-rainbow-text,
 
 .settings-title {
     font-size: 1.75rem;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
     color: var(--textPrimary);
     margin-bottom: 0.25rem;
 }
@@ -147,7 +163,7 @@ h1.apple-rainbow-text,
     align-items: center;
     gap: 0.5rem;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
     color: var(--textPrimary);
     margin-bottom: 1rem;
 }
@@ -321,7 +337,7 @@ h1.apple-rainbow-text,
 
 .settings-subsection-label {
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: var(--weight-medium);
     color: var(--textSecondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -570,7 +586,7 @@ input[type="checkbox"] {
     border-radius: 8px;
     color: var(--textSecondary, #a1a1a6);
     font-size: 16px;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
     cursor: pointer;
     transition: all 0.15s ease;
 }
@@ -661,7 +677,7 @@ input[type="checkbox"] {
 }
 
 .command-name {
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
 }
 
 .command-item-meta {
@@ -682,7 +698,7 @@ input[type="checkbox"] {
 .command-arrow {
     color: var(--textSecondary, #a1a1a6);
     font-size: 12px;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
 }
 
 .command-palette-footer {
@@ -724,7 +740,7 @@ input[type="checkbox"] {
     margin: 0;
     color: var(--textPrimary, #f5f5f7);
     font-size: 18px;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
 }
 
 .variable-selection-subtitle {
@@ -748,7 +764,7 @@ input[type="checkbox"] {
     border-radius: 6px;
     color: var(--textPrimary, #f5f5f7);
     font-size: 12px;
-    font-weight: 500;
+    font-weight: var(--weight-medium);
     cursor: pointer;
     transition: background-color 0.15s ease;
 }
@@ -860,7 +876,7 @@ input[type="checkbox"] {
 .variable-info-label {
     color: var(--textPrimary, #f5f5f7);
     font-size: 14px;
-    font-weight: 500;
+    font-weight: var(--weight-medium);
 }
 
 .variable-info-unit {
@@ -910,7 +926,7 @@ input[type="checkbox"] {
 .variable-category-name {
     flex: 1;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
     color: var(--textPrimary, #f5f5f7);
 }
 
@@ -970,7 +986,7 @@ input[type="checkbox"] {
 .variable-card-label {
     flex: 1;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: var(--weight-medium);
     color: var(--textPrimary, #f5f5f7);
     white-space: nowrap;
     overflow: hidden;
@@ -1088,7 +1104,7 @@ input[type="checkbox"] {
 .fps-value {
     color: var(--accent, #0a84ff);
     font-size: 14px;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
 }
 
 .fps-label {
@@ -1279,7 +1295,7 @@ input[type="checkbox"] {
     border: 2px solid var(--textSecondary, #a1a1a6);
     border-radius: 4px;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: var(--weight-bold);
     color: transparent;
     background: transparent;
     transition: all 0.15s ease;
@@ -1323,7 +1339,7 @@ input[type="checkbox"] {
 }
 
 .resort-tree-name {
-    font-weight: 500;
+    font-weight: var(--weight-medium);
 }
 
 .resort-tree-count {
@@ -1332,13 +1348,13 @@ input[type="checkbox"] {
     border-radius: 10px;
     color: var(--textSecondary, #a1a1a6);
     font-size: 11px;
-    font-weight: 500;
+    font-weight: var(--weight-medium);
 }
 
 .resort-tree-arrow {
     color: var(--textSecondary, #a1a1a6);
     font-size: 12px;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
 }
 
 .resort-selection-count {
@@ -1348,7 +1364,7 @@ input[type="checkbox"] {
     border-radius: 10px;
     color: #ffffff;
     font-size: 11px;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
 }
 
 .resort-grid-clear-btn + .resort-selection-count {
@@ -1495,7 +1511,7 @@ input[type="checkbox"] {
 }
 
 .resort-grid-continent-name {
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
     font-size: 14px;
     color: var(--textPrimary, #f5f5f7);
     flex: 1;
@@ -1533,7 +1549,7 @@ input[type="checkbox"] {
 }
 
 .resort-grid-country-name {
-    font-weight: 500;
+    font-weight: var(--weight-medium);
     font-size: 13px;
     color: var(--textPrimary, #f5f5f7);
     flex: 1;
@@ -1571,7 +1587,7 @@ input[type="checkbox"] {
 }
 
 .resort-grid-province-name {
-    font-weight: 500;
+    font-weight: var(--weight-medium);
     font-size: 12px;
     color: var(--textPrimary, #f5f5f7);
     flex: 1;
@@ -1644,7 +1660,7 @@ input[type="checkbox"] {
 
 .model-tag {
     font-size: 8px;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--textSecondary, #a1a1a6);
@@ -1684,7 +1700,7 @@ input[type="checkbox"] {
     border-radius: 8px;
     color: var(--textSecondary, #a1a1a6);
     font-size: 10px;
-    font-weight: 500;
+    font-weight: var(--weight-medium);
     white-space: nowrap;
 }
 
@@ -1698,7 +1714,7 @@ input[type="checkbox"] {
     border: 2px solid var(--textSecondary, #a1a1a6);
     border-radius: 3px;
     font-size: 10px;
-    font-weight: 700;
+    font-weight: var(--weight-bold);
     color: transparent;
     background: transparent;
     transition: all 0.15s ease;
@@ -1742,7 +1758,7 @@ input[type="checkbox"] {
 
 .compact-utility-bar-inner {
     font-size: 14px;
-    font-weight: 500;
+    font-weight: var(--weight-medium);
 }
 
 .compact-bar-text {
@@ -1861,7 +1877,7 @@ input[type="checkbox"] {
     border: 2px solid var(--textSecondary, #a1a1a6);
     border-radius: 4px;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: var(--weight-bold);
     color: transparent;
     background: transparent;
     transition: all 0.15s ease;
@@ -1911,7 +1927,7 @@ input[type="checkbox"] {
 }
 
 .model-tree-name {
-    font-weight: 500;
+    font-weight: var(--weight-medium);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1935,14 +1951,14 @@ input[type="checkbox"] {
     border-radius: 10px;
     color: var(--textSecondary, #a1a1a6);
     font-size: 11px;
-    font-weight: 500;
+    font-weight: var(--weight-medium);
     white-space: nowrap;
 }
 
 .model-tree-arrow {
     color: var(--textSecondary, #a1a1a6);
     font-size: 12px;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
 }
 
 /* Color picker for aggregations */
@@ -2012,7 +2028,7 @@ input[type="checkbox"] {
 
 .model-aggregation-header {
     font-size: 11px;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--textSecondary, #a1a1a6);
@@ -2235,7 +2251,7 @@ input[type="checkbox"] {
     margin: 0;
     color: var(--textPrimary, #f5f5f7);
     font-size: 16px;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
 }
 
 .chart-settings-content {
@@ -2256,7 +2272,7 @@ input[type="checkbox"] {
     margin: 0 0 10px 0;
     color: var(--textSecondary, #a1a1a6);
     font-size: 12px;
-    font-weight: 500;
+    font-weight: var(--weight-medium);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -2303,7 +2319,7 @@ input[type="checkbox"] {
 }
 
 .chart-type-label {
-    font-weight: 500;
+    font-weight: var(--weight-medium);
 }
 
 /* Settings Toggle */
@@ -2334,7 +2350,7 @@ input[type="checkbox"] {
     gap: 10px;
     color: var(--textPrimary, #f5f5f7);
     font-size: 14px;
-    font-weight: 500;
+    font-weight: var(--weight-medium);
 }
 
 .chart-settings-toggle-label::before {
@@ -2376,7 +2392,7 @@ input[type="checkbox"] {
     padding: 4px 10px;
     border-radius: 4px;
     font-size: 11px;
-    font-weight: 500;
+    font-weight: var(--weight-medium);
     color: #fff;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
@@ -2403,7 +2419,7 @@ input[type="checkbox"] {
 
 .elevation-line.current {
     color: var(--textPrimary, #f5f5f7);
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
     border-left-color: var(--accent, #0a84ff);
     border-left-width: 3px;
 }
@@ -2422,7 +2438,7 @@ input[type="checkbox"] {
     border: none;
     border-radius: 6px;
     font-size: 13px;
-    font-weight: 500;
+    font-weight: var(--weight-medium);
     font-family: inherit;
     cursor: pointer;
     transition: all 0.15s ease;
@@ -2473,7 +2489,7 @@ input[type="checkbox"] {
 .sort-filter-title {
     margin: 0;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
     color: var(--textPrimary, #f5f5f7);
 }
 
@@ -2513,7 +2529,7 @@ input[type="checkbox"] {
 .sort-filter-section-title {
     margin: 0 0 10px 0;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--textSecondary, #a1a1a6);
@@ -2536,7 +2552,7 @@ input[type="checkbox"] {
     background: var(--cardBg, rgba(255, 255, 255, 0.05));
     color: var(--textPrimary, #f5f5f7);
     font-size: 14px;
-    font-weight: 500;
+    font-weight: var(--weight-medium);
     cursor: pointer;
     transition: all 0.15s ease;
     text-align: center;
@@ -2565,7 +2581,7 @@ input[type="checkbox"] {
     background: var(--cardBg, rgba(255, 255, 255, 0.05));
     color: var(--textPrimary, #f5f5f7);
     font-size: 13px;
-    font-weight: 500;
+    font-weight: var(--weight-medium);
     cursor: pointer;
     transition: all 0.15s ease;
 }
@@ -2664,18 +2680,18 @@ input[type="checkbox"] {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
     font-size: 0.9rem;
     color: var(--textPrimary, #f5f5f7);
 }
 
 .weather-chart-unit {
-    font-weight: 400;
+    font-weight: var(--weight-normal);
     opacity: 0.7;
 }
 
 .weather-chart-description {
-    font-weight: 400;
+    font-weight: var(--weight-normal);
     font-size: 0.75rem;
     opacity: 0.5;
     margin-left: 0.5rem;
@@ -2850,7 +2866,7 @@ input[type="checkbox"] {
 
 .chart-settings-slider-value {
     color: var(--accent, #0a84ff);
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
     font-size: 0.8125rem;
 }
 
@@ -2946,14 +2962,14 @@ input[type="checkbox"] {
     font-size: 1.125rem;
     color: var(--textSecondary, #a1a1a6);
     margin: 0;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
 }
 
 .about-hero-subtext {
     font-size: 0.875rem;
     color: var(--textSecondary, #a1a1a6);
     margin: 0.5rem 0 0;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
 }
 
 /* Section Styles */
@@ -2969,7 +2985,7 @@ input[type="checkbox"] {
     align-items: center;
     gap: 0.75rem;
     font-size: 1.5rem;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
     color: var(--textPrimary);
     margin: 0 0 1rem;
     padding-bottom: 0.75rem;
@@ -2991,7 +3007,7 @@ input[type="checkbox"] {
     margin: 0;
     color: var(--textSecondary);
     line-height: 1.7;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
 }
 
 /* Subsection Styles */
@@ -3004,7 +3020,7 @@ input[type="checkbox"] {
     align-items: center;
     gap: 0.5rem;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
     color: var(--textPrimary);
     margin: 0 0 0.75rem;
 }
@@ -3028,7 +3044,7 @@ input[type="checkbox"] {
 
 .about-stats-list dt {
     color: var(--textPrimary);
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
     font-size: 0.9375rem;
 }
 
@@ -3037,14 +3053,14 @@ input[type="checkbox"] {
     margin: 0 0 0.75rem;
     padding-left: 0.5rem;
     line-height: 1.6;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
 }
 
 /* Note styling */
 .about-note {
     font-size: 0.8125rem;
     font-style: italic;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
     opacity: 0.8;
     margin-top: 1rem;
     padding: 0.75rem;
@@ -3095,7 +3111,7 @@ input[type="checkbox"] {
     border: none;
     border-radius: 8px;
     font-size: 0.9375rem;
-    font-weight: 500;
+    font-weight: var(--weight-medium);
     text-decoration: none;
     cursor: pointer;
     transition: opacity 0.15s ease, transform 0.15s ease;

@@ -28,6 +28,7 @@ import { useFullscreen, isFullscreenSupported } from './hooks/useFullscreen';
 import { useFPSCounter } from './hooks/useFPSCounter';
 import { useCommandPalette } from './hooks/useCommandPalette';
 import { useRainbowText } from './hooks/useRainbowText';
+import { useBoldText } from './hooks/useBoldText';
 import { useHideIcons } from './hooks/useHideIcons';
 import { useHideBorders } from './hooks/useHideBorders';
 import { useShowDate } from './hooks/useShowDate';
@@ -216,9 +217,10 @@ function SavedLocationRoute({
 function App(): JSX.Element {
     const navigate = useNavigate();
 
-    // Theme, font, fullscreen, FPS, rainbow, hide emoji, and language hooks
+    // Theme, font, bold text, fullscreen, FPS, rainbow, hide emoji, and language hooks
     const { theme, setTheme, availableThemes, applyTheme, resetPreview } = useTheme();
     const { font, setFont, availableFonts, applyFont, resetPreview: resetFontPreview } = useFont();
+    const { isBoldTextEnabled, setBoldTextEnabled } = useBoldText();
     const { isFullscreen, enterFullscreen, exitFullscreen } = useFullscreen();
     const { fps, isEnabled: isFPSEnabled, setEnabled: setFPSEnabled } = useFPSCounter();
     const { isRainbowEnabled, setRainbowEnabled } = useRainbowText();
@@ -316,6 +318,7 @@ function App(): JSX.Element {
         availableThemes, setTheme,
         availableFonts, setFont,
         isRainbowEnabled, setRainbowEnabled,
+        isBoldTextEnabled, setBoldTextEnabled,
         isFullscreen, enterFullscreen, exitFullscreen,
         isFPSEnabled, setFPSEnabled,
         isHideIconsEnabled, setHideIconsEnabled,
@@ -382,6 +385,25 @@ function App(): JSX.Element {
                         name: 'Off',
                         icon: !isRainbowEnabled ? icons.check : undefined,
                         action: () => setRainbowEnabled(false),
+                    },
+                ],
+            },
+            {
+                id: 'bold-text',
+                name: 'Bold text',
+                icon: icons.bold,
+                subCommands: [
+                    {
+                        id: 'bold-text-on',
+                        name: 'On',
+                        icon: isBoldTextEnabled ? icons.check : undefined,
+                        action: () => setBoldTextEnabled(true),
+                    },
+                    {
+                        id: 'bold-text-off',
+                        name: 'Off',
+                        icon: !isBoldTextEnabled ? icons.check : undefined,
+                        action: () => setBoldTextEnabled(false),
                     },
                 ],
             },
@@ -912,6 +934,8 @@ function App(): JSX.Element {
         resetFontPreview,
         isRainbowEnabled,
         setRainbowEnabled,
+        isBoldTextEnabled,
+        setBoldTextEnabled,
         isHideIconsEnabled,
         setHideIconsEnabled,
         isHideBordersEnabled,
