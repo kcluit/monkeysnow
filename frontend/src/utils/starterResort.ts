@@ -23,8 +23,10 @@ interface Coordinates {
 }
 
 export async function pickStarterResort(landingPath: string, signal: AbortSignal): Promise<string> {
+    // Old IDs from search engines' indexes (e.g. /resort/Big-White) count as landing on that Resort
     const landedOn = matchPath('/resort/:resortId', landingPath)?.params.resortId;
-    if (landedOn && RESORT_LOCATIONS.has(landedOn)) return landedOn;
+    const landedOnResort = landedOn ? resolveResortId(landedOn) : null;
+    if (landedOnResort) return landedOnResort;
 
     const visitor = await locateVisitor(signal);
     return visitor ? nearestResort(visitor) : randomResort();
