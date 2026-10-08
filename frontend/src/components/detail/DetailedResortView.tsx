@@ -293,8 +293,8 @@ export function DetailedResortView({
                     <DetailUtilityBar
                         onBack={onBack}
                         unitSystem={unitSystem}
-                        selectedModels={selectedModels}
-                        setSelectedModels={setSelectedModels}
+                        selectedModels={preferredModels}
+                        setSelectedModels={setPreferredModels}
                         selectedVariables={selectedVariables}
                         setSelectedVariables={setSelectedVariables}
                         selectedAggregations={selectedAggregations}
