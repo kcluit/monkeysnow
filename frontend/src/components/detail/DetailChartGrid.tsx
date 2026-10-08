@@ -22,6 +22,7 @@ export function DetailChartGrid({
     unitSystem,
     timezoneInfo,
     isChartLocked,
+    isLoading,
     onToggleVariable,
     location,
 }: DetailChartGridProps): JSX.Element {
