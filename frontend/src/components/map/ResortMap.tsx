@@ -133,16 +133,15 @@ export function ResortMap({
                 <MapContainer
                     center={[lat, lon]}
                     zoom={11}
-                    maxZoom={17}
+                    maxZoom={18}
                     scrollWheelZoom={true}
                     className={`h-full rounded-xl shadow-lg ${className}`}
                     style={{ zIndex: 0 }}
                 >
-                    {/* Topo base map. OpenSkiMap looks better, but its terms forbid other sites using its tiles. */}
+                    {/* Plain OpenStreetMap base map. OpenSkiMap looks better, but its terms forbid other sites using its tiles. */}
                     <TileLayer
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, SRTM | &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
-                        url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
-                        maxZoom={17}
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                        url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
 
                     {/* Ski runs (coloured by difficulty) and lifts, drawn over the base map */}
