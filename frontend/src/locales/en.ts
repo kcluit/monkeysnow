@@ -112,6 +112,20 @@ export const en: Translations = {
     // Empty states
     'empty.selectResorts': 'Select resorts to view forecasts',
 
+    // Fetch status
+    'fetchStatus.queued': '{count} {things} queued · {eta}',
+    'fetchStatus.limitReached': 'Limit reached · {count} {things} will load in {eta}',
+    'fetchStatus.limitReachedTomorrow': 'Limit reached · {count} {things} will load tomorrow',
+    'fetchStatus.etaMinutes': '~{n} min',
+    'fetchStatus.etaHours': '~{n} hr',
+    'fetchStatus.resort': 'resort',
+    'fetchStatus.resorts': 'resorts',
+    'fetchStatus.model': 'model',
+    'fetchStatus.models': 'models',
+
+    // Selection
+    'selection.trimmed': 'Your selection was trimmed to {max} resorts, the new maximum.',
+
     // Detail View
     'detail.loadingForecast': 'Loading forecast data...',
     'detail.errorLoadingForecast': 'Error loading forecast data',
