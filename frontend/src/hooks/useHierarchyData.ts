@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { RESORT_HIERARCHY } from '../data/resortLocations';
 import type { ContinentData } from '../data/resortLocations';
 import { useSavedLocations } from './useSavedLocations';
@@ -137,11 +137,6 @@ export interface UseHierarchyDataReturn {
 }
 
 export function useHierarchyData(): UseHierarchyDataReturn {
-  // Drop the copy of the hierarchy that used to be cached from the backend
-  useEffect(() => {
-    try { localStorage.removeItem('hierarchyCache'); } catch { /* ignore */ }
-  }, []);
-
   const savedLocations = useSavedLocations();
 
   const hierarchyTree = useMemo(

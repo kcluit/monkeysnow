@@ -123,9 +123,6 @@ export const en: Translations = {
     'fetchStatus.model': 'model',
     'fetchStatus.models': 'models',
 
-    // Selection
-    'selection.trimmed': 'Your selection was trimmed to {max} resorts, the new maximum.',
-
     // Detail View
     'detail.loadingForecast': 'Loading forecast data...',
     'detail.errorLoadingForecast': 'Error loading forecast data',

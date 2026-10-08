@@ -122,9 +122,6 @@ export interface Translations {
     'fetchStatus.model': string;
     'fetchStatus.models': string;
 
-    // Selection ({max} is filled in at runtime)
-    'selection.trimmed': string;
-
     // Detail View
     'detail.loadingForecast': string;
     'detail.errorLoadingForecast': string;
@@ -269,9 +266,6 @@ export const TranslationsSchema = z.object({
     'fetchStatus.resorts': z.string(),
     'fetchStatus.model': z.string(),
     'fetchStatus.models': z.string(),
-
-    // Selection
-    'selection.trimmed': z.string(),
 
     // Detail View
     'detail.loadingForecast': z.string(),

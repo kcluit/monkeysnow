@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { HierarchyProvider } from './contexts/HierarchyContext'
-import { MAX_SELECTED_RESORTS } from './hooks/useResortHierarchy'
 import { resolveResortId } from './data/resortLocations'
 import { getSavedLocation, isSavedLocationId } from './utils/savedLocations'
+import { idbClear } from './utils/indexedDB'
 import './style.css'
 
 // Main app wrapper
@@ -18,6 +18,26 @@ function Root(): JSX.Element {
         </BrowserRouter>
     );
 }
+
+// One-off reset after the backend removal and the switch to the OpenSkiData resort
+// list: a visitor without the marker loses their Selection, every setting and the
+// cached forecasts, so this visit starts like a first one, Starter resort included.
+const RESET_MARKER = 'storedDataReset';
+
+const resetStoredData = () => {
+    try {
+        if (localStorage.getItem(RESET_MARKER)) return;
+        localStorage.clear();
+        localStorage.setItem(RESET_MARKER, 'true');
+    } catch (err) {
+        console.error('Error resetting stored data:', err);
+        return;
+    }
+    // Emptying the store, unlike deleting the database, isn't blocked by an older tab left open
+    idbClear().catch(() => {
+        // IndexedDB unavailable — nothing cached to clear
+    });
+};
 
 // Rewrite saved resort IDs to current slugs before rendering. Earlier slugs and
 // pre-OpenSkiData IDs (e.g. "Big-White") resolve through the aliases in
@@ -44,26 +64,9 @@ const migrateResortIds = () => {
     }
 };
 
-// Selections saved under the old 600-resort cap are trimmed to the current
-// Selection cap before anything is fetched. App shows a one-time notice.
-const trimOversizedSelection = () => {
-    try {
-        const stored = localStorage.getItem('selectedResorts');
-        if (!stored) return;
-
-        const selectedResorts: string[] = JSON.parse(stored);
-        if (selectedResorts.length <= MAX_SELECTED_RESORTS) return;
-
-        localStorage.setItem('selectedResorts', JSON.stringify(selectedResorts.slice(0, MAX_SELECTED_RESORTS)));
-        localStorage.setItem('selectionTrimmed', 'true');
-    } catch (err) {
-        console.error('Error trimming resort selection:', err);
-    }
-};
-
 // Run migrations before rendering
+resetStoredData();
 migrateResortIds();
-trimOversizedSelection();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
