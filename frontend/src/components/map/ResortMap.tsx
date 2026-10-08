@@ -48,14 +48,15 @@ interface ResortMapProps {
     isLoadingElevation?: boolean;
 }
 
-// Inner component to invalidate map size after resize
-function MapResizeHandler({ isExpanded }: { isExpanded: boolean }): null {
+// Inner component to invalidate map size whenever its container resizes
+function MapResizeHandler(): null {
     const map = useMap();
     useEffect(() => {
-        // Invalidate size after CSS transition completes
-        const timeout = setTimeout(() => map.invalidateSize(), 350);
-        return () => clearTimeout(timeout);
-    }, [map, isExpanded]);
+        // Covers every frame of the expand transition as well as entering/leaving fullscreen
+        const observer = new ResizeObserver(() => map.invalidateSize());
+        observer.observe(map.getContainer());
+        return () => observer.disconnect();
+    }, [map]);
     return null;
 }
 
