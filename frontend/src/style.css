@@ -467,7 +467,8 @@ input[type="checkbox"] {
 .command-palette-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 100;
+    /* Above fullscreen charts and the fullscreen map (9999), so modals opened there show */
+    z-index: 10000;
     display: flex;
     align-items: flex-start;
     justify-content: center;

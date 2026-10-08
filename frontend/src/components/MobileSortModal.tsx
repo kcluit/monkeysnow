@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useOverlay } from '../hooks/useOverlay';
 import type { SortOption, SortDay, SortDayData } from '../types';
 
 interface MobileSortModalProps {
@@ -26,28 +26,8 @@ export function MobileSortModal({
   isReversed,
   setIsReversed,
 }: MobileSortModalProps): JSX.Element | null {
-  // Prevent body scroll when open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
-  }, [isOpen]);
-
-  // Escape key handler
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        onClose();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  // Lock page scroll while open, and close on Esc
+  useOverlay(isOpen, onClose);
 
   if (!isOpen) return null;
 

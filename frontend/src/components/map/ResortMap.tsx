@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { useFullscreenView } from '../../hooks/useFullscreenView';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -81,50 +82,15 @@ export function ResortMap({
     isLoadingElevation,
 }: ResortMapProps): JSX.Element {
     const hasCustomLocation = customLocation !== null && customLocation !== undefined;
-    const [size, setSize] = useState<MapSize>('small');
-    const isFullscreen = size === 'fullscreen';
+    const [isExpanded, setIsExpanded] = useState(false);
+    // While fullscreen: Back and Esc close the map, and the page behind it can't scroll
+    const { isFullscreen, enterFullscreen, exitFullscreen } = useFullscreenView(FULLSCREEN_HISTORY_KEY);
+    // Fullscreen is only offered once expanded, so leaving it returns to the expanded map
+    const size: MapSize = isFullscreen ? 'fullscreen' : isExpanded ? 'expanded' : 'small';
 
     const toggleExpanded = useCallback(() => {
-        setSize(prev => (prev === 'small' ? 'expanded' : 'small'));
+        setIsExpanded(prev => !prev);
     }, []);
-
-    const enterFullscreen = useCallback(() => {
-        // Keep React Router's state on the entry so its history index stays consistent
-        window.history.pushState({ ...window.history.state, [FULLSCREEN_HISTORY_KEY]: true }, '');
-        setSize('fullscreen');
-    }, []);
-
-    const exitFullscreen = useCallback(() => {
-        setSize('expanded');
-        // Drop the entry pushed on entering, so the next Back leaves the page as normal
-        if (window.history.state?.[FULLSCREEN_HISTORY_KEY]) {
-            window.history.back();
-        }
-    }, []);
-
-    // While fullscreen: Back and Esc close the map, and the page behind it can't scroll
-    useEffect(() => {
-        if (!isFullscreen) return;
-
-        const handlePopState = () => setSize('expanded');
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') {
-                e.preventDefault();
-                e.stopImmediatePropagation(); // Esc would otherwise also open the command palette
-                exitFullscreen();
-            }
-        };
-        const previousOverflow = document.body.style.overflow;
-        document.body.style.overflow = 'hidden';
-        window.addEventListener('popstate', handlePopState);
-        // Use capture phase to handle before the command palette's bubbling handler
-        window.addEventListener('keydown', handleKeyDown, true);
-        return () => {
-            document.body.style.overflow = previousOverflow;
-            window.removeEventListener('popstate', handlePopState);
-            window.removeEventListener('keydown', handleKeyDown, true);
-        };
-    }, [isFullscreen, exitFullscreen]);
 
     return (
         // The outer box keeps the map's place in the page while the frame inside it goes fullscreen
