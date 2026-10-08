@@ -171,6 +171,7 @@ export function useDetailedWeatherData({
 
     return {
         data,
+        unavailableModels,
         timezoneInfo,
         loading,
         error,
