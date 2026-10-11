@@ -2055,28 +2055,15 @@ input[type="checkbox"] {
     max-width: 400px;
 }
 
-/* The Model styles tab, at the model picker's size */
+/* The Model styles tab: one column, a little wider and taller than the other tabs, so an
+   open editor's swatches and opacity chips sit beside their labels */
 .chart-settings-modal.model-styles-wide {
-    max-width: 90vw;
-    width: 90vw;
-    height: 85vh;
-    display: flex;
-    flex-direction: column;
+    max-width: 560px;
 }
 
 .model-styles-wide .chart-settings-content {
-    flex: 1;
-    min-height: 0;
-    max-height: none;
-}
-
-@media (max-width: 768px) {
-    .chart-settings-modal.model-styles-wide {
-        max-width: 95vw;
-        width: 95vw;
-        height: 90vh;
-        height: 90dvh;
-    }
+    max-height: min(560px, 70vh);
+    max-height: min(560px, 70dvh);
 }
 
 .chart-settings-header {
@@ -2381,81 +2368,63 @@ input[type="checkbox"] {
     font-size: 12px;
 }
 
-/* Rows in columns, like the model picker's; an open row grows on its own */
-.model-style-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
-    gap: 6px 8px;
-    align-items: start;
+/* Stays in view while the list scrolls under it */
+.model-styles-filter {
+    position: sticky;
+    top: -12px;
+    z-index: 1;
+    margin: 0 -16px 12px -16px;
+    padding: 0 16px 8px 16px;
+    background: var(--background);
 }
 
-.model-style-row {
-    padding: 6px 8px;
-    background: var(--cardBg, rgba(255, 255, 255, 0.05));
-    border-radius: 8px;
-}
-
-/* Spans every column, with its controls beside its name */
-.model-style-all {
-    grid-column: 1 / -1;
-}
-
-.model-style-main {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-/* Built like the Bold and opacity controls beside it, so it reads as one too */
-.model-style-color,
-.model-style-color-placeholder {
-    width: 44px;
-    height: 28px;
-    flex-shrink: 0;
-}
-
-.model-style-color {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 0;
+.model-styles-filter-input {
+    width: 100%;
+    height: 32px;
+    padding: 0 10px;
     border: 1px solid var(--gridLine, rgba(255, 255, 255, 0.15));
     border-radius: 6px;
     background: var(--secondary, rgba(255, 255, 255, 0.05));
-    color: var(--textSecondary, #a1a1a6);
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
-
-.model-style-color:hover {
-    border-color: var(--textSecondary, #a1a1a6);
     color: var(--textPrimary, #f5f5f7);
+    font-size: 13px;
+    font-family: inherit;
 }
 
-.model-style-color.open {
+.model-styles-filter-input:focus {
+    outline: none;
     border-color: var(--accent, #0a84ff);
-    color: var(--accent, #0a84ff);
 }
 
-.model-style-color-dot {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
-}
-
-.model-style-color-caret {
+/* A section title with "Set all…" at its end */
+.model-styles-heading {
     display: flex;
-    font-size: 10px;
-    transition: transform 0.15s ease;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
 }
 
-.model-style-color.open .model-style-color-caret {
-    transform: rotate(180deg);
+.model-styles-heading .chart-settings-section-title {
+    margin: 0;
 }
 
-/* "Other models": a section title that folds its section */
+.model-styles-set-all {
+    padding: 2px 8px;
+    border: none;
+    border-radius: 6px;
+    background: none;
+    color: var(--accent, #0a84ff);
+    font-size: 12px;
+    font-weight: var(--weight-medium);
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.model-styles-set-all:hover,
+.model-styles-set-all[aria-expanded="true"] {
+    background: rgba(10, 132, 255, 0.12);
+}
+
+/* "Other models" and "Other Aggregations": a heading that folds what's under it */
 .model-styles-fold {
     display: inline-flex;
     align-items: center;
@@ -2470,20 +2439,73 @@ input[type="checkbox"] {
     cursor: pointer;
 }
 
-.model-styles-fold:hover {
+.model-styles-fold:hover:not(:disabled) {
     color: var(--textPrimary, #f5f5f7);
 }
 
+.model-styles-fold:disabled {
+    cursor: default;
+}
+
+.model-styles-fold-changed {
+    color: var(--accent, #0a84ff);
+    text-transform: none;
+    letter-spacing: normal;
+}
+
 .model-style-provider {
-    grid-column: 1 / -1;
-    margin: 6px 0 0 0;
+    margin: 10px 0 2px 8px;
     color: var(--textSecondary, #a1a1a6);
     font-size: 12px;
     font-weight: var(--weight-medium);
 }
 
-.model-style-provider:first-child {
+.model-style-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.model-style-list > .model-style-provider:first-child {
     margin-top: 0;
+}
+
+.model-style-row {
+    border-radius: 8px;
+}
+
+/* Tinted with the text colour, since a theme's card colour can match the modal's */
+.model-style-row.open {
+    background: color-mix(in srgb, var(--textPrimary, #f5f5f7) 5%, transparent);
+}
+
+/* A line's row as it sits closed: its colour, name, a sample of the line, opacity and a changed dot */
+.model-style-summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 36px;
+    padding: 6px 8px;
+    border: none;
+    border-radius: 8px;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.model-style-summary:hover {
+    background: color-mix(in srgb, var(--textPrimary, #f5f5f7) 5%, transparent);
+}
+
+.model-style-color-dot {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
 }
 
 .model-style-name {
@@ -2495,26 +2517,6 @@ input[type="checkbox"] {
     font-size: 13px;
 }
 
-.model-style-name-bold {
-    font-weight: 700;
-}
-
-.model-style-all .model-style-name {
-    flex: 0 1 auto;
-    color: var(--textSecondary, #a1a1a6);
-}
-
-/* One column on phones, as in the model picker, where the All row lines up with the rest */
-@media (max-width: 768px) {
-    .model-style-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .model-style-all .model-style-name {
-        flex: 1;
-    }
-}
-
 .model-style-note {
     color: var(--textSecondary, #a1a1a6);
     font-size: 11px;
@@ -2522,58 +2524,86 @@ input[type="checkbox"] {
 
 /* Not drawn here, but still stylable */
 .model-style-row.unavailable .model-style-color-dot,
-.model-style-row.unavailable .model-style-name {
+.model-style-row.unavailable .model-style-name,
+.model-style-row.unavailable .model-style-sample {
     opacity: 0.5;
 }
 
-.model-style-bold {
-    width: 28px;
-    height: 28px;
+/* As wide and thick as the line on the charts: 2px, or 3.5px when bold */
+.model-style-sample {
+    display: flex;
+    align-items: center;
+    width: 64px;
+    height: 12px;
     flex-shrink: 0;
-    border: 1px solid var(--gridLine, rgba(255, 255, 255, 0.15));
-    border-radius: 6px;
-    background: var(--secondary, rgba(255, 255, 255, 0.05));
+}
+
+.model-style-sample > span {
+    width: 100%;
+    height: 2px;
+    border-radius: 2px;
+}
+
+.model-style-sample > span.bold {
+    height: 3.5px;
+}
+
+.model-style-tag {
+    width: 34px;
+    flex-shrink: 0;
     color: var(--textSecondary, #a1a1a6);
-    font-size: 13px;
-    font-weight: 700;
-    font-family: inherit;
-    cursor: pointer;
-    transition: all 0.15s ease;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
 }
 
-.model-style-bold:hover {
-    color: var(--textPrimary, #f5f5f7);
-}
-
-.model-style-bold.active {
-    background: var(--accent, #0a84ff);
-    border-color: var(--accent, #0a84ff);
-    color: #ffffff;
-}
-
-.model-style-bold.mixed {
-    border-style: dashed;
-    color: var(--textPrimary, #f5f5f7);
-}
-
-.model-style-opacity {
-    height: 28px;
+.model-style-changed {
+    width: 6px;
+    height: 6px;
     flex-shrink: 0;
-    padding: 0 4px;
-    border: 1px solid var(--gridLine, rgba(255, 255, 255, 0.15));
-    border-radius: 6px;
-    background: var(--secondary, #1c1c1e);
-    color: var(--textPrimary, #f5f5f7);
+    border-radius: 50%;
+}
+
+.model-style-changed.on {
+    background: var(--accent, #0a84ff);
+}
+
+/* An open row's editor, in line with the name above it */
+.model-style-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 4px 8px 10px 32px;
+}
+
+.model-style-all-editor {
+    margin-bottom: 6px;
+    padding: 10px 8px;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--textPrimary, #f5f5f7) 5%, transparent);
+}
+
+.model-style-field {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 8px;
+    align-items: start;
+}
+
+.model-style-field-label {
+    color: var(--textSecondary, #a1a1a6);
     font-size: 12px;
-    font-family: inherit;
-    cursor: pointer;
+    line-height: 24px;
+}
+
+.model-style-field-control {
+    min-width: 0;
 }
 
 .model-style-colors {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    padding: 8px 0 4px 0;
 }
 
 .model-color-original {
@@ -2594,6 +2624,157 @@ input[type="checkbox"] {
     height: 100%;
     opacity: 0;
     cursor: pointer;
+}
+
+.model-style-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.model-style-chip {
+    height: 24px;
+    padding: 0 8px;
+    border: 1px solid var(--gridLine, rgba(255, 255, 255, 0.15));
+    border-radius: 6px;
+    background: var(--secondary, rgba(255, 255, 255, 0.05));
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 12px;
+    font-family: inherit;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.model-style-chip:hover {
+    color: var(--textPrimary, #f5f5f7);
+}
+
+.model-style-chip.selected {
+    background: var(--accent, #0a84ff);
+    border-color: var(--accent, #0a84ff);
+    color: #ffffff;
+}
+
+.model-style-bold-switch {
+    display: flex;
+    padding: 1px 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.model-style-bold-switch .settings-toggle-switch,
+.model-style-switch .settings-toggle-switch {
+    display: block;
+    flex-shrink: 0;
+}
+
+/* Off, the track is the charts' grid line colour, which "hide borders" leaves visible */
+.model-style-bold-switch .settings-toggle-switch:not(.on),
+.model-style-switch .settings-toggle-switch:not(.on) {
+    background: var(--gridLine, rgba(255, 255, 255, 0.15));
+}
+
+/* Bold on some of the Selected models but not all */
+.settings-toggle-switch.mixed .settings-toggle-knob {
+    left: 11px;
+}
+
+.model-style-reset {
+    align-self: flex-end;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border: none;
+    border-radius: 6px;
+    background: none;
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.model-style-reset:hover:not(:disabled) {
+    color: var(--textPrimary, #f5f5f7);
+}
+
+.model-style-reset:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+/* The Spread fills and hiding the model lines, under the Aggregations */
+.model-style-switches {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+}
+
+.model-style-switch {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    padding: 6px 8px;
+    border: none;
+    border-radius: 8px;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.model-style-switch:hover {
+    background: color-mix(in srgb, var(--textPrimary, #f5f5f7) 5%, transparent);
+}
+
+.model-style-switch-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.model-style-switch-label {
+    color: var(--textPrimary, #f5f5f7);
+    font-size: 13px;
+}
+
+/* Phones: a shorter sample, and each editor label above its control */
+@media (max-width: 480px) {
+    .model-style-sample {
+        width: 40px;
+    }
+
+    .model-style-editor {
+        padding-left: 8px;
+    }
+
+    .model-style-field {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+
+    .model-style-field-label {
+        line-height: normal;
+    }
+
+    /* Every opacity on one line, sharing it evenly */
+    .model-style-chips {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+    }
+
+    .model-style-chip {
+        padding: 0;
+    }
 }
 
 /* Mobile Sort & Filter Modal Styles */

@@ -2,7 +2,7 @@
  * Model styles (see CONTEXT.md): the colour, boldness and opacity a visitor has chosen
  * for each Forecast model's and Aggregation's line, the same on every chart in the
  * detail view. They live in this browser's localStorage only, together with the other
- * choices made in the Models tab of a chart's gear modal: the band fills, and hiding
+ * choices made in the Models tab of a chart's gear modal: the Spread fills, and hiding
  * the model lines behind the Aggregations.
  */
 
