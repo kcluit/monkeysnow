@@ -205,7 +205,7 @@ export function ChartSettingsModal({
                                             Show accumulation graph overlay
                                         </span>
                                         <span className="chart-settings-toggle-desc">
-                                            Displays cumulative total as a line graph
+                                            Each model's running total on the right axis, with any Aggregations you've ticked
                                         </span>
                                     </label>
                                 </div>

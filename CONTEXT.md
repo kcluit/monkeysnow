@@ -141,8 +141,12 @@ The **Preferred models** whose **Coverage** includes the point being forecast (a
 _Avoid_: selected models, model selection
 
 **Aggregation**:
-A line computed hour by hour across the **Comparison models**: median, mean, min, max, or the 25th or 75th percentile.
+A line computed hour by hour across the **Comparison models**: median, mean, min, max, or the 25th or 75th percentile. An Aggregation of an **Accumulation** is taken across the models' running totals, never the running total of the hourly Aggregation, and only at hours where every Comparison model has one.
 _Avoid_: ensemble, consensus
+
+**Accumulation**:
+One **Comparison model**'s running total of an hourly amount, such as snowfall or precipitation, from the first hour the chart shows.
+_Avoid_: cumulative, total, sum
 
 **Model style**:
 How a visitor has chosen to draw the line of one **Forecast model** or **Aggregation**: its colour, whether it is bold, and its opacity. It is the same on every chart, for every **Resort** and location. A bold line is drawn thicker and above the others of its kind; a model whose opacity is Auto is faded only while **Aggregations** are drawn.

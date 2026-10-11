@@ -31,6 +31,7 @@ export function createBandFillPlugin(options: BandFillPluginOptions): uPlot.Plug
         ctx.clip();
 
         const { upper, lower } = series.bandData;
+        const scale = series.yAxisIndex === 1 ? 'y2' : 'y';
         const fillOpacity = series.fillOpacity ?? 0.1;
         const fillColor = colorWithOpacity(series.color, fillOpacity);
 
@@ -57,8 +58,8 @@ export function createBandFillPlugin(options: BandFillPluginOptions): uPlot.Plug
             }
 
             const x = u.valToPos(i, 'x', true);
-            const yUpper = u.valToPos(upperVal, 'y', true);
-            const yLower = u.valToPos(lowerVal, 'y', true);
+            const yUpper = u.valToPos(upperVal, scale, true);
+            const yLower = u.valToPos(lowerVal, scale, true);
 
             // Skip if positions are invalid (NaN or Infinity)
             if (!Number.isFinite(x) || !Number.isFinite(yUpper) || !Number.isFinite(yLower)) {

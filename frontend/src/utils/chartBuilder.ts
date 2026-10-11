@@ -290,22 +290,25 @@ function calculateAccumulation(values: Series): Series {
 }
 
 /**
- * Build accumulation series from model data.
- * Creates a cumulative sum line for each model, plotted on the secondary Y-axis,
- * in its model's style. Returns multiple series (one per model) with solid lines.
+ * Build accumulation series from each model's running total, plotted on the secondary
+ * Y-axis in its model's style. Like the model lines, they are faded on Auto while
+ * aggregations are drawn over them, and hidden behind them with the model lines.
  */
 function buildAccumulationSeries(
-    seriesData: Map<WeatherModel, Series>,
+    accumulations: Map<WeatherModel, Series>,
     selectedModels: WeatherModel[],
+    hasAggregations: boolean,
     styles: ModelStyles
 ): SeriesConfig[] {
-    if (seriesData.size === 0) return [];
+    if (styles.hideModelLines && hasAggregations) return [];
 
     const accumulationSeries: SeriesConfig[] = [];
+    // Auto is 90% on its own
+    const autoOpacity = hasAggregations ? autoModelOpacity(selectedModels.length, true) : 0.9;
 
     for (const model of selectedModels) {
-        const modelData = seriesData.get(model);
-        if (!modelData || modelData.length === 0) continue;
+        const data = accumulations.get(model);
+        if (!data || data.length === 0) continue;
 
         const style = styles.models[model];
 
@@ -316,11 +319,10 @@ function buildAccumulationSeries(
             name: `${getModelConfig(model).name} (Accum)`,
             color: modelColor(styles, model),
             type: 'line',
-            data: calculateAccumulation(modelData),
+            data,
             lineWidth: style?.bold ? BOLD_LINE_WIDTH : LINE_WIDTH,
             bold: style?.bold,
-            // Auto is 90%, with or without Aggregations
-            opacity: style?.opacity ?? 0.9,
+            opacity: style?.opacity ?? autoOpacity,
             zIndex: 50, // Above model series but below aggregations
             lineStyle: 'solid',
             yAxisIndex: 1, // Use secondary Y-axis (right side)
@@ -328,6 +330,38 @@ function buildAccumulationSeries(
     }
 
     return boldOnTop(accumulationSeries);
+}
+
+/**
+ * Aggregations across the models' running totals (never the running total of an
+ * hourly aggregation), left as gaps at hours where any model has no running total:
+ * a model whose forecast ends early would otherwise pull the median of a running
+ * total down. Models with no values for the variable take no part.
+ */
+function computeAccumulatedStatistics(
+    accumulations: Map<WeatherModel, Series>,
+    length: number,
+    wanted: ReadonlySet<AggregationType>
+): Map<AggregationType, Series> {
+    const members = Array.from(accumulations.values()).filter((s) => s.some((v) => v !== null));
+    const statistics = computeStatistics(members, length, wanted);
+
+    for (let i = 0; i < length; i++) {
+        if (!members.some((s) => s[i] === null)) continue;
+        for (const values of statistics.values()) values[i] = null;
+    }
+
+    return statistics;
+}
+
+/** An aggregation line or band redrawn on the secondary Y-axis from accumulated statistics. */
+function onAccumulationAxis(series: SeriesConfig): SeriesConfig {
+    return {
+        ...series,
+        id: `accumulation_${series.id}`,
+        name: `${series.name} (Accum)`,
+        yAxisIndex: 1,
+    };
 }
 
 /**
@@ -531,9 +565,24 @@ export function buildWeatherChartConfig(
     // Track if we need a secondary Y-axis for accumulation
     let hasAccumulation = false;
 
-    // Add accumulation series if enabled and variable supports it
-    if (settings?.showAccumulation && supportsAccumulation(variable as any)) {
-        const accSeries = buildAccumulationSeries(seriesData, selectedModels, styles);
+    // Add accumulation series if enabled and variable supports it; a heatmap's x axis is days, not hours
+    if (settings?.showAccumulation && supportsAccumulation(variable as any) && chartType !== 'heatmap') {
+        const accumulations = new Map<WeatherModel, Series>(
+            Array.from(seriesData, ([model, values]) => [model, calculateAccumulation(values)])
+        );
+        const accumulatedStatistics = computeAccumulatedStatistics(
+            accumulations,
+            timePoints,
+            new Set(hasAggregations ? selectedAggregations : [])
+        );
+        // Same layering as the primary axis: bands, then models, then aggregations
+        const accSeries = [
+            ...buildBandSeries(accumulatedStatistics, showMinMax, showPercentiles, styles).map(onAccumulationAxis),
+            ...buildAccumulationSeries(accumulations, selectedModels, hasAggregations, styles),
+            ...(hasAggregations
+                ? buildAggregationSeries(accumulatedStatistics, selectedAggregations, styles, 'line').map(onAccumulationAxis)
+                : []),
+        ];
         if (accSeries.length > 0) {
             allSeries.push(...accSeries);
             hasAccumulation = true;
