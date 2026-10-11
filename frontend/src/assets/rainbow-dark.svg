@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1600">
+    <!-- Rainbow text's rainbow on dark themes: the colours of rainbow-colors (style.css) twice along the
+         tile's diagonal, sliding one tile to the right every 8 seconds, so tiles meet and loop seamlessly -->
+    <linearGradient id="rainbow" gradientUnits="userSpaceOnUse" x2="800" y2="800" spreadMethod="repeat">
+        <stop offset="0" stop-color="#FF375F"/>
+        <stop offset="0.1" stop-color="#FF453A"/>
+        <stop offset="0.2" stop-color="#FF9F0A"/>
+        <stop offset="0.3" stop-color="#FFD60A"/>
+        <stop offset="0.4" stop-color="#30D158"/>
+        <stop offset="0.5" stop-color="#66D4CF"/>
+        <stop offset="0.6" stop-color="#40C8E0"/>
+        <stop offset="0.7" stop-color="#0A84FF"/>
+        <stop offset="0.8" stop-color="#5E5CE6"/>
+        <stop offset="0.9" stop-color="#BF5AF2"/>
+        <stop offset="1" stop-color="#FF375F"/>
+    </linearGradient>
+    <rect x="-1600" width="3200" height="1600" fill="url(#rainbow)">
+        <animateTransform attributeName="transform" type="translate" from="0" to="1600" dur="8s" repeatCount="indefinite"/>
+    </rect>
+</svg>

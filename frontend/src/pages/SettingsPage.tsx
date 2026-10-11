@@ -17,7 +17,6 @@ import type {
     UtilityBarStyle,
     UnitSystem,
     ResortDisplayLimit,
-    ModelLineOpacity,
 } from '../types';
 
 export interface SettingsPageProps {
@@ -38,8 +37,6 @@ export interface SettingsPageProps {
     setRainbowEnabled: (enabled: boolean) => void;
     isBoldTextEnabled: boolean;
     setBoldTextEnabled: (enabled: boolean) => void;
-    isHideIconsEnabled: boolean;
-    setHideIconsEnabled: (enabled: boolean) => void;
     isHideBordersEnabled: boolean;
     setHideBordersEnabled: (enabled: boolean) => void;
     isShowDateEnabled: boolean;
@@ -86,9 +83,8 @@ export interface SettingsPageProps {
     // Resort display limit
     resortDisplayLimit: ResortDisplayLimit;
     setResortDisplayLimit: (limit: ResortDisplayLimit) => void;
-    // Model line opacity
-    modelLineOpacity: ModelLineOpacity;
-    setModelLineOpacity: (opacity: ModelLineOpacity) => void;
+    // Model styles
+    openModelStyles: () => void;
     // Resort selector
     openResortSelector: () => void;
 }
@@ -230,7 +226,6 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
         availableFonts, setFont, currentFontId, applyFont, resetFontPreview,
         isRainbowEnabled, setRainbowEnabled,
         isBoldTextEnabled, setBoldTextEnabled,
-        isHideIconsEnabled, setHideIconsEnabled,
         isHideBordersEnabled, setHideBordersEnabled,
         isShowDateEnabled, setShowDateEnabled,
         isFullscreen, enterFullscreen, exitFullscreen,
@@ -249,7 +244,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
         unitSystem, setUnitSystem,
         language, setLanguage, availableLanguages,
         resortDisplayLimit, setResortDisplayLimit,
-        modelLineOpacity, setModelLineOpacity,
+        openModelStyles,
         openResortSelector,
     } = props;
     const cardModelsSummary = useCardModelsSummary();
@@ -330,12 +325,6 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                             isEnabled={isBoldTextEnabled}
                             onToggle={setBoldTextEnabled}
                             icon={icons.bold}
-                        />
-                        <Toggle
-                            label="Hide icons"
-                            isEnabled={isHideIconsEnabled}
-                            onToggle={setHideIconsEnabled}
-                            icon={icons.hideIcons}
                         />
                         <Toggle
                             label="Show borders"
@@ -432,7 +421,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                         </div>
                     </div>
                     <div className="settings-subsection">
-                        <span className="settings-subsection-label">Card models by country</span>
+                        <span className="settings-subsection-label">Main page models</span>
                         <div className="settings-options-row">
                             <OptionButton label="Choose…" icon={icons.weatherModel} isSelected={false} onClick={openCardModels} />
                             <span className="self-center text-sm text-theme-textSecondary">{cardModelsSummary}</span>
@@ -468,7 +457,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                             icon={icons.fps}
                         />
                         <Toggle
-                            label="Sync chart zoom"
+                            label="Sync charts"
                             isEnabled={chartZoomSyncEnabled}
                             onToggle={setChartZoomSyncEnabled}
                             icon={icons.link}
@@ -495,24 +484,10 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                         </div>
                     </div>
                     <div className="settings-subsection">
-                        <span className="settings-subsection-label">Model line opacity</span>
-                        <div className="settings-options-grid">
-                            {([
-                                { value: 'auto' as ModelLineOpacity, label: 'Auto' },
-                                { value: 0.05 as ModelLineOpacity, label: '5%' },
-                                { value: 0.1 as ModelLineOpacity, label: '10%' },
-                                { value: 0.2 as ModelLineOpacity, label: '20%' },
-                                { value: 0.35 as ModelLineOpacity, label: '35%' },
-                                { value: 0.5 as ModelLineOpacity, label: '50%' },
-                                { value: 1 as ModelLineOpacity, label: '100%' },
-                            ]).map(option => (
-                                <OptionButton
-                                    key={String(option.value)}
-                                    label={option.label}
-                                    isSelected={modelLineOpacity === option.value}
-                                    onClick={() => setModelLineOpacity(option.value)}
-                                />
-                            ))}
+                        <span className="settings-subsection-label">Model styles</span>
+                        <div className="settings-options-row">
+                            <OptionButton label="Edit…" icon={icons.chart} isSelected={false} onClick={openModelStyles} />
+                            <span className="self-center text-sm text-theme-textSecondary">Colours, bold and opacity of each model's chart lines</span>
                         </div>
                     </div>
                 </SettingSection>

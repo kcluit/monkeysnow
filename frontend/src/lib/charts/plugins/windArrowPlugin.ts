@@ -22,11 +22,14 @@ export function createWindArrowPlugin(options: WindArrowPluginOptions): uPlot.Pl
     const { getConfig, arrowSize = 14, spacing = 6 } = options;
 
     function draw(u: uPlot) {
-        const series = getConfig().series.find((s) => s.windArrowData);
+        const seriesIdx = getConfig().series.findIndex((s) => s.windArrowData);
+        const series = getConfig().series[seriesIdx];
         if (!series?.windArrowData) return;
 
         const ctx = u.ctx;
         ctx.save();
+        // Faded, like a series, while another line is focused
+        ctx.globalAlpha = u.series[seriesIdx + 1]?.alpha ?? 1;
 
         // Clip to chart area
         ctx.beginPath();

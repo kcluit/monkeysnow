@@ -27,5 +27,21 @@ export function getUPlotTheme(): ChartTheme {
         accent: getVar('--accent', '#3b82f6'),
         tooltipBg: getVar('--cardBg', '#ffffff'),
         tooltipBorder: getVar('--border', '#e5e7eb'),
+        // Only set while Rainbow text is on (style.css)
+        rainbowText: getVar('--rainbow-colors', ''),
     };
+}
+
+/**
+ * The fill for text drawn on a chart's canvas: the given theme colour, or while Rainbow text
+ * is on, a rainbow across the whole canvas, fainter for secondary text as on the page.
+ */
+export function chartTextFill(ctx: CanvasRenderingContext2D, theme: ChartTheme, color: string): string | CanvasGradient {
+    if (!theme.rainbowText) return color;
+    const colors = theme.rainbowText.split(',').map((c) => c.trim());
+    // The rainbow colours are #rrggbb, so a fainter one is the same with an alpha byte
+    const alpha = color === theme.textSecondary ? '99' : '';
+    const gradient = ctx.createLinearGradient(0, 0, ctx.canvas.width, ctx.canvas.height);
+    colors.forEach((c, i) => gradient.addColorStop(i / (colors.length - 1), c + alpha));
+    return gradient;
 }

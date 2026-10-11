@@ -42,11 +42,11 @@ const ALL_COUNTRIES = CONTINENTS
 
 const labelOf = (model: WeatherModel): string => getModelInfo(model)?.label ?? model;
 
-/** "Auto everywhere", or how many countries have a Country model. */
+/** "All countries on Auto", or how many countries have a Country model. */
 export function useCardModelsSummary(): string {
     const { t } = useLanguage();
     const changed = Object.keys(useCountryModels()).length;
-    if (changed === 0) return t('cardModels.autoEverywhere');
+    if (changed === 0) return t('cardModels.allAuto');
     return changed === 1 ? t('cardModels.changedOne') : interpolate(t('cardModels.changedMany'), { count: changed });
 }
 
@@ -140,7 +140,7 @@ export interface CardModelsModalProps {
 }
 
 /**
- * Card models by country: a Country model for any country, or Auto for its
+ * Main page models: a Country model for any country, or Auto for its
  * Recommended card model (docs/adr/0006).
  */
 export const CardModelsModal = memo(function CardModelsModal({ isOpen, onClose, selectedResorts }: CardModelsModalProps): JSX.Element | null {

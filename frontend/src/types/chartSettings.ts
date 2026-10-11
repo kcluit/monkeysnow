@@ -10,13 +10,15 @@ import type { WeatherVariable } from './openMeteo';
 /** Available chart types for display */
 export type ChartDisplayType = 'line' | 'bar' | 'area' | 'boxwhisker' | 'heatmap';
 
-/** Variables that support accumulation overlay */
+/** The gear modal's tabs: this chart's own settings, or the Model styles shared by every chart */
+export type ChartSettingsTab = 'chart' | 'models';
+
+/** Variables that support accumulation overlay: hourly amounts, whose running total means something */
 export const ACCUMULATION_VARIABLES: WeatherVariable[] = [
   'precipitation',
   'rain',
   'showers',
   'snowfall',
-  'snow_depth',
   'sunshine_duration',
   'evapotranspiration',
   'et0_fao_evapotranspiration',

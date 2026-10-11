@@ -46,7 +46,6 @@ export interface Translations {
     'command.boldText': string;
     'command.fullscreen': string;
     'command.fpsCounter': string;
-    'command.hideIcons': string;
     'command.showBorders': string;
     'command.showDate': string;
     'command.elevation': string;
@@ -131,7 +130,17 @@ export interface Translations {
     'detail.noModelHasData': string;
     'detail.chooseModels': string;
 
-    // Card models by country
+    // Detail view map
+    'map.show3d': string;
+    'map.showFlat': string;
+    'map.loading3d': string;
+    'map.failed3d': string;
+    'map.exaggeration': string;
+    'map.heightLineBase': string;
+    'map.heightLineMid': string;
+    'map.heightLineTop': string;
+
+    // Main page models
     'cardModels.search': string;
     'cardModels.everywhere': string;
     'cardModels.yourSelection': string;
@@ -139,7 +148,7 @@ export interface Translations {
     'cardModels.covers': string;
     'cardModels.noCountries': string;
     'cardModels.resetAll': string;
-    'cardModels.autoEverywhere': string;
+    'cardModels.allAuto': string;
     'cardModels.changedOne': string;
     'cardModels.changedMany': string;
 }
@@ -207,7 +216,6 @@ export const TranslationsSchema = z.object({
     'command.boldText': z.string(),
     'command.fullscreen': z.string(),
     'command.fpsCounter': z.string(),
-    'command.hideIcons': z.string(),
     'command.showBorders': z.string(),
     'command.showDate': z.string(),
     'command.elevation': z.string(),
@@ -291,8 +299,16 @@ export const TranslationsSchema = z.object({
     'detail.noModelCovers': z.string(),
     'detail.noModelHasData': z.string(),
     'detail.chooseModels': z.string(),
+    'map.show3d': z.string(),
+    'map.showFlat': z.string(),
+    'map.loading3d': z.string(),
+    'map.failed3d': z.string(),
+    'map.exaggeration': z.string(),
+    'map.heightLineBase': z.string(),
+    'map.heightLineMid': z.string(),
+    'map.heightLineTop': z.string(),
 
-    // Card models by country
+    // Main page models
     'cardModels.search': z.string(),
     'cardModels.everywhere': z.string(),
     'cardModels.yourSelection': z.string(),
@@ -300,7 +316,7 @@ export const TranslationsSchema = z.object({
     'cardModels.covers': z.string(),
     'cardModels.noCountries': z.string(),
     'cardModels.resetAll': z.string(),
-    'cardModels.autoEverywhere': z.string(),
+    'cardModels.allAuto': z.string(),
     'cardModels.changedOne': z.string(),
     'cardModels.changedMany': z.string(),
 }) satisfies z.ZodType<Translations>;

@@ -1,6 +1,7 @@
 import type { WeatherModel, WeatherVariable, AggregationType, HourlyDataPoint } from './openMeteo';
 import type { UnitSystem } from '../utils/unitConversion';
-import type { UtilityBarStyle, ModelLineOpacity } from './index';
+import type { UtilityBarStyle } from './index';
+import type { ChartSettingsTab } from './chartSettings';
 import type { DroppedModel } from '../utils/comparisonModels';
 import type { TimeAxis } from '../utils/timeAxis';
 
@@ -121,11 +122,14 @@ export interface DetailChartGridProps {
     selectedModels: WeatherModel[];
     selectedVariables: WeatherVariable[];
     selectedAggregations: AggregationType[];
-    aggregationColors: Record<AggregationType, string>;
-    hideAggregationMembers?: boolean;
-    showMinMaxFill?: boolean;
-    showPercentileFill?: boolean;
-    modelLineOpacity?: ModelLineOpacity;
+    /** Every Preferred model, listed in the Models tab of each chart's gear modal */
+    preferredModels: WeatherModel[];
+    /** Which Preferred models are drawn at the point being forecast */
+    modelAvailability: ModelAvailabilityContext;
+    /** The chart whose gear modal is open, and the tab to open it on (left out: the one last used) */
+    openSettings: { variable: WeatherVariable; tab?: ChartSettingsTab } | null;
+    onOpenSettings: (variable: WeatherVariable) => void;
+    onCloseSettings: () => void;
     unitSystem: UnitSystem;
     isChartLocked?: boolean;
     isLoading?: boolean;
@@ -144,11 +148,6 @@ export interface WeatherChartProps {
     timeAxis: TimeAxis | null;
     selectedModels: WeatherModel[];
     selectedAggregations: AggregationType[];
-    aggregationColors: Record<AggregationType, string>;
-    hideAggregationMembers?: boolean;
-    showMinMaxFill?: boolean;
-    showPercentileFill?: boolean;
-    modelLineOpacity?: ModelLineOpacity;
     variable: WeatherVariable;
     unitSystem: UnitSystem;
     isChartLocked?: boolean;

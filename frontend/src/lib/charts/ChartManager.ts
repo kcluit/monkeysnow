@@ -10,10 +10,14 @@ import 'uplot/dist/uPlot.min.css';
 import type { ChartConfig } from './types';
 import { createZoomPlugin, createTouchPlugin, createBandFillPlugin, createBoxWhiskerPlugin, createHeatmapPlugin, createWindArrowPlugin, createZeroAxisPlugin, createElevationLinesPlugin, createTooltipPlugin, createLegendPlugin, createSeriesFocusPlugin } from './plugins';
 import { colorWithOpacity } from './utils/colorUtils';
+import { chartTextFill } from './theme';
 import {
     subscribeToZoomChanges,
     broadcastZoomChange,
     isChartZoomSyncEnabled,
+    getLockedLine,
+    setLockedLine,
+    subscribeToLockedLines,
 } from './chartRegistry';
 
 /**
@@ -33,6 +37,9 @@ function getStructuralKey(config: ChartConfig): string {
         seriesColors: config.series.map(s => s.color),
         // Line styles are baked into the uPlot series when the chart is built
         seriesOpacity: config.series.map(s => s.opacity ?? 1),
+        seriesWidths: config.series.map(s => s.lineWidth ?? 2),
+        // The legend is drawn once, when the chart is built
+        seriesBold: config.series.map(s => !!s.bold),
         seriesYAxisIndex: config.series.map(s => s.yAxisIndex ?? 0),
         hasBandData: config.series.map(s => !!s.bandData),
         hasSecondaryAxis: !!config.yAxisSecondary,
@@ -41,6 +48,8 @@ function getStructuralKey(config: ChartConfig): string {
         // Theme affects colors
         themeAccent: config.theme.accent,
         themeBackground: config.theme.background,
+        // Axis text is filled when the chart is built
+        themeRainbowText: config.theme.rainbowText,
     });
 }
 
@@ -76,8 +85,9 @@ function transformToUPlotData(config: ChartConfig): uPlot.AlignedData {
 /**
  * Build uPlot series configuration from ChartConfig.
  * Handles different chart types: line, area, bar, boxwhisker, heatmap.
+ * A series of the Focused line is drawn at full strength, whatever its usual opacity.
  */
-function buildUPlotSeries(config: ChartConfig): uPlot.Series[] {
+function buildUPlotSeries(config: ChartConfig, isFocused: (seriesIdx: number) => boolean): uPlot.Series[] {
     const { series } = config;
     const uplotSeries: uPlot.Series[] = [{}];
 
@@ -95,7 +105,7 @@ function buildUPlotSeries(config: ChartConfig): uPlot.Series[] {
 
         // Determine paths based on series type
         let paths: uPlot.Series.PathBuilder | undefined;
-        let fill: string | undefined;
+        let fill: ((opacity: number) => string) | undefined;
 
         switch (s.type) {
             case 'bar':
@@ -103,7 +113,7 @@ function buildUPlotSeries(config: ChartConfig): uPlot.Series[] {
                 if (barPaths) {
                     paths = barPaths;
                 }
-                fill = colorWithOpacity(s.color, opacity);
+                fill = (o) => colorWithOpacity(s.color, o);
                 break;
 
             case 'boxwhisker':
@@ -115,7 +125,7 @@ function buildUPlotSeries(config: ChartConfig): uPlot.Series[] {
             case 'area':
                 // Area charts use default line paths with fill
                 const fillOpacity = s.fillOpacity ?? 0.3;
-                fill = colorWithOpacity(s.color, fillOpacity * opacity);
+                fill = (o) => colorWithOpacity(s.color, fillOpacity * o);
                 break;
 
             case 'band':
@@ -133,10 +143,13 @@ function buildUPlotSeries(config: ChartConfig): uPlot.Series[] {
             dash = [2, 2];
         }
 
+        const strokes = [colorWithOpacity(stroke, opacity), colorWithOpacity(stroke, 1)];
+        const fills = fill && [fill(opacity), fill(1)];
+
         const seriesConfig: uPlot.Series = {
             label: s.name,
-            stroke: colorWithOpacity(stroke, opacity),
-            fill,
+            stroke: (_u, seriesIdx) => strokes[isFocused(seriesIdx) ? 1 : 0],
+            fill: fills && ((_u, seriesIdx) => fills[isFocused(seriesIdx) ? 1 : 0]),
             width: s.lineWidth ?? 2,
             dash,
             points: { show: false },
@@ -223,11 +236,13 @@ function createClockAlignedSplits(getConfig: () => ChartConfig) {
  */
 function buildUPlotAxes(config: ChartConfig, getConfig: () => ChartConfig): uPlot.Axis[] {
     const { xAxis, yAxisSecondary, theme } = config;
+    // Labels are text, so they turn rainbow with Rainbow text
+    const labelFill: uPlot.Axis.Stroke = (u) => chartTextFill(u.ctx, theme, theme.textSecondary);
 
     const axes: uPlot.Axis[] = [
         {
             scale: 'x',
-            stroke: theme.textSecondary,
+            stroke: labelFill,
             grid: { show: true, stroke: theme.gridColor, width: 1 },
             ticks: { show: true, stroke: theme.gridColor, size: 5 },
             border: { show: true, stroke: theme.textSecondary, width: 2 },
@@ -242,7 +257,7 @@ function buildUPlotAxes(config: ChartConfig, getConfig: () => ChartConfig): uPlo
             font: '11px system-ui, -apple-system, sans-serif',
         },
         {
-            stroke: theme.textSecondary,
+            stroke: labelFill,
             grid: { show: true, stroke: theme.gridColor, width: 1 },
             ticks: { show: true, stroke: theme.gridColor, size: 5 },
             border: { show: true, stroke: theme.textSecondary, width: 2 },
@@ -261,7 +276,7 @@ function buildUPlotAxes(config: ChartConfig, getConfig: () => ChartConfig): uPlo
 
     if (yAxisSecondary) {
         axes.push({
-            stroke: theme.textSecondary,
+            stroke: labelFill,
             grid: { show: false },
             ticks: { show: true, stroke: theme.gridColor, size: 5 },
             values: (u, vals) => {
@@ -369,6 +384,10 @@ export class ChartManager {
     private unsubscribeZoom: (() => void) | null = null;
     private isApplyingExternalZoom: boolean = false;
 
+    // The Locked line, which another chart in zoom sync may change
+    private unsubscribeLockedLines: (() => void) | null = null;
+    private refreshFocus: (() => void) | null = null;
+
     /** Axes and plugins call this while drawing; a chart only exists once a config has been set. */
     private readonly getConfig = (): ChartConfig => this.currentConfig!;
 
@@ -384,6 +403,8 @@ export class ChartManager {
                 this.applyExternalZoom(min, max);
             }
         });
+
+        this.unsubscribeLockedLines = subscribeToLockedLines(() => this.refreshFocus?.());
 
         // Set up resize observer
         this.resizeObserver = new ResizeObserver(() => {
@@ -425,6 +446,7 @@ export class ChartManager {
             this.chart.destroy();
             this.chart = null;
         }
+        this.refreshFocus = null;
 
         this.structuralKey = newStructuralKey;
         this.createChart(config);
@@ -488,24 +510,27 @@ export class ChartManager {
             plugins.push(createElevationLinesPlugin({ getConfig }));
         }
 
-        // Series focus plugin - highlights series on cursor proximity or legend hover
-        const seriesFocus = createSeriesFocusPlugin();
+        // Series focus plugin - fades everything but the Focused line: the legend entry pointed at,
+        // the Locked line, or the line nearest the cursor
+        const seriesFocus = createSeriesFocusPlugin({
+            getConfig,
+            getLockedLine: () => getLockedLine(this.chartId),
+            setLockedLine: (line) => setLockedLine(this.chartId, line),
+        });
         plugins.push(seriesFocus.plugin);
+        this.refreshFocus = seriesFocus.refresh;
 
         // Tooltip plugin - shows values at cursor position
         plugins.push(createTooltipPlugin({ getConfig }));
 
-        // Legend plugin - interactive series toggle with focus integration
-        plugins.push(createLegendPlugin({
-            getConfig,
-            onSeriesHover: seriesFocus.handleLegendHover,
-        }));
+        // Legend plugin - interactive series toggle, hover preview and line locking
+        plugins.push(createLegendPlugin({ getConfig, seriesFocus }));
 
         // Build uPlot options
         const opts: uPlot.Options = {
             width,
             height: config.height,
-            series: buildUPlotSeries(config),
+            series: buildUPlotSeries(config, seriesFocus.isFocused),
             axes: buildUPlotAxes(config, getConfig),
             scales: buildUPlotScales(config),
             plugins,
@@ -585,6 +610,12 @@ export class ChartManager {
             this.unsubscribeZoom();
             this.unsubscribeZoom = null;
         }
+
+        if (this.unsubscribeLockedLines) {
+            this.unsubscribeLockedLines();
+            this.unsubscribeLockedLines = null;
+        }
+        this.refreshFocus = null;
 
         if (this.resizeObserver) {
             this.resizeObserver.disconnect();

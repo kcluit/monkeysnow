@@ -1,6 +1,6 @@
 /**
  * Reusable Icon component that wraps FontAwesomeIcon.
- * Provides consistent styling and handles the hideIcons prop.
+ * Provides consistent styling.
  */
 
 import { memo } from 'react';

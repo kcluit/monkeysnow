@@ -72,6 +72,20 @@ _Avoid_: TTL, cache expiry, refresh interval
 A **Resort** or **Saved location** in the **Selection** that has no forecast yet and is waiting for, or in the middle of, its fetch. A **Resort** whose **stale** forecast is being refreshed is not queued; its card stays on show.
 _Avoid_: pending resort, loading resort
 
+### Forecasts
+
+**Period**:
+One of the three parts a forecast day is split into on the main page, in the local time of the point being forecast: AM (midnight to noon), PM (noon to 6 pm) and Night (6 pm to midnight). The small hours before dawn belong to AM, not to the previous day's Night.
+_Avoid_: chunk, time slot, time of day
+
+**Snow quality**:
+What falls during a **Period**, estimated hour by hour from the air's temperature and humidity: Powder, Dry snow, Wet snow, Sleet/Mix or Rain, from best to worst. A Period's Snow quality is the worst of its hours with precipitation, and a day's is the worst of its Periods'; a Period with no precipitation has none.
+_Avoid_: snow condition, snow type, precip type
+
+**Freezing level**:
+The height above which the air is below 0 °C. A **Period**'s is the highest it reaches in that Period, and a day's is the highest of its Periods'.
+_Avoid_: freezing elevation, snow line, zero-degree line
+
 ### Forecast models
 
 **Forecast model**:
@@ -99,7 +113,7 @@ A **Forecast model** whose numbers at the point being forecast are identical to 
 _Avoid_: duplicate
 
 **Card model**:
-The single **Forecast model** behind a card on the main page. It is the visitor's **Country model** for the **Resort**'s country (for a **Saved location**, the country of the **Resort** nearest to it) wherever that model covers the point and has data there, and otherwise the **Recommended card model**.
+The single **Forecast model** behind a card on the main page. It is the visitor's **Country model** for the **Resort**'s country (for a **Saved location**, the country of the **Resort** nearest to it) wherever that model covers the point and has data there, and otherwise the **Recommended card model**. Visitors change them under "Main page models".
 _Avoid_: default model, primary model
 
 **Recommended card model**:
@@ -127,5 +141,51 @@ The **Preferred models** whose **Coverage** includes the point being forecast (a
 _Avoid_: selected models, model selection
 
 **Aggregation**:
-A line computed hour by hour across the **Comparison models**: median, mean, min, max, or the 25th or 75th percentile.
+A line computed hour by hour across the **Comparison models**: median, mean, min, max, or the 25th or 75th percentile. An Aggregation of an **Accumulation** is taken across the models' running totals, never the running total of the hourly Aggregation, and only at hours where every Comparison model has one.
 _Avoid_: ensemble, consensus
+
+**Accumulation**:
+One **Comparison model**'s running total of an hourly amount, such as snowfall or precipitation, from the first hour the chart shows.
+_Avoid_: cumulative, total, sum
+
+**Model style**:
+How a visitor has chosen to draw the line of one **Forecast model** or **Aggregation**: its colour, whether it is bold, and its opacity. It is the same on every chart, for every **Resort** and location. A bold line is drawn thicker and above the others of its kind; a model whose opacity is Auto is faded only while **Aggregations** are drawn.
+_Avoid_: line style, model settings, model appearance
+
+**Focused line**:
+The line a visitor is pointing at, in a detail-view chart or its legend, drawn at full strength while every other line fades. A **Comparison model**'s hourly and **Accumulation** lines are focused together.
+_Avoid_: highlighted series, selected line
+
+**Locked line**:
+A **Focused line** that stays focused when the pointer moves away, set by double-clicking its legend entry. Pointing at another legend entry previews it; pointing in the chart does not.
+_Avoid_: pinned line, selected model
+
+### The map
+
+**Base map**:
+The picture under everything else on the map of a **Resort** or a **Saved location**: Standard or Satellite. A visitor sees one at a time.
+_Avoid_: map style, map type, tiles
+
+**Overlay**:
+Something drawn on top of the **Base map** that a visitor turns on or off by itself: the **Ski map**, contour lines, hillshade or slope angle. Any number can be on at once, over either **Base map**.
+_Avoid_: layer, mode
+
+**Ski map**:
+The **Overlay** that draws every **Run** and **Lift** around the point on the map.
+_Avoid_: winter mode, piste map, trail map
+
+**Run**:
+A marked snow route as OpenStreetMap maps it: downhill, nordic, ski touring, terrain park or sled.
+_Avoid_: piste, trail, slope
+
+**Lift**:
+Anything that carries skiers uphill, from a gondola or chairlift down to a rope tow or magic carpet.
+_Avoid_: aerialway, ski lift (as the general term)
+
+**Difficulty colours**:
+The colours a downhill **Run** is drawn in to show how hard it is. They follow the convention of the **Resort**'s country (for a **Saved location**, the country of the **Resort** nearest to it), so an intermediate **Run** is blue in Canada and red in France.
+_Avoid_: piste colours, run grades
+
+**Height line**:
+A line on the 3D map that follows the terrain at one forecast height, near the point being forecast and fading out a few kilometres from it: each **Elevation band**'s for a **Resort**, or the one height a **Saved location** or **Custom location** is forecast at. The line at the height the charts are for is bold, even where it misses the point it belongs to, because Open-Meteo's ground and the map's terrain disagree. It is not an **Overlay**: it is always drawn, and only at the heights being forecast.
+_Avoid_: contour (that is the Overlay's evenly spaced lines), elevation line

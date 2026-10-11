@@ -246,6 +246,50 @@ export function AboutPage(): JSX.Element {
                     .
                 </p>
                 <p>
+                    Map runs and lifts from OpenStreetMap through the{' '}
+                    <a
+                        href="https://overpass-api.de/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="about-link"
+                    >
+                        Overpass API
+                    </a>
+                    ; satellite photos from{' '}
+                    {[
+                        ['EOxCloudless', 'https://cloudless.eox.at/'],
+                        ['swisstopo', 'https://www.swisstopo.admin.ch/'],
+                        ['IGN', 'https://geoservices.ign.fr/'],
+                        ['basemap.at', 'https://basemap.at/'],
+                        ['USGS', 'https://www.usgs.gov/programs/national-geospatial-program/national-map'],
+                        ['GSI Japan', 'https://maps.gsi.go.jp/development/ichiran.html'],
+                    ].map(([name, href], i, all) => (
+                        <span key={name}>
+                            {i > 0 && (i === all.length - 1 ? ' and ' : ', ')}
+                            <a href={href} target="_blank" rel="noopener noreferrer" className="about-link">{name}</a>
+                        </span>
+                    ))}
+                    ; terrain from{' '}
+                    <a
+                        href="https://github.com/tilezen/joerd/blob/master/docs/attribution.md"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="about-link"
+                    >
+                        Mapzen Terrain Tiles
+                    </a>
+                    {' '}and, on the 3D map,{' '}
+                    <a
+                        href="https://mapterhorn.com/attribution"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="about-link"
+                    >
+                        Mapterhorn
+                    </a>
+                    .
+                </p>
+                <p>
                     Icons by{' '}
                     <a
                         href="https://fontawesome.com/"

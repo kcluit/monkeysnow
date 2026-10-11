@@ -47,7 +47,6 @@ export const en: Translations = {
     'command.boldText': 'Bold text',
     'command.fullscreen': 'Fullscreen',
     'command.fpsCounter': 'FPS counter',
-    'command.hideIcons': 'Hide icons',
     'command.showBorders': 'Show borders',
     'command.showDate': 'Show date',
     'command.elevation': 'Elevation',
@@ -132,7 +131,17 @@ export const en: Translations = {
     'detail.noModelHasData': 'None of your preferred models have data here.',
     'detail.chooseModels': 'Choose models',
 
-    // Card models by country
+    // Detail view map
+    'map.show3d': 'Show the 3D map',
+    'map.showFlat': 'Show the flat map',
+    'map.loading3d': 'Loading the 3D map…',
+    'map.failed3d': "Couldn't load the 3D map. Switch back to the flat map, or try again later.",
+    'map.exaggeration': 'Exaggerate the terrain',
+    'map.heightLineBase': 'Base {height}',
+    'map.heightLineMid': 'Mid {height}',
+    'map.heightLineTop': 'Top {height}',
+
+    // Main page models
     'cardModels.search': 'Search countries...',
     'cardModels.everywhere': 'Use one model everywhere…',
     'cardModels.yourSelection': 'Your Selection',
@@ -140,7 +149,7 @@ export const en: Translations = {
     'cardModels.covers': 'covers {covered} of {total}',
     'cardModels.noCountries': 'No countries found',
     'cardModels.resetAll': 'Reset all to Auto',
-    'cardModels.autoEverywhere': 'Auto everywhere',
+    'cardModels.allAuto': 'All countries on Auto',
     'cardModels.changedOne': '1 country changed',
     'cardModels.changedMany': '{count} countries changed',
 };

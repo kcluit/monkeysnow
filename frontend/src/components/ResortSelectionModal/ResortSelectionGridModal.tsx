@@ -18,7 +18,6 @@ import { shouldAutoFocusSearch } from '../../utils/autoFocus';
 
 interface ResortSelectionGridModalProps {
   hierarchy: UseResortHierarchyReturn;
-  hideIcons?: boolean;
 }
 
 // The text search compares each resort with: its names, its Region and its country, but not its continent
@@ -124,14 +123,12 @@ const ResortItem = memo(function ResortItem({
   isSelected,
   isHighlighted,
   onToggle,
-  hideIcons,
   icon = icons.resort,
 }: {
   node: HierarchyNode;
   isSelected: boolean;
   isHighlighted: boolean;
   onToggle: (resortId: string) => void;
-  hideIcons?: boolean;
   icon?: typeof icons.resort;
 }) {
   const toggle = (): void => {
@@ -144,7 +141,7 @@ const ResortItem = memo(function ResortItem({
       onClick={(e) => { e.preventDefault(); toggle(); }}
     >
       <Checkbox state={isSelected ? 'all' : 'none'} onClick={(e) => { e.stopPropagation(); toggle(); }} />
-      {!hideIcons && <span className="resort-grid-item-icon"><Icon icon={icon} /></span>}
+      <span className="resort-grid-item-icon"><Icon icon={icon} /></span>
       <span className="resort-grid-item-name">{node.name}</span>
     </label>
   );
@@ -159,12 +156,11 @@ interface GroupNodeProps {
   onToggleGroup: (resortIds: string[]) => void;
   onToggleResort: (resortId: string) => void;
   highlightedId: string | null;
-  hideIcons?: boolean;
 }
 
 // One group at any level: Saved locations, a continent, a country or a Region
 const GroupNode = memo(function GroupNode(props: GroupNodeProps) {
-  const { node, isGroupOpen, onToggleOpen, groupResorts, selected, onToggleGroup, onToggleResort, highlightedId, hideIcons } = props;
+  const { node, isGroupOpen, onToggleOpen, groupResorts, selected, onToggleGroup, onToggleResort, highlightedId } = props;
   const level = isTopLevel(node) ? 'continent' : node.type === 'country' ? 'country' : 'province';
   const icon = node.type === 'custom' ? icons.custom : icons[level];
   const isOpen = isGroupOpen(node);
@@ -197,7 +193,7 @@ const GroupNode = memo(function GroupNode(props: GroupNodeProps) {
           <Icon icon={isOpen ? icons.caretDown : icons.caretRight} />
         </button>
         <Checkbox state={selectionState} onClick={handleCheckboxClick} />
-        {!hideIcons && <span className="resort-grid-header-icon"><Icon icon={icon} /></span>}
+        <span className="resort-grid-header-icon"><Icon icon={icon} /></span>
         <span className={`resort-grid-${level}-name`}>{node.name}</span>
         <span className="resort-grid-count">
           {selectedCount}/{resortIds.length}
@@ -218,7 +214,6 @@ const GroupNode = memo(function GroupNode(props: GroupNodeProps) {
                 isSelected={resort.resortId ? selected.has(resort.resortId) : false}
                 isHighlighted={resort.id === highlightedId}
                 onToggle={onToggleResort}
-                hideIcons={hideIcons}
                 icon={node.type === 'custom' ? icons.custom : icons.resort}
               />
             ))}
@@ -238,7 +233,6 @@ const GroupNode = memo(function GroupNode(props: GroupNodeProps) {
 // Main modal component
 export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
   hierarchy,
-  hideIcons,
 }: ResortSelectionGridModalProps): JSX.Element | null {
   const {
     isOpen,
@@ -376,7 +370,6 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
                   onToggleGroup={toggleGroup}
                   onToggleResort={toggleResort}
                   highlightedId={onlyResort?.id ?? null}
-                  hideIcons={hideIcons}
                 />
               ))}
             </div>

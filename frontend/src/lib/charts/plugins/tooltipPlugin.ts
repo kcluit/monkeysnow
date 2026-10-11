@@ -61,7 +61,8 @@ export function createTooltipPlugin(options: TooltipPluginOptions): uPlot.Plugin
             const formattedValue = value.toFixed(2);
             const color = seriesConfig.color;
 
-            content += `<div><span style="color:${color}">●</span> ${seriesConfig.name}: ${formattedValue}</div>`;
+            const name = seriesConfig.bold ? `<strong>${seriesConfig.name}</strong>` : seriesConfig.name;
+            content += `<div><span style="color:${color}">●</span> ${name}: ${formattedValue}</div>`;
         }
 
         tooltip.innerHTML = content;

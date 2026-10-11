@@ -83,8 +83,8 @@ export function processResortData(
             ].filter((level): level is number => typeof level === 'number' && !isNaN(level));
             const highestFreezingLevel = freezingLevels.length > 0 ? Math.max(...freezingLevels) : null;
 
-            // Get main weather condition from first available period
-            const mainWeatherCode = dayData.AM?.weather_code ?? dayData.PM?.weather_code ?? dayData.NIGHT?.weather_code ?? 0;
+            // The day's weather (and its emoji) is its PM Period's, else Night's, else AM's
+            const mainWeatherCode = dayData.PM?.weather_code ?? dayData.NIGHT?.weather_code ?? dayData.AM?.weather_code ?? 0;
             const mainCondition = getWeatherDescription(mainWeatherCode);
 
             days.push({
@@ -208,7 +208,8 @@ function createPeriodFromData(data: PeriodData, label: string, temperatureMetric
         windKmh: data.wind_speed ?? 0,
         condition: getWeatherDescription(data.weather_code ?? 0),
         snowQuality: effectiveQuality,
-        snowToLiquidRatio: data.snow_to_liquid_ratio ?? 0
+        snowToLiquidRatio: data.snow_to_liquid_ratio ?? 0,
+        freezingLevel: formatFreezingLevel(data.freezing_level, unitSystem)
     };
 }
 
@@ -261,25 +262,25 @@ function getWeatherEmoji(condition: string): string {
 }
 
 /**
- * Maps snow quality from API to display text and rainbow status
+ * Maps snow quality from API to display text and whether it is highlighted
  */
-function getSnowConditionFromQuality(quality: SnowQuality | null): SnowCondition {
+export function getSnowConditionFromQuality(quality: SnowQuality | null): SnowCondition {
     if (quality === null) {
-        return { text: 'N/A', isRainbow: false, isSecondary: true };
+        return { text: 'N/A', isHighlight: false, isSecondary: true };
     }
     switch (quality) {
         case 'powder':
-            return { text: 'Powder!', isRainbow: true };
+            return { text: 'Powder!', isHighlight: true };
         case 'dry_snow':
-            return { text: 'Dry Snow', isRainbow: true };
+            return { text: 'Dry Snow', isHighlight: true };
         case 'wet_snow':
-            return { text: 'Wet Snow', isRainbow: false };
+            return { text: 'Wet Snow', isHighlight: false };
         case 'sleet/mix':
-            return { text: 'Sleet/Mix', isRainbow: false };
+            return { text: 'Sleet/Mix', isHighlight: false };
         case 'rain':
-            return { text: 'Rain', isRainbow: false };
+            return { text: 'Rain', isHighlight: false };
         default:
-            return { text: 'Mixed conditions', isRainbow: false };
+            return { text: 'Mixed conditions', isHighlight: false };
     }
 }
 
@@ -288,7 +289,7 @@ function getSnowConditionFromQuality(quality: SnowQuality | null): SnowCondition
  */
 function getSnowConditionFromPeriods(periods: Period[]): SnowCondition {
     if (periods.length === 0) {
-        return { text: 'Mixed conditions', isRainbow: false };
+        return { text: 'Mixed conditions', isHighlight: false };
     }
 
     // Find periods with snow and get the best quality (powder is best, rain is worst)
@@ -299,7 +300,7 @@ function getSnowConditionFromPeriods(periods: Period[]): SnowCondition {
 
     if (periodsWithPrecip.length === 0) {
         // No precipitation - return N/A
-        return { text: 'N/A', isRainbow: false, isSecondary: true };
+        return { text: 'N/A', isHighlight: false, isSecondary: true };
     }
 
     // Filter out periods with null quality
@@ -307,7 +308,7 @@ function getSnowConditionFromPeriods(periods: Period[]): SnowCondition {
 
     if (periodsWithQuality.length === 0) {
         // All periods with precipitation have null quality - return N/A
-        return { text: 'N/A', isRainbow: false, isSecondary: true };
+        return { text: 'N/A', isHighlight: false, isSecondary: true };
     }
 
     // Find the worst (lowest priority) quality among periods with precipitation

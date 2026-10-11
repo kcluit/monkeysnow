@@ -8,6 +8,7 @@
 
 import type uPlot from 'uplot';
 import type { ChartConfig } from '../types';
+import { chartTextFill } from '../theme';
 
 export interface HeatmapPluginOptions {
     /** Latest chart configuration; its heatmap series is drawn, coloured across its own value range */
@@ -118,7 +119,7 @@ export function createHeatmapPlugin(options: HeatmapPluginOptions): uPlot.Plugin
         }
 
         // Draw hour labels on left side
-        ctx.fillStyle = theme.textSecondary;
+        ctx.fillStyle = chartTextFill(ctx, theme, theme.textSecondary);
         ctx.font = '10px system-ui, -apple-system, sans-serif';
         ctx.textAlign = 'right';
         ctx.textBaseline = 'middle';

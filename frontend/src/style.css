@@ -56,8 +56,8 @@ body,
     max-width: 100vw;
 }
 
-h1.apple-rainbow-text,
-.apple-rainbow-text {
+h1.title-color-text,
+.title-color-text {
     background: var(--titleColor) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
@@ -362,16 +362,16 @@ h1.apple-rainbow-text,
     opacity: 0.9;
 }
 
-.rainbow-text {
+.special-color-text {
     background: var(--specialColor);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
     background-size: 200% auto;
-    animation: rainbow 8s linear infinite;
+    animation: special-color-drift 8s linear infinite;
 }
 
-@keyframes rainbow {
+@keyframes special-color-drift {
     to {
         background-position: 200% center;
     }
@@ -1113,123 +1113,75 @@ input[type="checkbox"] {
     text-transform: uppercase;
 }
 
-/* Rainbow Text Mode - Overrides theme text colors when enabled */
-.rainbow-mode {
-    --rainbow-gradient: linear-gradient(90deg,
-            #FF375F,
-            #FF453A,
-            #FF9F0A,
-            #FFD60A,
-            #30D158,
-            #66D4CF,
-            #40C8E0,
-            #0A84FF,
-            #5E5CE6,
-            #BF5AF2,
-            #FF375F);
+/* Rainbow text - every piece of text shows one rainbow pinned to the screen, drifting sideways.
+   utils/rainbowText.ts marks the elements that hold text with data-rainbow, since CSS can't
+   select them. The rainbow is a background cut out by the letters, over the element's own fill.
+   It drifts inside an animated SVG: animating anything in CSS here would restyle the whole page
+   every frame. */
+:root.rainbow-mode {
+    /* Apple's dark-mode system colours, also in assets/rainbow-dark.svg; chart text reads them */
+    --rainbow-colors: #FF375F, #FF453A, #FF9F0A, #FFD60A, #30D158, #66D4CF, #40C8E0, #0A84FF, #5E5CE6, #BF5AF2, #FF375F;
+    --rainbow-image: url('./assets/rainbow-dark.svg');
+    /* A square tile holding the rainbow twice, diagonally, so tiles meet seamlessly */
+    --rainbow-tile: 1600px;
+    /* Laid over the rainbow on secondary text, fading it toward the background */
+    --rainbow-veil: linear-gradient(color-mix(in srgb, var(--background) 45%, transparent) 0 0);
 }
 
-/* Rainbow text for primary text elements */
-.rainbow-mode h1,
-.rainbow-mode h2,
-.rainbow-mode h3,
-.rainbow-mode h4,
-.rainbow-mode h5,
-.rainbow-mode h6 {
-    background: var(--rainbow-gradient);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    animation: rainbow 8s linear infinite;
+/* Apple's increased-contrast light-mode colours, readable on white */
+:root.rainbow-mode:not(.dark) {
+    --rainbow-colors: #D30F45, #D70015, #C93400, #B25000, #248A3D, #0C817B, #0071A4, #0040DD, #3634A3, #8944AB, #D30F45;
+    --rainbow-image: url('./assets/rainbow-light.svg');
 }
 
-/* Rainbow text for body text */
-.rainbow-mode .rainbow-text-primary {
-    background: var(--rainbow-gradient);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    animation: rainbow 8s linear infinite;
+@media (max-width: 640px) {
+    :root.rainbow-mode {
+        --rainbow-tile: 800px;
+    }
 }
 
-/* Rainbow accent elements - buttons, links, accents */
-.rainbow-mode .text-accent,
-.rainbow-mode [class*="text-blue-"],
-.rainbow-mode [class*="text-indigo-"],
-.rainbow-mode a:not(.no-rainbow) {
-    background: var(--rainbow-gradient);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    animation: rainbow 8s linear infinite;
+/* The same rainbow, standing still */
+@media (prefers-reduced-motion: reduce) {
+    :root.rainbow-mode {
+        --rainbow-image: repeating-linear-gradient(135deg, var(--rainbow-colors) 50%);
+    }
 }
 
-/* Rainbow borders and accents */
-.rainbow-mode .rainbow-border {
-    border-image: var(--rainbow-gradient) 1;
-    border-image-slice: 1;
+/* !important to win over theme gradient text (.title-color-text) and inline colours */
+:root.rainbow-mode [data-rainbow="on"] {
+    background-image: var(--rainbow-image), none !important;
+    background-size: var(--rainbow-tile) var(--rainbow-tile), auto !important;
+    background-repeat: repeat, no-repeat !important;
+    background-attachment: fixed, scroll !important;
+    background-position: 0 0, 0 0 !important;
+    -webkit-background-clip: text, border-box !important;
+    background-clip: text, border-box !important;
+    -webkit-text-fill-color: transparent !important;
+    text-shadow: none !important;
 }
 
-/* Rainbow background accent (for cards, buttons, etc.) */
-.rainbow-mode .rainbow-bg-accent {
-    background: var(--rainbow-gradient);
-    background-size: 200% auto;
-    animation: rainbow 8s linear infinite;
+:root.rainbow-mode [data-rainbow="dim"] {
+    background-image: var(--rainbow-veil), var(--rainbow-image), none !important;
+    background-size: auto, var(--rainbow-tile) var(--rainbow-tile), auto !important;
+    background-repeat: no-repeat, repeat, no-repeat !important;
+    background-attachment: scroll, fixed, scroll !important;
+    background-position: 0 0, 0 0, 0 0 !important;
+    -webkit-background-clip: text, text, border-box !important;
+    background-clip: text, text, border-box !important;
+    -webkit-text-fill-color: transparent !important;
+    text-shadow: none !important;
 }
 
-/* Override accent color variable in rainbow mode */
-.rainbow-mode {
-    --accent: linear-gradient(90deg, #FF375F, #BF5AF2);
+/* Inside a rainbow element, but painting its own text */
+:root.rainbow-mode [data-rainbow="off"] {
+    -webkit-text-fill-color: currentcolor !important;
 }
 
-/* Resort card text in rainbow mode */
-.rainbow-mode .resort-card h2,
-.rainbow-mode .resort-card h3,
-.rainbow-mode .resort-card .text-lg,
-.rainbow-mode .resort-card .text-xl,
-.rainbow-mode .resort-card .text-2xl {
-    background: var(--rainbow-gradient);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    animation: rainbow 8s linear infinite;
-}
-
-/* Command palette accent in rainbow mode */
-.rainbow-mode .command-item.selected {
-    background: linear-gradient(90deg, #5E5CE6, #BF5AF2, #FF375F);
-    background-size: 200% auto;
-    animation: rainbow 8s linear infinite;
-}
-
-/* FPS counter accent in rainbow mode */
-.rainbow-mode .fps-value {
-    background: var(--rainbow-gradient);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    animation: rainbow 8s linear infinite;
-}
-
-/* Logo in rainbow mode - inherits from apple-rainbow-text already */
-.rainbow-mode .logo-text {
-    background: var(--rainbow-gradient);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    animation: rainbow 8s linear infinite;
+/* The rainbow only fills an element's box, and the subtitle's 0.1 line box is a sliver of its
+   letters: a full one, moved down to keep the letters in place */
+:root.rainbow-mode .logo-text .subtitle {
+    bottom: 0.05em;
+    line-height: 1;
 }
 
 /* Resort Selection Modal Styles */
@@ -1380,23 +1332,6 @@ input[type="checkbox"] {
 .resort-selection-cap-notice + .resort-grid-clear-btn,
 .resort-selection-cap-notice + .resort-selection-count {
     margin-left: 8px;
-}
-
-/* Rainbow mode for resort selection */
-.rainbow-mode .resort-checkbox.checked,
-.rainbow-mode .resort-checkbox.indeterminate {
-    background: linear-gradient(90deg, #5E5CE6, #BF5AF2);
-    border-color: transparent;
-}
-
-.rainbow-mode .resort-tree-item.selected {
-    background: linear-gradient(90deg, #5E5CE6, #BF5AF2, #FF375F);
-    background-size: 200% auto;
-    animation: rainbow 8s linear infinite;
-}
-
-.rainbow-mode .resort-selection-count {
-    background: linear-gradient(90deg, #5E5CE6, #BF5AF2);
 }
 
 /* Resort Grid Modal Styles - Large fullscreen-like modal */
@@ -1752,19 +1687,6 @@ input[type="checkbox"] {
     color: #ffffff;
 }
 
-/* Rainbow mode for grid modal */
-.rainbow-mode .resort-grid-checkbox.checked,
-.rainbow-mode .resort-grid-checkbox.indeterminate {
-    background: linear-gradient(90deg, #5E5CE6, #BF5AF2);
-    border-color: transparent;
-}
-
-.rainbow-mode .resort-grid-close-btn:hover,
-.rainbow-mode .resort-grid-clear-btn:hover {
-    background: linear-gradient(90deg, #5E5CE6, #BF5AF2);
-    color: #ffffff;
-}
-
 /* Compact Utility Bar - MonkeyType style */
 .compact-utility-bar {
     font-family: var(--fontFamily, 'SF Pro Display', system-ui, sans-serif);
@@ -1834,97 +1756,7 @@ input[type="checkbox"] {
     }
 }
 
-/* Model Selection Modal Styles */
-.model-selection-modal {
-    max-width: 650px;
-}
-
-.model-tree-list {
-    max-height: 400px;
-    overflow-y: auto;
-    padding: 4px;
-}
-
-.model-tree-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    padding: 10px 12px;
-    background: transparent;
-    border: none;
-    border-radius: 8px;
-    color: var(--textPrimary, #f5f5f7);
-    font-size: 14px;
-    font-family: inherit;
-    text-align: left;
-    cursor: pointer;
-    transition: background-color 0.1s ease, color 0.1s ease;
-}
-
-.model-tree-item:hover {
-    background: var(--cardBg, rgba(255, 255, 255, 0.05));
-}
-
-.model-tree-item.selected {
-    background: var(--accent, #0a84ff);
-    color: #ffffff;
-}
-
-.model-tree-item.selected .model-tree-count,
-.model-tree-item.selected .model-tree-arrow {
-    color: rgba(255, 255, 255, 0.8);
-}
-
-.model-tree-item-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.model-checkbox {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 18px;
-    height: 18px;
-    border: 2px solid var(--textSecondary, #a1a1a6);
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: var(--weight-bold);
-    color: transparent;
-    background: transparent;
-    transition: all 0.15s ease;
-    cursor: pointer;
-    flex-shrink: 0;
-}
-
-.model-checkbox:hover {
-    border-color: var(--accent, #0a84ff);
-}
-
-.model-checkbox.checked {
-    background: var(--accent, #0a84ff);
-    border-color: var(--accent, #0a84ff);
-    color: #ffffff;
-}
-
-.model-checkbox.indeterminate {
-    background: var(--accent, #0a84ff);
-    border-color: var(--accent, #0a84ff);
-    color: #ffffff;
-}
-
-.model-tree-item.selected .model-checkbox {
-    border-color: rgba(255, 255, 255, 0.6);
-}
-
-.model-tree-item.selected .model-checkbox.checked,
-.model-tree-item.selected .model-checkbox.indeterminate {
-    background: rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.6);
-}
-
+/* Model picker */
 .model-color-dot {
     width: 12px;
     height: 12px;
@@ -1940,13 +1772,6 @@ input[type="checkbox"] {
     min-width: 0;
 }
 
-.model-tree-name {
-    font-weight: var(--weight-medium);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
 .model-tree-description {
     font-size: 11px;
     color: var(--textSecondary, #a1a1a6);
@@ -1955,65 +1780,7 @@ input[type="checkbox"] {
     text-overflow: ellipsis;
 }
 
-.model-tree-item.selected .model-tree-description {
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.model-tree-count {
-    padding: 2px 8px;
-    background: var(--cardBg, rgba(255, 255, 255, 0.1));
-    border-radius: 10px;
-    color: var(--textSecondary, #a1a1a6);
-    font-size: 11px;
-    font-weight: var(--weight-medium);
-    white-space: nowrap;
-}
-
-.model-tree-arrow {
-    color: var(--textSecondary, #a1a1a6);
-    font-size: 12px;
-    font-weight: var(--weight-semibold);
-}
-
-/* Color picker for aggregations */
-.model-color-picker {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 10;
-}
-
-.model-color-picker-trigger {
-    width: 24px;
-    height: 24px;
-    border-radius: 6px;
-    border: 2px solid var(--border, rgba(255, 255, 255, 0.2));
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
-
-.model-color-picker-trigger:hover {
-    border-color: var(--accent, #0a84ff);
-    transform: scale(1.1);
-}
-
-.model-color-picker-grid {
-    position: absolute;
-    right: 0;
-    top: 100%;
-    margin-top: 4px;
-    padding: 8px;
-    background: var(--background, #1c1c1e);
-    border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
-    border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 4px;
-    z-index: 20;
-}
-
+/* Colour swatches in the Model styles tab */
 .model-color-swatch {
     width: 24px;
     height: 24px;
@@ -2031,35 +1798,6 @@ input[type="checkbox"] {
 .model-color-swatch.selected {
     border-color: var(--textPrimary, #f5f5f7);
     box-shadow: 0 0 0 2px var(--background, #1c1c1e);
-}
-
-/* Aggregation section header */
-.model-aggregation-section {
-    padding: 8px 12px;
-    border-top: 1px solid var(--border, rgba(255, 255, 255, 0.1));
-    margin-top: 4px;
-}
-
-.model-aggregation-header {
-    font-size: 11px;
-    font-weight: var(--weight-semibold);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--textSecondary, #a1a1a6);
-    margin-bottom: 8px;
-}
-
-/* Rainbow mode for model selection */
-.rainbow-mode .model-checkbox.checked,
-.rainbow-mode .model-checkbox.indeterminate {
-    background: linear-gradient(90deg, #5E5CE6, #BF5AF2);
-    border-color: transparent;
-}
-
-.rainbow-mode .model-tree-item.selected {
-    background: linear-gradient(90deg, #5E5CE6, #BF5AF2, #FF375F);
-    background-size: 200% auto;
-    animation: rainbow 8s linear infinite;
 }
 
 /* Model Selection Grid Modal Styles */
@@ -2094,16 +1832,7 @@ input[type="checkbox"] {
     height: 10px;
 }
 
-.model-color-clickable {
-    cursor: pointer;
-    transition: transform 0.1s ease;
-}
-
-.model-color-clickable:hover {
-    transform: scale(1.2);
-}
-
-/* Aggregation item with color picker */
+/* Aggregation item */
 .model-aggregation-item {
     position: relative;
 }
@@ -2122,29 +1851,6 @@ input[type="checkbox"] {
     font-size: 10px;
 }
 
-/* Color picker dropdown for grid modal */
-.model-color-picker-dropdown {
-    position: absolute;
-    left: 32px;
-    top: 100%;
-    margin-top: 4px;
-    padding: 8px;
-    background: var(--background, #1c1c1e);
-    border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
-    border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-    z-index: 30;
-}
-
-.model-color-picker-dropdown .model-color-picker-grid {
-    position: static;
-    margin-top: 0;
-    padding: 0;
-    background: transparent;
-    border: none;
-    box-shadow: none;
-}
-
 /* Aggregations section styling */
 .model-aggregations-section {
     border: 1px solid var(--accent, #0a84ff);
@@ -2155,46 +1861,42 @@ input[type="checkbox"] {
     background: rgba(10, 132, 255, 0.1);
 }
 
-/* Hide aggregation members toggle button */
-.aggregation-hide-toggle {
-    margin-left: auto;
-    border: none;
-    background: none;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.15s ease;
-    opacity: 0.7;
+/* Opens the Model styles tab, from beside the search */
+.model-styles-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    height: 32px;
+    padding: 0 12px;
+    margin-right: 8px;
+    border: 1px solid var(--accent, #0a84ff);
+    border-radius: 6px;
+    background: rgba(10, 132, 255, 0.12);
     color: var(--accent, #0a84ff);
+    font-size: 13px;
+    font-weight: var(--weight-medium);
+    font-family: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
 }
 
-.aggregation-hide-toggle:hover {
-    opacity: 1;
+.model-styles-link:hover {
+    background: rgba(10, 132, 255, 0.25);
 }
 
-.aggregation-hide-toggle.active {
-    opacity: 1;
-}
+/* Icon only on phones, so the search keeps its room */
+@media (max-width: 480px) {
+    .model-styles-link {
+        width: 32px;
+        padding: 0;
+        justify-content: center;
+    }
 
-/* Fill option items in aggregations section */
-.model-fill-options-divider {
-    grid-column: 1 / -1;
-    height: 1px;
-    background: var(--border, #3a3a3c);
-    margin: 8px 0;
-}
-
-.fill-option-item {
-    opacity: 0.9;
-}
-
-.fill-option-item .fill-option-icon {
-    width: 12px;
-    height: 12px;
-    font-size: 10px;
-    line-height: 12px;
-    text-align: center;
-    color: var(--text-secondary, #8e8e93);
-    margin-right: 4px;
+    .model-styles-link-label {
+        display: none;
+    }
 }
 
 /* Responsive adjustments for model grid */
@@ -2245,7 +1947,7 @@ input[type="checkbox"] {
     width: 100%;
 }
 
-/* Card models by country */
+/* Main page models */
 .card-models-group {
     padding: 4px;
     background: var(--cardBg, rgba(255, 255, 255, 0.05));
@@ -2351,6 +2053,30 @@ input[type="checkbox"] {
 /* Chart Settings Modal Styles */
 .chart-settings-modal {
     max-width: 400px;
+}
+
+/* The Model styles tab, at the model picker's size */
+.chart-settings-modal.model-styles-wide {
+    max-width: 90vw;
+    width: 90vw;
+    height: 85vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.model-styles-wide .chart-settings-content {
+    flex: 1;
+    min-height: 0;
+    max-height: none;
+}
+
+@media (max-width: 768px) {
+    .chart-settings-modal.model-styles-wide {
+        max-width: 95vw;
+        width: 95vw;
+        height: 90vh;
+        height: 90dvh;
+    }
 }
 
 .chart-settings-header {
@@ -2578,6 +2304,282 @@ input[type="checkbox"] {
 
 .chart-settings-btn.apply:hover {
     opacity: 0.9;
+}
+
+/* Chart settings tabs: this chart, and the Model styles tab shared by every chart */
+.chart-settings-tabs {
+    display: flex;
+    gap: 8px;
+}
+
+/* As wide as in the narrow modal, and centred, so the tabs stay put when it widens */
+.model-styles-wide .chart-settings-tabs {
+    max-width: 366px;
+    margin: 0 auto;
+}
+
+.chart-settings-tab {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: var(--cardBg, rgba(255, 255, 255, 0.05));
+    border: 2px solid transparent;
+    border-radius: 8px;
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 14px;
+    font-weight: var(--weight-medium);
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.chart-settings-tab:hover {
+    color: var(--textPrimary, #f5f5f7);
+}
+
+.chart-settings-tab.selected {
+    background: rgba(10, 132, 255, 0.15);
+    border-color: var(--accent, #0a84ff);
+    color: var(--accent, #0a84ff);
+}
+
+.chart-settings-tab-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chart-settings-tab-hint {
+    font-size: 11px;
+    font-weight: var(--weight-normal, 400);
+    opacity: 0.8;
+    white-space: nowrap;
+}
+
+/* Model styles tab */
+.model-styles-intro {
+    margin: 0 0 12px 0;
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 12px;
+}
+
+/* Rows in columns, like the model picker's; an open row grows on its own */
+.model-style-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+    gap: 6px 8px;
+    align-items: start;
+}
+
+.model-style-row {
+    padding: 6px 8px;
+    background: var(--cardBg, rgba(255, 255, 255, 0.05));
+    border-radius: 8px;
+}
+
+/* Spans every column, with its controls beside its name */
+.model-style-all {
+    grid-column: 1 / -1;
+}
+
+.model-style-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Built like the Bold and opacity controls beside it, so it reads as one too */
+.model-style-color,
+.model-style-color-placeholder {
+    width: 44px;
+    height: 28px;
+    flex-shrink: 0;
+}
+
+.model-style-color {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0;
+    border: 1px solid var(--gridLine, rgba(255, 255, 255, 0.15));
+    border-radius: 6px;
+    background: var(--secondary, rgba(255, 255, 255, 0.05));
+    color: var(--textSecondary, #a1a1a6);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.model-style-color:hover {
+    border-color: var(--textSecondary, #a1a1a6);
+    color: var(--textPrimary, #f5f5f7);
+}
+
+.model-style-color.open {
+    border-color: var(--accent, #0a84ff);
+    color: var(--accent, #0a84ff);
+}
+
+.model-style-color-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+.model-style-color-caret {
+    display: flex;
+    font-size: 10px;
+    transition: transform 0.15s ease;
+}
+
+.model-style-color.open .model-style-color-caret {
+    transform: rotate(180deg);
+}
+
+/* "Other models": a section title that folds its section */
+.model-styles-fold {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    cursor: pointer;
+}
+
+.model-styles-fold:hover {
+    color: var(--textPrimary, #f5f5f7);
+}
+
+.model-style-provider {
+    grid-column: 1 / -1;
+    margin: 6px 0 0 0;
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 12px;
+    font-weight: var(--weight-medium);
+}
+
+.model-style-provider:first-child {
+    margin-top: 0;
+}
+
+.model-style-name {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    color: var(--textPrimary, #f5f5f7);
+    font-size: 13px;
+}
+
+.model-style-name-bold {
+    font-weight: 700;
+}
+
+.model-style-all .model-style-name {
+    flex: 0 1 auto;
+    color: var(--textSecondary, #a1a1a6);
+}
+
+/* One column on phones, as in the model picker, where the All row lines up with the rest */
+@media (max-width: 768px) {
+    .model-style-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .model-style-all .model-style-name {
+        flex: 1;
+    }
+}
+
+.model-style-note {
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 11px;
+}
+
+/* Not drawn here, but still stylable */
+.model-style-row.unavailable .model-style-color-dot,
+.model-style-row.unavailable .model-style-name {
+    opacity: 0.5;
+}
+
+.model-style-bold {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    border: 1px solid var(--gridLine, rgba(255, 255, 255, 0.15));
+    border-radius: 6px;
+    background: var(--secondary, rgba(255, 255, 255, 0.05));
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.model-style-bold:hover {
+    color: var(--textPrimary, #f5f5f7);
+}
+
+.model-style-bold.active {
+    background: var(--accent, #0a84ff);
+    border-color: var(--accent, #0a84ff);
+    color: #ffffff;
+}
+
+.model-style-bold.mixed {
+    border-style: dashed;
+    color: var(--textPrimary, #f5f5f7);
+}
+
+.model-style-opacity {
+    height: 28px;
+    flex-shrink: 0;
+    padding: 0 4px;
+    border: 1px solid var(--gridLine, rgba(255, 255, 255, 0.15));
+    border-radius: 6px;
+    background: var(--secondary, #1c1c1e);
+    color: var(--textPrimary, #f5f5f7);
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.model-style-colors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px 0 4px 0;
+}
+
+.model-color-original {
+    border-radius: 50%;
+}
+
+/* Any colour, through the browser's own picker */
+.model-color-custom {
+    position: relative;
+    overflow: hidden;
+    background: conic-gradient(#ef4444, #eab308, #22c55e, #06b6d4, #3b82f6, #d946ef, #ef4444);
+}
+
+.model-color-custom input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
 }
 
 /* Mobile Sort & Filter Modal Styles */
@@ -2932,9 +2934,87 @@ input[type="checkbox"] {
     border-radius: 0;
 }
 
-/* Keep the map credits clear of the size buttons in the bottom-left corner when they wrap on narrow screens */
-.resort-map-frame .leaflet-bottom.leaflet-right {
-    left: 76px;
+.resort-map-fullscreen .maplibregl-map {
+    border-radius: 0;
+}
+
+/* Keep the map credits clear of the 3D, size and layers buttons in the bottom-left corner when they wrap on narrow screens */
+.resort-map-frame .leaflet-bottom.leaflet-right,
+.resort-map-frame .maplibregl-ctrl-bottom-right {
+    left: 150px;
+}
+
+/* Where the 3D map goes, while it loads or if it can't */
+.resort-map-message {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    text-align: center;
+    border-radius: 0.75rem;
+    background: var(--cardBg, #1e1e1e);
+    color: var(--textSecondary, #999);
+}
+
+.resort-map-fullscreen .resort-map-message {
+    border-radius: 0;
+}
+
+/* Terrain exaggeration, in the 3D map's top-right corner */
+.resort-map-exaggeration {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 8px;
+    border-radius: 6px;
+    background: var(--cardBg, rgba(30, 30, 30, 0.85));
+    color: var(--textSecondary, #999);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.resort-map-exaggeration input {
+    width: 80px;
+    accent-color: var(--accent, #3b82f6);
+}
+
+.resort-map-exaggeration-value {
+    min-width: 2.2em;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.resort-map-3d-marker {
+    cursor: pointer;
+}
+
+/* A Height line's label sits on the terrain and lets clicks through to the map */
+.resort-map-height-label {
+    pointer-events: none;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.8);
+    color: #7e22ce;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.resort-map-height-label-bold {
+    background: rgba(255, 255, 255, 0.92);
+    font-weight: 800;
+}
+
+.resort-map-hide-height-labels .resort-map-height-label {
+    visibility: hidden;
 }
 
 .resort-map-controls {
@@ -2965,6 +3045,121 @@ input[type="checkbox"] {
 .resort-map-btn:hover {
     background: var(--secondary, rgba(50, 50, 50, 0.9));
     color: var(--textPrimary, #fff);
+}
+
+.resort-map-btn.active {
+    color: var(--accent, #0a84ff);
+}
+
+/* Base map and Overlay picker, opened by the layers button; scrolls when the small map is too short for it */
+.resort-map-layers {
+    position: absolute;
+    bottom: 44px;
+    left: 8px;
+    z-index: 1000;
+    width: 240px;
+    max-width: calc(100% - 16px);
+    max-height: calc(100% - 52px);
+    overflow-y: auto;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    border-radius: 8px;
+    background: var(--cardBg, rgba(30, 30, 30, 0.85));
+    color: var(--textPrimary, #f5f5f7);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+    font-size: 0.8125rem;
+}
+
+.resort-map-layers-bases {
+    display: flex;
+    gap: 2px;
+    padding: 2px;
+    margin-bottom: 4px;
+    border-radius: 6px;
+    background: var(--secondary, rgba(255, 255, 255, 0.08));
+}
+
+.resort-map-layers-base {
+    flex: 1;
+    padding: 3px 0;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--textSecondary, #a1a1a6);
+    cursor: pointer;
+    font: inherit;
+}
+
+.resort-map-layers-base.active {
+    background: var(--cardBg, rgba(30, 30, 30, 0.85));
+    color: var(--textPrimary, #f5f5f7);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.resort-map-layers-overlay {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 24px;
+    padding: 0 4px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.resort-map-layers-overlay:hover {
+    background: var(--secondary, rgba(255, 255, 255, 0.08));
+}
+
+.resort-map-layers-overlay input {
+    accent-color: var(--accent, #0a84ff);
+    margin: 0;
+}
+
+.resort-map-layers-hint {
+    margin-left: auto;
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 0.6875rem;
+    white-space: nowrap;
+}
+
+.resort-map-layers-legend {
+    padding: 2px 4px 2px 28px;
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 0.6875rem;
+}
+
+.resort-map-layers-bands {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 2px;
+}
+
+.resort-map-layers-bands span {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.resort-map-layers-bands i {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    opacity: 0.8;
+}
+
+/* The 3D button is a word rather than an icon, and lights up while the 3D map is showing */
+.resort-map-btn-text {
+    width: auto;
+    padding: 0 8px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.resort-map-btn[aria-pressed="true"] {
+    color: var(--accent, #3b82f6);
 }
 
 /* Chart settings slider controls */
@@ -3051,6 +3246,28 @@ input[type="checkbox"] {
 
 .uplot-legend-item {
     user-select: none;
+    /* Lets a double-tap lock a line instead of zooming the page */
+    touch-action: manipulation;
+}
+
+/* Hovered or locked; the chart behind is --cardBg, so the tint comes from the text colour */
+.uplot-legend-item-tinted {
+    background-color: color-mix(in srgb, var(--textPrimary) 10%, transparent);
+}
+
+/* Wide enough for the name in bold, so focusing an entry doesn't reflow the legend */
+.uplot-legend-label {
+    display: inline-flex;
+    flex-direction: column;
+}
+
+.uplot-legend-label::after {
+    content: attr(data-text);
+    content: attr(data-text) / '';
+    font-weight: var(--weight-bold);
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
 }
 
 /* Tooltip styling (via plugin) */
@@ -3244,22 +3461,6 @@ input[type="checkbox"] {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(13em, 1fr));
     gap: 0.25rem 1rem;
-}
-
-/* Rainbow mode for about page */
-.rainbow-mode .about-section-title,
-.rainbow-mode .about-subsection-title {
-    background: var(--rainbow-gradient);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    animation: rainbow 8s linear infinite;
-}
-
-.rainbow-mode .about-contact-btn {
-    background: linear-gradient(90deg, #5E5CE6, #BF5AF2);
 }
 
 /* Responsive adjustments */

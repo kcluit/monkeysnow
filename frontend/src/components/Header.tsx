@@ -22,7 +22,7 @@ function NavIconLink({ to, icon, isActive, title }: NavIconLinkProps): JSX.Eleme
         <Link
             to={to}
             title={title}
-            className={`nav-icon-btn no-rainbow ${isActive ? 'active' : ''}`}
+            className={`nav-icon-btn ${isActive ? 'active' : ''}`}
         >
             <Icon icon={icon} size="sm" />
         </Link>
@@ -75,7 +75,7 @@ export function Header({ font }: HeaderProps): JSX.Element {
         <header className="mb-8 pt-4">
             <div className="header-content">
                 <Link to="/">
-                    <h1 className="logo-text apple-rainbow-text">
+                    <h1 className="logo-text title-color-text">
                         <div className="subtitle">monkey do</div>
                         <LogoSnowflake className="logo-snowflake" />
                         monkeysnow

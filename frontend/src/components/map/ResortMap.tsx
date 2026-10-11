@@ -1,11 +1,41 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { Component, Suspense, lazy, useState, useCallback, useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useFullscreenView } from '../../hooks/useFullscreenView';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { useLanguage } from '../../hooks/useLanguage';
+import {
+    DEFAULT_MAP_LAYERS,
+    MAP_LAYERS_STORAGE_KEY,
+    OSM_ATTRIBUTION,
+    sanitizeMapLayers,
+    type MapLayers,
+    type OverlayId,
+} from '../../utils/mapLayers';
+import { difficultyConvention } from '../../utils/difficultyColours';
+import { SKI_MAP_MIN_ZOOM } from '../../utils/skiMapData';
+import { CONTOURS_MIN_ZOOM, SLOPE_ANGLE_MIN_ZOOM } from '../../utils/terrainRendering';
+import type { UnitSystem } from '../../utils/unitConversion';
+import type { HeightLine } from '../../utils/heightLines';
+import type { MapView } from './ResortMap3D';
+import { SatelliteBaseMap } from './SatelliteBaseMap';
+import { TerrainOverlay } from './TerrainOverlay';
+import { SkiMapOverlay, type SkiMapStatus } from './SkiMapOverlay';
+import { MapLayersPanel } from './MapLayersPanel';
+import {
+    CUSTOM_LOCATION_DOT_HTML,
+    CUSTOM_LOCATION_DOT_SIZE,
+    CustomLocationPopupContent,
+    DOUBLE_CLICK_MS,
+    ResortPopupContent,
+} from './mapMarkers';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+// The 3D map and MapLibre behind it are only downloaded the first time a visitor switches to it (docs/adr/0008)
+const ResortMap3D = lazy(() => import('./ResortMap3D'));
 
 // Fix Leaflet's default marker icon issue with bundlers (Vite/Webpack)
 // Import icons locally instead of relying on CDN for production reliability
@@ -19,17 +49,10 @@ L.Icon.Default.mergeOptions({
 // Custom red marker for clicked location
 const customLocationIcon = L.divIcon({
     className: 'custom-location-marker',
-    html: `<div style="
-        width: 24px;
-        height: 24px;
-        background: #ef4444;
-        border: 3px solid white;
-        border-radius: 50%;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-    "></div>`,
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
-    popupAnchor: [0, -12],
+    html: CUSTOM_LOCATION_DOT_HTML,
+    iconSize: [CUSTOM_LOCATION_DOT_SIZE, CUSTOM_LOCATION_DOT_SIZE],
+    iconAnchor: [CUSTOM_LOCATION_DOT_SIZE / 2, CUSTOM_LOCATION_DOT_SIZE / 2],
+    popupAnchor: [0, -CUSTOM_LOCATION_DOT_SIZE / 2],
 });
 
 // Marks the history entry pushed on entering fullscreen, so Back closes the map instead of leaving the page
@@ -39,6 +62,18 @@ const FULLSCREEN_HISTORY_KEY = 'resortMapFullscreen';
 const INITIAL_ZOOM = 14;
 
 type MapSize = 'small' | 'expanded' | 'fullscreen';
+
+// MapLibre draws with WebGL2, so without it the 3D map is never offered
+function supportsWebGL2(): boolean {
+    try {
+        const context = document.createElement('canvas').getContext('webgl2');
+        // Browsers allow only a few contexts at once, so give this one back
+        context?.getExtension('WEBGL_lose_context')?.loseContext();
+        return context !== null;
+    } catch {
+        return false;
+    }
+}
 
 interface ResortMapProps {
     lat: number;
@@ -50,6 +85,29 @@ interface ResortMapProps {
     customLocation?: { lat: number; lon: number } | null;
     /** The height the Custom location is forecast at, e.g. "2100m (ground 1845m)", or null until the forecast reports it */
     customElevationText?: string | null;
+    /** ISO code of the Resort's country (for a Saved location, its nearest Resort's): picks the Difficulty colours */
+    country?: string;
+    /** Contour lines are spaced and labelled in the visitor's units */
+    unitSystem: UnitSystem;
+    /** Drawn on the 3D map only */
+    heightLines: readonly HeightLine[];
+}
+
+// Reports the zoom whenever it changes, so the layers panel can say when an Overlay needs the map closer in
+function ZoomTracker({ onZoom }: { onZoom: (zoom: number) => void }): null {
+    const map = useMapEvents({ zoomend: () => onZoom(map.getZoom()) });
+    return null;
+}
+
+// Inner component reporting where the flat map is looking, so the 3D map can start there
+function MapViewTracker({ onChange }: { onChange: (view: MapView) => void }): null {
+    const map = useMapEvents({
+        moveend: () => {
+            const centre = map.getCenter();
+            onChange({ lat: centre.lat, lon: centre.lng, zoom: map.getZoom() });
+        },
+    });
+    return null;
 }
 
 // Inner component to invalidate map size whenever its container resizes
@@ -63,9 +121,6 @@ function MapResizeHandler(): null {
     }, [map]);
     return null;
 }
-
-// A double-click or double-tap zooms the map, so a click only counts once no second one follows this soon
-const DOUBLE_CLICK_MS = 300;
 
 // Inner component to handle map click events
 function MapClickHandler({ onClick }: { onClick: (lat: number, lon: number) => void }): null {
@@ -83,6 +138,19 @@ function MapClickHandler({ onClick }: { onClick: (lat: number, lon: number) => v
     return null;
 }
 
+// Shown in place of the 3D map when its code fails to load, e.g. offline or after a new release
+class Map3DErrorBoundary extends Component<{ message: string; children: ReactNode }, { failed: boolean }> {
+    state = { failed: false };
+
+    static getDerivedStateFromError(): { failed: boolean } {
+        return { failed: true };
+    }
+
+    render(): ReactNode {
+        return this.state.failed ? <div className="resort-map-message">{this.props.message}</div> : this.props.children;
+    }
+}
+
 export function ResortMap({
     lat,
     lon,
@@ -91,7 +159,11 @@ export function ResortMap({
     onMapClick,
     customLocation,
     customElevationText,
+    country,
+    unitSystem,
+    heightLines,
 }: ResortMapProps): JSX.Element {
+    const { t } = useLanguage();
     const hasCustomLocation = customLocation !== null && customLocation !== undefined;
     const [isExpanded, setIsExpanded] = useState(false);
     // While fullscreen: Back and Esc close the map, and the page behind it can't scroll
@@ -103,65 +175,170 @@ export function ResortMap({
         setIsExpanded(prev => !prev);
     }, []);
 
+    // One Base map and any Overlays, the same on every map in this browser
+    const [storedLayers, setStoredLayers] = useLocalStorage<unknown>(MAP_LAYERS_STORAGE_KEY, DEFAULT_MAP_LAYERS);
+    const layers = useMemo(() => sanitizeMapLayers(storedLayers), [storedLayers]);
+    const setLayers = useCallback((next: MapLayers) => setStoredLayers(next), [setStoredLayers]);
+    const isOn = (overlay: OverlayId) => layers.overlays.includes(overlay);
+    const convention = useMemo(() => difficultyConvention(country), [country]);
+
+    const [zoom, setZoom] = useState(INITIAL_ZOOM);
+    const [skiMapStatus, setSkiMapStatus] = useState<SkiMapStatus>('loading');
+    // e.g. "On Peak to Creek, blue run" when the Custom location is on a Run or Lift of the Ski map
+    const [customLocationOn, setCustomLocationOn] = useState<string | null>(null);
+
+    const hints: Partial<Record<OverlayId, string>> = {
+        skiMap: zoom < SKI_MAP_MIN_ZOOM ? 'Zoom in to see runs'
+            : skiMapStatus === 'unavailable' ? 'Unavailable, retrying'
+            : skiMapStatus === 'loading' ? 'Loading...'
+            : undefined,
+        contours: zoom < CONTOURS_MIN_ZOOM ? 'Zoom in to see contours' : undefined,
+        slopeAngle: zoom < SLOPE_ANGLE_MIN_ZOOM ? 'Zoom in to see slopes' : undefined,
+    };
+
+    // The layers panel closes on a click or tap anywhere outside it, or on Esc
+    const [isLayersPanelOpen, setIsLayersPanelOpen] = useState(false);
+    const layersPanelRef = useRef<HTMLDivElement>(null);
+    const layersButtonRef = useRef<HTMLButtonElement>(null);
+    useEffect(() => {
+        if (!isLayersPanelOpen) return;
+        const closeOutside = (e: PointerEvent) => {
+            const target = e.target as Node;
+            if (!layersPanelRef.current?.contains(target) && !layersButtonRef.current?.contains(target)) {
+                setIsLayersPanelOpen(false);
+            }
+        };
+        const closeOnEscape = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setIsLayersPanelOpen(false);
+        };
+        document.addEventListener('pointerdown', closeOutside);
+        document.addEventListener('keydown', closeOnEscape);
+        return () => {
+            document.removeEventListener('pointerdown', closeOutside);
+            document.removeEventListener('keydown', closeOnEscape);
+        };
+    }, [isLayersPanelOpen]);
+
+    // The 3D map is never remembered: every detail view opens on the flat map
+    const [is3D, setIs3D] = useState(false);
+    const [canShow3D] = useState(supportsWebGL2);
+    // Where either map was last looking, so switching keeps the same place in view
+    const view = useRef<MapView>({ lat, lon, zoom: INITIAL_ZOOM });
+    const setView = useCallback((next: MapView) => {
+        view.current = next;
+    }, []);
+
+    // The 3D map shows only the Standard Base map, so the layers panel goes while it is on
+    const toggle3D = useCallback(() => {
+        setIsLayersPanelOpen(false);
+        // The flat map comes back where the 3D map was, which the zoom hints must know
+        if (is3D) setZoom(Math.round(view.current.zoom));
+        setIs3D(!is3D);
+    }, [is3D]);
+
     return (
         // The outer box keeps the map's place in the page while the frame inside it goes fullscreen
         <div className={`resort-map-container ${size === 'small' ? '' : 'resort-map-expanded'}`}>
             <div className={`resort-map-frame ${isFullscreen ? 'resort-map-fullscreen' : ''}`}>
-                <MapContainer
-                    center={[lat, lon]}
-                    zoom={INITIAL_ZOOM}
-                    maxZoom={18}
-                    scrollWheelZoom={true}
-                    className={`h-full rounded-xl shadow-lg ${className}`}
-                    style={{ zIndex: 0 }}
-                >
-                    {/* Plain OpenStreetMap map. OpenSkiMap looks better, but its terms forbid other sites using its tiles;
-                        OpenSnowMap's ski run and lift overlay was tried and dropped for how it looked. */}
-                    <TileLayer
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                        url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-
-                    {/* Resize handler to invalidate map on expand/collapse and fullscreen */}
-                    <MapResizeHandler />
-
-                    {/* Click handler */}
-                    {onMapClick && <MapClickHandler onClick={onMapClick} />}
-
-                    {/* Original resort marker - dimmed when custom location is active */}
-                    <Marker
-                        position={[lat, lon]}
-                        opacity={hasCustomLocation ? 0.4 : 1}
+                {is3D ? (
+                    <Map3DErrorBoundary message={t('map.failed3d')}>
+                        <Suspense fallback={<div className="resort-map-message">{t('map.loading3d')}</div>}>
+                            <ResortMap3D
+                                initialView={view.current}
+                                onViewChange={setView}
+                                lat={lat}
+                                lon={lon}
+                                resortName={resortName}
+                                className={className}
+                                onMapClick={onMapClick}
+                                customLocation={customLocation}
+                                customElevationText={customElevationText}
+                                heightLines={heightLines}
+                            />
+                        </Suspense>
+                    </Map3DErrorBoundary>
+                ) : (
+                    <MapContainer
+                        center={[view.current.lat, view.current.lon]}
+                        zoom={Math.round(view.current.zoom)}
+                        maxZoom={18}
+                        scrollWheelZoom={true}
+                        className={`h-full rounded-xl shadow-lg ${className}`}
+                        style={{ zIndex: 0 }}
                     >
-                        <Popup>
-                            {resortName}
-                            {hasCustomLocation && <span className="text-xs text-gray-500"> (Original)</span>}
-                        </Popup>
-                    </Marker>
+                        {/* Standard is plain OpenStreetMap. OpenSkiMap looks better, but its terms forbid other sites using its tiles;
+                            OpenSnowMap's ski run and lift overlay was tried and dropped for how it looked, so the Ski map draws its own. */}
+                        {layers.baseMap === 'satellite' ? (
+                            <SatelliteBaseMap />
+                        ) : (
+                            <TileLayer attribution={OSM_ATTRIBUTION} url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                        )}
 
-                    {/* Custom location marker */}
-                    {hasCustomLocation && (
+                        {isOn('hillshade') && <TerrainOverlay kind="hillshade" unitSystem={unitSystem} onSatellite={layers.baseMap === 'satellite'} />}
+                        {isOn('slopeAngle') && <TerrainOverlay kind="slopeAngle" unitSystem={unitSystem} onSatellite={layers.baseMap === 'satellite'} />}
+                        {isOn('contours') && <TerrainOverlay kind="contours" unitSystem={unitSystem} onSatellite={layers.baseMap === 'satellite'} />}
+                        {isOn('skiMap') && (
+                            <SkiMapOverlay
+                                convention={convention}
+                                customLocation={customLocation}
+                                onStatusChange={setSkiMapStatus}
+                                onCustomLocationOnChange={setCustomLocationOn}
+                            />
+                        )}
+
+                        <ZoomTracker onZoom={setZoom} />
+
+                        <MapViewTracker onChange={setView} />
+
+                        {/* Resize handler to invalidate map on expand/collapse and fullscreen */}
+                        <MapResizeHandler />
+
+                        {/* Click handler */}
+                        {onMapClick && <MapClickHandler onClick={onMapClick} />}
+
+                        {/* Original resort marker - dimmed when custom location is active */}
                         <Marker
-                            position={[customLocation.lat, customLocation.lon]}
-                            icon={customLocationIcon}
+                            position={[lat, lon]}
+                            opacity={hasCustomLocation ? 0.4 : 1}
                         >
                             <Popup>
-                                <div className="text-sm">
-                                    <div className="font-semibold mb-1">Custom Location</div>
-                                    <div className="text-gray-600">Lat: {customLocation.lat.toFixed(4)}</div>
-                                    <div className="text-gray-600">Lon: {customLocation.lon.toFixed(4)}</div>
-                                    {customElevationText === null || customElevationText === undefined ? (
-                                        <div className="text-gray-500 italic mt-1">Loading elevation...</div>
-                                    ) : (
-                                        <div className="text-gray-600 mt-1">Elevation: {customElevationText}</div>
-                                    )}
-                                </div>
+                                <ResortPopupContent resortName={resortName} hasCustomLocation={hasCustomLocation} />
                             </Popup>
                         </Marker>
-                    )}
-                </MapContainer>
+
+                        {/* Custom location marker */}
+                        {hasCustomLocation && (
+                            <Marker
+                                position={[customLocation.lat, customLocation.lon]}
+                                icon={customLocationIcon}
+                            >
+                                <Popup>
+                                    <CustomLocationPopupContent
+                                        lat={customLocation.lat}
+                                        lon={customLocation.lon}
+                                        elevationText={customElevationText}
+                                        onText={customLocationOn}
+                                    />
+                                </Popup>
+                            </Marker>
+                        )}
+                    </MapContainer>
+                )}
 
                 <div className="resort-map-controls">
+                    {/* Switches between the flat map and the 3D map */}
+                    {canShow3D && (
+                        <button
+                            type="button"
+                            onClick={toggle3D}
+                            className="resort-map-btn resort-map-btn-text"
+                            aria-pressed={is3D}
+                            title={is3D ? t('map.showFlat') : t('map.show3d')}
+                        >
+                            3D
+                        </button>
+                    )}
+
                     {/* Expand/collapse button (fullscreen has its own exit button) */}
                     {!isFullscreen && (
                         <button
@@ -201,7 +378,28 @@ export function ResortMap({
                             </svg>
                         </button>
                     )}
+
+                    {/* Layers button: the Base map and Overlays, at every size of the flat map */}
+                    {!is3D && (
+                        <button
+                            ref={layersButtonRef}
+                            type="button"
+                            onClick={() => setIsLayersPanelOpen(open => !open)}
+                            className={`resort-map-btn ${isLayersPanelOpen ? 'active' : ''}`}
+                            title="Map layers"
+                            aria-expanded={isLayersPanelOpen}
+                        >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                {/* Stacked squares icon */}
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6.429 9.75 2.25 12l4.179 2.25m0-4.5 5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0 4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0-5.571 3-5.571-3" />
+                            </svg>
+                        </button>
+                    )}
                 </div>
+
+                {isLayersPanelOpen && (
+                    <MapLayersPanel ref={layersPanelRef} layers={layers} onChange={setLayers} hints={hints} />
+                )}
             </div>
         </div>
     );

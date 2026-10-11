@@ -61,7 +61,6 @@ export type UtilityBarStyle = 'compact' | 'large';
 export type TemperatureMetric = 'max' | 'min' | 'avg' | 'median';
 export type SnowfallEstimateMode = 'model' | 'totalPrecip';
 export type ResortDisplayLimit = 'auto' | number;
-export type ModelLineOpacity = 'auto' | 0.05 | 0.1 | 0.2 | 0.35 | 0.5 | 1;
 export type SnowQuality = 'rain' | 'sleet/mix' | 'wet_snow' | 'powder' | 'dry_snow';
 
 // Weather data structures from new API format
@@ -119,7 +118,7 @@ export interface AllWeatherData {
 // Snow condition type
 export interface SnowCondition {
     text: string;
-    isRainbow: boolean;
+    isHighlight: boolean;
     isSecondary?: boolean;  // true for N/A display
 }
 
@@ -141,6 +140,8 @@ export interface Period {
     condition: string;
     snowQuality: SnowQuality | null;
     snowToLiquidRatio: number;
+    /** The highest Freezing level in this Period, e.g. "1720 m" */
+    freezingLevel: string;
 }
 
 // Day forecast data

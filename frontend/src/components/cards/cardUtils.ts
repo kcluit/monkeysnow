@@ -25,6 +25,28 @@ export function formatWeatherText(periods: Period[]): string {
 }
 
 /**
+ * Shortens a weather description to fit a narrow column by dropping intensity words
+ * ("Light drizzle" and "Dense drizzle" are both "Drizzle"): the snow and rain amounts show intensity.
+ */
+export function shortWeatherText(condition: string): string {
+    const c = condition.toLowerCase();
+    if (c.includes('thunderstorm')) return c.includes('hail') ? 'Storm + hail' : 'Storm';
+    if (c.includes('snow showers')) return 'Snow showers';
+    if (c.includes('rain showers')) return 'Showers';
+    if (c.includes('snow grains')) return 'Snow grains';
+    if (c.includes('freezing drizzle')) return 'Freezing drizzle';
+    if (c.includes('freezing rain')) return 'Freezing rain';
+    if (c.includes('drizzle')) return 'Drizzle';
+    if (c.includes('rain')) return 'Rain';
+    if (c.includes('snow')) return 'Snow';
+    if (c.includes('rime')) return 'Rime fog';
+    if (c.includes('fog')) return 'Fog';
+    if (c === 'mainly clear') return 'Mostly clear';
+    if (c.includes('clear')) return 'Clear';
+    return condition;
+}
+
+/**
  * Calculates aggregated day statistics based on temperature metric.
  * For max: returns max of all period maxes (true daily max)
  * For min: returns min of all period mins (true daily min)
@@ -136,12 +158,12 @@ export function getTemperatureStyle(temp: number): { className?: string; style?:
 }
 
 /**
- * Gets snow amount color class (rainbow for significant amounts).
- * Thresholds are based on cm values: 20cm+ rainbow, 10cm+ apple-rainbow.
+ * Gets snow amount color class (the theme's highlight colours for significant amounts).
+ * Thresholds are based on cm values: 20cm+ special colour, 10cm+ title colour.
  */
 export function getSnowClass(snowCm: number): string {
-    if (snowCm >= 20) return 'rainbow-text';
-    if (snowCm >= 10) return 'apple-rainbow-text';
+    if (snowCm >= 20) return 'special-color-text';
+    if (snowCm >= 10) return 'title-color-text';
     return 'text-theme-accent';
 }
 

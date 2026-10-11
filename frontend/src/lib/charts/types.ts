@@ -38,16 +38,22 @@ export interface ChartTheme {
     accent: string;
     tooltipBg: string;
     tooltipBorder: string;
+    /** Rainbow text's colours, comma-separated, or '' while it is off */
+    rainbowText: string;
 }
 
 /** Configuration for a single data series */
 export interface SeriesConfig {
     id: string;
+    /** The line this series is focused and locked as, shared across charts; defaults to its id */
+    line?: string;
     name: string;
     color: string;
     type: ChartType;
     data: (number | null)[];
     lineWidth?: number;
+    /** Named in bold in the legend and tooltip */
+    bold?: boolean;
     opacity?: number;
     fillOpacity?: number;
     lineStyle?: LineStyle;
