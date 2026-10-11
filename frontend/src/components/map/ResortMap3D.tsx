@@ -40,6 +40,7 @@ import {
 } from '../../utils/satelliteImagery';
 import { OSM_ATTRIBUTION, type MapLayers } from '../../utils/mapLayers';
 import type { MapRotation } from '../../utils/mapRotation';
+import type { TerrainPoint } from '../../utils/terrainAtPoint';
 import type { DifficultyConvention } from '../../utils/difficultyColours';
 import type { UnitSystem } from '../../utils/unitConversion';
 import { SKI_MAP_LAYERS, SKI_MAP_SOURCES, useSkiMap3D } from './SkiMap3D';
@@ -303,6 +304,8 @@ export interface ResortMap3DProps {
     /** What the Custom location is on, e.g. "On Peak to Creek, blue run", reported to and shown back from the parent */
     customLocationOn: string | null;
     onCustomLocationOnChange: (text: string | null) => void;
+    /** Where on the ground the mouse is, for the cursor readout, or null off the map or over the sky */
+    onPointerMove?: (point: TerrainPoint | null) => void;
 }
 
 export default function ResortMap3D({
@@ -323,6 +326,7 @@ export default function ResortMap3D({
     onSkiMapStatusChange,
     customLocationOn,
     onCustomLocationOnChange,
+    onPointerMove,
 }: ResortMap3DProps): JSX.Element {
     const { t } = useLanguage();
     const containerRef = useRef<HTMLDivElement>(null);
@@ -343,6 +347,8 @@ export default function ResortMap3D({
     onMapClickRef.current = onMapClick;
     const onViewChangeRef = useRef(onViewChange);
     onViewChangeRef.current = onViewChange;
+    const onPointerMoveRef = useRef(onPointerMove);
+    onPointerMoveRef.current = onPointerMove;
     const onSatelliteRef = useRef(onSatellite);
     onSatelliteRef.current = onSatellite;
 
@@ -390,6 +396,13 @@ export default function ResortMap3D({
             pendingClick = window.setTimeout(() => onMapClickRef.current?.(clickedLat, clickedLon), DOUBLE_CLICK_MS);
         });
         created.on('dblclick', () => window.clearTimeout(pendingClick));
+        // The cursor readout follows the ground under the mouse, and goes when it points at the sky
+        created.on('mousemove', (event) => {
+            const back = created.project(event.lngLat);
+            const onGround = Math.hypot(back.x - event.point.x, back.y - event.point.y) <= SKY_CLICK_TOLERANCE_PX;
+            onPointerMoveRef.current?.(onGround ? { lat: event.lngLat.lat, lon: event.lngLat.lng, zoom: created.getZoom() + 1 } : null);
+        });
+        created.on('mouseout', () => onPointerMoveRef.current?.(null));
         // Zoomed far out, the lines' labels crowd onto one another
         const hideLabelsWhenFar = (): void => {
             container.classList.toggle('resort-map-hide-height-labels', created.getZoom() < HEIGHT_LABEL_MIN_ZOOM);

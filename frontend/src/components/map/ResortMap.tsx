@@ -27,6 +27,9 @@ import { SkiMapOverlay } from './SkiMapOverlay';
 import type { SkiMapStatus } from './skiMapFeatures';
 import { MapLayersPanel } from './MapLayersPanel';
 import { MapLegend } from './MapLegend';
+import { CursorReadout } from './CursorReadout';
+import { useTerrainReadout } from '../../hooks/useTerrainReadout';
+import type { TerrainPoint } from '../../utils/terrainAtPoint';
 import {
     CUSTOM_LOCATION_DOT_HTML,
     CUSTOM_LOCATION_DOT_SIZE,
@@ -102,6 +105,15 @@ interface ResortMapProps {
 // Reports the zoom whenever it changes, so the layers panel can say when an Overlay needs the map closer in
 function ZoomTracker({ onZoom }: { onZoom: (zoom: number) => void }): null {
     const map = useMapEvents({ zoomend: () => onZoom(map.getZoom()) });
+    return null;
+}
+
+// Inner component reporting the ground under the mouse, for the cursor readout
+function PointerTracker({ onPointer }: { onPointer: (point: TerrainPoint | null) => void }): null {
+    const map = useMapEvents({
+        mousemove: (e) => onPointer({ lat: e.latlng.lat, lon: e.latlng.lng, zoom: map.getZoom() }),
+        mouseout: () => onPointer(null),
+    });
     return null;
 }
 
@@ -245,12 +257,17 @@ export function ResortMap({
         setZoom(next.zoom);
     }, []);
 
+    // The terrain under the mouse, where there is one; a tap on a touch screen picks a Custom location instead
+    const [canHover] = useState(() => window.matchMedia('(hover: hover)').matches);
+    const { reading, pointAt } = useTerrainReadout();
+
     const toggle3D = useCallback(() => {
         setIsLayersPanelOpen(false);
+        pointAt(null);
         // The flat map comes back where the 3D map was, which the zoom hints must know
         if (is3D) setZoom(Math.round(view.current.zoom));
         setIs3D(!is3D);
-    }, [is3D]);
+    }, [is3D, pointAt]);
 
     return (
         // The outer box keeps the map's place in the page while the frame inside it goes fullscreen
@@ -279,6 +296,7 @@ export function ResortMap({
                                 onSkiMapStatusChange={setSkiMapStatus}
                                 customLocationOn={customLocationOn}
                                 onCustomLocationOnChange={setCustomLocationOn}
+                                onPointerMove={canHover ? pointAt : undefined}
                             />
                         </Suspense>
                     </Map3DErrorBoundary>
@@ -315,6 +333,8 @@ export function ResortMap({
                         <ZoomTracker onZoom={setZoom} />
 
                         <MapViewTracker onChange={setView} />
+
+                        {canHover && <PointerTracker onPointer={pointAt} />}
 
                         {/* Resize handler to invalidate map on expand/collapse and fullscreen */}
                         <MapResizeHandler />
@@ -422,6 +442,8 @@ export function ResortMap({
                 </div>
 
                 {colouring && <MapLegend colouring={colouring} unitSystem={unitSystem} />}
+
+                {reading && <CursorReadout reading={reading} unitSystem={unitSystem} is3D={is3D} />}
 
                 {isLayersPanelOpen && (
                     <MapLayersPanel ref={layersPanelRef} layers={layers} onChange={setLayers} hints={hints} is3D={is3D} />

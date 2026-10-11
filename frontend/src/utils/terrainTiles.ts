@@ -12,7 +12,7 @@ export const TERRAIN_ATTRIBUTION = '<a href="https://mapterhorn.com/attribution"
 /** Every point has tiles down to this zoom, about 30 m data; only some countries have sharper ones */
 export const TERRAIN_BASE_ZOOM = 12;
 // About 10 m (7 m in the Alps): finer picks out rock steps rather than slopes a slab could run on (docs/adr/0009)
-const OVERLAY_MAX_ZOOM = 13;
+export const OVERLAY_MAX_ZOOM = 13;
 const EARTH_CIRCUMFERENCE_M = 40075016.686;
 
 // About 32 MB of heights: a fullscreen flat map's worth of tiles plus their neighbours

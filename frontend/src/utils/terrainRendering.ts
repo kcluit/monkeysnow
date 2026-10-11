@@ -234,15 +234,23 @@ export const ASPECT_SECTORS: readonly { name: string; colour: Rgb }[] = [
 
 const FLAT_GRADIENT = Math.tan((FLAT_BELOW_DEGREES * Math.PI) / 180);
 
+/**
+ * Which of ASPECT_SECTORS a slope faces, from how fast the ground rises to the east and to the south,
+ * or null on a Flat, which has no Aspect.
+ */
+export function aspectSector(east: number, south: number): number | null {
+    if (Math.hypot(east, south) < FLAT_GRADIENT) return null;
+    // A slope faces downhill: west where the ground rises to the east, north where it rises to the south
+    const bearing = (Math.atan2(-east, south) * 180) / Math.PI;
+    return Math.floor((((bearing + 22.5) % 360) + 360) % 360 / 45) % 8;
+}
+
 export function renderAspect(canvas: HTMLCanvasElement, w: ElevationWindow): void {
     const { east, south, size } = gradients(w);
     // The slope's two directions are interpolated rather than its compass bearing, which jumps from 359 to 0 degrees
     paintPixels(canvas, [east, south], size, w.n, (e, s, rgba, o) => {
-        if (Math.hypot(e, s) < FLAT_GRADIENT) return;
-        // A slope faces downhill: west where the ground rises to the east, north where it rises to the south
-        const bearing = (Math.atan2(-e, s) * 180) / Math.PI;
-        const sector = Math.floor((((bearing + 22.5) % 360) + 360) % 360 / 45) % 8;
-        setPixel(rgba, o, ASPECT_SECTORS[sector].colour, 150);
+        const sector = aspectSector(e, s);
+        if (sector !== null) setPixel(rgba, o, ASPECT_SECTORS[sector].colour, 150);
     });
 }
 
