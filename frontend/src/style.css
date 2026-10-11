@@ -2245,7 +2245,7 @@ input[type="checkbox"] {
     width: 100%;
 }
 
-/* Card models by country */
+/* Main page models */
 .card-models-group {
     padding: 4px;
     background: var(--cardBg, rgba(255, 255, 255, 0.05));

@@ -99,7 +99,7 @@ A **Forecast model** whose numbers at the point being forecast are identical to 
 _Avoid_: duplicate
 
 **Card model**:
-The single **Forecast model** behind a card on the main page. It is the visitor's **Country model** for the **Resort**'s country (for a **Saved location**, the country of the **Resort** nearest to it) wherever that model covers the point and has data there, and otherwise the **Recommended card model**.
+The single **Forecast model** behind a card on the main page. It is the visitor's **Country model** for the **Resort**'s country (for a **Saved location**, the country of the **Resort** nearest to it) wherever that model covers the point and has data there, and otherwise the **Recommended card model**. Visitors change them under "Main page models".
 _Avoid_: default model, primary model
 
 **Recommended card model**:

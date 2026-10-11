@@ -293,7 +293,7 @@ function App(): JSX.Element {
         onResortsChange: setSelectedResorts,
     });
 
-    // Card models by country
+    // Main page models
     const [isCardModelsOpen, setCardModelsOpen] = useState(false);
     const openCardModels = useCallback(() => setCardModelsOpen(true), []);
     const closeCardModels = useCallback(() => setCardModelsOpen(false), []);
@@ -1000,7 +1000,7 @@ function App(): JSX.Element {
             {/* Resort Selection Grid Modal */}
             <ResortSelectionGridModal hierarchy={resortHierarchy} hideIcons={isHideIconsEnabled} />
 
-            {/* Card models by country */}
+            {/* Main page models */}
             <CardModelsModal isOpen={isCardModelsOpen} onClose={closeCardModels} selectedResorts={selectedResorts} />
 
             {/* FPS Counter */}

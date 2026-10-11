@@ -432,7 +432,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                         </div>
                     </div>
                     <div className="settings-subsection">
-                        <span className="settings-subsection-label">Card models by country</span>
+                        <span className="settings-subsection-label">Main page models</span>
                         <div className="settings-options-row">
                             <OptionButton label="Choose…" icon={icons.weatherModel} isSelected={false} onClick={openCardModels} />
                             <span className="self-center text-sm text-theme-textSecondary">{cardModelsSummary}</span>

@@ -132,7 +132,7 @@ export const en: Translations = {
     'detail.noModelHasData': 'None of your preferred models have data here.',
     'detail.chooseModels': 'Choose models',
 
-    // Card models by country
+    // Main page models
     'cardModels.search': 'Search countries...',
     'cardModels.everywhere': 'Use one model everywhere…',
     'cardModels.yourSelection': 'Your Selection',
@@ -140,7 +140,7 @@ export const en: Translations = {
     'cardModels.covers': 'covers {covered} of {total}',
     'cardModels.noCountries': 'No countries found',
     'cardModels.resetAll': 'Reset all to Auto',
-    'cardModels.autoEverywhere': 'Auto everywhere',
+    'cardModels.allAuto': 'All countries on Auto',
     'cardModels.changedOne': '1 country changed',
     'cardModels.changedMany': '{count} countries changed',
 };

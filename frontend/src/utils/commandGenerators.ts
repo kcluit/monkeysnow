@@ -471,7 +471,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     },
     {
       id: 'card-models',
-      name: 'Card models by country',
+      name: 'Main page models',
       icon: icons.weatherModel,
       action: params.openCardModels,
     },
