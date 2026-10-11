@@ -4,7 +4,7 @@
  * Command-palette-style modal behind each chart's gear, with two tabs: this chart's own
  * settings (chart type and variable-specific options), and the Model styles tab, which
  * applies to every chart and widens the modal to the model picker's size. Mounted only
- * while open; one Apply covers both tabs.
+ * while open; closing it, however it's closed, saves both tabs.
  */
 
 import { useState } from 'react';
@@ -17,7 +17,7 @@ import type { ModelAvailabilityContext } from '../../types/detailView';
 import { supportsAccumulation } from '../../types/chartSettings';
 import { getVariableConfig, hasOverlays, getOverlayConfig } from '../../utils/chartConfigurations';
 import { getModelStyles, setModelStyles } from '../../utils/modelStyles';
-import { ModelStylesTab } from './ModelStylesTab';
+import { ModelStylesTab, ResetModelStyles } from './ModelStylesTab';
 import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
@@ -92,7 +92,7 @@ export function ChartSettingsModal({
         setLastTab(next);
     };
 
-    // Local state for changes before applying
+    // Local state for changes, saved on close
     const [localChartType, setLocalChartType] = useState(chartType);
     const [localShowAccumulation, setLocalShowAccumulation] = useState(showAccumulation);
     const [localShowOverlays, setLocalShowOverlays] = useState(showOverlays);
@@ -101,16 +101,7 @@ export function ChartSettingsModal({
     const [localChartWidth, setLocalChartWidth] = useState(chartWidth);
     const [localModelStyles, setLocalModelStyles] = useState(getModelStyles);
 
-    // Lock page scroll while open, and close on Esc
-    useOverlay(true, onClose);
-
-    const handleBackdropClick = (e: React.MouseEvent) => {
-        if (e.target === e.currentTarget) {
-            onClose();
-        }
-    };
-
-    const handleApply = () => {
+    const saveAndClose = () => {
         onChartTypeChange(localChartType);
         onAccumulationChange(localShowAccumulation);
         onOverlaysChange(localShowOverlays);
@@ -122,6 +113,15 @@ export function ChartSettingsModal({
             setModelStyles(localModelStyles);
         }
         onClose();
+    };
+
+    // Lock page scroll while open; Esc closes, and saves, like every other way out
+    useOverlay(true, saveAndClose);
+
+    const handleBackdropClick = (e: React.MouseEvent) => {
+        if (e.target === e.currentTarget) {
+            saveAndClose();
+        }
     };
 
     const variableConfig = getVariableConfig(variable);
@@ -309,19 +309,13 @@ export function ChartSettingsModal({
 
                 {/* Footer */}
                 <div className="chart-settings-footer">
-                    <button
-                        type="button"
-                        className="chart-settings-btn cancel"
-                        onClick={onClose}
-                    >
-                        Cancel
-                    </button>
+                    {tab === 'models' && <ResetModelStyles onChange={setLocalModelStyles} />}
                     <button
                         type="button"
                         className="chart-settings-btn apply"
-                        onClick={handleApply}
+                        onClick={saveAndClose}
                     >
-                        Apply
+                        Done
                     </button>
                 </div>
             </div>

@@ -10,6 +10,7 @@ import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
 import {
     COLOR_PRESETS,
+    DEFAULT_MODEL_STYLES,
     OPACITY_CHOICES,
     aggregationColor,
     modelColor,
@@ -23,7 +24,7 @@ import type { ModelAvailabilityContext } from '../../types/detailView';
 import type { AggregationType, WeatherModel } from '../../types/openMeteo';
 
 interface ModelStylesTabProps {
-    /** The styles being edited, applied only when the modal's Apply is pressed */
+    /** The styles being edited, saved when the modal closes */
     styles: ModelStyles;
     onChange: (styles: ModelStyles) => void;
     selectedModels: WeatherModel[];
@@ -54,6 +55,43 @@ function withStyle<K extends string>(
 }
 
 const percent = (opacity: number): string => `${Math.round(opacity * 100)}%`;
+
+/**
+ * Reset to default, for the footer of a modal showing this tab. Closing the modal saves,
+ * so nothing could undo a reset: it asks first.
+ */
+export function ResetModelStyles({ onChange }: { onChange: (styles: ModelStyles) => void }): JSX.Element {
+    const [confirming, setConfirming] = useState(false);
+
+    if (!confirming) {
+        return (
+            <div className="chart-settings-footer-start">
+                <button type="button" className="chart-settings-btn cancel" onClick={() => setConfirming(true)}>
+                    Reset to default
+                </button>
+            </div>
+        );
+    }
+
+    return (
+        <div className="chart-settings-footer-start" role="group" aria-label="Reset to default">
+            <span className="chart-settings-footer-question">Reset every Model style?</span>
+            <button
+                type="button"
+                className="chart-settings-btn apply"
+                onClick={() => {
+                    onChange(DEFAULT_MODEL_STYLES);
+                    setConfirming(false);
+                }}
+            >
+                Yes
+            </button>
+            <button type="button" className="chart-settings-btn cancel" onClick={() => setConfirming(false)}>
+                No
+            </button>
+        </div>
+    );
+}
 
 /** The swatches for one line's colour: its original, the presets, and any colour at all. */
 function ColorChoices({ color, original, onPick }: {

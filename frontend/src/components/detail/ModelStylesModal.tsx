@@ -9,28 +9,28 @@ import { createPortal } from 'react-dom';
 import { useOverlay } from '../../hooks/useOverlay';
 import { useSelectedModels, useSelectedAggregations } from '../../hooks/useSelectedModels';
 import { getModelStyles, setModelStyles } from '../../utils/modelStyles';
-import { ModelStylesTab } from './ModelStylesTab';
+import { ModelStylesTab, ResetModelStyles } from './ModelStylesTab';
 
 export function ModelStylesModal({ onClose }: { onClose: () => void }): JSX.Element {
     const [selectedModels] = useSelectedModels();
     const [selectedAggregations] = useSelectedAggregations();
     const [localModelStyles, setLocalModelStyles] = useState(getModelStyles);
 
-    // Lock page scroll while open, and close on Esc
-    useOverlay(true, onClose);
-
-    const handleApply = () => {
+    const saveAndClose = () => {
         if (localModelStyles !== getModelStyles()) {
             setModelStyles(localModelStyles);
         }
         onClose();
     };
 
+    // Lock page scroll while open; Esc closes, and saves, like every other way out
+    useOverlay(true, saveAndClose);
+
     return createPortal(
         <div
             className="command-palette-backdrop"
             onClick={(e) => {
-                if (e.target === e.currentTarget) onClose();
+                if (e.target === e.currentTarget) saveAndClose();
             }}
         >
             <div className="command-palette chart-settings-modal model-styles-wide">
@@ -48,11 +48,9 @@ export function ModelStylesModal({ onClose }: { onClose: () => void }): JSX.Elem
                 </div>
 
                 <div className="chart-settings-footer">
-                    <button type="button" className="chart-settings-btn cancel" onClick={onClose}>
-                        Cancel
-                    </button>
-                    <button type="button" className="chart-settings-btn apply" onClick={handleApply}>
-                        Apply
+                    <ResetModelStyles onChange={setLocalModelStyles} />
+                    <button type="button" className="chart-settings-btn apply" onClick={saveAndClose}>
+                        Done
                     </button>
                 </div>
             </div>

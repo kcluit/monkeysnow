@@ -2276,6 +2276,20 @@ input[type="checkbox"] {
     border-top: 1px solid var(--border, rgba(255, 255, 255, 0.1));
 }
 
+/* Left of the footer, apart from Done: Reset to default, and its Yes/No */
+.chart-settings-footer-start {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-right: auto;
+}
+
+.chart-settings-footer-question {
+    font-size: 13px;
+    color: var(--textPrimary, #f5f5f7);
+}
+
 .chart-settings-btn {
     padding: 8px 16px;
     border: none;
