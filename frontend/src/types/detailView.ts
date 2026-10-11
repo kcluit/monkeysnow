@@ -83,9 +83,9 @@ export interface DetailViewHeaderProps {
 export interface DetailUtilityBarProps {
     onBack: () => void;
     unitSystem: UnitSystem;
-    /** Comparison models drawn here, Preferred models and Aggregations, for the Models button */
+    /** Comparison models drawn here, Selected models and Aggregations, for the Models button */
     shownModelCount: number;
-    preferredModelCount: number;
+    selectedModelCount: number;
     aggregationCount: number;
     onOpenModels: () => void;
     selectedVariables: WeatherVariable[];
@@ -119,12 +119,12 @@ export interface DetailChartGridProps {
     data: ReadonlyMap<WeatherModel, HourlyDataPoint[]>;
     /** Time axis shared by every chart, or null until a model has arrived */
     timeAxis: TimeAxis | null;
-    selectedModels: WeatherModel[];
+    comparisonModels: WeatherModel[];
     selectedVariables: WeatherVariable[];
     selectedAggregations: AggregationType[];
-    /** Every Preferred model, listed in the Models tab of each chart's gear modal */
-    preferredModels: WeatherModel[];
-    /** Which Preferred models are drawn at the point being forecast */
+    /** Every Selected model, listed in the Model styles tab of each chart's gear modal */
+    selectedModels: WeatherModel[];
+    /** Which Selected models are drawn at the point being forecast */
     modelAvailability: ModelAvailabilityContext;
     /** The chart whose gear modal is open, and the tab to open it on (left out: the one last used) */
     openSettings: { variable: WeatherVariable; tab?: ChartSettingsTab } | null;
@@ -146,7 +146,7 @@ export interface WeatherChartProps {
     data: ReadonlyMap<WeatherModel, HourlyDataPoint[]>;
     /** Time axis shared by every chart, or null until a model has arrived */
     timeAxis: TimeAxis | null;
-    selectedModels: WeatherModel[];
+    comparisonModels: WeatherModel[];
     selectedAggregations: AggregationType[];
     variable: WeatherVariable;
     unitSystem: UnitSystem;

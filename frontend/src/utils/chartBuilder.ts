@@ -235,7 +235,7 @@ function autoModelOpacity(modelCount: number, hasAggregations: boolean): number 
  */
 function buildSeriesConfigs(
     seriesData: Map<WeatherModel, Series>,
-    selectedModels: WeatherModel[],
+    comparisonModels: WeatherModel[],
     chartType: ChartType,
     hasAggregations: boolean,
     styles: ModelStyles
@@ -246,9 +246,9 @@ function buildSeriesConfigs(
     }
 
     const configs: SeriesConfig[] = [];
-    const autoOpacity = autoModelOpacity(selectedModels.length, hasAggregations);
+    const autoOpacity = autoModelOpacity(comparisonModels.length, hasAggregations);
 
-    for (const model of selectedModels) {
+    for (const model of comparisonModels) {
         const data = seriesData.get(model);
         // Skip if no data or empty array
         if (!data || data.length === 0) continue;
@@ -296,7 +296,7 @@ function calculateAccumulation(values: Series): Series {
  */
 function buildAccumulationSeries(
     accumulations: Map<WeatherModel, Series>,
-    selectedModels: WeatherModel[],
+    comparisonModels: WeatherModel[],
     hasAggregations: boolean,
     styles: ModelStyles
 ): SeriesConfig[] {
@@ -304,9 +304,9 @@ function buildAccumulationSeries(
 
     const accumulationSeries: SeriesConfig[] = [];
     // Auto is 90% on its own
-    const autoOpacity = hasAggregations ? autoModelOpacity(selectedModels.length, true) : 0.9;
+    const autoOpacity = hasAggregations ? autoModelOpacity(comparisonModels.length, true) : 0.9;
 
-    for (const model of selectedModels) {
+    for (const model of comparisonModels) {
         const data = accumulations.get(model);
         if (!data || data.length === 0) continue;
 
@@ -370,7 +370,7 @@ function onAccumulationAxis(series: SeriesConfig): SeriesConfig {
  */
 function buildOverlaySeries(
     data: ReadonlyMap<WeatherModel, HourlyDataPoint[]>,
-    selectedModels: WeatherModel[],
+    comparisonModels: WeatherModel[],
     baseVariable: string,
     axis: TimeAxis,
     unitSystem: UnitSystem,
@@ -383,7 +383,7 @@ function buildOverlaySeries(
 
     for (const overlay of overlayConfig.overlays) {
         const overlayVarConfig = getVariableConfig(overlay.variable);
-        const seriesData = extractSeries(data, selectedModels, overlay.variable, axis, unitSystem, overlayVarConfig.convertToImperial);
+        const seriesData = extractSeries(data, comparisonModels, overlay.variable, axis, unitSystem, overlayVarConfig.convertToImperial);
         if (seriesData.size === 0) continue;
 
         const median = computeStatistics(Array.from(seriesData.values()), axis.timestamps.length, new Set(['median']));
@@ -431,10 +431,10 @@ function buildHeatmapData(seriesData: Map<WeatherModel, Series>, axis: TimeAxis)
  */
 function buildWindArrowData(
     data: ReadonlyMap<WeatherModel, HourlyDataPoint[]>,
-    selectedModels: WeatherModel[],
+    comparisonModels: WeatherModel[],
     axis: TimeAxis
 ): WindArrowData {
-    const directions = Array.from(extractSeries(data, selectedModels, 'wind_direction_10m', axis, 'metric').values());
+    const directions = Array.from(extractSeries(data, comparisonModels, 'wind_direction_10m', axis, 'metric').values());
 
     const direction: Series = axis.timestamps.map((_, i) => {
         let x = 0;
@@ -467,7 +467,7 @@ export function buildWeatherChartConfig(
     const {
         data,
         timeAxis,
-        selectedModels,
+        comparisonModels,
         selectedAggregations = [],
         variable,
         unitSystem,
@@ -488,7 +488,7 @@ export function buildWeatherChartConfig(
     const chartType = (settings?.chartTypeOverride ?? variableConfig.chartType) as ChartType;
     const timePoints = timeAxis.timestamps.length;
 
-    const seriesData = extractSeries(data, selectedModels, variable, timeAxis, unitSystem, variableConfig.convertToImperial);
+    const seriesData = extractSeries(data, comparisonModels, variable, timeAxis, unitSystem, variableConfig.convertToImperial);
     const allSeriesValues = Array.from(seriesData.values());
     const multipleModels = seriesData.size > 1;
 
@@ -507,7 +507,7 @@ export function buildWeatherChartConfig(
     const statistics = computeStatistics(allSeriesValues, timePoints, wantedStatistics);
 
     // Build model series (faded on Auto while aggregations are drawn, or hidden behind them)
-    const modelSeries = buildSeriesConfigs(seriesData, selectedModels, chartType, hasAggregations, styles);
+    const modelSeries = buildSeriesConfigs(seriesData, comparisonModels, chartType, hasAggregations, styles);
     const aggregationSeries = hasAggregations
         ? buildAggregationSeries(statistics, selectedAggregations, styles, chartType)
         : [];
@@ -578,7 +578,7 @@ export function buildWeatherChartConfig(
         // Same layering as the primary axis: bands, then models, then aggregations
         const accSeries = [
             ...buildBandSeries(accumulatedStatistics, showMinMax, showPercentiles, styles).map(onAccumulationAxis),
-            ...buildAccumulationSeries(accumulations, selectedModels, hasAggregations, styles),
+            ...buildAccumulationSeries(accumulations, comparisonModels, hasAggregations, styles),
             ...(hasAggregations
                 ? buildAggregationSeries(accumulatedStatistics, selectedAggregations, styles, 'line').map(onAccumulationAxis)
                 : []),
@@ -591,7 +591,7 @@ export function buildWeatherChartConfig(
 
     // Add multi-level overlay series if enabled (e.g., wind at different altitudes)
     if (settings?.showOverlays && hasOverlays(variable as any) && chartType !== 'heatmap' && chartType !== 'boxwhisker') {
-        const overlaySeries = buildOverlaySeries(data, selectedModels, variable, timeAxis, unitSystem, chartType);
+        const overlaySeries = buildOverlaySeries(data, comparisonModels, variable, timeAxis, unitSystem, chartType);
         if (overlaySeries.length > 0) {
             allSeries.push(...overlaySeries);
         }
@@ -599,7 +599,7 @@ export function buildWeatherChartConfig(
 
     // Add wind direction arrows for wind speed charts
     if (variable === 'wind_speed_10m' && chartType !== 'heatmap' && chartType !== 'boxwhisker') {
-        const windArrowData = buildWindArrowData(data, selectedModels, timeAxis);
+        const windArrowData = buildWindArrowData(data, comparisonModels, timeAxis);
         // Only add if we have direction data
         if (windArrowData.direction.some(d => d !== null)) {
             allSeries.push({

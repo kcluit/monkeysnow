@@ -10,7 +10,7 @@ export function CompactDetailUtilityBar({
     onBack,
     unitSystem,
     shownModelCount,
-    preferredModelCount,
+    selectedModelCount,
     aggregationCount,
     onOpenModels,
     selectedVariables,
@@ -61,9 +61,9 @@ export function CompactDetailUtilityBar({
         setForecastDays(options[nextIndex]);
     };
 
-    // Model button text: Comparison models shown here / Preferred models
+    // Model button text: Comparison models shown here / Selected models
     const getModelButtonText = (): string => {
-        const modelCount = `${shownModelCount}/${preferredModelCount}`;
+        const modelCount = `${shownModelCount}/${selectedModelCount}`;
         if (aggregationCount > 0) return `Models (${modelCount}+${aggregationCount})`;
         return `Models (${modelCount})`;
     };

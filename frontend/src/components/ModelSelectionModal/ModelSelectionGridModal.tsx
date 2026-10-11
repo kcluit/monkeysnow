@@ -108,7 +108,7 @@ const Checkbox = memo(function Checkbox({
   );
 });
 
-// Model item component; unavailable ones stay tickable, since Preferred models are one list for every Resort
+// Model item component; unavailable ones stay tickable, since Selected models are one list for every Resort
 const ModelItem = memo(function ModelItem({
   node,
   isSelected,
@@ -365,12 +365,12 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
     }
   };
 
-  // Get total selection count: Preferred models drawn at this point, of all Preferred models
+  // Get total selection count: Selected models drawn at this point, of all Selected models
   const getTotalCount = (): string => {
     const shownCount = selectedModels.filter(
       (id) => getUnavailableReason(id, modelAvailability) === null
     ).length;
-    const modelCount = `${shownCount} shown of ${selectedModels.length} preferred`;
+    const modelCount = `${shownCount} shown of ${selectedModels.length} selected`;
     const aggCount = selectedAggregations.length;
     if (aggCount > 0) {
       return `${modelCount} + ${aggCount} aggregation${aggCount > 1 ? 's' : ''}`;

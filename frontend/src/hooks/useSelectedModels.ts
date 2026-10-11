@@ -5,10 +5,11 @@ import type { AggregationType, WeatherModel } from '../types/openMeteo';
 type Setter<T> = (value: T | ((prev: T) => T)) => void;
 
 /**
- * The visitor's Preferred models: one list for every Resort, starting as the Recommended models.
- * A new key wiped saved model lists once (docs/adr/0003, docs/adr/0005).
+ * The visitor's Selected models: one list for every Resort, starting as the Recommended models.
+ * A new key wiped saved model lists once (docs/adr/0003, docs/adr/0005); this one keeps their
+ * earlier name, Preferred models, so renaming them didn't.
  */
-export function usePreferredModels(): [WeatherModel[], Setter<WeatherModel[]>] {
+export function useSelectedModels(): [WeatherModel[], Setter<WeatherModel[]>] {
     return useLocalStorage<WeatherModel[]>('detailPreferredModelsV2', RECOMMENDED_MODELS);
 }
 

@@ -298,7 +298,7 @@ export function isKnownModel(modelId: string): modelId is WeatherModel {
   return MODEL_INFO.has(modelId as WeatherModel);
 }
 
-/** The Preferred models every visitor starts with (docs/adr/0005). */
+/** The Selected models every visitor starts with (docs/adr/0005). */
 export const RECOMMENDED_MODELS: WeatherModel[] = modelProviders.flatMap((provider) =>
   provider.models.filter((model) => model.recommended).map((model) => model.id)
 );

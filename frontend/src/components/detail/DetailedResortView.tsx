@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
-import { usePreferredModels, useSelectedAggregations } from '../../hooks/usePreferredModels';
+import { useSelectedModels, useSelectedAggregations } from '../../hooks/useSelectedModels';
 import { useDetailedWeatherData } from '../../hooks/useDetailedWeatherData';
 import { useBudgetPause } from '../../hooks/useBudgetPause';
 import { useModelHierarchy } from '../../hooks/useModelHierarchy';
@@ -77,7 +77,7 @@ export function DetailedResortView({
 }: DetailedResortViewPropsWithUnits): JSX.Element {
     const { t } = useLanguage();
 
-    const [preferredModels, setPreferredModels] = usePreferredModels();
+    const [selectedModels, setSelectedModels] = useSelectedModels();
 
     // State for selected variables - default selection
     const [selectedVariables, setSelectedVariables] = useLocalStorage<WeatherVariable[]>(
@@ -168,14 +168,14 @@ export function DetailedResortView({
         }
     }, [selectedVariables, setSelectedVariables]);
 
-    // Only fetch Preferred models whose Coverage includes the point being forecast
+    // Only fetch Selected models whose Coverage includes the point being forecast
     const coveringModels = useMemo(
         () => inCatalogueOrder(
-            preferredModels.filter((model) =>
+            selectedModels.filter((model) =>
                 isKnownModel(model) && coversPoint(model, effectiveCoords.lat, effectiveCoords.lon)
             )
         ),
-        [preferredModels, effectiveCoords.lat, effectiveCoords.lon]
+        [selectedModels, effectiveCoords.lat, effectiveCoords.lon]
     );
 
     // Fetch weather data using effective coordinates
@@ -245,8 +245,8 @@ export function DetailedResortView({
 
     // The Models modal lives here rather than in the utility bar, so the notices below can open it too
     const modelHierarchy = useModelHierarchy({
-        selectedModels: preferredModels,
-        onModelsChange: setPreferredModels,
+        selectedModels,
+        onModelsChange: setSelectedModels,
         selectedAggregations,
         onAggregationsChange: setSelectedAggregations,
     });
@@ -418,7 +418,7 @@ export function DetailedResortView({
                         onBack={onBack}
                         unitSystem={unitSystem}
                         shownModelCount={comparisonModels.length}
-                        preferredModelCount={preferredModels.length}
+                        selectedModelCount={selectedModels.length}
                         aggregationCount={selectedAggregations.length}
                         onOpenModels={modelHierarchy.openModal}
                         selectedVariables={selectedVariables}
@@ -460,10 +460,10 @@ export function DetailedResortView({
                     <DetailChartGrid
                         data={data}
                         timeAxis={timeAxis}
-                        selectedModels={comparisonModels}
+                        comparisonModels={comparisonModels}
                         selectedVariables={selectedVariables}
                         selectedAggregations={selectedAggregations}
-                        preferredModels={preferredModels}
+                        selectedModels={selectedModels}
                         modelAvailability={modelAvailability}
                         openSettings={openChartSettings}
                         onOpenSettings={handleOpenChartSettings}
