@@ -1,0 +1,5 @@
+[
+{"id":"w429886121","kind":"lift","liftType":"platter","name":"Orczyk I","coords":[[52.98292,16.93933],[52.98136,16.94116]]},
+{"id":"w429886122","kind":"lift","liftType":"platter","name":"Orczyk II","coords":[[52.98315,16.93763],[52.98084,16.94051]]},
+{"id":"w692653495","kind":"downhill","difficulty":"easy","name":"ChodzieSki Stok Narciarski","area":true,"coords":[[52.98328,16.93743],[52.98058,16.94077],[52.98111,16.94157],[52.98299,16.93926],[52.98316,16.93884],[52.9833,16.93804],[52.98328,16.93743]]}
+]

@@ -1,0 +1,7 @@
+[
+{"id":"w1220662186","kind":"sled","name":"Tubing Park","area":true,"coords":[[43.72724,-79.72614],[43.72703,-79.72594],[43.72791,-79.72491],[43.72816,-79.72538],[43.72767,-79.72586],[43.72724,-79.72614]]},
+{"id":"w1220662187","kind":"lift","liftType":"magic_carpet","name":"Tubing Carpet","coords":[[43.7279,-79.72482],[43.72698,-79.72586]]},
+{"id":"w257941640","kind":"lift","liftType":"magic_carpet","name":"Wonder Carpet","coords":[[43.72756,-79.72433],[43.72681,-79.72571]]},
+{"id":"w695812924","kind":"downhill","difficulty":"novice","name":"Bramalea","coords":[[43.7269,-79.72579],[43.72781,-79.72448]]},
+{"id":"w695812925","kind":"downhill","difficulty":"novice","name":"The Peel","coords":[[43.72672,-79.72565],[43.72707,-79.725],[43.72715,-79.72485],[43.72748,-79.72415]]}
+]

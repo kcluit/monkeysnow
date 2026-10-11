@@ -1,0 +1,4 @@
+[
+{"id":"w304755343","kind":"lift","liftType":"gondola","name":"华山西峰索道, Seilbahn zum Westgipfel von Huashan","coords":[[34.47944,110.07666],[34.4778,110.06173],[34.47759,110.0595],[34.47757,110.05932],[34.47693,110.05348],[34.47679,110.05022],[34.47663,110.0464],[34.47646,110.04324],[34.47611,110.03587]]},
+{"id":"w85318488","kind":"lift","liftType":"cable_car","name":"华山北峰索道, Seilbahn zum Nordgipfel des Huashan, Cable car to the north summit of Huashan","coords":[[34.49267,110.08155],[34.49316,110.08332],[34.49461,110.08852],[34.49561,110.09536]]}
+]

@@ -1,0 +1,6 @@
+[
+{"id":"w1263289038","kind":"downhill","difficulty":"novice","name":"Blatonfüredi síiskola","coords":[[46.94702,17.86419],[46.94674,17.86351]]},
+{"id":"w1263289039","kind":"lift","liftType":"drag_lift","name":"felvonó","coords":[[46.94681,17.86346],[46.94707,17.86417]]},
+{"id":"w1263296031","kind":"sled","difficulty":"novice","name":"Koloska Szánkódomb","coords":[[46.97821,17.88881],[46.97805,17.88936]]},
+{"id":"w1427943512","kind":"lift","liftType":"drag_lift","coords":[[46.94182,17.87727],[46.94062,17.87691],[46.93977,17.87827],[46.9405,17.87963],[46.94168,17.8793],[46.94182,17.87727]]}
+]

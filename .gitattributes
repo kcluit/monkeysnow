@@ -1,0 +1,3 @@
+# The Ski map's squares are generated data: kept byte for byte as npm run import-ski-map writes them,
+# so no checkout converts 21,000 files' line endings or makes the script see them all as changed
+frontend/public/skimap/** -text

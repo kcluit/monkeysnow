@@ -1,0 +1,6 @@
+[
+{"id":"w1052401100","kind":"sled","difficulty":"intermediate","name":"тюбинг","coords":[[56.03593,37.27534],[56.03536,37.27304]]},
+{"id":"w1052401101","kind":"sled","difficulty":"easy","name":"тюбинг","coords":[[56.03622,37.27481],[56.03698,37.2728]]},
+{"id":"w1052401102","kind":"lift","liftType":"rope_tow","coords":[[56.03484,37.27426],[56.03542,37.2762]]},
+{"id":"w128272996","kind":"downhill","difficulty":"intermediate","name":"могул / фрирайд","coords":[[56.03554,37.27595],[56.03498,37.27355]]}
+]

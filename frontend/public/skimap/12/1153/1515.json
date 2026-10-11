@@ -1,0 +1,5 @@
+[
+{"id":"w256639548","kind":"sled","name":"Tubing Trail","coords":[[42.30444,-78.62308],[42.30549,-78.62576],[42.30576,-78.62643]]},
+{"id":"w256639549","kind":"lift","liftType":"rope_tow","name":"Tubing Tow Rope","coords":[[42.30537,-78.62456],[42.30475,-78.62297]]},
+{"id":"w256639550","kind":"lift","liftType":"rope_tow","name":"Tubing Tow Rope","coords":[[42.30478,-78.62511],[42.30416,-78.62343]]}
+]

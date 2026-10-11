@@ -1,0 +1,5 @@
+[
+{"id":"w100810020","kind":"lift","liftType":"cable_car","name":"Luftseilbahn Vorderbärchi-Oberbärchi","coords":[[46.91883,8.58512],[46.921,8.58166],[46.92119,8.58137]]},
+{"id":"w26195286","kind":"lift","liftType":"cable_car","name":"Luftseilbahn Emmetten-Niederbauen","coords":[[46.95587,8.51895],[46.95389,8.52228],[46.94915,8.53013],[46.94821,8.53169],[46.94752,8.53283],[46.94694,8.5338],[46.94632,8.53482]]},
+{"id":"w38666726","kind":"lift","liftType":"cable_car","name":"Luftseilbahn Seelisberg-Alp Weid","coords":[[46.95876,8.58179],[46.95269,8.5707],[46.95235,8.5701]]}
+]

@@ -1,0 +1,10 @@
+[
+{"id":"w1558898605","kind":"lift","liftType":"chair_lift","name":"Telescaun Râușor","coords":[[45.41535,22.83813],[45.41117,22.8457]]},
+{"id":"w329183193","kind":"downhill","difficulty":"intermediate","name":"Pârtia 2","coords":[[45.41233,22.84369],[45.41314,22.84061]]},
+{"id":"w329183194","kind":"downhill","difficulty":"easy","name":"Pârtia 1, Pârtia 2","coords":[[45.41314,22.84061],[45.41397,22.83986]]},
+{"id":"w329183195","kind":"downhill","difficulty":"easy","name":"Pârtia 1","coords":[[45.4129,22.84063],[45.41314,22.84061]]},
+{"id":"w329183196","kind":"downhill","difficulty":"easy","name":"Pârtia 2","coords":[[45.41397,22.83986],[45.4145,22.8399]]},
+{"id":"w329183197","kind":"downhill","difficulty":"easy","name":"Pârtia 1","coords":[[45.41397,22.83986],[45.41496,22.83809],[45.41497,22.83787],[45.41492,22.83753]]},
+{"id":"w329183198","kind":"lift","liftType":"platter","name":"Teleschi 1","coords":[[45.41492,22.83753],[45.4129,22.84063]]},
+{"id":"w329183199","kind":"lift","liftType":"platter","name":"Teleschi 2","coords":[[45.4145,22.8399],[45.41405,22.84069],[45.4136,22.84148],[45.41317,22.84222],[45.41274,22.84298],[45.41233,22.84369]]}
+]

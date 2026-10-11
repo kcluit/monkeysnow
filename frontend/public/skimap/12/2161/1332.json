@@ -1,0 +1,7 @@
+[
+{"id":"w639547013","kind":"lift","liftType":"chair_lift","name":"Snow World Bispingen","coords":[[53.10394,9.98389],[53.10313,9.98743]]},
+{"id":"w639547015","kind":"sled","difficulty":"easy","name":"Snow World Bispingen","coords":[[53.10326,9.98752],[53.10407,9.98396]]},
+{"id":"w639547016","kind":"downhill","difficulty":"easy","name":"Snow World Bispingen","coords":[[53.1034,9.98761],[53.10427,9.98407]]},
+{"id":"w639547019","kind":"lift","liftType":"magic_carpet","name":"Snow Dome Bispingen","coords":[[53.10455,9.98422],[53.10439,9.98496]]},
+{"id":"w639547020","kind":"lift","liftType":"platter","name":"Snow World Bispingen","coords":[[53.10445,9.98417],[53.10353,9.98771]]}
+]

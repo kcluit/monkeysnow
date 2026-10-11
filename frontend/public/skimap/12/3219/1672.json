@@ -1,0 +1,6 @@
+[
+{"id":"w1019865505","kind":"lift","liftType":"magic_carpet","coords":[[31.3227,102.95307],[31.32326,102.95419]]},
+{"id":"w1019865506","kind":"lift","liftType":"magic_carpet","coords":[[31.3233,102.95428],[31.3237,102.95507]]},
+{"id":"w1019865507","kind":"downhill","difficulty":"easy","coords":[[31.32357,102.95515],[31.32257,102.95314]]},
+{"id":"w1019865508","kind":"downhill","difficulty":"novice","coords":[[31.32339,102.95402],[31.32286,102.95301]]}
+]

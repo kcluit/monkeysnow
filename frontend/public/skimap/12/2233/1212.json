@@ -1,0 +1,7 @@
+[
+{"id":"w260510488","kind":"lift","liftType":"drag_lift","coords":[[58.9508,16.26958],[58.94912,16.26944]]},
+{"id":"w895866502","kind":"downhill","difficulty":"intermediate","name":"Specialen hoppbacke","coords":[[58.94988,16.26815],[58.95077,16.26942]]},
+{"id":"w895866503","kind":"downhill","difficulty":"easy","name":"Kolbergasvängen","coords":[[58.94978,16.26793],[58.94995,16.26766],[58.95019,16.26769],[58.95033,16.26799]]},
+{"id":"w895866504","kind":"downhill","difficulty":"novice","name":"Fun park","coords":[[58.95033,16.26799],[58.95087,16.26948]]},
+{"id":"w895866506","kind":"downhill","difficulty":"intermediate","name":"Backen","coords":[[58.94914,16.2699],[58.95,16.27008],[58.95074,16.26992]]}
+]

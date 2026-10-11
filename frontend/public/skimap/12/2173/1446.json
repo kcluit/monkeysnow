@@ -1,0 +1,6 @@
+[
+{"id":"w1507495938","kind":"lift","liftType":"cable_car","name":"Privatseilbahn Rabenstein","coords":[[46.67446,11.05429],[46.6799,11.04508]]},
+{"id":"w25333487","kind":"lift","liftType":"cable_car","name":"Seilbahn Unterstell - Funivia Unterstell, Seilbahn Unterstell, Funivia Unterstell","coords":[[46.65078,10.99176],[46.65352,10.98864],[46.65687,10.9848],[46.65785,10.98369],[46.65839,10.98307]]},
+{"id":"w26631649","kind":"lift","liftType":"cable_car","name":"Seilbahn Aschbach - Funivia Riolagundo, Seilbahn Aschbach, Funivia Riolagundo","coords":[[46.64503,11.07535],[46.6581,11.07148],[46.66553,11.06926]]},
+{"id":"w60730566","kind":"lift","liftType":"cable_car","name":"Texelbahn","coords":[[46.67942,11.06406],[46.68462,11.04754]]}
+]

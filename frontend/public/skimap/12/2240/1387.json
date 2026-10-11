@@ -1,0 +1,5 @@
+[
+{"id":"w1011031765","kind":"lift","liftType":"platter","name":"vlek Vysoká","coords":[[50.11942,16.88493],[50.12106,16.88065]]},
+{"id":"w1011031768","kind":"lift","liftType":"platter","name":"vlek Vysoké Žibřidovice","coords":[[50.11871,16.91676],[50.11809,16.91635]]},
+{"id":"w1011031769","kind":"downhill","difficulty":"novice","name":"Obecní sjezdovka","coords":[[50.11809,16.91635],[50.11824,16.91638],[50.11858,16.91658],[50.11871,16.91676]]}
+]

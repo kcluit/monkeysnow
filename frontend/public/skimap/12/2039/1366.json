@@ -1,0 +1,8 @@
+[
+{"id":"w1456887165","kind":"downhill","difficulty":"advanced","name":"Slope one","coords":[[51.25654,-0.74924],[51.25671,-0.75054]]},
+{"id":"w1456887166","kind":"downhill","difficulty":"easy","name":"Slope two","coords":[[51.25647,-0.74956],[51.25662,-0.75058]]},
+{"id":"w1456887167","kind":"lift","liftType":"platter","name":"Slope one lift","coords":[[51.25676,-0.75053],[51.25658,-0.74923]]},
+{"id":"w1456887168","kind":"lift","liftType":"platter","name":"Slope two lift","coords":[[51.25655,-0.75047],[51.25643,-0.74958]]},
+{"id":"w1456973428","kind":"downhill","name":"Slope three","coords":[[51.25631,-0.74993],[51.25639,-0.75072]]},
+{"id":"w1456973429","kind":"lift","liftType":"platter","name":"Slope three lift","coords":[[51.25634,-0.75075],[51.25626,-0.74994]]}
+]

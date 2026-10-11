@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "generate-sitemap": "node scripts/generate-sitemap.mjs",
     "generate-og": "node scripts/generate-og-image.mjs",
-    "import-resorts": "node scripts/import-resorts.mjs"
+    "import-resorts": "node scripts/import-resorts.mjs",
+    "import-ski-map": "node scripts/import-ski-map.mjs"
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.21",

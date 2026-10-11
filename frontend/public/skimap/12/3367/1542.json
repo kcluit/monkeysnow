@@ -1,0 +1,20 @@
+[
+{"id":"w595923483","kind":"lift","liftType":"cable_car","coords":[[40.54599,116.00076],[40.54999,116.00007]]},
+{"id":"w880068886","kind":"lift","liftType":"chair_lift","name":"2人吊椅B, Double Chair B","coords":[[40.52242,115.96255],[40.52348,115.96182],[40.52462,115.96105],[40.52533,115.96056],[40.52624,115.95994]]},
+{"id":"w880068887","kind":"lift","liftType":"chair_lift","name":"4人吊椅A, Quad Chair A","coords":[[40.52339,115.96368],[40.52501,115.9628],[40.52639,115.9621],[40.52703,115.96174],[40.5278,115.96133],[40.52839,115.96094],[40.53048,115.95954]]},
+{"id":"w880068888","kind":"lift","liftType":"magic_carpet","name":"魔毯M1, Magic Carpet M1","coords":[[40.52267,115.96389],[40.52341,115.96415]]},
+{"id":"w880068889","kind":"lift","liftType":"magic_carpet","name":"魔毯M2, Magic Carpet M2","coords":[[40.52264,115.96432],[40.52495,115.96503]]},
+{"id":"w880068890","kind":"lift","liftType":"magic_carpet","name":"魔毯M3, Magic Carpet M3","coords":[[40.52266,115.96559],[40.52341,115.96559]]},
+{"id":"w880068891","kind":"lift","liftType":"magic_carpet","name":"魔毯M4, Magic Carpoet M4","coords":[[40.52359,115.96558],[40.52484,115.96556]]},
+{"id":"w880068892","kind":"lift","liftType":"platter","name":"拖牵P1, Platter P1","coords":[[40.52355,115.96411],[40.52519,115.96443]]},
+{"id":"w880068893","kind":"downhill","difficulty":"intermediate","name":"1","coords":[[40.52661,115.95981],[40.52643,115.95975],[40.526,115.95989],[40.5242,115.96103],[40.52243,115.96214]]},
+{"id":"w880068894","kind":"downhill","difficulty":"intermediate","name":"2","coords":[[40.52665,115.96019],[40.52486,115.96205],[40.52309,115.96312],[40.52285,115.96358]]},
+{"id":"w880068895","kind":"downhill","difficulty":"intermediate","name":"3","coords":[[40.52641,115.96191],[40.52606,115.9615],[40.52546,115.96178],[40.52521,115.96304]]},
+{"id":"w880068896","kind":"downhill","difficulty":"intermediate","name":"4","coords":[[40.52639,115.96222],[40.52417,115.9639]]},
+{"id":"w880068897","kind":"downhill","difficulty":"advanced","name":"5","coords":[[40.53077,115.95948],[40.53043,115.95939],[40.52969,115.95982],[40.52665,115.96019]]},
+{"id":"w880068898","kind":"downhill","difficulty":"easy","name":"6","coords":[[40.52342,115.96429],[40.52262,115.96406]]},
+{"id":"w880068899","kind":"downhill","difficulty":"easy","name":"7","coords":[[40.52516,115.96463],[40.52352,115.9643]]},
+{"id":"w880068900","kind":"downhill","difficulty":"easy","name":"8","coords":[[40.52493,115.96524],[40.52256,115.96484]]},
+{"id":"w880068901","kind":"downhill","difficulty":"novice","name":"9","coords":[[40.52489,115.96575],[40.52356,115.96581]]},
+{"id":"w880068902","kind":"downhill","difficulty":"novice","name":"10","coords":[[40.52343,115.96579],[40.52262,115.96585]]}
+]

@@ -1,0 +1,19 @@
+[
+{"id":"w1047738010","kind":"downhill","difficulty":"intermediate","name":"Snowflake","coords":[[53.48309,-113.5572],[53.48382,-113.55705]]},
+{"id":"w1107861651","kind":"sled","difficulty":"advanced","name":"Wedgewood Ravine Toboggan Hill","coords":[[53.47603,-113.63896],[53.47636,-113.63945]]},
+{"id":"w1112644916","kind":"sled","difficulty":"intermediate","name":"Magrath Heights Park Sled Hill","coords":[[53.44865,-113.55976],[53.44897,-113.5597]]},
+{"id":"w257978288","kind":"lift","liftType":"magic_carpet","name":"Discover Carpet","coords":[[53.48427,-113.55658],[53.48459,-113.55682]]},
+{"id":"w257978289","kind":"lift","liftType":"chair_lift","name":"Rainbow Valley Chair","coords":[[53.48449,-113.55785],[53.48453,-113.55846],[53.48457,-113.55916],[53.48463,-113.55999],[53.48465,-113.56035]]},
+{"id":"w257978290","kind":"lift","liftType":"chair_lift","name":"Wish Bone Quad","coords":[[53.48408,-113.55755],[53.48394,-113.55808],[53.48377,-113.55873],[53.48358,-113.55943],[53.48342,-113.56005],[53.48329,-113.56056],[53.48318,-113.56097]]},
+{"id":"w257978291","kind":"lift","liftType":"magic_carpet","name":"Snowflake Carpet","coords":[[53.48383,-113.55722],[53.48312,-113.55738]]},
+{"id":"w643010097","kind":"downhill","difficulty":"advanced","name":"Rainbow Ridge","coords":[[53.48475,-113.56003],[53.48465,-113.55795]]},
+{"id":"w643010098","kind":"downhill","difficulty":"intermediate","name":"Cascade","coords":[[53.4845,-113.55964],[53.48413,-113.55891]]},
+{"id":"w643010099","kind":"downhill","difficulty":"intermediate","name":"Cascade","coords":[[53.48373,-113.5603],[53.48413,-113.55891],[53.4842,-113.55791]]},
+{"id":"w643010100","kind":"downhill","difficulty":"intermediate","name":"Wishbone","coords":[[53.48322,-113.56039],[53.48364,-113.55859],[53.48373,-113.55805]]},
+{"id":"w643010101","kind":"downhill","difficulty":"novice","name":"Discover","coords":[[53.4846,-113.55722],[53.48417,-113.55691]]},
+{"id":"w643010102","kind":"downhill","difficulty":"intermediate","name":"Wishbone","coords":[[53.48305,-113.56012],[53.48342,-113.55891],[53.48364,-113.55859]]},
+{"id":"w643010103","kind":"downhill","difficulty":"easy","name":"Old Road","coords":[[53.48304,-113.56096],[53.48305,-113.56012],[53.48307,-113.55879],[53.48308,-113.55785],[53.48309,-113.5572]]},
+{"id":"w643010104","kind":"downhill","difficulty":"easy","name":"Klaus's Korner","coords":[[53.48308,-113.55785],[53.48339,-113.5576],[53.48356,-113.55814],[53.48373,-113.55805],[53.48388,-113.55747]]},
+{"id":"w643010105","kind":"downhill","difficulty":"intermediate","name":"South Paw","coords":[[53.48307,-113.55879],[53.48356,-113.55814]]},
+{"id":"w643010106","kind":"nordic","name":"Terrain Park","coords":[[53.48496,-113.55976],[53.48483,-113.55806]]}
+]

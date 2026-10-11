@@ -1,0 +1,8 @@
+[
+{"id":"w137166964","kind":"lift","liftType":"cable_car","name":"Luftseilbahn Dallenwil-Niederrickenbach","coords":[[46.92779,8.39728],[46.92843,8.40733],[46.92895,8.41546],[46.92969,8.42697]]},
+{"id":"w27376450","kind":"lift","liftType":"cable_car","name":"Luftseilbahn Kälti-Stanserhorn (CabriO)","coords":[[46.94759,8.35133],[46.94751,8.35129],[46.94423,8.34954],[46.93973,8.34718],[46.93683,8.34565],[46.93248,8.34339],[46.9305,8.34235],[46.93044,8.34232]]},
+{"id":"w330511638","kind":"lift","liftType":"cable_car","name":"Luftseilbahn Wiesenberg-Unter Schwändli","coords":[[46.92386,8.36502],[46.91767,8.36608],[46.91642,8.36634]]},
+{"id":"w48488192","kind":"lift","liftType":"cable_car","name":"Luftseilbahn Dallenwil-Wirzweli","coords":[[46.92514,8.38697],[46.92461,8.38604],[46.92275,8.38273],[46.91956,8.37708],[46.91506,8.36912],[46.91399,8.36721]]},
+{"id":"w60199982","kind":"lift","liftType":"cable_car","name":"Luftseilbahn Niederrickenbach-Musenalp","coords":[[46.92987,8.42709],[46.92909,8.43836],[46.929,8.44002],[46.92891,8.44264],[46.92889,8.44317]]},
+{"id":"w70526898","kind":"lift","liftType":"cable_car","name":"Luftseilbahn Dallenwil-Wiesenberg","coords":[[46.93296,8.39058],[46.93212,8.38779],[46.93177,8.38662],[46.93045,8.38224],[46.92797,8.37401],[46.92724,8.37158],[46.92634,8.36859],[46.92505,8.36431]]}
+]

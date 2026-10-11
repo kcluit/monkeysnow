@@ -1,0 +1,9 @@
+[
+{"id":"w100810020","kind":"lift","liftType":"cable_car","name":"Luftseilbahn Vorderbärchi-Oberbärchi","coords":[[46.91883,8.58512],[46.921,8.58166],[46.92119,8.58137]]},
+{"id":"w242877768","kind":"lift","liftType":"cable_car","name":"Luftseilbahn Grosstal-Horlachen","coords":[[46.91051,8.53444],[46.9095,8.53501],[46.90625,8.53683],[46.90564,8.53716],[46.90537,8.53731]]},
+{"id":"w244795759","kind":"lift","liftType":"cable_car","name":"Luftseilbahn Turmmatt-Gitschenberg","coords":[[46.87734,8.58979],[46.87736,8.58984],[46.87768,8.5904],[46.87855,8.59193],[46.87949,8.59359],[46.88605,8.60517]]},
+{"id":"w26194757","kind":"lift","liftType":"cable_car","name":"Luftseilbahn Chlital-Gietisflue","coords":[[46.89251,8.56163],[46.8928,8.56139],[46.89814,8.55697]]},
+{"id":"w331165604","kind":"lift","liftType":"cable_car","name":"Luftseilbahn Weid-Furggelen","coords":[[46.91251,8.55315],[46.91735,8.55751],[46.91754,8.5577]]},
+{"id":"w331317176","kind":"lift","liftType":"cable_car","name":"Luftseilbahn Bolzbach-Bodmi","coords":[[46.89859,8.59227],[46.89828,8.58984],[46.89769,8.5851],[46.89762,8.5845]]},
+{"id":"w666695580","kind":"lift","liftType":"cable_car","name":"Luftseilbahn Chlital-Musenalp","coords":[[46.88209,8.54583],[46.88214,8.54594],[46.88227,8.54625],[46.88246,8.54669],[46.88391,8.55013],[46.8859,8.55487],[46.88598,8.55506]]}
+]

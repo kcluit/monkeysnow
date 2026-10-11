@@ -1,0 +1,16 @@
+[
+{"id":"w143792868","kind":"lift","liftType":"t-bar","name":"T-Bar","coords":[[42.30167,-71.68216],[42.29862,-71.68085]]},
+{"id":"w143792869","kind":"lift","liftType":"chair_lift","name":"Triple Chair","coords":[[42.30112,-71.68285],[42.30075,-71.68259],[42.30018,-71.68218],[42.29967,-71.68181],[42.29917,-71.68145],[42.29884,-71.68122],[42.29861,-71.68104]]},
+{"id":"w208645225","kind":"downhill","difficulty":"easy","name":"Dream Maker","coords":[[42.30039,-71.68132],[42.30178,-71.68175]]},
+{"id":"w208645226","kind":"downhill","difficulty":"easy","name":"First Tracks Teaching Area","coords":[[42.30062,-71.68078],[42.30195,-71.68106]]},
+{"id":"w208645230","kind":"downhill","difficulty":"intermediate","name":"White Out","coords":[[42.29883,-71.68155],[42.30127,-71.68321]]},
+{"id":"w208645231","kind":"downhill","difficulty":"intermediate","name":"Winter's Magic","coords":[[42.29913,-71.68126],[42.30151,-71.6825]]},
+{"id":"w208645239","kind":"lift","liftType":"rope_tow","name":"Handle Pull","coords":[[42.30187,-71.68135],[42.30052,-71.68109]]},
+{"id":"w208645240","kind":"lift","liftType":"rope_tow","name":"Tuba Lift","coords":[[42.30214,-71.68085],[42.30076,-71.6803]]},
+{"id":"w255820276","kind":"lift","liftType":"rope_tow","name":"Tuba Lift","coords":[[42.30217,-71.68073],[42.30079,-71.68018]]},
+{"id":"w255820277","kind":"lift","liftType":"magic_carpet","name":"Conveyor Lift","coords":[[42.30181,-71.68138],[42.30129,-71.68128]]},
+{"id":"w455591643","kind":"downhill","difficulty":"easy","name":"Skate Home","coords":[[42.30076,-71.68023],[42.30216,-71.6808]]},
+{"id":"w455591857","kind":"downhill","difficulty":"advanced","name":"Richie's Ravine","coords":[[42.29853,-71.68055],[42.29957,-71.68082],[42.30007,-71.68089],[42.30029,-71.68093],[42.30037,-71.6809],[42.30044,-71.68086]]},
+{"id":"w455591859","kind":"downhill","difficulty":"advanced","name":"East Bowl","coords":[[42.299,-71.68063],[42.29921,-71.68036],[42.29942,-71.68009],[42.29979,-71.67971]]},
+{"id":"w455591860","kind":"downhill","difficulty":"intermediate","name":"Snow Day","coords":[[42.2984,-71.68057],[42.29853,-71.68015],[42.29872,-71.6796],[42.29896,-71.67945],[42.29929,-71.67944],[42.2998,-71.67965],[42.30039,-71.68017],[42.30061,-71.68037]]}
+]
