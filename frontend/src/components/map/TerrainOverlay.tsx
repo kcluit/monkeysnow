@@ -8,6 +8,7 @@ import {
     terrainTileCanvas,
     type TerrainOverlayKind,
 } from '../../utils/terrainOverlays';
+import type { SlopeBand } from '../../utils/slopeBands';
 import type { UnitSystem } from '../../utils/unitConversion';
 
 type DrawTile = (canvas: HTMLCanvasElement, coords: L.Coords) => Promise<void>;
@@ -46,15 +47,17 @@ interface TerrainOverlayProps {
     kind: TerrainOverlayKind;
     unitSystem: UnitSystem;
     onSatellite: boolean;
+    /** Only Slope angle needs them; the tiles are drawn again when they change */
+    slopeBands?: readonly SlopeBand[];
 }
 
 /** One terrain Overlay on the flat map, drawn from Mapterhorn's terrain (docs/adr/0009). */
-export function TerrainOverlay({ kind, unitSystem, onSatellite }: TerrainOverlayProps): null {
+export function TerrainOverlay({ kind, unitSystem, onSatellite, slopeBands }: TerrainOverlayProps): null {
     const map = useMap();
 
     useEffect(() => {
         const layer = new CanvasTileLayer(
-            (canvas, { x, y, z }) => drawTerrainOverlayTile(kind, canvas, z, x, y, { unitSystem, onSatellite }),
+            (canvas, { x, y, z }) => drawTerrainOverlayTile(kind, canvas, z, x, y, { unitSystem, onSatellite, slopeBands }),
             {
                 attribution: TERRAIN_ATTRIBUTION,
                 minZoom: TERRAIN_OVERLAY_MIN_ZOOM[kind],
@@ -66,7 +69,7 @@ export function TerrainOverlay({ kind, unitSystem, onSatellite }: TerrainOverlay
         return () => {
             layer.remove();
         };
-    }, [map, kind, unitSystem, onSatellite]);
+    }, [map, kind, unitSystem, onSatellite, slopeBands]);
 
     return null;
 }

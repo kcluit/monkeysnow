@@ -60,6 +60,9 @@ import {
   faRotateLeft,
   // 3D map rotation
   faArrowsRotate,
+  // Map settings
+  faLayerGroup,
+  faArrowPointer,
   // Lock icons
   faLock,
   faLockOpen,
@@ -158,6 +161,10 @@ export const icons = {
   // 3D map rotation
   rotate: faArrowsRotate,
   tilt: faArrowsUpDown,
+
+  // Map settings
+  slopeBands: faLayerGroup,
+  cursor: faArrowPointer,
 
   // Lock icons
   lock: faLock,

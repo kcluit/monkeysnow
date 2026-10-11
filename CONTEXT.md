@@ -197,8 +197,12 @@ An **Overlay** that colours the ground by one property of the terrain: **Slope a
 _Avoid_: terrain layer, shading
 
 **Slope angle**:
-The **Terrain colouring** that shades ground steeper than 30° in four bands, 30, 35, 40 and 45° and up, as avalanche maps do. It shows where slab avalanches can start, not how likely they are today.
+How steep the ground is, in degrees from flat. The Slope angle **Terrain colouring** shades ground in the visitor's **Slope bands**, by default one band of red from 30 to 45°, where most slab avalanches start. It shows where they can start, not how likely they are today. The same Slope bands show on the flat map and the 3D map.
 _Avoid_: avalanche overlay, avalanche terrain, steepness
+
+**Slope band**:
+A range of **Slope angle**, from one angle up to another, and the colour the Slope angle **Terrain colouring** paints ground within it. A visitor can add, change and remove them. They never overlap, so each colour means one range; ground in none of them is left uncoloured.
+_Avoid_: threshold, range, colour stop
 
 **Gradient**:
 The **Terrain colouring** that colours all ground by how steep it is, on one smooth scale from flat to vertical.
@@ -235,3 +239,11 @@ _Avoid_: piste colours, run grades
 **Height line**:
 A line on the 3D map that follows the terrain at one forecast height, near the point being forecast and fading out a few kilometres from it: each **Elevation band**'s for a **Resort**, or the one height a **Saved location** or **Custom location** is forecast at. The line at the height the charts are for is bold, even where it misses the point it belongs to, because Open-Meteo's ground and the map's terrain disagree. It is not an **Overlay**: it is always drawn, and only at the heights being forecast.
 _Avoid_: contour (that is the Overlay's evenly spaced lines), elevation line
+
+**Cursor readout**:
+The height, **Slope angle** and **Aspect** of the map's terrain under the mouse, shown in a corner of either map wherever there is a mouse. A visitor can turn it off.
+_Avoid_: cursor display, hover info, tooltip
+
+**Exaggeration**:
+How many times taller the 3D map draws the terrain than it really is, from 1× to 5×, starting at 1.5× each time the 3D map opens. It changes how steep slopes look, never their **Slope angle**.
+_Avoid_: steepness enhancer, vertical scale

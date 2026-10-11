@@ -40,6 +40,7 @@ import {
 } from '../../utils/satelliteImagery';
 import { OSM_ATTRIBUTION, type MapLayers } from '../../utils/mapLayers';
 import { mapDragOptions, type MapRotation, type MapTilt } from '../../utils/mapRotation';
+import { slopeBandsFromKey, slopeBandsKey, type SlopeBand } from '../../utils/slopeBands';
 import type { TerrainPoint } from '../../utils/terrainAtPoint';
 import type { DifficultyConvention } from '../../utils/difficultyColours';
 import type { UnitSystem } from '../../utils/unitConversion';
@@ -76,6 +77,8 @@ const TERRAIN_MAX_ZOOM = 15;
 const EXAGGERATION_MIN = 1;
 const EXAGGERATION_MAX = 5;
 const EXAGGERATION_STEP = 0.5;
+// Mountains look flatter from the 3D map's camera than they feel on them, so the map opens with them a little taller
+const EXAGGERATION_DEFAULT = 1.5;
 // A click whose ground point projects back further than this from it was on the sky
 const SKY_CLICK_TOLERANCE_PX = 20;
 // Leaflet's default marker, so the Resort looks the same on both maps
@@ -87,23 +90,30 @@ const HEIGHT_LINE_COLOUR = '#7e22ce';
 
 /**
  * The terrain Overlays are drawn in the browser by the same code as the flat map's tiles, and handed to
- * MapLibre through this made-up scheme: terrain-overlay://<kind>/<z>/<x>/<y>?units=<units>&base=<base map>
+ * MapLibre through this made-up scheme: terrain-overlay://<kind>/<z>/<x>/<y>?units=<units>&base=<base map>,
+ * and for Slope angle &bands=<Slope bands>
  */
 const TERRAIN_OVERLAY_SCHEME = 'terrain-overlay';
-const TERRAIN_OVERLAY_TILE = /^terrain-overlay:\/\/(\w+)\/(\d+)\/(\d+)\/(\d+)\?units=(\w+)&base=(\w+)$/;
+const TERRAIN_OVERLAY_TILE = /^terrain-overlay:\/\/(\w+)\/(\d+)\/(\d+)\/(\d+)\?units=(\w+)&base=(\w+)(?:&bands=([\w,-]+))?$/;
 
 addProtocol(TERRAIN_OVERLAY_SCHEME, async ({ url }) => {
     const match = TERRAIN_OVERLAY_TILE.exec(url);
     if (!match) throw new Error(`Not a terrain Overlay tile: ${url}`);
-    const [, kind, z, x, y, units, base] = match;
+    const [, kind, z, x, y, units, base, bands] = match;
     const canvas = terrainTileCanvas();
-    const options: TerrainOverlayOptions = { unitSystem: units === 'imperial' ? 'imperial' : 'metric', onSatellite: base === 'satellite' };
+    const options: TerrainOverlayOptions = {
+        unitSystem: units === 'imperial' ? 'imperial' : 'metric',
+        onSatellite: base === 'satellite',
+        slopeBands: bands ? slopeBandsFromKey(bands) : undefined,
+    };
     await drawTerrainOverlayTile(kind as TerrainOverlayKind, canvas, Number(z), Number(x), Number(y), options);
     return { data: await createImageBitmap(canvas) };
 });
 
-const overlayTiles = (kind: TerrainOverlayKind, { unitSystem, onSatellite }: TerrainOverlayOptions): string[] =>
-    [`${TERRAIN_OVERLAY_SCHEME}://${kind}/{z}/{x}/{y}?units=${unitSystem}&base=${onSatellite ? 'satellite' : 'standard'}`];
+const overlayTiles = (kind: TerrainOverlayKind, { unitSystem, onSatellite, slopeBands }: TerrainOverlayOptions): string[] => {
+    const bands = kind === 'slopeAngle' && slopeBands ? `&bands=${slopeBandsKey(slopeBands)}` : '';
+    return [`${TERRAIN_OVERLAY_SCHEME}://${kind}/{z}/{x}/{y}?units=${unitSystem}&base=${onSatellite ? 'satellite' : 'standard'}${bands}`];
+};
 
 // MapLibre's own hillshade always shades the 3D map, so only the canvas-drawn kinds are Overlays here
 const DRAPED_OVERLAYS = TERRAIN_OVERLAY_KINDS.filter(kind => kind !== 'hillshade');
@@ -215,7 +225,7 @@ function buildStyle(options: TerrainOverlayOptions, overlays: readonly string[])
         },
     );
 
-    return { version: 8, sources, layers, terrain: { source: 'terrain', exaggeration: EXAGGERATION_MIN } };
+    return { version: 8, sources, layers, terrain: { source: 'terrain', exaggeration: EXAGGERATION_DEFAULT } };
 }
 
 /** Shows the Base map's layers, with each national source only where its photos are in view, so the map credits only what it shows */
@@ -298,6 +308,8 @@ export interface ResortMap3DProps {
     heightLines: readonly HeightLine[];
     /** The visitor's Base map and Overlays, shared with the flat map */
     layers: MapLayers;
+    /** What Slope angle paints, shared with the flat map */
+    slopeBands: readonly SlopeBand[];
     unitSystem: UnitSystem;
     /** How downhill Runs are coloured: the convention of the Resort's country */
     convention: DifficultyConvention;
@@ -324,6 +336,7 @@ export default function ResortMap3D({
     customElevationText,
     heightLines,
     layers,
+    slopeBands,
     unitSystem,
     convention,
     rotation,
@@ -338,7 +351,8 @@ export default function ResortMap3D({
     const [map, setMap] = useState<MapLibreMap | null>(null);
     // Resolves once the style is parsed, when its sources can be changed
     const [styleReady, setStyleReady] = useState<Promise<void>>(() => Promise.resolve());
-    const [exaggeration, setExaggeration] = useState(EXAGGERATION_MIN);
+    // Never remembered: every 3D map opens at the default
+    const [exaggeration, setExaggeration] = useState(EXAGGERATION_DEFAULT);
     // Popups are filled by React through portals into these
     const [resortPopupNode] = useState(() => document.createElement('div'));
     const [customPopupNode] = useState(() => document.createElement('div'));
@@ -363,7 +377,7 @@ export default function ResortMap3D({
         if (!container) return;
         const created = new MapLibreMap({
             container,
-            style: buildStyle({ unitSystem, onSatellite }, layers.overlays),
+            style: buildStyle({ unitSystem, onSatellite, slopeBands }, layers.overlays),
             center: [initialView.lon, initialView.lat],
             zoom: initialView.zoom - 1,
             pitch: initialView.pitch ?? INITIAL_PITCH,
@@ -463,6 +477,21 @@ export default function ResortMap3D({
         });
         return () => { current = false; };
     }, [map, styleReady, unitSystem, onSatellite]);
+
+    // Slope angle is painted in the visitor's Slope bands, which can change while the map is open
+    useEffect(() => {
+        if (!map) return;
+        let current = true;
+        void styleReady.then(() => {
+            if (!current) return;
+            const source = map.getSource('overlay-slopeAngle') as RasterTileSource | undefined;
+            const tiles = overlayTiles('slopeAngle', { unitSystem, onSatellite, slopeBands });
+            if (source && source.tiles?.[0] !== tiles[0]) source.setTiles(tiles);
+        });
+        return () => { current = false; };
+        // Its other options don't change how it looks, so only new bands draw new tiles
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [map, styleReady, slopeBands]);
 
     useSkiMap3D(map, styleReady, {
         enabled: layers.overlays.includes('skiMap'),

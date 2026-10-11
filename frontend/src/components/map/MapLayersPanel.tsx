@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, useState } from 'react';
 import {
     BASE_MAPS,
     OVERLAYS,
@@ -9,6 +9,7 @@ import {
     type OverlayId,
     type TerrainColouringId,
 } from '../../utils/mapLayers';
+import { SlopeBandsEditor } from './SlopeBandsEditor';
 
 interface MapLayersPanelProps {
     layers: MapLayers;
@@ -17,10 +18,20 @@ interface MapLayersPanelProps {
     hints: Partial<Record<OverlayId, string>>;
     /** The 3D map always shades its terrain, so Hillshade can't be turned off there */
     is3D: boolean;
+    /** Whether the Cursor readout shows; left out where there is no mouse, which it needs */
+    cursorReadout?: boolean;
+    onCursorReadoutChange: (shown: boolean) => void;
 }
 
-/** Picks the Base map, turns Overlays on and off, and picks the Terrain colouring; opened by the layers button on either map. */
-export const MapLayersPanel = forwardRef<HTMLDivElement, MapLayersPanelProps>(function MapLayersPanel({ layers, onChange, hints, is3D }, ref) {
+/**
+ * Picks the Base map, turns Overlays on and off, picks the Terrain colouring and edits Slope angle's
+ * bands, and turns the Cursor readout on and off; opened by the layers button on either map.
+ */
+export const MapLayersPanel = forwardRef<HTMLDivElement, MapLayersPanelProps>(function MapLayersPanel(
+    { layers, onChange, hints, is3D, cursorReadout, onCursorReadoutChange },
+    ref,
+) {
+    const [isEditingBands, setIsEditingBands] = useState(false);
     const toggle = (id: OverlayId) => onChange({
         ...layers,
         overlays: layers.overlays.includes(id) ? layers.overlays.filter(o => o !== id) : [...layers.overlays, id],
@@ -62,19 +73,46 @@ export const MapLayersPanel = forwardRef<HTMLDivElement, MapLayersPanelProps>(fu
                     const on = colouring === option.id;
                     const hint = on && option.id ? hints[option.id] : undefined;
                     return (
-                        <label key={option.id ?? 'none'} className="resort-map-layers-overlay">
-                            <input
-                                type="radio"
-                                name="resort-map-terrain-colouring"
-                                checked={on}
-                                onChange={() => onChange(withTerrainColouring(layers, option.id))}
-                            />
-                            <span>{option.label}</span>
-                            {hint && <span className="resort-map-layers-hint">{hint}</span>}
-                        </label>
+                        <div key={option.id ?? 'none'}>
+                            <label className="resort-map-layers-overlay">
+                                <input
+                                    type="radio"
+                                    name="resort-map-terrain-colouring"
+                                    checked={on}
+                                    onChange={() => onChange(withTerrainColouring(layers, option.id))}
+                                />
+                                <span>{option.label}</span>
+                                {hint && <span className="resort-map-layers-hint">{hint}</span>}
+                            </label>
+                            {on && option.id === 'slopeAngle' && (
+                                <>
+                                    <button
+                                        type="button"
+                                        className="resort-map-layers-edit"
+                                        aria-expanded={isEditingBands}
+                                        onClick={() => setIsEditingBands(editing => !editing)}
+                                    >
+                                        <svg className={`w-3 h-3 ${isEditingBands ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                                        </svg>
+                                        Edit bands
+                                    </button>
+                                    {isEditingBands && <SlopeBandsEditor />}
+                                </>
+                            )}
+                        </div>
                     );
                 })}
             </div>
+            {cursorReadout !== undefined && (
+                <>
+                    <div className="resort-map-layers-heading">Under the mouse</div>
+                    <label className="resort-map-layers-overlay">
+                        <input type="checkbox" checked={cursorReadout} onChange={() => onCursorReadoutChange(!cursorReadout)} />
+                        <span>Height, slope angle and aspect</span>
+                    </label>
+                </>
+            )}
         </div>
     );
 });
