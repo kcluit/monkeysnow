@@ -278,6 +278,15 @@ export function AboutPage(): JSX.Element {
                     >
                         Mapzen Terrain Tiles
                     </a>
+                    {' '}and, on the 3D map,{' '}
+                    <a
+                        href="https://mapterhorn.com/attribution"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="about-link"
+                    >
+                        Mapterhorn
+                    </a>
                     .
                 </p>
                 <p>

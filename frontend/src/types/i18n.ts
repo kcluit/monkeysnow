@@ -131,6 +131,16 @@ export interface Translations {
     'detail.noModelHasData': string;
     'detail.chooseModels': string;
 
+    // Detail view map
+    'map.show3d': string;
+    'map.showFlat': string;
+    'map.loading3d': string;
+    'map.failed3d': string;
+    'map.exaggeration': string;
+    'map.heightLineBase': string;
+    'map.heightLineMid': string;
+    'map.heightLineTop': string;
+
     // Main page models
     'cardModels.search': string;
     'cardModels.everywhere': string;
@@ -291,6 +301,14 @@ export const TranslationsSchema = z.object({
     'detail.noModelCovers': z.string(),
     'detail.noModelHasData': z.string(),
     'detail.chooseModels': z.string(),
+    'map.show3d': z.string(),
+    'map.showFlat': z.string(),
+    'map.loading3d': z.string(),
+    'map.failed3d': z.string(),
+    'map.exaggeration': z.string(),
+    'map.heightLineBase': z.string(),
+    'map.heightLineMid': z.string(),
+    'map.heightLineTop': z.string(),
 
     // Main page models
     'cardModels.search': z.string(),

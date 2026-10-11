@@ -2805,9 +2805,87 @@ input[type="checkbox"] {
     border-radius: 0;
 }
 
-/* Keep the map credits clear of the size and layers buttons in the bottom-left corner when they wrap on narrow screens */
-.resort-map-frame .leaflet-bottom.leaflet-right {
-    left: 110px;
+.resort-map-fullscreen .maplibregl-map {
+    border-radius: 0;
+}
+
+/* Keep the map credits clear of the 3D, size and layers buttons in the bottom-left corner when they wrap on narrow screens */
+.resort-map-frame .leaflet-bottom.leaflet-right,
+.resort-map-frame .maplibregl-ctrl-bottom-right {
+    left: 150px;
+}
+
+/* Where the 3D map goes, while it loads or if it can't */
+.resort-map-message {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    text-align: center;
+    border-radius: 0.75rem;
+    background: var(--cardBg, #1e1e1e);
+    color: var(--textSecondary, #999);
+}
+
+.resort-map-fullscreen .resort-map-message {
+    border-radius: 0;
+}
+
+/* Terrain exaggeration, in the 3D map's top-right corner */
+.resort-map-exaggeration {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 8px;
+    border-radius: 6px;
+    background: var(--cardBg, rgba(30, 30, 30, 0.85));
+    color: var(--textSecondary, #999);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.resort-map-exaggeration input {
+    width: 80px;
+    accent-color: var(--accent, #3b82f6);
+}
+
+.resort-map-exaggeration-value {
+    min-width: 2.2em;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.resort-map-3d-marker {
+    cursor: pointer;
+}
+
+/* A Height line's label sits on the terrain and lets clicks through to the map */
+.resort-map-height-label {
+    pointer-events: none;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.8);
+    color: #7e22ce;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.resort-map-height-label-bold {
+    background: rgba(255, 255, 255, 0.92);
+    font-weight: 800;
+}
+
+.resort-map-hide-height-labels .resort-map-height-label {
+    visibility: hidden;
 }
 
 .resort-map-controls {
@@ -2941,6 +3019,18 @@ input[type="checkbox"] {
     height: 10px;
     border-radius: 2px;
     opacity: 0.8;
+}
+
+/* The 3D button is a word rather than an icon, and lights up while the 3D map is showing */
+.resort-map-btn-text {
+    width: auto;
+    padding: 0 8px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.resort-map-btn[aria-pressed="true"] {
+    color: var(--accent, #3b82f6);
 }
 
 /* Chart settings slider controls */

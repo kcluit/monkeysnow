@@ -53,6 +53,7 @@ npm run build
 - `SatelliteBaseMap.tsx` - EOX Sentinel-2 everywhere, with national aerial photos (swisstopo, IGN, basemap.at, USGS, GSI) over it inside rectangles around their countries
 - `TerrainOverlay.tsx` - contours, hillshade and slope angle, drawn on canvas tiles from AWS Terrain Tiles (`utils/terrainTiles.ts`, `utils/terrainRendering.ts`)
 - `SkiMapOverlay.tsx` - Runs and Lifts from the Overpass API by zoom-12 square, cached a week in IndexedDB (`utils/skiMapData.ts`), coloured by `utils/difficultyColours.ts`; it also works out what a Custom location is on
+- `ResortMap3D.tsx` - the 3D map behind the map's "3D" button, lazy-loaded with MapLibre (docs/adr/0008): the Standard Base map, shaded and draped over Mapterhorn terrain, with an exaggeration slider and Height lines traced by `utils/heightLines.ts`. It and the flat map share markers and popups through `mapMarkers.tsx`; the 3D choice is never remembered
 
 ### Frontend Data Flow
 1. `useWeatherData(selectedResorts)` loads forecasts into `AllWeatherData` and reports queued resorts

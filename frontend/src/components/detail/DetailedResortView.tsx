@@ -25,6 +25,8 @@ import type { WeatherVariable } from '../../types/openMeteo';
 import type { ChartSettingsTab } from '../../types/chartSettings';
 import type { UnitSystem } from '../../types';
 import { formatElevation } from '../../utils/unitConversion';
+import type { HeightLine } from '../../utils/heightLines';
+import { interpolate } from '../../locales';
 
 interface DetailedResortViewPropsWithUnits extends DetailedResortViewProps {
     unitSystem: UnitSystem;
@@ -207,6 +209,28 @@ export function DetailedResortView({
                 : ''
         );
 
+    // The 3D map draws a Height line at each Elevation band of a Resort, or at the one height of a Saved location
+    // or Custom location; the one the charts are for is bold
+    const heightLines = useMemo((): HeightLine[] => {
+        const single = (elevation: number): HeightLine[] =>
+            [{ elevation, label: formatElevation(elevation, unitSystem), bold: true }];
+        if (customLocation) return customLocationElevation === null ? [] : single(customLocationElevation);
+        if (savedLocation) return single(savedLocation.elevation);
+        const bands = [
+            { selection: 'base', elevation: location.baseElevation, template: t('map.heightLineBase') },
+            { selection: 'mid', elevation: location.midElevation, template: t('map.heightLineMid') },
+            { selection: 'top', elevation: location.topElevation, template: t('map.heightLineTop') },
+        ].map(({ selection, elevation, template }): HeightLine => ({
+            elevation,
+            label: interpolate(template, { height: formatElevation(elevation, unitSystem) }),
+            bold: elevationSelection === selection,
+        }));
+        return typeof elevationSelection === 'number' ? [...bands, ...single(elevationSelection)] : bands;
+    }, [
+        customLocation, customLocationElevation, savedLocation, elevationSelection, unitSystem, t,
+        location.baseElevation, location.midElevation, location.topElevation,
+    ]);
+
     // Drop models that came back empty and Clones, leaving the Comparison models
     const { comparisonModels, dropped } = useMemo(
         () => resolveComparisonModels(coveringModels, data, unavailableModels),
@@ -279,6 +303,7 @@ export function DetailedResortView({
                     customElevationText={customLocationElevationText}
                     country={savedLocation?.country ?? RESORT_LOCATIONS.get(resortId)?.country}
                     unitSystem={unitSystem}
+                    heightLines={heightLines}
                 />
             </div>
 
