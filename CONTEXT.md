@@ -72,6 +72,20 @@ _Avoid_: TTL, cache expiry, refresh interval
 A **Resort** or **Saved location** in the **Selection** that has no forecast yet and is waiting for, or in the middle of, its fetch. A **Resort** whose **stale** forecast is being refreshed is not queued; its card stays on show.
 _Avoid_: pending resort, loading resort
 
+### Forecasts
+
+**Period**:
+One of the three parts a forecast day is split into on the main page, in the local time of the point being forecast: AM (midnight to noon), PM (noon to 6 pm) and Night (6 pm to midnight). The small hours before dawn belong to AM, not to the previous day's Night.
+_Avoid_: chunk, time slot, time of day
+
+**Snow quality**:
+What falls during a **Period**, estimated hour by hour from the air's temperature and humidity: Powder, Dry snow, Wet snow, Sleet/Mix or Rain, from best to worst. A Period's Snow quality is the worst of its hours with precipitation, and a day's is the worst of its Periods'; a Period with no precipitation has none.
+_Avoid_: snow condition, snow type, precip type
+
+**Freezing level**:
+The height above which the air is below 0 °C. A **Period**'s is the highest it reaches in that Period, and a day's is the highest of its Periods'.
+_Avoid_: freezing elevation, snow line, zero-degree line
+
 ### Forecast models
 
 **Forecast model**:
