@@ -3,6 +3,7 @@
  * map's canvas tiles and the 3D map's draped raster tiles come from the same drawing (docs/adr/0009).
  */
 
+import { DEFAULT_SLOPE_BANDS, type SlopeBand } from './slopeBands';
 import { elevationWindow } from './terrainTiles';
 import {
     CONTOURS_MIN_ZOOM,
@@ -43,6 +44,8 @@ const CONTOUR_STYLES: Record<'standard' | 'satellite', ContourStyle> = {
 export interface TerrainOverlayOptions {
     unitSystem: UnitSystem;
     onSatellite: boolean;
+    /** What Slope angle paints; left out, the default Slope bands */
+    slopeBands?: readonly SlopeBand[];
 }
 
 /** A canvas for one 256 px tile, at the screen's resolution so lines and labels stay sharp on high-DPI screens */
@@ -61,7 +64,7 @@ export async function drawTerrainOverlayTile(
     z: number,
     x: number,
     y: number,
-    { unitSystem, onSatellite }: TerrainOverlayOptions,
+    { unitSystem, onSatellite, slopeBands = DEFAULT_SLOPE_BANDS }: TerrainOverlayOptions,
 ): Promise<void> {
     const heights = await elevationWindow(z, x, y, TERRAIN_BORDER);
     if (!heights) return;
@@ -69,7 +72,7 @@ export async function drawTerrainOverlayTile(
         case 'hillshade': return renderHillshade(canvas, heights);
         case 'contours': return renderContours(canvas, heights, z, unitSystem, CONTOUR_STYLES[onSatellite ? 'satellite' : 'standard']);
         case 'flats': return renderFlats(canvas, heights);
-        case 'slopeAngle': return renderSlopeAngle(canvas, heights);
+        case 'slopeAngle': return renderSlopeAngle(canvas, heights, slopeBands);
         case 'gradient': return renderGradient(canvas, heights);
         case 'aspect': return renderAspect(canvas, heights);
         case 'heightTint': return renderHeightTint(canvas, heights);

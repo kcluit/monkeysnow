@@ -4,6 +4,7 @@
  * a two-sample border of heights around the tile, so neighbouring tiles join without seams.
  */
 
+import type { SlopeBand } from './slopeBands';
 import type { ElevationWindow } from './terrainTiles';
 import type { UnitSystem } from './unitConversion';
 
@@ -167,20 +168,21 @@ export function renderHillshade(canvas: HTMLCanvasElement, w: ElevationWindow): 
     });
 }
 
-/** Steepness bands from 30 degrees, where avalanche courses say slab avalanches start, in swisstopo's colours. */
-export const SLOPE_ANGLE_BANDS: readonly { from: number; colour: Rgb }[] = [
-    { from: 45, colour: [148, 51, 197] },
-    { from: 40, colour: [229, 30, 37] },
-    { from: 35, colour: [255, 140, 0] },
-    { from: 30, colour: [255, 221, 0] },
-];
+const rgbOf = (hex: string): Rgb => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)) as unknown as Rgb;
 
-export function renderSlopeAngle(canvas: HTMLCanvasElement, w: ElevationWindow): void {
+/** Ground in one of the visitor's Slope bands in that band's colour; the rest is left clear. */
+export function renderSlopeAngle(canvas: HTMLCanvasElement, w: ElevationWindow, bands: readonly SlopeBand[]): void {
+    // Bands start and end on whole degrees, so a pixel's band is the one its degrees rounded down fall in
+    const byDegree: (Rgb | undefined)[] = [];
+    for (const band of bands) {
+        const colour = rgbOf(band.colour);
+        for (let degree = band.from; degree < band.to; degree++) byDegree[degree] = colour;
+    }
     const { east, south, size } = gradients(w);
     // Banding after interpolating keeps the bands' edges crisp when zoomed past the terrain data
     paintPixels(canvas, [steepness(east, south)], size, w.n, (degrees, _, rgba, o) => {
-        const band = SLOPE_ANGLE_BANDS.find(b => degrees >= b.from);
-        if (band) setPixel(rgba, o, band.colour, 130);
+        const colour = byDegree[Math.floor(degrees)];
+        if (colour) setPixel(rgba, o, colour, 130);
     });
 }
 

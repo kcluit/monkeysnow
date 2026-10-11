@@ -1,9 +1,9 @@
 import { TERRAIN_COLOURINGS, type TerrainColouringId } from '../../utils/mapLayers';
+import { slopeBandLabel, type SlopeBand } from '../../utils/slopeBands';
 import {
     ASPECT_SECTORS,
     GRADIENT_STOPS,
     HEIGHT_TINT_STOPS,
-    SLOPE_ANGLE_BANDS,
     type ColourStop,
 } from '../../utils/terrainRendering';
 import type { UnitSystem } from '../../utils/unitConversion';
@@ -60,11 +60,12 @@ function heightTicks(unitSystem: UnitSystem): { value: number; label: string }[]
 
 interface MapLegendProps {
     colouring: TerrainColouringId;
+    slopeBands: readonly SlopeBand[];
     unitSystem: UnitSystem;
 }
 
 /** What the Terrain colouring's colours mean, along the bottom of either map while it is on. */
-export function MapLegend({ colouring, unitSystem }: MapLegendProps): JSX.Element {
+export function MapLegend({ colouring, slopeBands, unitSystem }: MapLegendProps): JSX.Element {
     const label = TERRAIN_COLOURINGS.find(c => c.id === colouring)?.label;
     return (
         <div className="resort-map-legend" aria-label={`${label} legend`}>
@@ -72,14 +73,14 @@ export function MapLegend({ colouring, unitSystem }: MapLegendProps): JSX.Elemen
             {colouring === 'slopeAngle' && (
                 <>
                     <div className="resort-map-legend-bands">
-                        {[...SLOPE_ANGLE_BANDS].reverse().map(band => (
+                        {slopeBands.map(band => (
                             <span key={band.from}>
-                                <i style={{ background: rgb(band.colour) }} />
-                                {band.from}°{band === SLOPE_ANGLE_BANDS[0] ? '+' : ''}
+                                <i style={{ background: band.colour }} />
+                                {slopeBandLabel(band)}
                             </span>
                         ))}
                     </div>
-                    <div className="resort-map-legend-note">Approximate, not for avalanche decisions</div>
+                    <div className="resort-map-legend-note">Approximate</div>
                 </>
             )}
             {colouring === 'gradient' && (

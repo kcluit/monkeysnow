@@ -52,11 +52,14 @@ export interface SettingsPageProps {
     // Chart zoom
     chartZoomSyncEnabled: boolean;
     setChartZoomSyncEnabled: (enabled: boolean) => void;
-    // 3D map
+    // Maps
     mapRotation: MapRotation;
     setMapRotation: (rotation: MapRotation) => void;
     mapTilt: MapTilt;
     setMapTilt: (tilt: MapTilt) => void;
+    cursorReadoutShown: boolean;
+    setCursorReadoutShown: (shown: boolean) => void;
+    openSlopeBands: () => void;
     // Weather display
     selectedElevation: ElevationLevel;
     setSelectedElevation: (e: ElevationLevel) => void;
@@ -292,6 +295,8 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
         chartZoomSyncEnabled, setChartZoomSyncEnabled,
         mapRotation, setMapRotation,
         mapTilt, setMapTilt,
+        cursorReadoutShown, setCursorReadoutShown,
+        openSlopeBands,
         selectedElevation, setSelectedElevation,
         selectedSort, setSelectedSort,
         selectedSortDay, setSelectedSortDay, sortDayData,
@@ -520,6 +525,24 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                                 <OptionButton label="Drag down" isSelected={mapTilt === 'dragDown'} onClick={() => setMapTilt('dragDown')} />
                             </div>
                             <span className="text-sm text-theme-textSecondary">{MAP_TILT_DESCRIPTIONS[mapTilt]}</span>
+                        </div>
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">Slope bands</span>
+                            <div className="settings-options-row">
+                                <ActionButton label="Edit…" icon={icons.slopeBands} onClick={openSlopeBands} />
+                                <span className="self-center text-sm text-theme-textSecondary">The ranges of steepness the Slope angle colouring paints, and their colours</span>
+                            </div>
+                        </div>
+                        <div className="settings-subsection">
+                            <div className="settings-toggles">
+                                <Toggle
+                                    label="Cursor readout"
+                                    isEnabled={cursorReadoutShown}
+                                    onToggle={setCursorReadoutShown}
+                                    icon={icons.cursor}
+                                />
+                            </div>
+                            <span className="text-sm text-theme-textSecondary">The height, Slope angle and Aspect of the terrain under the mouse, in a corner of either map; only where there is a mouse</span>
                         </div>
                     </SettingSection>
                 </SettingGroup>

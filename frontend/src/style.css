@@ -3401,6 +3401,159 @@ input[type="checkbox"] {
     font-weight: 600;
 }
 
+/* Opens the Slope bands editor under Slope angle, indented to line up with its label */
+.resort-map-layers-edit {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 22px;
+    margin-left: 25px;
+    padding: 0 4px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--textSecondary, #a1a1a6);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.75rem;
+}
+
+.resort-map-layers-edit:hover {
+    background: var(--secondary, rgba(255, 255, 255, 0.08));
+    color: var(--textPrimary, #f5f5f7);
+}
+
+.resort-map-layers-edit svg {
+    transition: transform 0.15s;
+}
+
+.resort-map-layers .slope-bands {
+    margin: 2px 0 4px 25px;
+}
+
+/* The Slope bands editor, in the layers panel and in its own modal: a row per band, then its buttons */
+.slope-bands-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.slope-bands-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--textSecondary, #a1a1a6);
+}
+
+.slope-bands-angle {
+    width: 2.6em;
+    padding: 2px 4px;
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.15));
+    border-radius: 4px;
+    background: var(--secondary, rgba(255, 255, 255, 0.08));
+    color: var(--textPrimary, #f5f5f7);
+    font: inherit;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+.slope-bands-angle:focus {
+    outline: 1px solid var(--accent, #0a84ff);
+    outline-offset: 0;
+}
+
+.slope-bands-colour {
+    width: 28px;
+    height: 22px;
+    margin-left: 4px;
+    padding: 0;
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.15));
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.slope-bands-colour::-webkit-color-swatch-wrapper {
+    padding: 2px;
+}
+
+.slope-bands-colour::-webkit-color-swatch {
+    border: none;
+    border-radius: 2px;
+}
+
+.slope-bands-colour::-moz-color-swatch {
+    border: none;
+    border-radius: 2px;
+}
+
+.slope-bands-remove {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    margin-left: auto;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--textSecondary, #a1a1a6);
+    cursor: pointer;
+}
+
+.slope-bands-remove:hover:not(:disabled) {
+    background: var(--secondary, rgba(255, 255, 255, 0.08));
+    color: var(--textPrimary, #f5f5f7);
+}
+
+.slope-bands-remove:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+.slope-bands-actions,
+.slope-bands-confirm {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 6px;
+    margin-top: 6px;
+    color: var(--textSecondary, #a1a1a6);
+}
+
+.slope-bands-confirm {
+    margin-top: 0;
+}
+
+.slope-bands-btn {
+    padding: 2px 8px;
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.15));
+    border-radius: 4px;
+    background: var(--secondary, rgba(255, 255, 255, 0.08));
+    color: var(--textPrimary, #f5f5f7);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.75rem;
+}
+
+.slope-bands-btn:hover:not(:disabled) {
+    color: var(--accent, #0a84ff);
+}
+
+.slope-bands-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.slope-bands-intro {
+    margin: 0 0 10px;
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 13px;
+}
+
 /* What the Terrain colouring's colours mean, above the buttons in the bottom-left corner; the layers panel opens over it */
 .resort-map-legend {
     position: absolute;

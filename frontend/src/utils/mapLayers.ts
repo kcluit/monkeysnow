@@ -56,8 +56,29 @@ export const OSM_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/co
 
 export const MAP_LAYERS_STORAGE_KEY = 'mapLayers';
 
-// A ski app's map is more use with its Runs and Lifts on, so a first visit starts with the Ski map
-export const DEFAULT_MAP_LAYERS: MapLayers = { baseMap: 'standard', overlays: ['skiMap'] };
+// A ski app's map is more use with its Runs and Lifts on, and the lie of the land, so a first visit starts with the Ski map and contours
+export const DEFAULT_MAP_LAYERS: MapLayers = { baseMap: 'standard', overlays: ['skiMap', 'contours'] };
+
+// Set once a stored choice has had contours turned on, when they became part of the default
+const CONTOURS_ON_MARKER = 'mapLayersContoursOn';
+
+/** One-off: contours are turned on in a visitor's stored choice made before they were on by default. Run before rendering. */
+export function turnOnContoursOnce(): void {
+    try {
+        if (localStorage.getItem(CONTOURS_ON_MARKER)) return;
+        const stored: unknown = JSON.parse(localStorage.getItem(MAP_LAYERS_STORAGE_KEY) ?? 'null');
+        // Without a stored choice, or with one sanitizeMapLayers can't read, the default applies, contours and all
+        if (typeof stored === 'object' && stored !== null) {
+            const { overlays } = stored as Partial<MapLayers>;
+            if (Array.isArray(overlays) && !overlays.includes('contours')) {
+                localStorage.setItem(MAP_LAYERS_STORAGE_KEY, JSON.stringify({ ...stored, overlays: [...overlays, 'contours'] }));
+            }
+        }
+        localStorage.setItem(CONTOURS_ON_MARKER, 'true');
+    } catch (err) {
+        console.error('Error turning on contours:', err);
+    }
+}
 
 /** The stored choice, with anything this version doesn't know about dropped, and at most one Terrain colouring. */
 export function sanitizeMapLayers(value: unknown): MapLayers {

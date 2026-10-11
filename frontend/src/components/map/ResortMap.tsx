@@ -29,6 +29,8 @@ import { MapLayersPanel } from './MapLayersPanel';
 import { MapLegend } from './MapLegend';
 import { CursorReadout } from './CursorReadout';
 import { useTerrainReadout } from '../../hooks/useTerrainReadout';
+import { useCursorReadout } from '../../hooks/useCursorReadout';
+import { useSlopeBands } from '../../hooks/useSlopeBands';
 import type { TerrainPoint } from '../../utils/terrainAtPoint';
 import {
     CUSTOM_LOCATION_DOT_HTML,
@@ -203,6 +205,7 @@ export function ResortMap({
     const isOn = (overlay: OverlayId) => layers.overlays.includes(overlay);
     const colouring = terrainColouring(layers);
     const onSatellite = layers.baseMap === 'satellite';
+    const slopeBands = useSlopeBands();
     const convention = useMemo(() => difficultyConvention(country), [country]);
 
     const [zoom, setZoom] = useState(INITIAL_ZOOM);
@@ -259,9 +262,14 @@ export function ResortMap({
         setZoom(next.zoom);
     }, []);
 
-    // The terrain under the mouse, where there is one; a tap on a touch screen picks a Custom location instead
+    // The terrain under the mouse, where there is one and the visitor hasn't turned it off; a tap on a touch screen picks a Custom location instead
     const [canHover] = useState(() => window.matchMedia('(hover: hover)').matches);
+    const [cursorReadoutShown, setCursorReadoutShown] = useCursorReadout();
+    const tracksPointer = canHover && cursorReadoutShown;
     const { reading, pointAt } = useTerrainReadout();
+    useEffect(() => {
+        if (!cursorReadoutShown) pointAt(null);
+    }, [cursorReadoutShown, pointAt]);
 
     const toggle3D = useCallback(() => {
         setIsLayersPanelOpen(false);
@@ -294,6 +302,7 @@ export function ResortMap({
                                 customElevationText={customElevationText}
                                 heightLines={heightLines}
                                 layers={layers}
+                                slopeBands={slopeBands}
                                 unitSystem={unitSystem}
                                 convention={convention}
                                 rotation={rotation}
@@ -301,7 +310,7 @@ export function ResortMap({
                                 onSkiMapStatusChange={setSkiMapStatus}
                                 customLocationOn={customLocationOn}
                                 onCustomLocationOnChange={setCustomLocationOn}
-                                onPointerMove={canHover ? pointAt : undefined}
+                                onPointerMove={tracksPointer ? pointAt : undefined}
                             />
                         </Suspense>
                     </Map3DErrorBoundary>
@@ -323,7 +332,7 @@ export function ResortMap({
                         )}
 
                         {isOn('hillshade') && <TerrainOverlay kind="hillshade" unitSystem={unitSystem} onSatellite={onSatellite} />}
-                        {colouring && <TerrainOverlay kind={colouring} unitSystem={unitSystem} onSatellite={onSatellite} />}
+                        {colouring && <TerrainOverlay kind={colouring} unitSystem={unitSystem} onSatellite={onSatellite} slopeBands={slopeBands} />}
                         {isOn('flats') && <TerrainOverlay kind="flats" unitSystem={unitSystem} onSatellite={onSatellite} />}
                         {isOn('contours') && <TerrainOverlay kind="contours" unitSystem={unitSystem} onSatellite={onSatellite} />}
                         {isOn('skiMap') && (
@@ -339,7 +348,7 @@ export function ResortMap({
 
                         <MapViewTracker onChange={setView} />
 
-                        {canHover && <PointerTracker onPointer={pointAt} />}
+                        {tracksPointer && <PointerTracker onPointer={pointAt} />}
 
                         {/* Resize handler to invalidate map on expand/collapse and fullscreen */}
                         <MapResizeHandler />
@@ -446,12 +455,20 @@ export function ResortMap({
                     </button>
                 </div>
 
-                {colouring && <MapLegend colouring={colouring} unitSystem={unitSystem} />}
+                {colouring && <MapLegend colouring={colouring} slopeBands={slopeBands} unitSystem={unitSystem} />}
 
-                {reading && <CursorReadout reading={reading} unitSystem={unitSystem} is3D={is3D} />}
+                {cursorReadoutShown && reading && <CursorReadout reading={reading} unitSystem={unitSystem} is3D={is3D} />}
 
                 {isLayersPanelOpen && (
-                    <MapLayersPanel ref={layersPanelRef} layers={layers} onChange={setLayers} hints={hints} is3D={is3D} />
+                    <MapLayersPanel
+                        ref={layersPanelRef}
+                        layers={layers}
+                        onChange={setLayers}
+                        hints={hints}
+                        is3D={is3D}
+                        cursorReadout={canHover ? cursorReadoutShown : undefined}
+                        onCursorReadoutChange={setCursorReadoutShown}
+                    />
                 )}
             </div>
         </div>

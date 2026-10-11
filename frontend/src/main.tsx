@@ -6,6 +6,7 @@ import { HierarchyProvider } from './contexts/HierarchyContext'
 import { resolveResortId } from './data/resortLocations'
 import { getSavedLocation, isSavedLocationId } from './utils/savedLocations'
 import { idbClear } from './utils/indexedDB'
+import { turnOnContoursOnce } from './utils/mapLayers'
 import './style.css'
 
 // Main app wrapper
@@ -67,6 +68,7 @@ const migrateResortIds = () => {
 // Run migrations before rendering
 resetStoredData();
 migrateResortIds();
+turnOnContoursOnce();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>

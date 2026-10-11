@@ -45,6 +45,8 @@ import {
     type MapRotation,
     type MapTilt,
 } from './utils/mapRotation';
+import { useCursorReadout } from './hooks/useCursorReadout';
+import { SlopeBandsModal } from './components/map/SlopeBandsModal';
 import { useIsMobile } from './hooks/useIsMobile';
 import { useLanguage } from './hooks/useLanguage';
 import { useHierarchy } from './contexts/HierarchyContext';
@@ -288,6 +290,7 @@ function App(): JSX.Element {
     const [chartZoomSyncEnabled, setChartZoomSyncEnabled] = useLocalStorage<boolean>('chartZoomSync', true);
     const [mapRotation, setMapRotation] = useLocalStorage<MapRotation>(MAP_ROTATION_STORAGE_KEY, DEFAULT_MAP_ROTATION);
     const [mapTilt, setMapTilt] = useLocalStorage<MapTilt>(MAP_TILT_STORAGE_KEY, DEFAULT_MAP_TILT);
+    const [cursorReadoutShown, setCursorReadoutShown] = useCursorReadout();
     const [unitSystem, setUnitSystem] = useUnitSystem();
     const [resortDisplayLimit, setResortDisplayLimit] = useLocalStorage<ResortDisplayLimit>('resortDisplayLimit', 'auto');
 
@@ -315,6 +318,11 @@ function App(): JSX.Element {
     const [isModelStylesOpen, setModelStylesOpen] = useState(false);
     const closeModelStyles = useCallback(() => setModelStylesOpen(false), []);
     useEffect(() => registerModelStylesOpener(() => setModelStylesOpen(true)), []);
+
+    // The Slope bands editor on its own; either map's layers panel has it too
+    const [isSlopeBandsOpen, setSlopeBandsOpen] = useState(false);
+    const openSlopeBands = useCallback(() => setSlopeBandsOpen(true), []);
+    const closeSlopeBands = useCallback(() => setSlopeBandsOpen(false), []);
 
     // Open resort modal and auto-dismiss the banner
     const openResortModalAndDismissBanner = useCallback(() => {
@@ -348,6 +356,8 @@ function App(): JSX.Element {
         chartZoomSyncEnabled, setChartZoomSyncEnabled,
         mapRotation, setMapRotation,
         mapTilt, setMapTilt,
+        cursorReadoutShown, setCursorReadoutShown,
+        openSlopeBands,
         selectedElevation, setSelectedElevation,
         selectedSort, setSelectedSort,
         selectedSortDay, setSelectedSortDay,
@@ -566,6 +576,31 @@ function App(): JSX.Element {
                         name: 'Drag down',
                         icon: mapTilt === 'dragDown' ? icons.check : undefined,
                         action: () => setMapTilt('dragDown'),
+                    },
+                ],
+            },
+            {
+                id: 'slope-bands',
+                name: 'Slope bands',
+                icon: icons.slopeBands,
+                action: openSlopeBands,
+            },
+            {
+                id: 'cursor-readout',
+                name: 'Cursor readout',
+                icon: icons.cursor,
+                subCommands: [
+                    {
+                        id: 'cursor-readout-on',
+                        name: 'On',
+                        icon: cursorReadoutShown ? icons.check : undefined,
+                        action: () => setCursorReadoutShown(true),
+                    },
+                    {
+                        id: 'cursor-readout-off',
+                        name: 'Off',
+                        icon: !cursorReadoutShown ? icons.check : undefined,
+                        action: () => setCursorReadoutShown(false),
                     },
                 ],
             },
@@ -994,6 +1029,9 @@ function App(): JSX.Element {
         setMapRotation,
         mapTilt,
         setMapTilt,
+        cursorReadoutShown,
+        setCursorReadoutShown,
+        openSlopeBands,
         selectedElevation,
         setSelectedElevation,
         selectedSort,
@@ -1052,6 +1090,9 @@ function App(): JSX.Element {
                     <ModelStylesModal onClose={closeModelStyles} />
                 </Suspense>
             )}
+
+            {/* Slope bands, opened from the Settings page or the command palette */}
+            {isSlopeBandsOpen && <SlopeBandsModal onClose={closeSlopeBands} />}
 
             {/* FPS Counter */}
             <FPSCounter fps={fps} isVisible={isFPSEnabled} />
