@@ -1780,7 +1780,7 @@ input[type="checkbox"] {
     text-overflow: ellipsis;
 }
 
-/* Colour swatches in the Models tab */
+/* Colour swatches in the Model styles tab */
 .model-color-swatch {
     width: 24px;
     height: 24px;
@@ -1861,15 +1861,21 @@ input[type="checkbox"] {
     background: rgba(10, 132, 255, 0.1);
 }
 
-/* Opens the Models tab, from the Aggregations header */
+/* Opens the Model styles tab, from beside the search */
 .model-styles-link {
-    margin-left: auto;
-    padding: 2px 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    height: 32px;
+    padding: 0 12px;
+    margin-right: 8px;
     border: 1px solid var(--accent, #0a84ff);
     border-radius: 6px;
-    background: none;
+    background: rgba(10, 132, 255, 0.12);
     color: var(--accent, #0a84ff);
-    font-size: 12px;
+    font-size: 13px;
+    font-weight: var(--weight-medium);
     font-family: inherit;
     white-space: nowrap;
     cursor: pointer;
@@ -1877,7 +1883,20 @@ input[type="checkbox"] {
 }
 
 .model-styles-link:hover {
-    background: rgba(10, 132, 255, 0.15);
+    background: rgba(10, 132, 255, 0.25);
+}
+
+/* Icon only on phones, so the search keeps its room */
+@media (max-width: 480px) {
+    .model-styles-link {
+        width: 32px;
+        padding: 0;
+        justify-content: center;
+    }
+
+    .model-styles-link-label {
+        display: none;
+    }
 }
 
 /* Responsive adjustments for model grid */
@@ -2034,6 +2053,30 @@ input[type="checkbox"] {
 /* Chart Settings Modal Styles */
 .chart-settings-modal {
     max-width: 400px;
+}
+
+/* The Model styles tab, at the model picker's size */
+.chart-settings-modal.model-styles-wide {
+    max-width: 90vw;
+    width: 90vw;
+    height: 85vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.model-styles-wide .chart-settings-content {
+    flex: 1;
+    min-height: 0;
+    max-height: none;
+}
+
+@media (max-width: 768px) {
+    .chart-settings-modal.model-styles-wide {
+        max-width: 95vw;
+        width: 95vw;
+        height: 90vh;
+        height: 90dvh;
+    }
 }
 
 .chart-settings-header {
@@ -2263,10 +2306,16 @@ input[type="checkbox"] {
     opacity: 0.9;
 }
 
-/* Chart settings tabs: this chart, and the Models tab shared by every chart */
+/* Chart settings tabs: this chart, and the Model styles tab shared by every chart */
 .chart-settings-tabs {
     display: flex;
     gap: 8px;
+}
+
+/* As wide as in the narrow modal, and centred, so the tabs stay put when it widens */
+.model-styles-wide .chart-settings-tabs {
+    max-width: 366px;
+    margin: 0 auto;
 }
 
 .chart-settings-tab {
@@ -2311,18 +2360,30 @@ input[type="checkbox"] {
     white-space: nowrap;
 }
 
-/* Models tab */
+/* Model styles tab */
 .model-styles-intro {
     margin: 0 0 12px 0;
     color: var(--textSecondary, #a1a1a6);
     font-size: 12px;
 }
 
+/* Rows in columns, like the model picker's; an open row grows on its own */
+.model-style-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+    gap: 6px 8px;
+    align-items: start;
+}
+
 .model-style-row {
     padding: 6px 8px;
-    margin-bottom: 4px;
     background: var(--cardBg, rgba(255, 255, 255, 0.05));
     border-radius: 8px;
+}
+
+/* Spans every column, with its controls beside its name */
+.model-style-all {
+    grid-column: 1 / -1;
 }
 
 .model-style-main {
@@ -2331,24 +2392,84 @@ input[type="checkbox"] {
     gap: 10px;
 }
 
+/* Built like the Bold and opacity controls beside it, so it reads as one too */
 .model-style-color,
 .model-style-color-placeholder {
-    width: 16px;
-    height: 16px;
+    width: 44px;
+    height: 28px;
     flex-shrink: 0;
-    border-radius: 50%;
 }
 
 .model-style-color {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     padding: 0;
-    border: none;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
+    border: 1px solid var(--gridLine, rgba(255, 255, 255, 0.15));
+    border-radius: 6px;
+    background: var(--secondary, rgba(255, 255, 255, 0.05));
+    color: var(--textSecondary, #a1a1a6);
     cursor: pointer;
-    transition: transform 0.1s ease;
+    transition: all 0.15s ease;
 }
 
 .model-style-color:hover {
-    transform: scale(1.2);
+    border-color: var(--textSecondary, #a1a1a6);
+    color: var(--textPrimary, #f5f5f7);
+}
+
+.model-style-color.open {
+    border-color: var(--accent, #0a84ff);
+    color: var(--accent, #0a84ff);
+}
+
+.model-style-color-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+.model-style-color-caret {
+    display: flex;
+    font-size: 10px;
+    transition: transform 0.15s ease;
+}
+
+.model-style-color.open .model-style-color-caret {
+    transform: rotate(180deg);
+}
+
+/* "Other models": a section title that folds its section */
+.model-styles-fold {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    cursor: pointer;
+}
+
+.model-styles-fold:hover {
+    color: var(--textPrimary, #f5f5f7);
+}
+
+.model-style-provider {
+    grid-column: 1 / -1;
+    margin: 6px 0 0 0;
+    color: var(--textSecondary, #a1a1a6);
+    font-size: 12px;
+    font-weight: var(--weight-medium);
+}
+
+.model-style-provider:first-child {
+    margin-top: 0;
 }
 
 .model-style-name {
@@ -2365,7 +2486,19 @@ input[type="checkbox"] {
 }
 
 .model-style-all .model-style-name {
+    flex: 0 1 auto;
     color: var(--textSecondary, #a1a1a6);
+}
+
+/* One column on phones, as in the model picker, where the All row lines up with the rest */
+@media (max-width: 768px) {
+    .model-style-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .model-style-all .model-style-name {
+        flex: 1;
+    }
 }
 
 .model-style-note {
@@ -2374,7 +2507,7 @@ input[type="checkbox"] {
 }
 
 /* Not drawn here, but still stylable */
-.model-style-row.unavailable .model-style-color,
+.model-style-row.unavailable .model-style-color-dot,
 .model-style-row.unavailable .model-style-name {
     opacity: 0.5;
 }
@@ -2426,7 +2559,7 @@ input[type="checkbox"] {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    padding: 8px 0 4px 26px;
+    padding: 8px 0 4px 0;
 }
 
 .model-color-original {
@@ -2447,10 +2580,6 @@ input[type="checkbox"] {
     height: 100%;
     opacity: 0;
     cursor: pointer;
-}
-
-.model-styles-toggles .chart-settings-toggle {
-    margin-bottom: 6px;
 }
 
 /* Mobile Sort & Filter Modal Styles */

@@ -2,7 +2,8 @@
  * Model Selection Grid Modal component.
  * Displays all models in a multi-column grid layout organized by Provider > Models.
  * All providers are expanded by default but collapsible.
- * Aggregations section at the top, linking to the Models tab where lines are styled.
+ * Aggregations section at the top; the Model styles button beside the search opens the
+ * Model styles tab, where lines are styled.
  */
 
 import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
@@ -146,7 +147,7 @@ const ModelItem = memo(function ModelItem({
   );
 });
 
-// Aggregation item component; its colour is set in the Models tab
+// Aggregation item component; its colour is set in the Model styles tab
 const AggregationItem = memo(function AggregationItem({
   node,
   isSelected,
@@ -190,7 +191,6 @@ const ProviderSection = memo(function ProviderSection({
   onSelectAll,
   onDeselectAll,
   getSelectionState,
-  onOpenModelStyles,
   modelAvailability,
 }: {
   node: ModelHierarchyNode;
@@ -205,7 +205,6 @@ const ProviderSection = memo(function ProviderSection({
   onSelectAll: (node: ModelHierarchyNode) => void;
   onDeselectAll: (node: ModelHierarchyNode) => void;
   getSelectionState: (node: ModelHierarchyNode) => 'all' | 'some' | 'none';
-  onOpenModelStyles: () => void;
 }) {
   const isExpanded = expandedNodes.has(node.id);
   const selectionState = getSelectionState(node);
@@ -249,16 +248,6 @@ const ProviderSection = memo(function ProviderSection({
         <span className="resort-grid-count">
           {selectedCount}/{totalItems}
         </span>
-        {isAggregationsSection && (
-          <button
-            type="button"
-            className="model-styles-link"
-            onClick={(e) => { e.stopPropagation(); onOpenModelStyles(); }}
-            title="Colours, bold and opacity of every line, the fills, and hiding model lines"
-          >
-            Colours & lines
-          </button>
-        )}
       </div>
       {isExpanded && node.children && (
         <div className="resort-grid-resorts model-grid-items">
@@ -315,7 +304,7 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
   const inputRef = useRef<HTMLInputElement>(null);
   const modelStyles = useModelStyles();
 
-  // Closing keeps the picks made here, so the Models tab lists them
+  // Closing keeps the picks made here, so the Model styles tab lists them
   const handleOpenModelStyles = useCallback(() => {
     closeModal();
     openModelStyles();
@@ -407,6 +396,16 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
             />
           </div>
           <button
+            type="button"
+            className="model-styles-link"
+            onClick={handleOpenModelStyles}
+            title="Colours, bold and opacity of every model's line"
+            aria-label="Model styles"
+          >
+            <Icon icon={icons.palette} />
+            <span className="model-styles-link-label">Model styles</span>
+          </button>
+          <button
             className="resort-grid-close-btn"
             onClick={closeModal}
             aria-label="Close"
@@ -438,7 +437,6 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
                   onSelectAll={selectAllInNode}
                   onDeselectAll={deselectAllInNode}
                   getSelectionState={getSelectionState}
-                  onOpenModelStyles={handleOpenModelStyles}
                 />
               ))}
             </div>
@@ -448,7 +446,7 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
         {/* Footer */}
         <div className="command-palette-footer model-grid-footer">
           <div className="model-grid-footer-note">
-            Note: Your models apply to every resort. Dimmed ones aren't drawn here: they don't cover this point, sent no data, or repeat another model's numbers. Seamless blends a provider's models into one forecast. Colours & lines sets how each one is drawn.
+            Note: Your models apply to every resort. Dimmed ones aren't drawn here: they don't cover this point, sent no data, or repeat another model's numbers. Seamless blends a provider's models into one forecast. Model styles set how each one is drawn.
           </div>
           <div className="model-grid-footer-actions">
             <span className="command-hint">

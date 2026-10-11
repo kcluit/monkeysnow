@@ -1,10 +1,13 @@
 /**
- * The Models tab of a chart's gear modal: the Model style of every Preferred model and
- * Aggregation, the band fills, and hiding the model lines. Its changes reach every chart.
+ * The Model styles tab of a chart's gear modal: the Model style of every Forecast model
+ * (Preferred models first, the rest folded away) and Aggregation, the band fills, and
+ * hiding the model lines. Its changes reach every chart.
  */
 
-import { useState } from 'react';
-import { aggregationOptions, getModelInfo, inCatalogueOrder, isKnownModel } from '../../data/modelHierarchy';
+import { Fragment, useState } from 'react';
+import { aggregationOptions, getModelInfo, inCatalogueOrder, isKnownModel, modelProviders } from '../../data/modelHierarchy';
+import { Icon } from '../Icon';
+import { icons } from '../../constants/icons';
 import {
     COLOR_PRESETS,
     OPACITY_CHOICES,
@@ -157,12 +160,15 @@ function LineStyleRow({ name, note, color, original, style, allowAuto, onChange 
             <div className="model-style-main">
                 <button
                     type="button"
-                    className="model-style-color"
-                    style={{ backgroundColor: color }}
-                    aria-label={`Colour of ${name}`}
+                    className={`model-style-color${isPicking ? ' open' : ''}`}
+                    title={`Change colour of ${name}`}
+                    aria-label={`Change colour of ${name}`}
                     aria-expanded={isPicking}
                     onClick={() => setIsPicking(!isPicking)}
-                />
+                >
+                    <span className="model-style-color-dot" style={{ backgroundColor: color }} />
+                    <span className="model-style-color-caret"><Icon icon={icons.caretDown} /></span>
+                </button>
                 <span className="model-style-name">
                     <span className={current.bold ? 'model-style-name-bold' : undefined}>{name}</span>
                     {note && <span className="model-style-note">{note}</span>}
@@ -211,9 +217,19 @@ export function ModelStylesTab({
     selectedAggregations,
     modelAvailability,
 }: ModelStylesTabProps): JSX.Element {
+    const [showOtherModels, setShowOtherModels] = useState(false);
     const models = inCatalogueOrder(preferredModels.filter(isKnownModel));
 
-    // The "All models" row shows what every model shares, and sets it on every model
+    // Every Forecast model that isn't a Preferred model, by Provider, so it is styled before it's picked
+    const otherModelsByProvider = modelProviders
+        .map((provider) => ({
+            provider,
+            others: provider.models.map((model) => model.id).filter((id) => !models.includes(id)),
+        }))
+        .filter(({ others }) => others.length > 0);
+    const otherModelCount = otherModelsByProvider.reduce((count, { others }) => count + others.length, 0);
+
+    // The "All Preferred models" row shows what they share, and sets it on each of them
     const boldCount = models.filter((model) => styles.models[model]?.bold).length;
     const allBold = boldCount === 0 ? false : boldCount === models.length ? true : 'mixed';
     const opacities = new Set(models.map((model) => styles.models[model]?.opacity));
@@ -224,6 +240,19 @@ export function ModelStylesTab({
         onChange({ ...styles, models: next });
     };
 
+    const modelRow = (model: WeatherModel, note: string | null) => (
+        <LineStyleRow
+            key={model}
+            name={getModelInfo(model)?.label ?? model}
+            note={note}
+            color={modelColor(styles, model)}
+            original={originalModelColor(model)}
+            style={styles.models[model]}
+            allowAuto
+            onChange={(style) => onChange({ ...styles, models: withStyle(styles.models, model, style) })}
+        />
+    );
+
     const hasPair = (a: AggregationType, b: AggregationType) =>
         selectedAggregations.includes(a) && selectedAggregations.includes(b);
 
@@ -232,15 +261,15 @@ export function ModelStylesTab({
             <p className="model-styles-intro">These apply to every chart, for every resort.</p>
 
             <div className="chart-settings-section">
-                <h3 className="chart-settings-section-title">Models</h3>
+                <h3 className="chart-settings-section-title">Preferred models</h3>
                 {models.length === 0 ? (
                     <p className="model-styles-intro">No Preferred models yet.</p>
                 ) : (
-                    <>
+                    <div className="model-style-grid">
                         <div className="model-style-row model-style-all">
                             <div className="model-style-main">
                                 <span className="model-style-color-placeholder" />
-                                <span className="model-style-name">All models</span>
+                                <span className="model-style-name">All Preferred models</span>
                                 <StyleControls
                                     bold={allBold}
                                     opacity={sharedOpacity}
@@ -250,58 +279,79 @@ export function ModelStylesTab({
                                 />
                             </div>
                         </div>
-                        {models.map((model) => (
-                            <LineStyleRow
-                                key={model}
-                                name={getModelInfo(model)?.label ?? model}
-                                note={modelAvailability ? getUnavailableReason(model, modelAvailability) : null}
-                                color={modelColor(styles, model)}
-                                original={originalModelColor(model)}
-                                style={styles.models[model]}
-                                allowAuto
-                                onChange={(style) => onChange({ ...styles, models: withStyle(styles.models, model, style) })}
-                            />
-                        ))}
-                    </>
+                        {models.map((model) =>
+                            modelRow(model, modelAvailability ? getUnavailableReason(model, modelAvailability) : null)
+                        )}
+                    </div>
                 )}
             </div>
 
+            {otherModelCount > 0 && (
+                <div className="chart-settings-section">
+                    <h3 className="chart-settings-section-title">
+                        <button
+                            type="button"
+                            className="model-styles-fold"
+                            aria-expanded={showOtherModels}
+                            onClick={() => setShowOtherModels(!showOtherModels)}
+                        >
+                            <Icon icon={showOtherModels ? icons.caretDown : icons.caretRight} />
+                            Other models ({otherModelCount})
+                        </button>
+                    </h3>
+                    {showOtherModels && (
+                        <div className="model-style-grid">
+                            {otherModelsByProvider.map(({ provider, others }) => (
+                                <Fragment key={provider.id}>
+                                    <h4 className="model-style-provider">{provider.name}</h4>
+                                    {others.map((model) => modelRow(model, null))}
+                                </Fragment>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
+
             <div className="chart-settings-section">
                 <h3 className="chart-settings-section-title">Aggregations</h3>
-                {aggregationOptions.map(({ id, name }) => (
-                    <LineStyleRow
-                        key={id}
-                        name={name}
-                        note={selectedAggregations.includes(id) ? null : 'Not picked'}
-                        color={aggregationColor(styles, id)}
-                        original={originalAggregationColor(id)}
-                        style={styles.aggregations[id]}
-                        allowAuto={false}
-                        onChange={(style) => onChange({ ...styles, aggregations: withStyle(styles.aggregations, id, style) })}
-                    />
-                ))}
+                <div className="model-style-grid">
+                    {aggregationOptions.map(({ id, name }) => (
+                        <LineStyleRow
+                            key={id}
+                            name={name}
+                            note={selectedAggregations.includes(id) ? null : 'Not picked'}
+                            color={aggregationColor(styles, id)}
+                            original={originalAggregationColor(id)}
+                            style={styles.aggregations[id]}
+                            allowAuto={false}
+                            onChange={(style) => onChange({ ...styles, aggregations: withStyle(styles.aggregations, id, style) })}
+                        />
+                    ))}
+                </div>
             </div>
 
-            <div className="chart-settings-section model-styles-toggles">
+            <div className="chart-settings-section">
                 <h3 className="chart-settings-section-title">With Aggregations</h3>
-                <Toggle
-                    label="Min-max fill"
-                    description={hasPair('min', 'max') ? 'Shades between the Min and Max lines' : 'Needs Min and Max picked'}
-                    checked={styles.showMinMaxFill}
-                    onChange={(showMinMaxFill) => onChange({ ...styles, showMinMaxFill })}
-                />
-                <Toggle
-                    label="25th-75th fill"
-                    description={hasPair('p25', 'p75') ? 'Shades between the 25th and 75th percentile lines' : 'Needs 25th and 75th Percentile picked'}
-                    checked={styles.showPercentileFill}
-                    onChange={(showPercentileFill) => onChange({ ...styles, showPercentileFill })}
-                />
-                <Toggle
-                    label="Hide individual model lines"
-                    description="While Aggregations are drawn, show only them"
-                    checked={styles.hideModelLines}
-                    onChange={(hideModelLines) => onChange({ ...styles, hideModelLines })}
-                />
+                <div className="model-style-grid">
+                    <Toggle
+                        label="Min-max fill"
+                        description={hasPair('min', 'max') ? 'Shades between the Min and Max lines' : 'Needs Min and Max picked'}
+                        checked={styles.showMinMaxFill}
+                        onChange={(showMinMaxFill) => onChange({ ...styles, showMinMaxFill })}
+                    />
+                    <Toggle
+                        label="25th-75th fill"
+                        description={hasPair('p25', 'p75') ? 'Shades between the 25th and 75th percentile lines' : 'Needs 25th and 75th Percentile picked'}
+                        checked={styles.showPercentileFill}
+                        onChange={(showPercentileFill) => onChange({ ...styles, showPercentileFill })}
+                    />
+                    <Toggle
+                        label="Hide individual model lines"
+                        description="While Aggregations are drawn, show only them"
+                        checked={styles.hideModelLines}
+                        onChange={(hideModelLines) => onChange({ ...styles, hideModelLines })}
+                    />
+                </div>
             </div>
         </>
     );

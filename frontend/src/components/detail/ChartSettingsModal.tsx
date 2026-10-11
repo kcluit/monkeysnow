@@ -2,8 +2,9 @@
  * Chart Settings Modal
  *
  * Command-palette-style modal behind each chart's gear, with two tabs: this chart's own
- * settings (chart type and variable-specific options), and the Models tab, whose Model
- * styles apply to every chart. Mounted only while open; one Apply covers both tabs.
+ * settings (chart type and variable-specific options), and the Model styles tab, which
+ * applies to every chart and widens the modal to the model picker's size. Mounted only
+ * while open; one Apply covers both tabs.
  */
 
 import { useState } from 'react';
@@ -26,7 +27,7 @@ interface ChartSettingsModalProps {
     variable: WeatherVariable;
     /** The tab to open on; left out, the one last used */
     initialTab?: ChartSettingsTab;
-    // Models tab
+    // Model styles tab
     preferredModels: WeatherModel[];
     selectedAggregations: AggregationType[];
     modelAvailability: ModelAvailabilityContext;
@@ -130,7 +131,7 @@ export function ChartSettingsModal({
 
     return createPortal(
         <div className="command-palette-backdrop" onClick={handleBackdropClick}>
-            <div className="command-palette chart-settings-modal">
+            <div className={`command-palette chart-settings-modal${tab === 'models' ? ' model-styles-wide' : ''}`}>
                 {/* Header */}
                 <div className="chart-settings-header">
                     <div className="chart-settings-tabs" role="tablist">
@@ -154,7 +155,7 @@ export function ChartSettingsModal({
                             className={`chart-settings-tab ${tab === 'models' ? 'selected' : ''}`}
                             onClick={() => selectTab('models')}
                         >
-                            <span className="chart-settings-tab-label">Models</span>
+                            <span className="chart-settings-tab-label">Model styles</span>
                             <span className="chart-settings-tab-hint">all charts</span>
                         </button>
                     </div>

@@ -1,7 +1,7 @@
 /**
- * The Models tab on its own, for where there is no chart to open a gear modal on:
- * the Settings page, and the command palette away from the detail view.
- * Mounted only while open.
+ * The Model styles tab on its own, at the model picker's size, for where there is no
+ * chart to open a gear modal on: the Settings page, and the command palette away from
+ * the detail view. Mounted only while open.
  */
 
 import { useState } from 'react';
@@ -33,7 +33,7 @@ export function ModelStylesModal({ onClose }: { onClose: () => void }): JSX.Elem
                 if (e.target === e.currentTarget) onClose();
             }}
         >
-            <div className="command-palette chart-settings-modal">
+            <div className="command-palette chart-settings-modal model-styles-wide">
                 <div className="chart-settings-header">
                     <h2 className="chart-settings-title">Model styles</h2>
                 </div>
