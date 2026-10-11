@@ -51,7 +51,11 @@ export function subscribeToZoomChanges(listener: ZoomListener): () => void {
  * Enable or disable global zoom sync.
  */
 export function setGlobalZoomSync(enabled: boolean): void {
+    if (globalZoomSyncEnabled && !enabled) {
+        charts.forEach((_, chartId) => keepSyncedHeldLine(chartId));
+    }
     globalZoomSyncEnabled = enabled;
+    notifyHeldLineListeners();
 }
 
 /**
@@ -66,10 +70,12 @@ export function isGlobalZoomSyncEnabled(): boolean {
  */
 export function setChartZoomSyncExclusion(chartId: string, excluded: boolean): void {
     if (excluded) {
+        keepSyncedHeldLine(chartId);
         chartSyncExclusions.add(chartId);
     } else {
         chartSyncExclusions.delete(chartId);
     }
+    notifyHeldLineListeners();
 }
 
 /**
@@ -84,6 +90,71 @@ export function isChartZoomSyncExcluded(chartId: string): boolean {
  */
 export function isChartZoomSyncEnabled(chartId: string): boolean {
     return globalZoomSyncEnabled && !chartSyncExclusions.has(chartId);
+}
+
+// ============================================
+// Held lines
+// ============================================
+
+// Kept here rather than in the charts, so a chart rebuilt for the same key keeps its Held line.
+// Charts in zoom sync share one; a chart out of it has its own.
+let syncedHeldLine: string | null = null;
+const ownHeldLines = new Map<string, string>();
+const heldLineListeners = new Set<() => void>();
+
+function notifyHeldLineListeners(): void {
+    heldLineListeners.forEach(listener => listener());
+}
+
+/** A chart leaving zoom sync keeps the Held line it was showing. */
+function keepSyncedHeldLine(chartId: string): void {
+    if (!isChartZoomSyncEnabled(chartId)) return;
+    if (syncedHeldLine === null) {
+        ownHeldLines.delete(chartId);
+    } else {
+        ownHeldLines.set(chartId, syncedHeldLine);
+    }
+}
+
+/**
+ * Get a chart's Held line, if any.
+ */
+export function getHeldLine(chartId: string): string | null {
+    return isChartZoomSyncEnabled(chartId)
+        ? syncedHeldLine
+        : ownHeldLines.get(chartId) ?? null;
+}
+
+/**
+ * Hold a line on a chart, and on every chart in zoom sync with it; null releases it.
+ */
+export function setHeldLine(chartId: string, line: string | null): void {
+    if (isChartZoomSyncEnabled(chartId)) {
+        syncedHeldLine = line;
+    } else if (line === null) {
+        ownHeldLines.delete(chartId);
+    } else {
+        ownHeldLines.set(chartId, line);
+    }
+    notifyHeldLineListeners();
+}
+
+/**
+ * Release every chart's Held line, for a place whose Comparison models may differ.
+ */
+export function clearHeldLines(): void {
+    syncedHeldLine = null;
+    ownHeldLines.clear();
+    notifyHeldLineListeners();
+}
+
+/**
+ * Subscribe to changes of any chart's Held line, or of which charts share one.
+ * Returns unsubscribe function.
+ */
+export function subscribeToHeldLines(listener: () => void): () => void {
+    heldLineListeners.add(listener);
+    return () => heldLineListeners.delete(listener);
 }
 
 /**
