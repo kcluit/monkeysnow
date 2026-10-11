@@ -45,7 +45,7 @@ export interface ChartTheme {
 /** Configuration for a single data series */
 export interface SeriesConfig {
     id: string;
-    /** The line this series is focused as, together with its other series; defaults to its id */
+    /** The line this series is focused and held as, shared across charts; defaults to its id */
     line?: string;
     name: string;
     color: string;

@@ -15,6 +15,9 @@ import {
     subscribeToZoomChanges,
     broadcastZoomChange,
     isChartZoomSyncEnabled,
+    getHeldLine,
+    setHeldLine,
+    subscribeToHeldLines,
 } from './chartRegistry';
 
 /**
@@ -381,6 +384,10 @@ export class ChartManager {
     private unsubscribeZoom: (() => void) | null = null;
     private isApplyingExternalZoom: boolean = false;
 
+    // The Held line, which another chart in zoom sync may change
+    private unsubscribeHeldLines: (() => void) | null = null;
+    private refreshFocus: (() => void) | null = null;
+
     /** Axes and plugins call this while drawing; a chart only exists once a config has been set. */
     private readonly getConfig = (): ChartConfig => this.currentConfig!;
 
@@ -396,6 +403,8 @@ export class ChartManager {
                 this.applyExternalZoom(min, max);
             }
         });
+
+        this.unsubscribeHeldLines = subscribeToHeldLines(() => this.refreshFocus?.());
 
         // Set up resize observer
         this.resizeObserver = new ResizeObserver(() => {
@@ -437,6 +446,7 @@ export class ChartManager {
             this.chart.destroy();
             this.chart = null;
         }
+        this.refreshFocus = null;
 
         this.structuralKey = newStructuralKey;
         this.createChart(config);
@@ -501,14 +511,19 @@ export class ChartManager {
         }
 
         // Series focus plugin - fades everything but the Focused line: the legend entry pointed at,
-        // or the line nearest the cursor
-        const seriesFocus = createSeriesFocusPlugin({ getConfig });
+        // the Held line, or the line nearest the cursor
+        const seriesFocus = createSeriesFocusPlugin({
+            getConfig,
+            getHeldLine: () => getHeldLine(this.chartId),
+            setHeldLine: (line) => setHeldLine(this.chartId, line),
+        });
         plugins.push(seriesFocus.plugin);
+        this.refreshFocus = seriesFocus.refresh;
 
         // Tooltip plugin - shows values at cursor position
         plugins.push(createTooltipPlugin({ getConfig }));
 
-        // Legend plugin - interactive series toggle and hover preview
+        // Legend plugin - interactive series toggle, hover preview and held lines
         plugins.push(createLegendPlugin({ getConfig, seriesFocus }));
 
         // Build uPlot options
@@ -595,6 +610,12 @@ export class ChartManager {
             this.unsubscribeZoom();
             this.unsubscribeZoom = null;
         }
+
+        if (this.unsubscribeHeldLines) {
+            this.unsubscribeHeldLines();
+            this.unsubscribeHeldLines = null;
+        }
+        this.refreshFocus = null;
 
         if (this.resizeObserver) {
             this.resizeObserver.disconnect();

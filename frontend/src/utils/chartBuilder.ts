@@ -314,7 +314,7 @@ function buildAccumulationSeries(
 
         accumulationSeries.push({
             id: `accumulation_${model}`,
-            // Focused together with the model's hourly line
+            // Focused and held together with the model's hourly line
             line: model,
             name: `${getModelConfig(model).name} (Accum)`,
             color: modelColor(styles, model),
