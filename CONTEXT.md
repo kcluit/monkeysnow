@@ -141,3 +141,29 @@ _Avoid_: highlighted series, selected line
 **Locked line**:
 A **Focused line** that stays focused when the pointer moves away, set by double-clicking its legend entry. Pointing at another legend entry previews it; pointing in the chart does not.
 _Avoid_: pinned line, selected model
+
+### The map
+
+**Base map**:
+The picture under everything else on the map of a **Resort** or a **Saved location**: Standard or Satellite. A visitor sees one at a time.
+_Avoid_: map style, map type, tiles
+
+**Overlay**:
+Something drawn on top of the **Base map** that a visitor turns on or off by itself: the **Ski map**, contour lines, hillshade or slope angle. Any number can be on at once, over either **Base map**.
+_Avoid_: layer, mode
+
+**Ski map**:
+The **Overlay** that draws every **Run** and **Lift** around the point on the map.
+_Avoid_: winter mode, piste map, trail map
+
+**Run**:
+A marked snow route as OpenStreetMap maps it: downhill, nordic, ski touring, terrain park or sled.
+_Avoid_: piste, trail, slope
+
+**Lift**:
+Anything that carries skiers uphill, from a gondola or chairlift down to a rope tow or magic carpet.
+_Avoid_: aerialway, ski lift (as the general term)
+
+**Difficulty colours**:
+The colours a downhill **Run** is drawn in to show how hard it is. They follow the convention of the **Resort**'s country (for a **Saved location**, the country of the **Resort** nearest to it), so an intermediate **Run** is blue in Canada and red in France.
+_Avoid_: piste colours, run grades
