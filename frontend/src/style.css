@@ -3182,29 +3182,102 @@ input[type="checkbox"] {
     white-space: nowrap;
 }
 
-.resort-map-layers-legend {
-    padding: 2px 4px 2px 28px;
+.resort-map-layers-overlay.disabled {
+    cursor: default;
+}
+
+.resort-map-layers-overlay.disabled:hover {
+    background: transparent;
+}
+
+.resort-map-layers-heading {
+    margin: 6px 4px 2px;
     color: var(--textSecondary, #a1a1a6);
     font-size: 0.6875rem;
+    font-weight: 600;
 }
 
-.resort-map-layers-bands {
+/* What the Terrain colouring's colours mean, above the buttons in the bottom-left corner; the layers panel opens over it */
+.resort-map-legend {
+    position: absolute;
+    bottom: 44px;
+    left: 8px;
+    z-index: 1000;
+    max-width: calc(100% - 16px);
+    padding: 5px 8px 6px;
+    border-radius: 6px;
+    background: var(--cardBg, rgba(30, 30, 30, 0.85));
+    color: var(--textSecondary, #a1a1a6);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    font-size: 0.6875rem;
+    pointer-events: none;
+}
+
+.resort-map-legend-title {
+    margin-bottom: 3px;
+    color: var(--textPrimary, #f5f5f7);
+    font-weight: 600;
+}
+
+.resort-map-legend-bands {
     display: flex;
     gap: 8px;
-    margin-bottom: 2px;
 }
 
-.resort-map-layers-bands span {
+.resort-map-legend-bands span {
     display: flex;
     align-items: center;
     gap: 3px;
 }
 
-.resort-map-layers-bands i {
+.resort-map-legend-bands i {
     width: 10px;
     height: 10px;
     border-radius: 2px;
     opacity: 0.8;
+}
+
+.resort-map-legend-note {
+    margin-top: 2px;
+}
+
+/* Room either side for the end labels, which are centred on the bar's ends */
+.resort-map-legend-scale {
+    width: 210px;
+    max-width: 100%;
+    padding: 0 18px;
+}
+
+.resort-map-legend-bar {
+    height: 8px;
+    border-radius: 2px;
+}
+
+.resort-map-legend-ticks {
+    position: relative;
+    height: 1.2em;
+    margin-top: 2px;
+}
+
+.resort-map-legend-ticks span {
+    position: absolute;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.resort-map-legend-rose {
+    display: block;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto;
+}
+
+.resort-map-legend-rose text {
+    fill: currentColor;
+    font-size: 9px;
+    font-weight: 700;
 }
 
 /* The 3D button is a word rather than an icon, and lights up while the 3D map is showing */

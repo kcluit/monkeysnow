@@ -26,12 +26,15 @@ import type { ChartSettingsTab } from '../../types/chartSettings';
 import type { UnitSystem } from '../../types';
 import { formatElevation } from '../../utils/unitConversion';
 import type { HeightLine } from '../../utils/heightLines';
+import type { MapRotation } from '../../utils/mapRotation';
 import { interpolate } from '../../locales';
 
 interface DetailedResortViewPropsWithUnits extends DetailedResortViewProps {
     unitSystem: UnitSystem;
     showUtilityBar: boolean;
     utilityBarStyle: import('../../types').UtilityBarStyle;
+    /** How a sideways right-drag turns the 3D map */
+    mapRotation: MapRotation;
     onBack: () => void;
     /** Keeps the Custom location being shown as a new Saved location */
     onSaveLocation: (input: SavedLocationInput) => void;
@@ -69,6 +72,7 @@ export function DetailedResortView({
     unitSystem,
     showUtilityBar,
     utilityBarStyle,
+    mapRotation,
     onBack,
     onSaveLocation,
     onDeleteSavedLocation,
@@ -304,6 +308,7 @@ export function DetailedResortView({
                     country={savedLocation?.country ?? RESORT_LOCATIONS.get(resortId)?.country}
                     unitSystem={unitSystem}
                     heightLines={heightLines}
+                    rotation={mapRotation}
                 />
             </div>
 

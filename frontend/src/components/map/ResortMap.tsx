@@ -10,19 +10,23 @@ import {
     MAP_LAYERS_STORAGE_KEY,
     OSM_ATTRIBUTION,
     sanitizeMapLayers,
+    terrainColouring,
     type MapLayers,
     type OverlayId,
 } from '../../utils/mapLayers';
 import { difficultyConvention } from '../../utils/difficultyColours';
 import { SKI_MAP_MIN_ZOOM } from '../../utils/skiMapData';
-import { CONTOURS_MIN_ZOOM, SLOPE_ANGLE_MIN_ZOOM } from '../../utils/terrainRendering';
+import { CONTOURS_MIN_ZOOM, STEEPNESS_MIN_ZOOM } from '../../utils/terrainRendering';
 import type { UnitSystem } from '../../utils/unitConversion';
 import type { HeightLine } from '../../utils/heightLines';
+import type { MapRotation } from '../../utils/mapRotation';
 import type { MapView } from './ResortMap3D';
 import { SatelliteBaseMap } from './SatelliteBaseMap';
 import { TerrainOverlay } from './TerrainOverlay';
-import { SkiMapOverlay, type SkiMapStatus } from './SkiMapOverlay';
+import { SkiMapOverlay } from './SkiMapOverlay';
+import type { SkiMapStatus } from './skiMapFeatures';
 import { MapLayersPanel } from './MapLayersPanel';
+import { MapLegend } from './MapLegend';
 import {
     CUSTOM_LOCATION_DOT_HTML,
     CUSTOM_LOCATION_DOT_SIZE,
@@ -91,6 +95,8 @@ interface ResortMapProps {
     unitSystem: UnitSystem;
     /** Drawn on the 3D map only */
     heightLines: readonly HeightLine[];
+    /** How a sideways right-drag turns the 3D map */
+    rotation: MapRotation;
 }
 
 // Reports the zoom whenever it changes, so the layers panel can say when an Overlay needs the map closer in
@@ -162,6 +168,7 @@ export function ResortMap({
     country,
     unitSystem,
     heightLines,
+    rotation,
 }: ResortMapProps): JSX.Element {
     const { t } = useLanguage();
     const hasCustomLocation = customLocation !== null && customLocation !== undefined;
@@ -175,11 +182,13 @@ export function ResortMap({
         setIsExpanded(prev => !prev);
     }, []);
 
-    // One Base map and any Overlays, the same on every map in this browser
+    // One Base map and any Overlays, the same on every map in this browser, flat and 3D
     const [storedLayers, setStoredLayers] = useLocalStorage<unknown>(MAP_LAYERS_STORAGE_KEY, DEFAULT_MAP_LAYERS);
     const layers = useMemo(() => sanitizeMapLayers(storedLayers), [storedLayers]);
     const setLayers = useCallback((next: MapLayers) => setStoredLayers(next), [setStoredLayers]);
     const isOn = (overlay: OverlayId) => layers.overlays.includes(overlay);
+    const colouring = terrainColouring(layers);
+    const onSatellite = layers.baseMap === 'satellite';
     const convention = useMemo(() => difficultyConvention(country), [country]);
 
     const [zoom, setZoom] = useState(INITIAL_ZOOM);
@@ -193,8 +202,11 @@ export function ResortMap({
             : skiMapStatus === 'loading' ? 'Loading...'
             : undefined,
         contours: zoom < CONTOURS_MIN_ZOOM ? 'Zoom in to see contours' : undefined,
-        slopeAngle: zoom < SLOPE_ANGLE_MIN_ZOOM ? 'Zoom in to see slopes' : undefined,
     };
+    // Steepness needs terrain about 30 m or finer (docs/adr/0009)
+    for (const steepness of ['slopeAngle', 'gradient', 'aspect', 'flats'] as const) {
+        if (zoom < STEEPNESS_MIN_ZOOM) hints[steepness] = 'Zoom in to see slopes';
+    }
 
     // The layers panel closes on a click or tap anywhere outside it, or on Esc
     const [isLayersPanelOpen, setIsLayersPanelOpen] = useState(false);
@@ -227,8 +239,12 @@ export function ResortMap({
     const setView = useCallback((next: MapView) => {
         view.current = next;
     }, []);
+    // The 3D map's zoom at the centre also decides the layers panel's zoom hints
+    const setView3D = useCallback((next: MapView) => {
+        view.current = next;
+        setZoom(next.zoom);
+    }, []);
 
-    // The 3D map shows only the Standard Base map, so the layers panel goes while it is on
     const toggle3D = useCallback(() => {
         setIsLayersPanelOpen(false);
         // The flat map comes back where the 3D map was, which the zoom hints must know
@@ -243,9 +259,11 @@ export function ResortMap({
                 {is3D ? (
                     <Map3DErrorBoundary message={t('map.failed3d')}>
                         <Suspense fallback={<div className="resort-map-message">{t('map.loading3d')}</div>}>
+                            {/* Remade when the rotation setting changes, which MapLibre only takes when a map is created */}
                             <ResortMap3D
+                                key={rotation}
                                 initialView={view.current}
-                                onViewChange={setView}
+                                onViewChange={setView3D}
                                 lat={lat}
                                 lon={lon}
                                 resortName={resortName}
@@ -254,6 +272,13 @@ export function ResortMap({
                                 customLocation={customLocation}
                                 customElevationText={customElevationText}
                                 heightLines={heightLines}
+                                layers={layers}
+                                unitSystem={unitSystem}
+                                convention={convention}
+                                rotation={rotation}
+                                onSkiMapStatusChange={setSkiMapStatus}
+                                customLocationOn={customLocationOn}
+                                onCustomLocationOnChange={setCustomLocationOn}
                             />
                         </Suspense>
                     </Map3DErrorBoundary>
@@ -268,15 +293,16 @@ export function ResortMap({
                     >
                         {/* Standard is plain OpenStreetMap. OpenSkiMap looks better, but its terms forbid other sites using its tiles;
                             OpenSnowMap's ski run and lift overlay was tried and dropped for how it looked, so the Ski map draws its own. */}
-                        {layers.baseMap === 'satellite' ? (
+                        {onSatellite ? (
                             <SatelliteBaseMap />
                         ) : (
                             <TileLayer attribution={OSM_ATTRIBUTION} url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" />
                         )}
 
-                        {isOn('hillshade') && <TerrainOverlay kind="hillshade" unitSystem={unitSystem} onSatellite={layers.baseMap === 'satellite'} />}
-                        {isOn('slopeAngle') && <TerrainOverlay kind="slopeAngle" unitSystem={unitSystem} onSatellite={layers.baseMap === 'satellite'} />}
-                        {isOn('contours') && <TerrainOverlay kind="contours" unitSystem={unitSystem} onSatellite={layers.baseMap === 'satellite'} />}
+                        {isOn('hillshade') && <TerrainOverlay kind="hillshade" unitSystem={unitSystem} onSatellite={onSatellite} />}
+                        {colouring && <TerrainOverlay kind={colouring} unitSystem={unitSystem} onSatellite={onSatellite} />}
+                        {isOn('flats') && <TerrainOverlay kind="flats" unitSystem={unitSystem} onSatellite={onSatellite} />}
+                        {isOn('contours') && <TerrainOverlay kind="contours" unitSystem={unitSystem} onSatellite={onSatellite} />}
                         {isOn('skiMap') && (
                             <SkiMapOverlay
                                 convention={convention}
@@ -379,26 +405,26 @@ export function ResortMap({
                         </button>
                     )}
 
-                    {/* Layers button: the Base map and Overlays, at every size of the flat map */}
-                    {!is3D && (
-                        <button
-                            ref={layersButtonRef}
-                            type="button"
-                            onClick={() => setIsLayersPanelOpen(open => !open)}
-                            className={`resort-map-btn ${isLayersPanelOpen ? 'active' : ''}`}
-                            title="Map layers"
-                            aria-expanded={isLayersPanelOpen}
-                        >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                {/* Stacked squares icon */}
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6.429 9.75 2.25 12l4.179 2.25m0-4.5 5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0 4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0-5.571 3-5.571-3" />
-                            </svg>
-                        </button>
-                    )}
+                    {/* Layers button: the Base map and Overlays, at every size of either map */}
+                    <button
+                        ref={layersButtonRef}
+                        type="button"
+                        onClick={() => setIsLayersPanelOpen(open => !open)}
+                        className={`resort-map-btn ${isLayersPanelOpen ? 'active' : ''}`}
+                        title="Map layers"
+                        aria-expanded={isLayersPanelOpen}
+                    >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            {/* Stacked squares icon */}
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6.429 9.75 2.25 12l4.179 2.25m0-4.5 5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0 4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0-5.571 3-5.571-3" />
+                        </svg>
+                    </button>
                 </div>
 
+                {colouring && <MapLegend colouring={colouring} unitSystem={unitSystem} />}
+
                 {isLayersPanelOpen && (
-                    <MapLayersPanel ref={layersPanelRef} layers={layers} onChange={setLayers} hints={hints} />
+                    <MapLayersPanel ref={layersPanelRef} layers={layers} onChange={setLayers} hints={hints} is3D={is3D} />
                 )}
             </div>
         </div>

@@ -58,6 +58,8 @@ import {
   // Modal controls
   faXmark,
   faRotateLeft,
+  // 3D map rotation
+  faArrowsRotate,
   // Lock icons
   faLock,
   faLockOpen,
@@ -152,6 +154,9 @@ export const icons = {
   // Modal controls
   close: faXmark,
   reset: faRotateLeft,
+
+  // 3D map rotation
+  rotate: faArrowsRotate,
 
   // Lock icons
   lock: faLock,
