@@ -19,7 +19,6 @@ import { coversPoint, inCatalogueOrder, isKnownModel } from '../../data/modelHie
 import { resolveComparisonModels } from '../../utils/comparisonModels';
 import { registerModelStylesOpener } from '../../utils/modelStyles';
 import { buildTimeAxis } from '../../utils/timeAxis';
-import { clearLockedLines } from '../../lib/charts/chartRegistry';
 import type { DetailedResortViewProps, ElevationSelection, CustomLocation } from '../../types/detailView';
 import type { WeatherVariable } from '../../types/openMeteo';
 import type { ChartSettingsTab } from '../../types/chartSettings';
@@ -156,9 +155,6 @@ export function DetailedResortView({
         }
         return { lat: location.lat, lon: location.lon };
     }, [customLocation, location.lat, location.lon]);
-
-    // Locked lines last while this point is shown: another point may have other Comparison models
-    useEffect(() => () => clearLockedLines(), [effectiveCoords.lat, effectiveCoords.lon]);
 
     // Toggle variable visibility (for the eye icon on each chart)
     const toggleVariable = useCallback((variable: WeatherVariable) => {

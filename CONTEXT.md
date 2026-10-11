@@ -156,10 +156,6 @@ _Avoid_: line style, model settings, model appearance
 The line a visitor is pointing at, in a detail-view chart or its legend, drawn at full strength while every other line fades. A **Comparison model**'s hourly and **Accumulation** lines are focused together.
 _Avoid_: highlighted series, selected line
 
-**Locked line**:
-A **Focused line** that stays focused when the pointer moves away, set by double-clicking its legend entry. Pointing at another legend entry previews it; pointing in the chart does not.
-_Avoid_: pinned line, selected model
-
 ### The map
 
 **Base map**:

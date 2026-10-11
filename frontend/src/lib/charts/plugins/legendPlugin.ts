@@ -2,8 +2,8 @@
  * Legend Plugin
  *
  * Renders an interactive legend below the chart.
- * Click to toggle series visibility, shift+click to solo, double-click (or double-tap) to
- * lock or unlock its line. Pointing at an entry with a mouse focuses its line.
+ * Click to toggle series visibility, shift+click to solo. Pointing at an entry with a mouse
+ * focuses its line.
  * Based on uPlot's series.show API and tooltips-closest demo pattern.
  */
 
@@ -11,13 +11,10 @@ import type uPlot from 'uplot';
 import type { ChartConfig } from '../types';
 import type { SeriesFocusPluginResult } from './seriesFocusPlugin';
 
-/** Longest gap between two taps on one entry that still counts as a double-tap */
-const DOUBLE_TAP_MS = 300;
-
 export interface LegendPluginOptions {
     /** Latest chart configuration, for series metadata */
     getConfig: () => ChartConfig;
-    /** Focus state, previewed on hover and locked on double-click */
+    /** Focus state, previewed on hover */
     seriesFocus: SeriesFocusPluginResult;
 }
 
@@ -34,33 +31,25 @@ export function createLegendPlugin(options: LegendPluginOptions): uPlot.Plugin {
     let legend: HTMLDivElement | null = null;
     let legendItems: LegendItem[] = [];
     let hoveredIdx: number | null = null;
-    // Taps can't be told from clicks by the click event itself on every browser
-    let lastPointerType = 'mouse';
-    let lastTap: { seriesIdx: number; time: number } | null = null;
-    // A double-click's first click may hide the Locked line, which unlocks it
-    let firstClick: { seriesIdx: number; lockedLine: string | null } | null = null;
 
-    /** Restyle the entries in place, so a double-click lands on the same element twice */
+    /** Restyle the entries in place */
     function refreshLegend(u: uPlot) {
         const config = getConfig();
         const focusedLine = seriesFocus.getFocusedLine();
-        const lockedLine = seriesFocus.getLockedLine();
 
         for (const { seriesIdx, item, bullet, label } of legendItems) {
             const seriesConfig = config.series[seriesIdx - 1];
             if (!seriesConfig) continue;
             const line = seriesFocus.lineOf(seriesIdx);
-            const isLocked = line !== null && line === lockedLine;
 
             item.style.opacity = u.series[seriesIdx].show ? '1' : '0.4';
-            // The hover tint stays on the Locked line, telling it apart from a previewed one
-            item.classList.toggle('uplot-legend-item-tinted', isLocked || seriesIdx === hoveredIdx);
+            item.classList.toggle('uplot-legend-item-tinted', seriesIdx === hoveredIdx);
             bullet.style.backgroundColor = seriesConfig.color;
             label.textContent = seriesConfig.name;
             label.dataset.text = seriesConfig.name;
             label.style.color = config.theme.textPrimary;
-            // Bold when its Model style is, and while its line is focused or locked
-            const isBold = seriesConfig.bold || isLocked || (line !== null && line === focusedLine);
+            // Bold when its Model style is, and while its line is focused
+            const isBold = seriesConfig.bold || (line !== null && line === focusedLine);
             label.style.fontWeight = isBold ? 'var(--weight-bold)' : '';
         }
     }
@@ -76,35 +65,6 @@ export function createLegendPlugin(options: LegendPluginOptions): uPlot.Plugin {
         } else {
             // Regular click: Toggle this series
             u.setSeries(seriesIdx, { show: !u.series[seriesIdx].show });
-        }
-    }
-
-    /** Which click of a double-click this is: 1, 2, or more */
-    function clickCount(e: MouseEvent, seriesIdx: number): number {
-        if (lastPointerType !== 'touch') return Math.max(e.detail, 1);
-
-        const now = performance.now();
-        const isDoubleTap = lastTap !== null && lastTap.seriesIdx === seriesIdx && now - lastTap.time < DOUBLE_TAP_MS;
-        // A third tap starts over rather than counting as a triple
-        lastTap = isDoubleTap ? null : { seriesIdx, time: now };
-        return isDoubleTap ? 2 : 1;
-    }
-
-    function handleClick(u: uPlot, seriesIdx: number, e: MouseEvent) {
-        const count = clickCount(e, seriesIdx);
-        // A triple click leaves the double-click's result alone
-        if (count > 2) return;
-
-        if (count === 1) {
-            firstClick = { seriesIdx, lockedLine: seriesFocus.getLockedLine() };
-        }
-
-        // Both clicks of a double-click toggle, so the line ends up shown again
-        toggleSeries(u, seriesIdx, e.shiftKey);
-
-        if (count === 2 && !e.shiftKey && firstClick?.seriesIdx === seriesIdx) {
-            const line = seriesFocus.lineOf(seriesIdx);
-            seriesFocus.setLockedLine(firstClick.lockedLine === line ? null : line);
         }
     }
 
@@ -143,14 +103,10 @@ export function createLegendPlugin(options: LegendPluginOptions): uPlot.Plugin {
             item.appendChild(bullet);
             item.appendChild(label);
 
-            item.addEventListener('pointerdown', (e) => {
-                lastPointerType = e.pointerType;
-            });
-
             item.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                handleClick(u, i, e);
+                toggleSeries(u, i, e.shiftKey);
             });
 
             // Hover previews the line; a tap's emulated hover would stick, so touch has none
@@ -208,8 +164,6 @@ export function createLegendPlugin(options: LegendPluginOptions): uPlot.Plugin {
                     legend = null;
                     legendItems = [];
                     hoveredIdx = null;
-                    lastTap = null;
-                    firstClick = null;
                 },
             ],
         },

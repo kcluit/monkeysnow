@@ -51,11 +51,7 @@ export function subscribeToZoomChanges(listener: ZoomListener): () => void {
  * Enable or disable global zoom sync.
  */
 export function setGlobalZoomSync(enabled: boolean): void {
-    if (globalZoomSyncEnabled && !enabled) {
-        charts.forEach((_, chartId) => keepSyncedLockedLine(chartId));
-    }
     globalZoomSyncEnabled = enabled;
-    notifyLockedLineListeners();
 }
 
 /**
@@ -70,12 +66,10 @@ export function isGlobalZoomSyncEnabled(): boolean {
  */
 export function setChartZoomSyncExclusion(chartId: string, excluded: boolean): void {
     if (excluded) {
-        keepSyncedLockedLine(chartId);
         chartSyncExclusions.add(chartId);
     } else {
         chartSyncExclusions.delete(chartId);
     }
-    notifyLockedLineListeners();
 }
 
 /**
@@ -90,71 +84,6 @@ export function isChartZoomSyncExcluded(chartId: string): boolean {
  */
 export function isChartZoomSyncEnabled(chartId: string): boolean {
     return globalZoomSyncEnabled && !chartSyncExclusions.has(chartId);
-}
-
-// ============================================
-// Locked lines
-// ============================================
-
-// Kept here rather than in the charts, so a chart rebuilt for the same key keeps its Locked line.
-// Charts in zoom sync share one; a chart out of it has its own.
-let syncedLockedLine: string | null = null;
-const ownLockedLines = new Map<string, string>();
-const lockedLineListeners = new Set<() => void>();
-
-function notifyLockedLineListeners(): void {
-    lockedLineListeners.forEach(listener => listener());
-}
-
-/** A chart leaving zoom sync keeps the Locked line it was showing. */
-function keepSyncedLockedLine(chartId: string): void {
-    if (!isChartZoomSyncEnabled(chartId)) return;
-    if (syncedLockedLine === null) {
-        ownLockedLines.delete(chartId);
-    } else {
-        ownLockedLines.set(chartId, syncedLockedLine);
-    }
-}
-
-/**
- * Get a chart's Locked line, if any.
- */
-export function getLockedLine(chartId: string): string | null {
-    return isChartZoomSyncEnabled(chartId)
-        ? syncedLockedLine
-        : ownLockedLines.get(chartId) ?? null;
-}
-
-/**
- * Lock a line on a chart, and on every chart in zoom sync with it; null unlocks.
- */
-export function setLockedLine(chartId: string, line: string | null): void {
-    if (isChartZoomSyncEnabled(chartId)) {
-        syncedLockedLine = line;
-    } else if (line === null) {
-        ownLockedLines.delete(chartId);
-    } else {
-        ownLockedLines.set(chartId, line);
-    }
-    notifyLockedLineListeners();
-}
-
-/**
- * Unlock every chart's line, for a place whose Comparison models may differ.
- */
-export function clearLockedLines(): void {
-    syncedLockedLine = null;
-    ownLockedLines.clear();
-    notifyLockedLineListeners();
-}
-
-/**
- * Subscribe to changes of any chart's Locked line, or of which charts share one.
- * Returns unsubscribe function.
- */
-export function subscribeToLockedLines(listener: () => void): () => void {
-    lockedLineListeners.add(listener);
-    return () => lockedLineListeners.delete(listener);
 }
 
 /**
