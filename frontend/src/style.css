@@ -3455,6 +3455,38 @@ input[type="checkbox"] {
     margin: 0 auto;
 }
 
+/* The terrain under the mouse, in the top-right corner; on the 3D map, below the exaggeration slider */
+.resort-map-readout {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 1000;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 2px 10px;
+    max-width: calc(100% - 60px);
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: var(--cardBg, rgba(30, 30, 30, 0.85));
+    color: var(--textSecondary, #a1a1a6);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.resort-map-readout strong {
+    color: var(--textPrimary, #f5f5f7);
+    font-weight: 700;
+}
+
+.resort-map-readout-3d {
+    top: 44px;
+}
+
 .resort-map-legend-rose text {
     fill: currentColor;
     font-size: 9px;
