@@ -150,14 +150,23 @@ export async function elevationWindow(z: number, x: number, y: number, border: n
         loaded.set(key, heights);
     }
 
+    // The window's columns in stretches that each lie within one terrain tile, so every row is copied a stretch at a time
+    const stretches: { from: number; tx: number; offset: number; length: number }[] = [];
+    for (let i = 0; i < size; ) {
+        const gx = wrapX(left + i);
+        const offset = gx % TERRAIN_TILE_SIZE;
+        const length = Math.min(TERRAIN_TILE_SIZE - offset, size - i);
+        stretches.push({ from: i, tx: Math.floor(gx / TERRAIN_TILE_SIZE), offset, length });
+        i += length;
+    }
+
     const heights = new Float32Array(size * size);
     for (let j = 0; j < size; j++) {
         const gy = clampY(top + j);
         const ty = Math.floor(gy / TERRAIN_TILE_SIZE);
         const row = (gy % TERRAIN_TILE_SIZE) * TERRAIN_TILE_SIZE;
-        for (let i = 0; i < size; i++) {
-            const gx = wrapX(left + i);
-            heights[j * size + i] = loaded.get(`${Math.floor(gx / TERRAIN_TILE_SIZE)}/${ty}`)![row + (gx % TERRAIN_TILE_SIZE)];
+        for (const { from, tx, offset, length } of stretches) {
+            heights.set(loaded.get(`${tx}/${ty}`)!.subarray(row + offset, row + offset + length), j * size + from);
         }
     }
 
