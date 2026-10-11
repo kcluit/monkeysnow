@@ -1,0 +1,10 @@
+[
+{"id":"w1500632963","kind":"downhill","difficulty":"intermediate","name":"Switchback","coords":[[40.81116,-74.06998],[40.81026,-74.07045]]},
+{"id":"w1500633538","kind":"snow_park","difficulty":"advanced","name":"Northern Lights Park","coords":[[40.81109,-74.06977],[40.8107,-74.06996],[40.81018,-74.07022],[40.80967,-74.07048]]},
+{"id":"w1500633675","kind":"downhill","difficulty":"easy","name":"The Perfect Slope","coords":[[40.81026,-74.07045],[40.81009,-74.07055],[40.80992,-74.07062],[40.80981,-74.07067]]},
+{"id":"w1500633972","kind":"downhill","difficulty":"easy","name":"Lil' Dipper","coords":[[40.81024,-74.07077],[40.80981,-74.07099]]},
+{"id":"w790235220","kind":"lift","liftType":"chair_lift","name":"The BIG Express Quad","coords":[[40.80974,-74.07056],[40.8098,-74.07053],[40.8103,-74.07028],[40.81091,-74.06996],[40.81106,-74.06988],[40.81113,-74.06985]]},
+{"id":"w790235221","kind":"lift","liftType":"drag_lift","name":"Poma Lift","coords":[[40.80965,-74.0704],[40.8111,-74.06966]]},
+{"id":"w790235222","kind":"lift","liftType":"magic_carpet","name":"Carpet 2","coords":[[40.80978,-74.07091],[40.81023,-74.07068]]},
+{"id":"w790235223","kind":"lift","liftType":"magic_carpet","name":"Carpet 1","coords":[[40.80982,-74.07105],[40.81027,-74.07083]]}
+]

@@ -1,0 +1,20 @@
+[
+{"id":"w1175760584","kind":"lift","liftType":"funicular","coords":[[45.75869,4.82146],[45.75866,4.82137]]},
+{"id":"w1475284013","kind":"lift","liftType":"funicular","name":"Funiculaire de Fourvière","coords":[[45.76123,4.82342],[45.76121,4.82347],[45.76118,4.82351],[45.76115,4.82355]]},
+{"id":"w172852177","kind":"lift","liftType":"funicular","name":"Funiculaire de Fourvière","coords":[[45.76012,4.82546],[45.76014,4.82535],[45.76018,4.82524],[45.76022,4.82513],[45.76025,4.82505]]},
+{"id":"w172852178","kind":"lift","liftType":"funicular","coords":[[45.75855,4.82103],[45.75833,4.82029],[45.75789,4.8188],[45.75728,4.81676],[45.7572,4.81648]]},
+{"id":"w172852180","kind":"lift","liftType":"funicular","name":"Funiculaire Saint-Just","coords":[[45.75972,4.82503],[45.75928,4.82356],[45.75927,4.82352],[45.75893,4.82232],[45.75874,4.82169]]},
+{"id":"w187064359","kind":"lift","liftType":"funicular","coords":[[45.75874,4.82169],[45.7587,4.82152],[45.75869,4.82146]]},
+{"id":"w187064361","kind":"lift","liftType":"funicular","coords":[[45.75855,4.82103],[45.75858,4.82118],[45.75861,4.82128]]},
+{"id":"w187481740","kind":"lift","liftType":"funicular","coords":[[45.75864,4.82138],[45.75866,4.82148]]},
+{"id":"w187481741","kind":"lift","liftType":"funicular","coords":[[45.75866,4.82137],[45.75864,4.82129]]},
+{"id":"w190031642","kind":"lift","liftType":"funicular","coords":[[45.75866,4.82148],[45.75868,4.82153],[45.75874,4.82169]]},
+{"id":"w190031647","kind":"lift","liftType":"funicular","coords":[[45.75861,4.82128],[45.75864,4.82138]]},
+{"id":"w190031654","kind":"lift","liftType":"funicular","coords":[[45.75864,4.82129],[45.7586,4.82117],[45.75855,4.82103]]},
+{"id":"w35538130","kind":"lift","liftType":"funicular","coords":[[45.75989,4.82562],[45.75985,4.82548]]},
+{"id":"w35538131","kind":"lift","liftType":"funicular","name":"Funiculaire Saint-Just","coords":[[45.75985,4.82548],[45.75972,4.82503]]},
+{"id":"w35538132","kind":"lift","liftType":"funicular","name":"Funiculaire de Fourvière","coords":[[45.76009,4.8256],[45.76012,4.82546]]},
+{"id":"w35538133","kind":"lift","liftType":"funicular","name":"Funiculaire de Fourvière","coords":[[45.76025,4.82505],[45.76115,4.82355],[45.76117,4.82351],[45.7612,4.82346],[45.76123,4.82342],[45.76238,4.82148]]},
+{"id":"w4990740","kind":"lift","liftType":"funicular","coords":[[45.75997,4.82589],[45.75989,4.82562]]},
+{"id":"w4990741","kind":"lift","liftType":"funicular","name":"Funiculaire de Fourvière","coords":[[45.76006,4.82577],[45.76009,4.8256]]}
+]

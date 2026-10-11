@@ -1,0 +1,6 @@
+[
+{"id":"w851794944","kind":"lift","liftType":"rope_tow","name":"Northbound Aurich","coords":[[53.52325,7.47688],[53.52315,7.47705]]},
+{"id":"w851794945","kind":"lift","liftType":"rope_tow","name":"Northbound Aurich","coords":[[53.52315,7.47705],[53.52388,7.47824],[53.52363,7.48011],[53.52299,7.48063],[53.52239,7.47996],[53.52252,7.4777],[53.52315,7.47705]]},
+{"id":"w857572275","kind":"lift","liftType":"rope_tow","name":"Northbound Aurich Anfängerbahn","coords":[[53.52214,7.47691],[53.5229,7.47585]]},
+{"id":"w857572276","kind":"lift","liftType":"rope_tow","name":"Northbound Aurich Anfängerbahn","coords":[[53.52231,7.47727],[53.52308,7.47627]]}
+]

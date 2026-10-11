@@ -1,0 +1,7 @@
+[
+{"id":"w25966721","kind":"lift","liftType":"cable_car","name":"Luftseilbahn Bristen-Waldiberg","coords":[[46.76952,8.69363],[46.7718,8.69206],[46.77419,8.69042],[46.77654,8.68881],[46.77686,8.68859]]},
+{"id":"w26138527","kind":"lift","liftType":"cable_car","name":"Luftseilbahn Intschi-Arnisee","coords":[[46.76068,8.6497],[46.7636,8.64719],[46.76418,8.6467],[46.7682,8.64325],[46.76899,8.64257],[46.76924,8.64236]]},
+{"id":"w283616910","kind":"lift","liftType":"cable_car","name":"Luftseilbahn Silenen-Chilcherberge","coords":[[46.79093,8.67371],[46.79116,8.67457],[46.79322,8.68179],[46.79377,8.68371],[46.79397,8.68443],[46.79402,8.6846]]},
+{"id":"w331459840","kind":"lift","liftType":"cable_car","name":"Luftseilbahn Steinmatt-Breitlaui","coords":[[46.76656,8.6989],[46.76512,8.69543],[46.76472,8.69445]]},
+{"id":"w37214957","kind":"lift","liftType":"cable_car","name":"Luftseilbahn Amsteg-Arnisee","coords":[[46.77491,8.66487],[46.77631,8.65897],[46.77671,8.65715],[46.77694,8.65616],[46.77794,8.65189],[46.77797,8.65176],[46.77805,8.65141]]}
+]

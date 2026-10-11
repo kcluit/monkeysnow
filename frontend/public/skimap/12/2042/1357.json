@@ -1,0 +1,8 @@
+[
+{"id":"w1448503586","kind":"downhill","difficulty":"easy","name":"The Snow Centre Main Slope","coords":[[51.74621,-0.45984],[51.74528,-0.45869]]},
+{"id":"w1448503682","kind":"downhill","difficulty":"easy","name":"The Snow Centre Learner Slope","coords":[[51.74596,-0.45894],[51.74546,-0.45833]]},
+{"id":"w1448504205","kind":"lift","liftType":"platter","name":"Main Slope Lift 1","coords":[[51.7452,-0.45886],[51.74614,-0.46]]},
+{"id":"w1448504206","kind":"lift","liftType":"platter","name":"Main Slope Lift 2","coords":[[51.74535,-0.45855],[51.74629,-0.45967]]},
+{"id":"w1448504503","kind":"lift","liftType":"magic_carpet","name":"Learner Slope Magic Carpet Lift 1","coords":[[51.74538,-0.4585],[51.74589,-0.45911]]},
+{"id":"w1448504504","kind":"lift","liftType":"magic_carpet","name":"Learner Slope Magic Carpet Lift 2","coords":[[51.74552,-0.45818],[51.74604,-0.45879]]}
+]

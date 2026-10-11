@@ -1,0 +1,11 @@
+[
+{"id":"w1473727698","kind":"downhill","difficulty":"novice","name":"Lower Snowflex","coords":[[53.21969,-6.18332],[53.21997,-6.18338]]},
+{"id":"w1473727699","kind":"downhill","difficulty":"intermediate","name":"Moguls","coords":[[53.21898,-6.18355],[53.21921,-6.18355]]},
+{"id":"w30928881","kind":"lift","liftType":"platter","name":"Main Lift","coords":[[53.22017,-6.18414],[53.21966,-6.18407],[53.21928,-6.18404],[53.21914,-6.18403],[53.21869,-6.18397]]},
+{"id":"w7870303","kind":"downhill","difficulty":"intermediate","name":"Main Slope","coords":[[53.21874,-6.18382],[53.22026,-6.18396]]},
+{"id":"w888992891","kind":"downhill","difficulty":"easy","name":"Middle Slope","coords":[[53.21905,-6.18361],[53.22025,-6.18365]]},
+{"id":"w888992892","kind":"downhill","difficulty":"novice","name":"Upper Snowflex","coords":[[53.2193,-6.18345],[53.21951,-6.18338],[53.21964,-6.18334]]},
+{"id":"w888992893","kind":"lift","liftType":"magic_carpet","name":"Upper Snowflex Travelator","coords":[[53.21964,-6.18309],[53.21932,-6.18327]]},
+{"id":"w888992894","kind":"lift","liftType":"magic_carpet","name":"Lower Snowflex Travelator","coords":[[53.21991,-6.18319],[53.21969,-6.18309]]},
+{"id":"w888992895","kind":"lift","liftType":"platter","name":"Middle Lift","coords":[[53.22026,-6.18379],[53.21974,-6.18375],[53.21935,-6.18373],[53.21906,-6.18371],[53.21873,-6.18369]]}
+]

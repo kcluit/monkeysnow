@@ -1,0 +1,6 @@
+[
+{"id":"w911791859","kind":"lift","liftType":"platter","name":"Neuer Skilift Mitteleschenbach","coords":[[49.20133,10.79638],[49.19908,10.79683]]},
+{"id":"w911791860","kind":"lift","liftType":"platter","name":"Alter Skilift Mitteleschenbach","coords":[[49.19847,10.79634],[49.19739,10.7944]]},
+{"id":"w911791861","kind":"downhill","name":"Neue Ski-Piste Mitteleschenbach","area":true,"coords":[[49.19907,10.79688],[49.1991,10.79745],[49.20156,10.79689],[49.20157,10.79644],[49.20135,10.79649],[49.20133,10.79638],[49.19907,10.79688]]},
+{"id":"w911791862","kind":"downhill","name":"Alte Ski-Piste Mitteleschenbach","area":true,"coords":[[49.19854,10.79648],[49.19735,10.79431],[49.19725,10.79441],[49.19856,10.79686],[49.19854,10.79648]]}
+]

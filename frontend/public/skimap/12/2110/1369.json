@@ -1,0 +1,11 @@
+[
+{"id":"w1219600327","kind":"lift","liftType":"magic_carpet","coords":[[51.12274,5.47098],[51.12262,5.47123]]},
+{"id":"w1219600328","kind":"lift","liftType":"magic_carpet","coords":[[51.12287,5.4711],[51.12275,5.47135]]},
+{"id":"w1219600329","kind":"downhill","difficulty":"novice","coords":[[51.12268,5.47129],[51.12281,5.47104]]},
+{"id":"w1219600330","kind":"snow_park","coords":[[51.1233,5.47075],[51.12291,5.4715]]},
+{"id":"w218074630","kind":"lift","liftType":"magic_carpet","coords":[[51.12278,5.47088],[51.12307,5.4703]]},
+{"id":"w218074631","kind":"lift","liftType":"magic_carpet","coords":[[51.12257,5.4706],[51.12418,5.46727]]},
+{"id":"w218074632","kind":"downhill","difficulty":"easy","name":"grote piste","coords":[[51.12422,5.46738],[51.12266,5.47069]]},
+{"id":"w218074633","kind":"lift","liftType":"magic_carpet","coords":[[51.12274,5.47081],[51.12433,5.46746]]},
+{"id":"w218074634","kind":"downhill","difficulty":"novice","coords":[[51.12314,5.47037],[51.12285,5.47095]]}
+]

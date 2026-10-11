@@ -1,0 +1,8 @@
+[
+{"id":"w260497241","kind":"lift","liftType":"drag_lift","coords":[[57.90514,15.21456],[57.90426,15.2103]]},
+{"id":"w260497540","kind":"lift","liftType":"drag_lift","coords":[[57.90482,15.21512],[57.90396,15.21185]]},
+{"id":"w895875306","kind":"downhill","difficulty":"easy","name":"Snowboardland","coords":[[57.90539,15.21109],[57.90577,15.21137],[57.90568,15.21238],[57.90522,15.21406]]},
+{"id":"w895875307","kind":"downhill","difficulty":"easy","name":"Slingan","coords":[[57.9047,15.21054],[57.90514,15.21106],[57.90514,15.21146],[57.90487,15.21222]]},
+{"id":"w895875308","kind":"downhill","difficulty":"intermediate","name":"Branten","coords":[[57.90418,15.2104],[57.90436,15.21194]]},
+{"id":"w895875309","kind":"downhill","difficulty":"easy","name":"Familjebacken","coords":[[57.90436,15.21194],[57.90496,15.21471]]}
+]

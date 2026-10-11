@@ -1,0 +1,5 @@
+[
+{"id":"w25275591","kind":"lift","liftType":"gondola","name":"Vellau - Leiteralm  -  Velloi - Malga Leiter, Vellau - Leiteralm, Velloi - Malga Leiter","coords":[[46.6956,11.10935],[46.69738,11.10916],[46.69836,11.10902],[46.69946,11.10891],[46.70042,11.10881],[46.70113,11.10874],[46.70174,11.10868],[46.70274,11.10857],[46.70422,11.10842],[46.7045,11.10839],[46.70471,11.10837]]},
+{"id":"w27166910","kind":"lift","liftType":"cable_car","name":"Hochmuth - Alta Muta, Hochmuth, Alta Muta","coords":[[46.69627,11.15201],[46.70237,11.13174]]},
+{"id":"w37805615","kind":"lift","liftType":"chair_lift","name":"Algund-Vellau - Lagundo-Velloi, Algund-Vellau, Lagundo-Velloi","coords":[[46.68654,11.11438],[46.68868,11.11306],[46.68949,11.11255],[46.68985,11.11233],[46.69288,11.11046],[46.69312,11.11031],[46.69451,11.10945],[46.69533,11.10894]]}
+]

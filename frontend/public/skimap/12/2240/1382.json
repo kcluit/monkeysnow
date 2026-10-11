@@ -1,0 +1,7 @@
+[
+{"id":"w1022918526","kind":"lift","liftType":"chair_lift","name":"Krzesło Doppelmayr","coords":[[50.34768,16.89713],[50.34728,16.89774],[50.34674,16.89855],[50.34602,16.89966],[50.34588,16.89986]]},
+{"id":"w1022918527","kind":"lift","liftType":"magic_carpet","name":"Kubus","coords":[[50.34729,16.89642],[50.34696,16.89681]]},
+{"id":"w1022918528","kind":"lift","liftType":"platter","name":"Bachleda","coords":[[50.34785,16.89788],[50.34614,16.90016]]},
+{"id":"w333396458","kind":"lift","liftType":"t-bar","name":"Orczyk Doppelmayr","coords":[[50.34722,16.89544],[50.34354,16.89972]]},
+{"id":"w333396631","kind":"lift","liftType":"platter","name":"Elster","coords":[[50.34758,16.89618],[50.34519,16.8991]]}
+]

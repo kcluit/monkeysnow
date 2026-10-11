@@ -1,0 +1,11 @@
+[
+{"id":"w1355950601","kind":"downhill","difficulty":"intermediate","coords":[[30.44701,119.64209],[30.44901,119.64237]]},
+{"id":"w1355950602","kind":"downhill","difficulty":"easy","coords":[[30.44693,119.64091],[30.44886,119.64196]]},
+{"id":"w1355950603","kind":"downhill","difficulty":"easy","coords":[[30.44734,119.64039],[30.44902,119.64161]]},
+{"id":"w1355950604","kind":"lift","liftType":"magic_carpet","coords":[[30.44896,119.64125],[30.44833,119.64082]]},
+{"id":"w1355950605","kind":"lift","liftType":"magic_carpet","coords":[[30.44831,119.64076],[30.44758,119.64028]]},
+{"id":"w1355950606","kind":"lift","liftType":"magic_carpet","coords":[[30.44872,119.64202],[30.44789,119.64161]]},
+{"id":"w1355950607","kind":"lift","liftType":"magic_carpet","coords":[[30.44898,119.64262],[30.44812,119.64249]]},
+{"id":"w1355950608","kind":"lift","liftType":"magic_carpet","coords":[[30.44807,119.6425],[30.44697,119.64235]]},
+{"id":"w1555189901","kind":"lift","liftType":"gondola","coords":[[30.44709,119.63467],[30.45579,119.62866]]}
+]
