@@ -31,7 +31,6 @@ import { useFPSCounter } from './hooks/useFPSCounter';
 import { useCommandPalette } from './hooks/useCommandPalette';
 import { useRainbowText } from './hooks/useRainbowText';
 import { useBoldText } from './hooks/useBoldText';
-import { useHideIcons } from './hooks/useHideIcons';
 import { useHideBorders } from './hooks/useHideBorders';
 import { useShowDate } from './hooks/useShowDate';
 import { useResortHierarchy, MAX_SELECTED_RESORTS } from './hooks/useResortHierarchy';
@@ -213,14 +212,13 @@ function SavedLocationRoute({
 function App(): JSX.Element {
     const navigate = useNavigate();
 
-    // Theme, font, bold text, fullscreen, FPS, rainbow, hide emoji, and language hooks
+    // Theme, font, bold text, fullscreen, FPS, rainbow, borders, date, and language hooks
     const { theme, setTheme, availableThemes, applyTheme, resetPreview } = useTheme();
     const { font, setFont, availableFonts, applyFont, resetPreview: resetFontPreview } = useFont();
     const { isBoldTextEnabled, setBoldTextEnabled } = useBoldText();
     const { isFullscreen, enterFullscreen, exitFullscreen } = useFullscreen();
     const { fps, isEnabled: isFPSEnabled, setEnabled: setFPSEnabled } = useFPSCounter();
     const { isRainbowEnabled, setRainbowEnabled } = useRainbowText();
-    const { isHideIconsEnabled, setHideIconsEnabled } = useHideIcons();
     const { isHideBordersEnabled, setHideBordersEnabled } = useHideBorders();
     const { isShowDateEnabled, setShowDateEnabled } = useShowDate();
     const { t, language, setLanguage, availableLanguages } = useLanguage();
@@ -325,7 +323,6 @@ function App(): JSX.Element {
         isBoldTextEnabled, setBoldTextEnabled,
         isFullscreen, enterFullscreen, exitFullscreen,
         isFPSEnabled, setFPSEnabled,
-        isHideIconsEnabled, setHideIconsEnabled,
         isHideBordersEnabled, setHideBordersEnabled,
         isShowDateEnabled, setShowDateEnabled,
         chartZoomSyncEnabled, setChartZoomSyncEnabled,
@@ -446,25 +443,6 @@ function App(): JSX.Element {
                         name: 'Off',
                         icon: !isFPSEnabled ? icons.check : undefined,
                         action: () => setFPSEnabled(false),
-                    },
-                ],
-            },
-            {
-                id: 'hide-icons',
-                name: 'Hide icons',
-                icon: icons.hideIcons,
-                subCommands: [
-                    {
-                        id: 'hide-icons-on',
-                        name: 'On',
-                        icon: isHideIconsEnabled ? icons.check : undefined,
-                        action: () => setHideIconsEnabled(true),
-                    },
-                    {
-                        id: 'hide-icons-off',
-                        name: 'Off',
-                        icon: !isHideIconsEnabled ? icons.check : undefined,
-                        action: () => setHideIconsEnabled(false),
                     },
                 ],
             },
@@ -935,8 +913,6 @@ function App(): JSX.Element {
         setRainbowEnabled,
         isBoldTextEnabled,
         setBoldTextEnabled,
-        isHideIconsEnabled,
-        setHideIconsEnabled,
         isHideBordersEnabled,
         setHideBordersEnabled,
         isShowDateEnabled,
@@ -992,10 +968,10 @@ function App(): JSX.Element {
             </a>
 
             {/* Command Palette */}
-            <CommandPalette palette={commandPalette} hideIcons={isHideIconsEnabled} />
+            <CommandPalette palette={commandPalette} />
 
             {/* Resort Selection Grid Modal */}
-            <ResortSelectionGridModal hierarchy={resortHierarchy} hideIcons={isHideIconsEnabled} />
+            <ResortSelectionGridModal hierarchy={resortHierarchy} />
 
             {/* Main page models */}
             <CardModelsModal isOpen={isCardModelsOpen} onClose={closeCardModels} selectedResorts={selectedResorts} />

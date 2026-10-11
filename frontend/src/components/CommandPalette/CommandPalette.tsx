@@ -5,10 +5,9 @@ import type { UseCommandPaletteReturn } from '../../types';
 
 interface CommandPaletteProps {
   palette: UseCommandPaletteReturn;
-  hideIcons?: boolean;
 }
 
-export function CommandPalette({ palette, hideIcons }: CommandPaletteProps): JSX.Element | null {
+export function CommandPalette({ palette }: CommandPaletteProps): JSX.Element | null {
   const {
     isOpen,
     searchQuery,
@@ -49,7 +48,6 @@ export function CommandPalette({ palette, hideIcons }: CommandPaletteProps): JSX
           selectedIndex={selectedIndex}
           onSelect={selectAtIndex}
           onHover={setSelectedIndex}
-          hideIcons={hideIcons}
         />
         <div className="command-palette-footer">
           <span className="command-hint">

@@ -47,7 +47,6 @@ export const en: Translations = {
     'command.boldText': 'Bold text',
     'command.fullscreen': 'Fullscreen',
     'command.fpsCounter': 'FPS counter',
-    'command.hideIcons': 'Hide icons',
     'command.showBorders': 'Show borders',
     'command.showDate': 'Show date',
     'command.elevation': 'Elevation',

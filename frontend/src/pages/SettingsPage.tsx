@@ -37,8 +37,6 @@ export interface SettingsPageProps {
     setRainbowEnabled: (enabled: boolean) => void;
     isBoldTextEnabled: boolean;
     setBoldTextEnabled: (enabled: boolean) => void;
-    isHideIconsEnabled: boolean;
-    setHideIconsEnabled: (enabled: boolean) => void;
     isHideBordersEnabled: boolean;
     setHideBordersEnabled: (enabled: boolean) => void;
     isShowDateEnabled: boolean;
@@ -228,7 +226,6 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
         availableFonts, setFont, currentFontId, applyFont, resetFontPreview,
         isRainbowEnabled, setRainbowEnabled,
         isBoldTextEnabled, setBoldTextEnabled,
-        isHideIconsEnabled, setHideIconsEnabled,
         isHideBordersEnabled, setHideBordersEnabled,
         isShowDateEnabled, setShowDateEnabled,
         isFullscreen, enterFullscreen, exitFullscreen,
@@ -328,12 +325,6 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                             isEnabled={isBoldTextEnabled}
                             onToggle={setBoldTextEnabled}
                             icon={icons.bold}
-                        />
-                        <Toggle
-                            label="Hide icons"
-                            isEnabled={isHideIconsEnabled}
-                            onToggle={setHideIconsEnabled}
-                            icon={icons.hideIcons}
                         />
                         <Toggle
                             label="Show borders"
