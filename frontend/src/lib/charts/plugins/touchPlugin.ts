@@ -5,14 +5,18 @@
  * - Pinch zoom: Two-finger pinch to zoom in/out centered on focal point
  * - Pan: Single-finger drag to pan horizontally
  * - Scroll: A mostly vertical single-finger swipe is left to the browser, so the page scrolls
- * - Tap: Single tap to show tooltip, tap elsewhere to hide
+ * - Tap: Single tap to show tooltip, tap elsewhere or scroll to hide
  *
- * Works alongside mouse-based zoomPlugin for hybrid desktop/mobile support.
+ * Works alongside mouse-based zoomPlugin for hybrid desktop/mobile support. A chart that can't
+ * zoom (a Locked chart or a heatmap) still takes its taps here, leaving pinches and drags to the
+ * browser: a phone's emulated mouse would focus the line nearest a tap and keep it focused.
  */
 
 import type uPlot from 'uplot';
 
 export interface TouchPluginOptions {
+    /** Whether a pinch zooms and a sideways drag pans; true by default */
+    canZoom?: boolean;
     /** Callback when zoom/pan changes */
     onZoom?: (min: number, max: number) => void;
 }
@@ -40,7 +44,7 @@ function onDocumentTouchStart(e: TouchEvent): void {
 }
 
 export function createTouchPlugin(options: TouchPluginOptions = {}): uPlot.Plugin {
-    const { onZoom } = options;
+    const { canZoom = true, onZoom } = options;
 
     return {
         hooks: {
@@ -131,7 +135,7 @@ export function createTouchPlugin(options: TouchPluginOptions = {}): uPlot.Plugi
                         panStartX = touch.clientX;
                         panStartXMin = u.scales.x.min!;
                         panStartXMax = u.scales.x.max!;
-                    } else if (touchCount === 2) {
+                    } else if (touchCount === 2 && canZoom) {
                         gestureType = 'pinch';
                         hasMoved = false;
                         const touches = Array.from(activeTouches.values());
@@ -170,9 +174,11 @@ export function createTouchPlugin(options: TouchPluginOptions = {}): uPlot.Plugi
 
                         if (!hasMoved && dist > TAP_THRESHOLD_PX) {
                             hasMoved = true;
-                            // Mostly vertical (or already scrolling): leave it to the browser (touch-action: pan-y) to scroll the page
-                            if (gestureType === 'tap' && (Math.abs(dy) > Math.abs(dx) || !e.cancelable)) {
+                            // Mostly vertical (or already scrolling, or nothing to pan): leave it to the browser to scroll the page
+                            if (gestureType === 'tap' && (!canZoom || Math.abs(dy) > Math.abs(dx) || !e.cancelable)) {
                                 gestureType = 'scroll';
+                                // As a swipe that starts outside the chart would, scrolling hides its tapped tooltip
+                                if (activeTooltipChart === u) hideActiveTooltip();
                                 return;
                             }
                             gestureType = 'pan';
@@ -310,7 +316,7 @@ export function createTouchPlugin(options: TouchPluginOptions = {}): uPlot.Plugi
                 resizeObserver.observe(over);
 
                 // The browser keeps vertical scrolling only; pinches and horizontal drags are handled here
-                over.style.touchAction = 'pan-y';
+                if (canZoom) over.style.touchAction = 'pan-y';
 
                 over.addEventListener('touchstart', onTouchStart, { passive: false });
                 over.addEventListener('touchmove', onTouchMove, { passive: false });
