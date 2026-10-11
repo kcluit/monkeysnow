@@ -176,6 +176,22 @@ function OptionButton({ label, isSelected, onClick, icon, onHover, onHoverEnd }:
     );
 }
 
+interface ActionButtonProps {
+    label: string;
+    icon: typeof icons[keyof typeof icons];
+    onClick: () => void;
+}
+
+// Opens a picker, where an OptionButton sets a value
+function ActionButton({ label, icon, onClick }: ActionButtonProps): JSX.Element {
+    return (
+        <button onClick={onClick} className="settings-action-btn">
+            <Icon icon={icon} />
+            <span>{label}</span>
+        </button>
+    );
+}
+
 interface ThemePickerProps {
     themes: Theme[];
     currentThemeId: string;
@@ -355,13 +371,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
 
                 <SettingGroup id="settings-main-page">
                     <SettingSection title="Resorts" icon={icons.resort}>
-                        <button
-                            onClick={openResortSelector}
-                            className="settings-action-btn"
-                        >
-                            <Icon icon={icons.resort} />
-                            <span>Select resorts</span>
-                        </button>
+                        <ActionButton label="Select resorts" icon={icons.resort} onClick={openResortSelector} />
                         <div className="settings-subsection">
                             <span className="settings-subsection-label">Resort display limit</span>
                             <div className="settings-options-grid">
@@ -420,7 +430,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                         <div className="settings-subsection">
                             <span className="settings-subsection-label">Main page models</span>
                             <div className="settings-options-row">
-                                <OptionButton label="Choose…" icon={icons.weatherModel} isSelected={false} onClick={openCardModels} />
+                                <ActionButton label="Choose…" icon={icons.weatherModel} onClick={openCardModels} />
                                 <span className="self-center text-sm text-theme-textSecondary">{cardModelsSummary}</span>
                             </div>
                         </div>
@@ -479,7 +489,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                         <div className="settings-subsection">
                             <span className="settings-subsection-label">Model styles</span>
                             <div className="settings-options-row">
-                                <OptionButton label="Edit…" icon={icons.chart} isSelected={false} onClick={openModelStyles} />
+                                <ActionButton label="Edit…" icon={icons.chart} onClick={openModelStyles} />
                                 <span className="self-center text-sm text-theme-textSecondary">Colours, bold and opacity of each model's chart lines</span>
                             </div>
                         </div>

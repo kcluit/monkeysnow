@@ -57,7 +57,7 @@ function NoChartsNotice({ message, actionLabel, onAction }: {
             <div className="text-theme-textSecondary text-lg">{message}</div>
             <button
                 onClick={onAction}
-                className="mt-4 px-4 py-2 rounded-lg bg-theme-accent text-white hover:opacity-90 transition-opacity"
+                className="mt-4 px-4 py-2 rounded-lg bg-theme-accent text-theme-background hover:opacity-90 transition-opacity"
             >
                 {actionLabel}
             </button>
