@@ -10,9 +10,9 @@ Ski resort weather forecasts with snow-quality estimates, fetched from Open-Mete
 The page that shows the **Selection** as cards, one per **Resort** or **Saved location**, each forecast by its **Card model**.
 _Avoid_: home page, dashboard, overview
 
-**Detail view**:
+**Detailed view**:
 The page for one **Resort**, **Saved location** or **Custom location**, with its **Charts** of the **Comparison models** and its map.
-_Avoid_: resort page (it shows Saved and Custom locations too), forecast page, details page
+_Avoid_: detail view, resort page (it shows Saved and Custom locations too), forecast page, details page
 
 ### Resorts
 
@@ -51,7 +51,7 @@ _Avoid_: custom resort, favourite, pin
 ### Selection and limits
 
 **Selection**:
-The set of **Resorts** and **Saved locations** a visitor has chosen to see on the main page.
+The set of **Resorts** and **Saved locations** a visitor has chosen to see on the **Main page**.
 _Avoid_: favourites, watchlist, **Selected models** (those are **Forecast models**)
 
 **Starter resort**:
@@ -67,7 +67,7 @@ How many members of the **Selection** are rendered as cards; it never affects wh
 _Avoid_: resort limit
 
 **Fetch budget**:
-How many Open-Meteo calls one browser tab allows itself per minute, shared by the main page and the detail view.
+How many Open-Meteo calls one browser tab allows itself per minute, shared by the **Main page** and the **Detailed view**.
 _Avoid_: **Rate limit** (that is Open-Meteo's cap, not ours), throttle
 
 **Rate limit**:
@@ -85,7 +85,7 @@ _Avoid_: pending resort, loading resort
 ### Forecasts
 
 **Period**:
-One of the three parts a forecast day is split into on the main page, in the local time of the point being forecast: AM (midnight to noon), PM (noon to 6 pm) and Night (6 pm to midnight). The small hours before dawn belong to AM, not to the previous day's Night.
+One of the three parts a forecast day is split into on the **Main page**, in the local time of the point being forecast: AM (midnight to noon), PM (noon to 6 pm) and Night (6 pm to midnight). The small hours before dawn belong to AM, not to the previous day's Night.
 _Avoid_: chunk, time slot, time of day
 
 **Snow quality**:
@@ -123,7 +123,7 @@ A **Forecast model** whose numbers at the point being forecast are identical to 
 _Avoid_: duplicate
 
 **Card model**:
-The single **Forecast model** behind a card on the main page. It is the visitor's **Country model** for the **Resort**'s country (for a **Saved location**, the country of the **Resort** nearest to it) wherever that model covers the point and has data there, and otherwise the **Recommended card model**. Visitors change them under "Main page models".
+The single **Forecast model** behind a card on the **Main page**. It is the visitor's **Country model** for the **Resort**'s country (for a **Saved location**, the country of the **Resort** nearest to it) wherever that model covers the point and has data there, and otherwise the **Recommended card model**. Visitors change them under "Main page models".
 _Avoid_: default model, primary model
 
 **Recommended card model**:
@@ -135,11 +135,11 @@ A **Forecast model** a visitor has chosen for the cards of every **Resort** in o
 _Avoid_: model override, country setting
 
 **Forecast horizon**:
-How many days ahead a forecast is asked for: fourteen on the main page, and whatever the visitor picks in the detail view. A card shows fewer days when its **Card model**'s **Range** ends sooner.
+How many days ahead a forecast is asked for: fourteen on the **Main page**, and whatever the visitor picks in the **Detailed view**. A card shows fewer days when its **Card model**'s **Range** ends sooner.
 _Avoid_: forecast days, forecast length
 
 **Selected models**:
-The **Forecast models** a visitor has ticked for the detail view, one list for every **Resort**. Every visitor starts with the **Recommended models**.
+The **Forecast models** a visitor has ticked for the **Detailed view**, one list for every **Resort**. Every visitor starts with the **Recommended models**.
 _Avoid_: preferred models, default models, **Selection** (that is **Resorts**)
 
 **Recommended models**:
@@ -147,7 +147,7 @@ The **Selected models** a visitor starts with: two global **Forecast models** fr
 _Avoid_: default models, defaults
 
 **Comparison models**:
-The **Selected models** whose **Coverage** includes the point being forecast (a **Resort**, a **Saved location** or a **Custom location**), minus **Clones**. These are the models drawn side by side in the detail view.
+The **Selected models** whose **Coverage** includes the point being forecast (a **Resort**, a **Saved location** or a **Custom location**), minus **Clones**. These are the models drawn side by side in the **Detailed view**.
 _Avoid_: **Selected models** (those include ones not drawn here), model selection
 
 **Aggregation**:
@@ -155,7 +155,7 @@ A line computed hour by hour across the **Comparison models**: median, mean, min
 _Avoid_: ensemble, consensus
 
 **Selected Aggregations**:
-The **Aggregations** a visitor has ticked for the detail view, one list for every **Resort**. Every visitor starts with none.
+The **Aggregations** a visitor has ticked for the **Detailed view**, one list for every **Resort**. Every visitor starts with none.
 _Avoid_: picked, ticked or chosen Aggregations
 
 **Spread fill**:
@@ -171,11 +171,11 @@ How a visitor has chosen to draw the line of one **Forecast model** or **Aggrega
 _Avoid_: line style, model settings, model appearance
 
 **Chart**:
-One weather variable, such as snowfall or wind, drawn across the **Comparison models** in the detail view. A visitor picks which Charts show and in what order, one list for every **Resort** and location.
+One weather variable, such as snowfall or wind, drawn across the **Comparison models** in the **Detailed view**. A visitor picks which Charts show and in what order, one list for every **Resort** and location.
 _Avoid_: graph, plot
 
 **Focused line**:
-The line a visitor is pointing at, in a detail-view chart or its legend, drawn at full strength while every other line fades. A **Comparison model**'s hourly and **Accumulation** lines are focused together.
+The line a visitor is pointing at, in a **Detailed view** chart or its legend, drawn at full strength while every other line fades. A **Comparison model**'s hourly and **Accumulation** lines are focused together.
 _Avoid_: highlighted series, selected line
 
 **Held line**:
