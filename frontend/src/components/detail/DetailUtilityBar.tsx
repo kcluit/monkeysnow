@@ -234,7 +234,7 @@ function LargeDetailUtilityBar({
                                             <div className="flex gap-1 mt-2">
                                                 <button
                                                     onClick={handleCustomElevationSubmit}
-                                                    className="flex-1 px-2 py-1 text-xs rounded bg-theme-accent text-white hover:opacity-90"
+                                                    className="flex-1 px-2 py-1 text-xs rounded bg-theme-accent text-theme-background hover:opacity-90"
                                                 >
                                                     Apply
                                                 </button>
