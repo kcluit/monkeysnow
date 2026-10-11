@@ -13,6 +13,7 @@ import { ModelSelectionGridModal } from '../ModelSelectionModal';
 import { ResortMap } from '../map/ResortMap';
 import { suggestedName, updateSavedLocation, type SavedLocationInput } from '../../utils/savedLocations';
 import { MAX_SELECTED_RESORTS } from '../../hooks/useResortHierarchy';
+import { RESORT_LOCATIONS } from '../../data/resortLocations';
 import { DEFAULT_VARIABLES } from '../../utils/chartConfigurations';
 import { coversPoint, inCatalogueOrder, isKnownModel } from '../../data/modelHierarchy';
 import { resolveComparisonModels } from '../../utils/comparisonModels';
@@ -59,7 +60,7 @@ function NoChartsNotice({ message, actionLabel, onAction }: {
 }
 
 export function DetailedResortView({
-    resortId: _resortId,
+    resortId,
     resortName,
     location,
     savedLocation,
@@ -276,6 +277,8 @@ export function DetailedResortView({
                     onMapClick={handleMapClick}
                     customLocation={customLocation}
                     customElevationText={customLocationElevationText}
+                    country={savedLocation?.country ?? RESORT_LOCATIONS.get(resortId)?.country}
+                    unitSystem={unitSystem}
                 />
             </div>
 

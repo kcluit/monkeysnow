@@ -48,6 +48,12 @@ npm run build
 - `utils/starterResort.ts` picks the Starter resort: the resort page landed on, else the nearest to the visitor, else random
 - The visitor's location comes from `frontend/netlify/edge-functions/geo.ts` at `/api/geo`, the only server-side code; under plain `vite` it is absent, so dev always falls back to random
 
+### The map (see docs/adr/0007-map-layers-from-keyless-openly-licensed-sources.md)
+- `components/map/ResortMap.tsx` - the detail view's Leaflet map; its layers button opens `MapLayersPanel`. The visitor's Base map and Overlays (`utils/mapLayers.ts`) are one localStorage choice for every map
+- `SatelliteBaseMap.tsx` - EOX Sentinel-2 everywhere, with national aerial photos (swisstopo, IGN, basemap.at, USGS, GSI) over it inside rectangles around their countries
+- `TerrainOverlay.tsx` - contours, hillshade and slope angle, drawn on canvas tiles from AWS Terrain Tiles (`utils/terrainTiles.ts`, `utils/terrainRendering.ts`)
+- `SkiMapOverlay.tsx` - Runs and Lifts from the Overpass API by zoom-12 square, cached a week in IndexedDB (`utils/skiMapData.ts`), coloured by `utils/difficultyColours.ts`; it also works out what a Custom location is on
+
 ### Frontend Data Flow
 1. `useWeatherData(selectedResorts)` loads forecasts into `AllWeatherData` and reports queued resorts
 2. `processResortData()` in `utils/weather.ts` transforms them into `ProcessedResortData` for display
