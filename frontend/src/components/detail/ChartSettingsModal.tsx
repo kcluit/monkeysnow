@@ -3,8 +3,8 @@
  *
  * Command-palette-style modal behind each chart's gear, with two tabs: this chart's own
  * settings (chart type and variable-specific options), and the Model styles tab, which
- * applies to every chart and widens the modal to the model picker's size. Mounted only
- * while open; closing it, however it's closed, saves both tabs.
+ * applies to every chart and widens the modal a little on desktop. Mounted only while
+ * open; closing it, however it's closed, saves both tabs.
  */
 
 import { useState } from 'react';

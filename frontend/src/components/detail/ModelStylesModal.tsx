@@ -1,7 +1,7 @@
 /**
- * The Model styles tab on its own, at the model picker's size, for where there is no
- * chart to open a gear modal on: the Settings page, and the command palette away from
- * the detail view. Mounted only while open.
+ * The Model styles tab on its own, at that tab's size, for where there is no chart to open
+ * a gear modal on: the Settings page, and the command palette away from the detail view.
+ * Mounted only while open.
  */
 
 import { useState } from 'react';

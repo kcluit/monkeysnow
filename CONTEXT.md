@@ -144,6 +144,14 @@ _Avoid_: **Selected models** (those include ones not drawn here), model selectio
 A line computed hour by hour across the **Comparison models**: median, mean, min, max, or the 25th or 75th percentile. An Aggregation of an **Accumulation** is taken across the models' running totals, never the running total of the hourly Aggregation, and only at hours where every Comparison model has one.
 _Avoid_: ensemble, consensus
 
+**Selected Aggregations**:
+The **Aggregations** a visitor has ticked for the detail view, one list for every **Resort**. Every visitor starts with none.
+_Avoid_: picked, ticked or chosen Aggregations
+
+**Spread fill**:
+The shading between two **Aggregations**' lines that shows how far the **Comparison models** disagree: Min to Max, or 25th to 75th percentile.
+_Avoid_: band fill (a band is an **Elevation band**), range fill (**Range** is how far ahead a model forecasts), envelope
+
 **Accumulation**:
 One **Comparison model**'s running total of an hourly amount, such as snowfall or precipitation, from the first hour the chart shows.
 _Avoid_: cumulative, total, sum
