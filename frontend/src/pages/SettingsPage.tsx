@@ -3,10 +3,24 @@ import { Icon } from '../components/Icon';
 import { icons } from '../constants/icons';
 import { isFullscreenSupported } from '../hooks/useFullscreen';
 import { useCardModelsSummary } from '../components/CardModelsModal';
+import { useDetailedViewModelsSummary } from '../hooks/useSelectedModels';
+import { useShownCharts } from '../hooks/useDetailedViewSettings';
 import type { Theme } from '../types/themes';
 import type { Font } from '../types/fonts';
 import type { Language } from '../types/i18n';
+import type { ElevationSelection } from '../types/detailView';
 import type { MapRotation, MapTilt } from '../utils/mapRotation';
+import {
+    BASE_MAPS,
+    OVERLAYS,
+    TERRAIN_COLOURINGS,
+    terrainColouring,
+    withOverlay,
+    withTerrainColouring,
+    type MapLayers,
+} from '../utils/mapLayers';
+import { FORECAST_HORIZONS } from '../utils/constants';
+import { elevationFromUnits, elevationInUnits, formatElevation, maxTypedElevation } from '../utils/unitConversion';
 import type {
     ElevationLevel,
     SortOption,
@@ -60,6 +74,18 @@ export interface SettingsPageProps {
     cursorReadoutShown: boolean;
     setCursorReadoutShown: (shown: boolean) => void;
     openSlopeBands: () => void;
+    // Detailed view
+    openDetailedViewModels: () => void;
+    openChartsPicker: () => void;
+    detailElevation: ElevationSelection;
+    setDetailElevation: (selection: ElevationSelection) => void;
+    forecastHorizon: number;
+    setForecastHorizon: (days: number) => void;
+    isChartLocked: boolean;
+    setIsChartLocked: (locked: boolean) => void;
+    // Map layers
+    mapLayers: MapLayers;
+    setMapLayers: (layers: MapLayers) => void;
     // Weather display
     selectedElevation: ElevationLevel;
     setSelectedElevation: (e: ElevationLevel) => void;
@@ -263,9 +289,11 @@ interface ToggleProps {
     isEnabled: boolean;
     onToggle: (enabled: boolean) => void;
     icon?: typeof icons[keyof typeof icons];
+    /** A few words after the label on what it does, e.g. "no zooming or range slider" */
+    hint?: string;
 }
 
-function Toggle({ label, isEnabled, onToggle, icon }: ToggleProps): JSX.Element {
+function Toggle({ label, isEnabled, onToggle, icon, hint }: ToggleProps): JSX.Element {
     return (
         <button
             onClick={() => onToggle(!isEnabled)}
@@ -274,11 +302,87 @@ function Toggle({ label, isEnabled, onToggle, icon }: ToggleProps): JSX.Element 
             <div className="settings-toggle-label">
                 {icon && <Icon icon={icon} className="settings-toggle-icon" />}
                 <span>{label}</span>
+                {hint && <span className="settings-toggle-hint">{hint}</span>}
             </div>
             <div className={`settings-toggle-switch ${isEnabled ? 'on' : ''}`}>
                 <div className="settings-toggle-knob" />
             </div>
         </button>
+    );
+}
+
+interface DetailElevationPickerProps {
+    selection: ElevationSelection;
+    setSelection: (selection: ElevationSelection) => void;
+    unitSystem: UnitSystem;
+}
+
+const ELEVATION_BANDS: { value: ElevationSelection; label: string }[] = [
+    { value: 'base', label: 'Base' },
+    { value: 'mid', label: 'Mid' },
+    { value: 'top', label: 'Top' },
+];
+
+// The Detailed view's Elevation: an Elevation band, or a Custom elevation typed in the visitor's units
+function DetailElevationPicker({ selection, setSelection, unitSystem }: DetailElevationPickerProps): JSX.Element {
+    const [isTyping, setIsTyping] = useState(false);
+    const [typed, setTyped] = useState('');
+    const customElevation = typeof selection === 'number' ? selection : null;
+    const unit = unitSystem === 'imperial' ? 'ft' : 'm';
+
+    const startTyping = () => {
+        setTyped(customElevation === null ? '' : String(elevationInUnits(customElevation, unitSystem)));
+        setIsTyping(true);
+    };
+    const apply = () => {
+        const value = parseInt(typed, 10);
+        if (!isNaN(value) && value >= 0 && value <= maxTypedElevation(unitSystem)) {
+            setSelection(elevationFromUnits(value, unitSystem));
+            setIsTyping(false);
+        }
+    };
+
+    return (
+        <>
+            <div className="settings-options-row">
+                {ELEVATION_BANDS.map(band => (
+                    <OptionButton
+                        key={String(band.value)}
+                        label={band.label}
+                        isSelected={selection === band.value}
+                        onClick={() => { setSelection(band.value); setIsTyping(false); }}
+                    />
+                ))}
+                <OptionButton
+                    label={customElevation === null ? 'Custom…' : `Custom: ${formatElevation(customElevation, unitSystem)}`}
+                    isSelected={customElevation !== null}
+                    onClick={startTyping}
+                />
+            </div>
+            {isTyping && (
+                <div className="settings-options-row">
+                    <input
+                        type="number"
+                        className="settings-search settings-elevation-input"
+                        value={typed}
+                        onChange={(e) => setTyped(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') apply();
+                            else if (e.key === 'Escape') setIsTyping(false);
+                        }}
+                        min="0"
+                        max={maxTypedElevation(unitSystem)}
+                        placeholder="Elevation"
+                        aria-label={`Custom elevation in ${unitSystem === 'imperial' ? 'feet' : 'metres'}`}
+                        autoFocus
+                    />
+                    <span className="self-center text-sm text-theme-textSecondary">{unit}</span>
+                    <OptionButton label="Apply" isSelected={false} onClick={apply} />
+                    <OptionButton label="Cancel" isSelected={false} onClick={() => setIsTyping(false)} />
+                </div>
+            )}
+            <span className="text-sm text-theme-textSecondary">Saved locations are always forecast at their own height</span>
+        </>
     );
 }
 
@@ -297,6 +401,11 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
         mapTilt, setMapTilt,
         cursorReadoutShown, setCursorReadoutShown,
         openSlopeBands,
+        openDetailedViewModels, openChartsPicker,
+        detailElevation, setDetailElevation,
+        forecastHorizon, setForecastHorizon,
+        isChartLocked, setIsChartLocked,
+        mapLayers, setMapLayers,
         selectedElevation, setSelectedElevation,
         selectedSort, setSelectedSort,
         selectedSortDay, setSelectedSortDay, sortDayData,
@@ -314,6 +423,9 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
         openResortSelector,
     } = props;
     const cardModelsSummary = useCardModelsSummary();
+    const detailedViewModelsSummary = useDetailedViewModelsSummary();
+    const [shownCharts] = useShownCharts();
+    const colouring = terrainColouring(mapLayers);
 
     return (
         <div className="settings-page">
@@ -413,7 +525,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                             <div className="settings-options-row">
                                 <OptionButton label="Base" isSelected={selectedElevation === 'bot'} onClick={() => setSelectedElevation('bot')} />
                                 <OptionButton label="Mid" isSelected={selectedElevation === 'mid'} onClick={() => setSelectedElevation('mid')} />
-                                <OptionButton label="Peak" isSelected={selectedElevation === 'top'} onClick={() => setSelectedElevation('top')} />
+                                <OptionButton label="Top" isSelected={selectedElevation === 'top'} onClick={() => setSelectedElevation('top')} />
                             </div>
                         </div>
                         <div className="settings-subsection">
@@ -490,7 +602,43 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                 </SettingGroup>
 
                 <SettingGroup id="settings-detailed-view">
+                    <SettingSection title="Forecast" icon={icons.weatherModel}>
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">Detailed view models</span>
+                            <div className="settings-options-row">
+                                <ActionButton label="Choose…" icon={icons.weatherModel} onClick={openDetailedViewModels} />
+                                <span className="self-center text-sm text-theme-textSecondary">{detailedViewModelsSummary}</span>
+                            </div>
+                        </div>
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">Elevation</span>
+                            <DetailElevationPicker selection={detailElevation} setSelection={setDetailElevation} unitSystem={unitSystem} />
+                        </div>
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">Forecast horizon</span>
+                            <div className="settings-options-row">
+                                {FORECAST_HORIZONS.map(days => (
+                                    <OptionButton
+                                        key={days}
+                                        label={days === 1 ? '1 day' : `${days} days`}
+                                        isSelected={forecastHorizon === days}
+                                        onClick={() => setForecastHorizon(days)}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    </SettingSection>
+
                     <SettingSection title="Charts" icon={icons.lineChart}>
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">Charts shown</span>
+                            <div className="settings-options-row">
+                                <ActionButton label="Choose…" icon={icons.lineChart} onClick={openChartsPicker} />
+                                <span className="self-center text-sm text-theme-textSecondary">
+                                    {shownCharts.length === 1 ? '1 chart' : `${shownCharts.length} charts`}
+                                </span>
+                            </div>
+                        </div>
                         <div className="settings-subsection">
                             <span className="settings-subsection-label">Model styles</span>
                             <div className="settings-options-row">
@@ -505,10 +653,65 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                                 onToggle={setChartZoomSyncEnabled}
                                 icon={icons.link}
                             />
+                            <Toggle
+                                label="Lock charts"
+                                hint="no zooming or range slider"
+                                isEnabled={isChartLocked}
+                                onToggle={setIsChartLocked}
+                                icon={icons.lock}
+                            />
                         </div>
                     </SettingSection>
 
                     <SettingSection title="Map" icon={icons.mountain}>
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">Base map</span>
+                            <div className="settings-options-row">
+                                {BASE_MAPS.map(base => (
+                                    <OptionButton
+                                        key={base.id}
+                                        label={base.label}
+                                        isSelected={mapLayers.baseMap === base.id}
+                                        onClick={() => setMapLayers({ ...mapLayers, baseMap: base.id })}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">Overlays</span>
+                            <div className="settings-toggles">
+                                {OVERLAYS.map(overlay => (
+                                    <Toggle
+                                        key={overlay.id}
+                                        label={overlay.label}
+                                        // The 3D map always shades its terrain
+                                        hint={overlay.id === 'hillshade' ? 'always on in 3D' : undefined}
+                                        isEnabled={mapLayers.overlays.includes(overlay.id)}
+                                        onToggle={(on) => setMapLayers(withOverlay(mapLayers, overlay.id, on))}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">Colour terrain by</span>
+                            <div className="settings-options-row">
+                                {[{ id: null, label: 'None' }, ...TERRAIN_COLOURINGS].map(option => (
+                                    <OptionButton
+                                        key={option.id ?? 'none'}
+                                        label={option.label}
+                                        isSelected={colouring === option.id}
+                                        onClick={() => setMapLayers(withTerrainColouring(mapLayers, option.id))}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">Slope bands</span>
+                            <div className="settings-options-row">
+                                <ActionButton label="Edit…" icon={icons.slopeBands} onClick={openSlopeBands} />
+                                <span className="self-center text-sm text-theme-textSecondary">The ranges of steepness the Slope angle colouring paints, and their colours</span>
+                            </div>
+                        </div>
                         <div className="settings-subsection">
                             <span className="settings-subsection-label">3D map rotation</span>
                             <div className="settings-options-row">
@@ -525,13 +728,6 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                                 <OptionButton label="Drag down" isSelected={mapTilt === 'dragDown'} onClick={() => setMapTilt('dragDown')} />
                             </div>
                             <span className="text-sm text-theme-textSecondary">{MAP_TILT_DESCRIPTIONS[mapTilt]}</span>
-                        </div>
-                        <div className="settings-subsection">
-                            <span className="settings-subsection-label">Slope bands</span>
-                            <div className="settings-options-row">
-                                <ActionButton label="Edit…" icon={icons.slopeBands} onClick={openSlopeBands} />
-                                <span className="self-center text-sm text-theme-textSecondary">The ranges of steepness the Slope angle colouring paints, and their colours</span>
-                            </div>
                         </div>
                         <div className="settings-subsection">
                             <div className="settings-toggles">

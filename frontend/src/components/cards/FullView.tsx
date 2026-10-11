@@ -80,7 +80,7 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
     const totals = calculateSnowTotals(resort);
     // A Saved location has one elevation, whichever band is selected
     const elevationLabel = isSavedLocationId(resort.id) ? ''
-        : selectedElevation === 'bot' ? 'Base ' : selectedElevation === 'mid' ? 'Mid ' : 'Peak ';
+        : selectedElevation === 'bot' ? 'Base ' : selectedElevation === 'mid' ? 'Mid ' : 'Top ';
 
     const rows: Row[] = [
         {

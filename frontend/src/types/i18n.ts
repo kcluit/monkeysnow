@@ -20,7 +20,7 @@ export interface Translations {
     'utilityBar.selectResorts': string;
     'utilityBar.baseForecast': string;
     'utilityBar.midForecast': string;
-    'utilityBar.peakForecast': string;
+    'utilityBar.topForecast': string;
     'utilityBar.sortByTemperature': string;
     'utilityBar.sortBySnowfall': string;
     'utilityBar.sortByWind': string;
@@ -64,7 +64,7 @@ export interface Translations {
     // Elevation options
     'elevation.base': string;
     'elevation.mid': string;
-    'elevation.peak': string;
+    'elevation.top': string;
 
     // Sort options
     'sort.temperature': string;
@@ -190,7 +190,7 @@ export const TranslationsSchema = z.object({
     'utilityBar.selectResorts': z.string(),
     'utilityBar.baseForecast': z.string(),
     'utilityBar.midForecast': z.string(),
-    'utilityBar.peakForecast': z.string(),
+    'utilityBar.topForecast': z.string(),
     'utilityBar.sortByTemperature': z.string(),
     'utilityBar.sortBySnowfall': z.string(),
     'utilityBar.sortByWind': z.string(),
@@ -234,7 +234,7 @@ export const TranslationsSchema = z.object({
     // Elevation options
     'elevation.base': z.string(),
     'elevation.mid': z.string(),
-    'elevation.peak': z.string(),
+    'elevation.top': z.string(),
 
     // Sort options
     'sort.temperature': z.string(),

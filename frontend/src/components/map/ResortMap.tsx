@@ -3,17 +3,9 @@ import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 're
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useFullscreenView } from '../../hooks/useFullscreenView';
-import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { useMapLayers } from '../../hooks/useMapLayers';
 import { useLanguage } from '../../hooks/useLanguage';
-import {
-    DEFAULT_MAP_LAYERS,
-    MAP_LAYERS_STORAGE_KEY,
-    OSM_ATTRIBUTION,
-    sanitizeMapLayers,
-    terrainColouring,
-    type MapLayers,
-    type OverlayId,
-} from '../../utils/mapLayers';
+import { OSM_ATTRIBUTION, terrainColouring, type OverlayId } from '../../utils/mapLayers';
 import { difficultyConvention } from '../../utils/difficultyColours';
 import { SKI_MAP_MIN_ZOOM } from '../../utils/skiMapData';
 import { CONTOURS_MIN_ZOOM, STEEPNESS_MIN_ZOOM } from '../../utils/terrainRendering';
@@ -199,9 +191,7 @@ export function ResortMap({
     }, []);
 
     // One Base map and any Overlays, the same on every map in this browser, flat and 3D
-    const [storedLayers, setStoredLayers] = useLocalStorage<unknown>(MAP_LAYERS_STORAGE_KEY, DEFAULT_MAP_LAYERS);
-    const layers = useMemo(() => sanitizeMapLayers(storedLayers), [storedLayers]);
-    const setLayers = useCallback((next: MapLayers) => setStoredLayers(next), [setStoredLayers]);
+    const [layers, setLayers] = useMapLayers();
     const isOn = (overlay: OverlayId) => layers.overlays.includes(overlay);
     const colouring = terrainColouring(layers);
     const onSatellite = layers.baseMap === 'satellite';

@@ -8,6 +8,7 @@
 
 import { aggregationOptions, getModelInfo, isKnownModel } from '../data/modelHierarchy';
 import type { AggregationType, WeatherModel } from '../types/openMeteo';
+import { createOpenerRegistry } from './openerRegistry';
 
 /** What a visitor changed about one line; anything left out is drawn as it was before. */
 export interface LineStyle {
@@ -195,22 +196,14 @@ export function subscribeModelStyles(listener: () => void): () => void {
 
 // --- Opening the Models tab ---
 
-const openers: (() => void)[] = [];
+const openers = createOpenerRegistry();
 
 /**
  * Offers a way to open the Models tab while the caller is mounted; the latest one offered
  * is used. The detail view opens its first chart's gear modal on it, and App opens it on
  * its own wherever there is no chart.
  */
-export function registerModelStylesOpener(open: () => void): () => void {
-    openers.push(open);
-    return () => {
-        const index = openers.indexOf(open);
-        if (index !== -1) openers.splice(index, 1);
-    };
-}
+export const registerModelStylesOpener = openers.register;
 
 /** Opens the Models tab, from the command palette, the Settings page or the model picker. */
-export function openModelStyles(): void {
-    openers[openers.length - 1]?.();
-}
+export const openModelStyles = openers.open;

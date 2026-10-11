@@ -21,7 +21,7 @@ export const en: Translations = {
     'utilityBar.selectResorts': 'Select Resorts',
     'utilityBar.baseForecast': 'Base Forecast',
     'utilityBar.midForecast': 'Mid Forecast',
-    'utilityBar.peakForecast': 'Peak Forecast',
+    'utilityBar.topForecast': 'Top Forecast',
     'utilityBar.sortByTemperature': 'Sort by Temperature',
     'utilityBar.sortBySnowfall': 'Sort by Snowfall',
     'utilityBar.sortByWind': 'Sort by Wind',
@@ -65,7 +65,7 @@ export const en: Translations = {
     // Elevation options
     'elevation.base': 'Base forecast',
     'elevation.mid': 'Mid forecast',
-    'elevation.peak': 'Peak forecast',
+    'elevation.top': 'Top forecast',
 
     // Sort options
     'sort.temperature': 'Temperature',

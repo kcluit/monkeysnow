@@ -149,9 +149,9 @@ export function VariableSelectionModal({
       <div className="command-palette variable-selection-modal">
         {/* Header */}
         <div className="variable-selection-header">
-          <h2 className="variable-selection-title">Select Variables</h2>
+          <h2 className="variable-selection-title">Select charts</h2>
           <p className="variable-selection-subtitle">
-            Choose which weather variables to display in charts.
+            Choose which charts to show, and drag them into order.
           </p>
         </div>
 
@@ -160,7 +160,7 @@ export function VariableSelectionModal({
           <input
             type="text"
             className="command-input"
-            placeholder="Search variables..."
+            placeholder="Search charts..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             autoFocus={shouldAutoFocusSearch()}

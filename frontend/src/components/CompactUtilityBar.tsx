@@ -95,7 +95,7 @@ export function CompactUtilityBar({
                                 : 'text-theme-textSecondary hover:text-theme-textPrimary hover:font-bold'
                                 }`}
                         >
-                            {level === 'bot' ? 'Base' : level === 'mid' ? 'Mid' : 'Peak'}
+                            {level === 'bot' ? 'Base' : level === 'mid' ? 'Mid' : 'Top'}
                         </button>
                     ))}
                 </div>

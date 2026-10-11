@@ -83,6 +83,21 @@ export function formatElevation(meters: number, system: UnitSystem): string {
   return `${Math.round(meters)}m`;
 }
 
+/** A height in metres as a whole number in the visitor's units, for typing over */
+export function elevationInUnits(meters: number, system: UnitSystem): number {
+  return Math.round(system === 'imperial' ? meters * M_TO_FT : meters);
+}
+
+/** A height typed in the visitor's units, in whole metres */
+export function elevationFromUnits(value: number, system: UnitSystem): number {
+  return Math.round(system === 'imperial' ? value / M_TO_FT : value);
+}
+
+/** The highest height a visitor can type, about 9000 m, in their units */
+export function maxTypedElevation(system: UnitSystem): number {
+  return system === 'imperial' ? 29528 : 9000;
+}
+
 /**
  * Format freezing level (handles null case).
  */

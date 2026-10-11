@@ -5,7 +5,19 @@
 
 import type { Command, ElevationLevel, SortOption, SortDay, SortDayData, ViewMode, TemperatureMetric, SnowfallEstimateMode, UtilityBarStyle, UnitSystem, ResortDisplayLimit } from '../types';
 import type { Language } from '../types/i18n';
+import type { ElevationSelection } from '../types/detailView';
 import { icons } from '../constants/icons';
+import { formatElevation } from './unitConversion';
+import { FORECAST_HORIZONS } from './constants';
+import {
+  BASE_MAPS,
+  OVERLAYS,
+  TERRAIN_COLOURINGS,
+  terrainColouring,
+  withOverlay,
+  withTerrainColouring,
+  type MapLayers,
+} from './mapLayers';
 
 export interface ControlCommandParams {
   // Elevation
@@ -76,7 +88,7 @@ export function generateElevationCommands(
     },
     {
       id: 'elevation-top',
-      name: 'Peak forecast',
+      name: 'Top forecast',
       icon: selectedElevation === 'top' ? icons.check : undefined,
       action: () => setSelectedElevation('top'),
     },
@@ -368,6 +380,130 @@ export function generateLanguageCommands(
 }
 
 /**
+ * On and Off for one setting, the current one ticked.
+ */
+function generateOnOffCommands(id: string, isOn: boolean, setOn: (on: boolean) => void): Command[] {
+  return [
+    { id: `${id}-on`, name: 'On', icon: isOn ? icons.check : undefined, action: () => setOn(true) },
+    { id: `${id}-off`, name: 'Off', icon: !isOn ? icons.check : undefined, action: () => setOn(false) },
+  ];
+}
+
+export interface DetailedViewCommandParams {
+  openDetailedViewModels: () => void;
+  openChartsPicker: () => void;
+  elevationSelection: ElevationSelection;
+  setElevationSelection: (e: ElevationSelection) => void;
+  unitSystem: UnitSystem;
+  forecastHorizon: number;
+  setForecastHorizon: (days: number) => void;
+  isChartLocked: boolean;
+  setIsChartLocked: (locked: boolean) => void;
+  mapLayers: MapLayers;
+  setMapLayers: (layers: MapLayers) => void;
+}
+
+/**
+ * Generate the Detailed view's commands: what is forecast, the Charts, and the map's Base map and Overlays.
+ * They show on every page, like the Settings page's Detailed view group, and change an open Detailed view at once.
+ */
+export function generateDetailedViewCommands(params: DetailedViewCommandParams): Command[] {
+  const { elevationSelection, setElevationSelection, mapLayers, setMapLayers } = params;
+  const elevationBands: { value: ElevationSelection; name: string }[] = [
+    { value: 'base', name: 'Base' },
+    { value: 'mid', name: 'Mid' },
+    { value: 'top', name: 'Top' },
+  ];
+  const elevationCommands: Command[] = elevationBands.map(({ value, name }) => ({
+    id: `detail-elevation-${value}`,
+    name,
+    icon: elevationSelection === value ? icons.check : undefined,
+    action: () => setElevationSelection(value),
+  }));
+  // A Custom elevation is typed on the Settings page or in the Detailed view; here it is only shown
+  if (typeof elevationSelection === 'number') {
+    elevationCommands.push({
+      id: 'detail-elevation-custom',
+      name: `Custom (${formatElevation(elevationSelection, params.unitSystem)})`,
+      icon: icons.check,
+      action: () => setElevationSelection(elevationSelection),
+    });
+  }
+
+  const colouring = terrainColouring(mapLayers);
+
+  return [
+    {
+      id: 'detail-models',
+      name: 'Detailed view models',
+      icon: icons.weatherModel,
+      action: params.openDetailedViewModels,
+    },
+    {
+      id: 'detail-elevation',
+      name: 'Detailed view elevation',
+      icon: icons.mountain,
+      subCommands: elevationCommands,
+    },
+    {
+      id: 'forecast-horizon',
+      name: 'Forecast horizon',
+      icon: icons.calendar,
+      subCommands: FORECAST_HORIZONS.map((days) => ({
+        id: `forecast-horizon-${days}`,
+        name: days === 1 ? '1 day' : `${days} days`,
+        icon: params.forecastHorizon === days ? icons.check : undefined,
+        action: () => params.setForecastHorizon(days),
+      })),
+    },
+    {
+      id: 'select-charts',
+      name: 'Select charts',
+      icon: icons.lineChart,
+      action: params.openChartsPicker,
+    },
+    {
+      id: 'lock-charts',
+      name: 'Lock charts',
+      icon: icons.lock,
+      subCommands: generateOnOffCommands('lock-charts', params.isChartLocked, params.setIsChartLocked),
+    },
+    {
+      id: 'base-map',
+      name: 'Base map',
+      icon: icons.baseMap,
+      subCommands: BASE_MAPS.map((base) => ({
+        id: `base-map-${base.id}`,
+        name: base.label,
+        icon: mapLayers.baseMap === base.id ? icons.check : undefined,
+        action: () => setMapLayers({ ...mapLayers, baseMap: base.id }),
+      })),
+    },
+    ...OVERLAYS.map((overlay) => ({
+      id: `overlay-${overlay.id}`,
+      name: overlay.label,
+      icon: icons.overlay,
+      subCommands: generateOnOffCommands(
+        `overlay-${overlay.id}`,
+        mapLayers.overlays.includes(overlay.id),
+        (on) => setMapLayers(withOverlay(mapLayers, overlay.id, on))
+      ),
+    })),
+    {
+      id: 'terrain-colouring',
+      name: 'Colour terrain by',
+      icon: icons.overlay,
+      subCommands: [{ id: null, label: 'None' }, ...TERRAIN_COLOURINGS].map((option) => ({
+        id: `terrain-colouring-${option.id ?? 'none'}`,
+        name: option.label,
+        icon: colouring === option.id ? icons.check : undefined,
+        action: () => setMapLayers(withTerrainColouring(mapLayers, option.id)),
+      })),
+    },
+  ];
+}
+
+/**
  * Generate all control-related commands for the command palette.
  * This is the main entry point for command generation.
  */
@@ -381,7 +517,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     },
     {
       id: 'elevation',
-      name: 'Elevation',
+      name: 'Main page elevation',
       icon: icons.mountain,
       subCommands: generateElevationCommands(
         params.selectedElevation,

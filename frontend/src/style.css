@@ -268,6 +268,11 @@ h1.title-color-text,
     border-color: var(--accent);
 }
 
+/* A height in metres or feet: five digits */
+.settings-elevation-input {
+    width: 7rem;
+}
+
 /* About six rows of themes; the rest scroll */
 .settings-theme-list {
     position: relative;
@@ -322,6 +327,13 @@ h1.title-color-text,
 
 .settings-toggle-icon {
     color: var(--textSecondary);
+}
+
+/* The few words after a toggle's label on what it does */
+.settings-toggle-hint {
+    color: var(--textSecondary);
+    font-size: 0.75rem;
+    text-align: left;
 }
 
 .settings-toggle-switch {

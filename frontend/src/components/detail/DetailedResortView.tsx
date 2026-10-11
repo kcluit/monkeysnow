@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useSelectedModels, useSelectedAggregations } from '../../hooks/useSelectedModels';
+import { useDetailElevation, useForecastHorizon, useLockedCharts, useShownCharts } from '../../hooks/useDetailedViewSettings';
 import { useDetailedWeatherData } from '../../hooks/useDetailedWeatherData';
 import { useBudgetPause } from '../../hooks/useBudgetPause';
 import { useModelHierarchy } from '../../hooks/useModelHierarchy';
@@ -14,13 +14,13 @@ import { ResortMap } from '../map/ResortMap';
 import { suggestedName, updateSavedLocation, type SavedLocationInput } from '../../utils/savedLocations';
 import { MAX_SELECTED_RESORTS } from '../../hooks/useResortHierarchy';
 import { RESORT_LOCATIONS } from '../../data/resortLocations';
-import { DEFAULT_VARIABLES } from '../../utils/chartConfigurations';
 import { coversPoint, inCatalogueOrder, isKnownModel } from '../../data/modelHierarchy';
 import { resolveComparisonModels } from '../../utils/comparisonModels';
 import { registerModelStylesOpener } from '../../utils/modelStyles';
+import { detailedViewModelsOpener } from '../../utils/openerRegistry';
 import { buildTimeAxis } from '../../utils/timeAxis';
 import { clearHeldLines } from '../../lib/charts/chartRegistry';
-import type { DetailedResortViewProps, ElevationSelection, CustomLocation } from '../../types/detailView';
+import type { DetailedResortViewProps, CustomLocation } from '../../types/detailView';
 import type { WeatherVariable } from '../../types/openMeteo';
 import type { ChartSettingsTab } from '../../types/chartSettings';
 import type { UnitSystem } from '../../types';
@@ -84,21 +84,9 @@ export function DetailedResortView({
     const { t } = useLanguage();
 
     const [selectedModels, setSelectedModels] = useSelectedModels();
-
-    // State for selected variables - default selection
-    const [selectedVariables, setSelectedVariables] = useLocalStorage<WeatherVariable[]>(
-        'detailSelectedVariables',
-        DEFAULT_VARIABLES
-    );
-
+    const [selectedVariables, setSelectedVariables] = useShownCharts();
     const [selectedAggregations, setSelectedAggregations] = useSelectedAggregations();
-
-    // State for elevation selection - can be 'base', 'mid', 'top', or a custom number
-    // Default to 'base' so it dynamically uses each resort's base elevation
-    const [elevationSelection, setElevationSelection] = useLocalStorage<ElevationSelection>(
-        'detailElevationSelection',
-        'base'
-    );
+    const [elevationSelection, setElevationSelection] = useDetailElevation();
 
     // Resolve the elevation selection to an actual number based on current resort
     const resolvedElevation = useMemo(() => {
@@ -117,17 +105,8 @@ export function DetailedResortView({
         }
     }, [savedLocation, elevationSelection, location.baseElevation, location.midElevation, location.topElevation]);
 
-    // State for forecast days - default to 14
-    const [forecastDays, setForecastDays] = useLocalStorage<number>(
-        'detailForecastDays',
-        14
-    );
-
-    // State for chart lock - prevents scroll zoom and hides range slider
-    const [isChartLocked, setIsChartLocked] = useLocalStorage<boolean>(
-        'detailChartLocked',
-        false
-    );
+    const [forecastDays, setForecastDays] = useForecastHorizon();
+    const [isChartLocked, setIsChartLocked] = useLockedCharts();
 
     // Custom location state (temporary - NOT persisted unless saved as a Saved location)
     const [customLocation, setCustomLocation] = useState<CustomLocation | null>(null);
@@ -256,6 +235,9 @@ export function DetailedResortView({
         selectedAggregations,
         onAggregationsChange: setSelectedAggregations,
     });
+    // The command palette opens this one while the Detailed view is showing, as it knows the point being forecast
+    const openModels = modelHierarchy.openModal;
+    useEffect(() => detailedViewModelsOpener.register(openModels), [openModels]);
 
     // One time axis for every chart, spanning the Comparison models' forecasts
     const axisRange = useMemo(() => {
