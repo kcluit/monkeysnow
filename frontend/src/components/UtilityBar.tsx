@@ -77,7 +77,7 @@ export function UtilityBar({
                     : 'text-theme-textSecondary hover:text-theme-textPrimary'
                 }`}
               >
-                {level === 'bot' ? 'Base' : level === 'mid' ? 'Mid' : 'Peak'}
+                {level === 'bot' ? 'Base' : level === 'mid' ? 'Mid' : 'Top'}
               </button>
             ))}
           </div>

@@ -17,6 +17,8 @@ const CompactCard = lazy(() => import('./components/cards/CompactCard').then(m =
 // Lazy load DetailedResortView - imports uplot (~80KB) and chart configs
 const DetailedResortView = lazy(() => import('./components/detail/DetailedResortView').then(m => ({ default: m.DetailedResortView })));
 const ModelStylesModal = lazy(() => import('./components/detail/ModelStylesModal').then(m => ({ default: m.ModelStylesModal })));
+const DetailedViewModelsPicker = lazy(() => import('./components/detail/DetailedViewPickers').then(m => ({ default: m.DetailedViewModelsPicker })));
+const ChartsPicker = lazy(() => import('./components/detail/DetailedViewPickers').then(m => ({ default: m.ChartsPicker })));
 import { FPSCounter } from './components/FPSCounter';
 import { ResortSelectionGridModal } from './components/ResortSelectionModal';
 import { CardModelsModal } from './components/CardModelsModal';
@@ -37,6 +39,8 @@ import { useResortHierarchy, MAX_SELECTED_RESORTS } from './hooks/useResortHiera
 import { FetchStatus } from './components/FetchStatus';
 import { useBudgetPause } from './hooks/useBudgetPause';
 import { useUnitSystem } from './hooks/useUnitSystem';
+import { useDetailElevation, useForecastHorizon, useLockedCharts } from './hooks/useDetailedViewSettings';
+import { useMapLayers } from './hooks/useMapLayers';
 import {
     DEFAULT_MAP_ROTATION,
     DEFAULT_MAP_TILT,
@@ -51,7 +55,7 @@ import { useIsMobile } from './hooks/useIsMobile';
 import { useLanguage } from './hooks/useLanguage';
 import { useHierarchy } from './contexts/HierarchyContext';
 import { processResortData } from './utils/weather';
-import { generateControlCommands } from './utils/commandGenerators';
+import { generateControlCommands, generateDetailedViewCommands } from './utils/commandGenerators';
 import { icons } from './constants/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { setGlobalZoomSync } from './lib/charts/chartRegistry';
@@ -60,6 +64,7 @@ import { getResortLocation } from './utils/openMeteoClient';
 import { resolveResortId } from './data/resortLocations';
 import { pickStarterResort } from './utils/starterResort';
 import { openModelStyles, registerModelStylesOpener } from './utils/modelStyles';
+import { detailedViewModelsOpener } from './utils/openerRegistry';
 import {
     deleteSavedLocation,
     isSavedLocationId,
@@ -291,6 +296,11 @@ function App(): JSX.Element {
     const [mapRotation, setMapRotation] = useLocalStorage<MapRotation>(MAP_ROTATION_STORAGE_KEY, DEFAULT_MAP_ROTATION);
     const [mapTilt, setMapTilt] = useLocalStorage<MapTilt>(MAP_TILT_STORAGE_KEY, DEFAULT_MAP_TILT);
     const [cursorReadoutShown, setCursorReadoutShown] = useCursorReadout();
+    // The Detailed view's own choices, also offered on the Settings page and in the command palette
+    const [detailElevation, setDetailElevation] = useDetailElevation();
+    const [forecastHorizon, setForecastHorizon] = useForecastHorizon();
+    const [isChartLocked, setIsChartLocked] = useLockedCharts();
+    const [mapLayers, setMapLayers] = useMapLayers();
     const [unitSystem, setUnitSystem] = useUnitSystem();
     const [resortDisplayLimit, setResortDisplayLimit] = useLocalStorage<ResortDisplayLimit>('resortDisplayLimit', 'auto');
 
@@ -323,6 +333,13 @@ function App(): JSX.Element {
     const [isSlopeBandsOpen, setSlopeBandsOpen] = useState(false);
     const openSlopeBands = useCallback(() => setSlopeBandsOpen(true), []);
     const closeSlopeBands = useCallback(() => setSlopeBandsOpen(false), []);
+
+    // The Detailed view's Models and Charts pickers on their own, for the Settings page and the command palette;
+    // on the Detailed view, its own Models picker registers later and wins
+    const [detailedViewPicker, setDetailedViewPicker] = useState<'models' | 'charts' | null>(null);
+    const closeDetailedViewPicker = useCallback(() => setDetailedViewPicker(null), []);
+    const openChartsPicker = useCallback(() => setDetailedViewPicker('charts'), []);
+    useEffect(() => detailedViewModelsOpener.register(() => setDetailedViewPicker('models')), []);
 
     // Open resort modal and auto-dismiss the banner
     const openResortModalAndDismissBanner = useCallback(() => {
@@ -358,6 +375,11 @@ function App(): JSX.Element {
         mapTilt, setMapTilt,
         cursorReadoutShown, setCursorReadoutShown,
         openSlopeBands,
+        detailElevation, setDetailElevation,
+        forecastHorizon, setForecastHorizon,
+        isChartLocked, setIsChartLocked,
+        mapLayers, setMapLayers,
+        openChartsPicker,
         selectedElevation, setSelectedElevation,
         selectedSort, setSelectedSort,
         selectedSortDay, setSelectedSortDay,
@@ -377,6 +399,21 @@ function App(): JSX.Element {
 
     // Command factory for lazy generation - commands only built when palette opens
     const commandFactory = useCallback(() => {
+        // The Detailed view's, after Sync charts and the 3D map commands, with the map's next to Slope bands
+        const detailedViewCommands = generateDetailedViewCommands({
+            openDetailedViewModels: detailedViewModelsOpener.open,
+            openChartsPicker,
+            elevationSelection: detailElevation,
+            setElevationSelection: setDetailElevation,
+            unitSystem,
+            forecastHorizon,
+            setForecastHorizon,
+            isChartLocked,
+            setIsChartLocked,
+            mapLayers,
+            setMapLayers,
+        });
+
         // Base commands (Theme, Font, etc.)
         const baseCommands: Command[] = [
             {
@@ -579,6 +616,7 @@ function App(): JSX.Element {
                     },
                 ],
             },
+            ...detailedViewCommands,
             {
                 id: 'slope-bands',
                 name: 'Slope bands',
@@ -1032,6 +1070,16 @@ function App(): JSX.Element {
         cursorReadoutShown,
         setCursorReadoutShown,
         openSlopeBands,
+        openDetailedViewModels: detailedViewModelsOpener.open,
+        openChartsPicker,
+        detailElevation,
+        setDetailElevation,
+        forecastHorizon,
+        setForecastHorizon,
+        isChartLocked,
+        setIsChartLocked,
+        mapLayers,
+        setMapLayers,
         selectedElevation,
         setSelectedElevation,
         selectedSort,
@@ -1093,6 +1141,15 @@ function App(): JSX.Element {
 
             {/* Slope bands, opened from the Settings page or the command palette */}
             {isSlopeBandsOpen && <SlopeBandsModal onClose={closeSlopeBands} />}
+
+            {/* The Detailed view's Models or Charts picker, opened from the Settings page or the command palette */}
+            {detailedViewPicker && (
+                <Suspense fallback={null}>
+                    {detailedViewPicker === 'models'
+                        ? <DetailedViewModelsPicker onClose={closeDetailedViewPicker} />
+                        : <ChartsPicker onClose={closeDetailedViewPicker} />}
+                </Suspense>
+            )}
 
             {/* FPS Counter */}
             <FPSCounter fps={fps} isVisible={isFPSEnabled} />

@@ -63,6 +63,7 @@ import {
   // Map settings
   faLayerGroup,
   faArrowPointer,
+  faMap,
   // Lock icons
   faLock,
   faLockOpen,
@@ -165,6 +166,9 @@ export const icons = {
   // Map settings
   slopeBands: faLayerGroup,
   cursor: faArrowPointer,
+  // Map layers: the Base map, and the Overlays over it
+  baseMap: faMap,
+  overlay: faLayerGroup,
 
   // Lock icons
   lock: faLock,

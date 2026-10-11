@@ -3,6 +3,7 @@ import type { ElevationSelection } from '../../types/detailView';
 import { useVariableSelection } from '../../hooks/useVariableSelection';
 import { VariableSelectionModal } from '../VariableSelectionModal';
 import { formatElevation } from '../../utils/unitConversion';
+import { FORECAST_HORIZONS } from '../../utils/constants';
 import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
 
@@ -55,10 +56,9 @@ export function CompactDetailUtilityBar({
 
     // Cycle forecast days: 1 → 3 → 7 → 14 → 16 → 1
     const cycleForecastDays = (): void => {
-        const options = [1, 3, 7, 14, 16];
-        const currentIndex = options.indexOf(forecastDays);
-        const nextIndex = (currentIndex + 1) % options.length;
-        setForecastDays(options[nextIndex]);
+        const currentIndex = FORECAST_HORIZONS.indexOf(forecastDays);
+        const nextIndex = (currentIndex + 1) % FORECAST_HORIZONS.length;
+        setForecastDays(FORECAST_HORIZONS[nextIndex]);
     };
 
     // Model button text: Comparison models shown here / Selected models
@@ -134,12 +134,12 @@ export function CompactDetailUtilityBar({
 
                     <span className="compact-bar-separator hidden sm:inline">|</span>
 
-                    {/* Variables - opens modal */}
+                    {/* Charts - opens the picker */}
                     <button
                         onClick={variableSelection.openModal}
                         className="compact-bar-text text-theme-textSecondary hover:text-theme-textPrimary hover:font-bold transition-colors"
                     >
-                        Variables ({selectedVariables.length})
+                        Charts ({selectedVariables.length})
                     </button>
 
                     <span className="compact-bar-separator hidden sm:inline">|</span>

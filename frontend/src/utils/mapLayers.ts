@@ -45,6 +45,12 @@ export function terrainColouring(layers: MapLayers): TerrainColouringId | null {
     return layers.overlays.find(isTerrainColouring) ?? null;
 }
 
+/** The same layers with this Overlay on or off; for a Terrain colouring, use withTerrainColouring */
+export function withOverlay(layers: MapLayers, overlay: OverlayId, on: boolean): MapLayers {
+    const others = layers.overlays.filter(id => id !== overlay);
+    return { ...layers, overlays: on ? [...others, overlay] : others };
+}
+
 /** The same layers with this Terrain colouring in place of any other, or none */
 export function withTerrainColouring(layers: MapLayers, colouring: TerrainColouringId | null): MapLayers {
     const others = layers.overlays.filter(id => !isTerrainColouring(id));

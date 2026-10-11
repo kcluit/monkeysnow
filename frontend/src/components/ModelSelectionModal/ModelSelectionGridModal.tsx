@@ -26,8 +26,8 @@ import type { ModelAvailabilityContext } from '../../types/detailView';
 
 interface ModelSelectionGridModalProps {
   hierarchy: UseModelHierarchyReturn;
-  /** Which models are drawn at the point being forecast, for dimming the rest */
-  modelAvailability: ModelAvailabilityContext;
+  /** Which models are drawn at the point being forecast, for dimming the rest; left out away from the Detailed view */
+  modelAvailability?: ModelAvailabilityContext;
 }
 
 // Get all node IDs from the hierarchy tree for default expansion
@@ -194,7 +194,7 @@ const ProviderSection = memo(function ProviderSection({
   modelAvailability,
 }: {
   node: ModelHierarchyNode;
-  modelAvailability: ModelAvailabilityContext;
+  modelAvailability?: ModelAvailabilityContext;
   expandedNodes: Set<string>;
   onToggleExpand: (id: string) => void;
   selectedModels: WeatherModel[];
@@ -269,7 +269,7 @@ const ProviderSection = memo(function ProviderSection({
                   node={child}
                   isSelected={selectedModels.includes(child.modelId)}
                   color={modelColor(modelStyles, child.modelId)}
-                  unavailableReason={getUnavailableReason(child.modelId, modelAvailability)}
+                  unavailableReason={modelAvailability ? getUnavailableReason(child.modelId, modelAvailability) : null}
                   onToggle={() => onToggleModel(child.modelId!)}
                 />
               );
@@ -365,12 +365,11 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
     }
   };
 
-  // Get total selection count: Selected models drawn at this point, of all Selected models
+  // Get total selection count: Selected models drawn at this point, of all Selected models; away from a point, just how many
   const getTotalCount = (): string => {
-    const shownCount = selectedModels.filter(
-      (id) => getUnavailableReason(id, modelAvailability) === null
-    ).length;
-    const modelCount = `${shownCount} shown of ${selectedModels.length} selected`;
+    const modelCount = modelAvailability
+      ? `${selectedModels.filter((id) => getUnavailableReason(id, modelAvailability) === null).length} shown of ${selectedModels.length} selected`
+      : `${selectedModels.length} selected`;
     const aggCount = selectedAggregations.length;
     if (aggCount > 0) {
       return `${modelCount} + ${aggCount} aggregation${aggCount > 1 ? 's' : ''}`;

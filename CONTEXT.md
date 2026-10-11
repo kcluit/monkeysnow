@@ -30,7 +30,7 @@ _Avoid_: province, state (as the general term)
 
 **Elevation band**:
 One of a **Resort**'s three forecast heights: base (`bot`), mid or top.
-_Avoid_: level, elevation (when meaning the band rather than a height in metres)
+_Avoid_: level, elevation (when meaning the band rather than a height in metres), peak (for the top band)
 
 **Ground elevation**:
 The height of the terrain at a point, as Open-Meteo knows it. A **Custom location** is forecast at its Ground elevation unless the visitor types a **Custom elevation**.
@@ -139,7 +139,7 @@ How many days ahead a forecast is asked for: fourteen on the **Main page**, and 
 _Avoid_: forecast days, forecast length
 
 **Selected models**:
-The **Forecast models** a visitor has ticked for the **Detailed view**, one list for every **Resort**. Every visitor starts with the **Recommended models**.
+The **Forecast models** a visitor has ticked for the **Detailed view**, one list for every **Resort**. Every visitor starts with the **Recommended models**. Visitors change them, with the **Selected Aggregations**, under "Detailed view models".
 _Avoid_: preferred models, default models, **Selection** (that is **Resorts**)
 
 **Recommended models**:
@@ -172,7 +172,11 @@ _Avoid_: line style, model settings, model appearance
 
 **Chart**:
 One weather variable, such as snowfall or wind, drawn across the **Comparison models** in the **Detailed view**. A visitor picks which Charts show and in what order, one list for every **Resort** and location.
-_Avoid_: graph, plot
+_Avoid_: graph, plot, variable (for what a visitor picks)
+
+**Locked charts**:
+**Charts** that can't be zoomed, by scrolling, pinching or a range slider. One choice for every **Resort** and location.
+_Avoid_: frozen charts, chart lock, locked lines (a line that stays focused is a **Held line**)
 
 **Focused line**:
 The line a visitor is pointing at, in a **Detailed view** chart or its legend, drawn at full strength while every other line fades. A **Comparison model**'s hourly and **Accumulation** lines are focused together.

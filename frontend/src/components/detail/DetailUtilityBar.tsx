@@ -5,7 +5,8 @@ import { VariableSelectionModal } from '../VariableSelectionModal';
 import { CompactDetailUtilityBar } from './CompactDetailUtilityBar';
 import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
-import { formatElevation } from '../../utils/unitConversion';
+import { elevationFromUnits, elevationInUnits, formatElevation, maxTypedElevation } from '../../utils/unitConversion';
+import { FORECAST_HORIZONS } from '../../utils/constants';
 
 /** The Elevation menu's width in px (w-48) */
 const ELEVATION_MENU_WIDTH = 192;
@@ -69,7 +70,7 @@ function LargeDetailUtilityBar({
     }, []);
 
     const elevationUnit = unitSystem === 'imperial' ? 'ft' : 'm';
-    const maxElevationInput = unitSystem === 'imperial' ? 29528 : 9000;
+    const maxElevationInput = maxTypedElevation(unitSystem);
 
     // The menu's presets above "Custom...": a Resort's Elevation bands, or a Custom location's Ground elevation
     const elevationPresets: { label: string; elevation: number | null; isSelected: boolean; select: () => void }[] = customLocation
@@ -93,8 +94,7 @@ function LargeDetailUtilityBar({
     const handleCustomElevationSubmit = () => {
         const value = parseInt(customElevationValue, 10);
         if (!isNaN(value) && value >= 0 && value <= maxElevationInput) {
-            // Convert to meters for internal storage if imperial
-            const meters = unitSystem === 'imperial' ? Math.round(value / 3.28084) : value;
+            const meters = elevationFromUnits(value, unitSystem);
             if (customLocation) {
                 setCustomElevation(meters);
             } else {
@@ -200,9 +200,7 @@ function LargeDetailUtilityBar({
                                                 setShowCustomElevationInput(true);
                                                 // Starts from the height being forecast; empty while a Ground elevation is still unknown
                                                 const metersValue = typedElevation ?? (customLocation ? groundElevation : resolvedElevation);
-                                                const displayValue = metersValue !== null && unitSystem === 'imperial'
-                                                    ? Math.round(metersValue * 3.28084)
-                                                    : metersValue;
+                                                const displayValue = metersValue === null ? null : elevationInUnits(metersValue, unitSystem);
                                                 setCustomElevationValue(displayValue === null ? '' : displayValue.toString());
                                             }}
                                             className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm ${typedElevation !== null
@@ -302,7 +300,7 @@ function LargeDetailUtilityBar({
                 </button>
                 {showForecastDropdown && (
                     <div className="absolute left-0 z-20 mt-1 w-32 bg-theme-background rounded-lg shadow-lg border border-theme-border p-1">
-                        {[1, 3, 7, 14, 16].map((days) => (
+                        {FORECAST_HORIZONS.map((days) => (
                             <button
                                 key={days}
                                 onClick={() => {
@@ -323,13 +321,13 @@ function LargeDetailUtilityBar({
 
             <div className="h-6 w-px bg-theme-border" />
 
-            {/* Variable Selection Button - Opens Modal */}
+            {/* Charts picker button - Opens Modal */}
             <button
                 onClick={variableSelection.openModal}
                 className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-background border border-theme-border hover:bg-theme-secondary transition-colors"
             >
                 <span className="text-sm text-theme-textPrimary">
-                    Variables ({selectedVariables.length})
+                    Charts ({selectedVariables.length})
                 </span>
                 <svg className="w-4 h-4 text-theme-textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />

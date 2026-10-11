@@ -4,6 +4,7 @@ import {
     OVERLAYS,
     TERRAIN_COLOURINGS,
     terrainColouring,
+    withOverlay,
     withTerrainColouring,
     type MapLayers,
     type OverlayId,
@@ -32,10 +33,7 @@ export const MapLayersPanel = forwardRef<HTMLDivElement, MapLayersPanelProps>(fu
     ref,
 ) {
     const [isEditingBands, setIsEditingBands] = useState(false);
-    const toggle = (id: OverlayId) => onChange({
-        ...layers,
-        overlays: layers.overlays.includes(id) ? layers.overlays.filter(o => o !== id) : [...layers.overlays, id],
-    });
+    const toggle = (id: OverlayId) => onChange(withOverlay(layers, id, !layers.overlays.includes(id)));
     const colouring = terrainColouring(layers);
     const colourings: { id: TerrainColouringId | null; label: string }[] = [{ id: null, label: 'None' }, ...TERRAIN_COLOURINGS];
 

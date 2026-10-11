@@ -44,6 +44,9 @@ export const defaultSort: SortOption = "temperature";
 export const defaultSortDay: SortDay = 'next3days';
 export const defaultTemperatureMetric: TemperatureMetric = "max";
 
+/** The Forecast horizons a visitor can pick for the Detailed view, in days */
+export const FORECAST_HORIZONS: readonly number[] = [1, 3, 7, 14, 16];
+
 /**
  * Fallback function to get display name from API ID.
  * Simply converts kebab-case to Title Case.
