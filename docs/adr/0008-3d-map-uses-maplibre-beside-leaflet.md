@@ -7,6 +7,6 @@ Following ADR 0007, both of the 3D map's sources need no key. It drapes the Stan
 ## Consequences
 
 - **Two map components share one job.** Behaviour added to one map, such as a new marker or a change to what a click does, has to be added to the other.
-- **The 3D map ignores the visitor's Base map and Overlays.** It shows Standard with no Ski map, contours or slope angle, so the layers button is hidden while it is on. Carrying them over means re-drawing each in MapLibre.
+- **The 3D map ignored the visitor's Base map and Overlays** (superseded by ADR 0009). It showed Standard with no Ski map, contours or slope angle, and hid the layers button. ADR 0009 re-draws each of them in MapLibre, so the 3D map now shows the same ones as the flat map.
 - **Missing terrain tiles show up as 404s.** Mapterhorn has sharper tiles than z12 only in some countries, and says so by answering 404 elsewhere, so the 3D map falls back to the coarser tile and the browser console logs each miss.
 - **Raster labels turn with the map.** The OpenStreetMap tiles have their text baked in, so the 3D map opens facing north, and labels are upside down whenever a visitor turns it to face south.

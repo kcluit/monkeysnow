@@ -167,12 +167,36 @@ _Avoid_: locked line, pinned line, selected line
 ### The map
 
 **Base map**:
-The picture under everything else on the map of a **Resort** or a **Saved location**: Standard or Satellite. A visitor sees one at a time.
+The picture under everything else on the map of a **Resort** or a **Saved location**, flat or 3D: Standard or Satellite. A visitor sees one at a time, the same on both.
 _Avoid_: map style, map type, tiles
 
 **Overlay**:
-Something drawn on top of the **Base map** that a visitor turns on or off by itself: the **Ski map**, contour lines, hillshade or slope angle. Any number can be on at once, over either **Base map**.
+Something drawn on top of the **Base map** that a visitor turns on or off by itself: the **Ski map**, contour lines, hillshade, **Slope angle**, **Gradient**, **Aspect**, **Flats** or **Height tint**. Any number can be on at once, except that only one **Terrain colouring** can, over either **Base map**. The same ones show on the flat map and the 3D map.
 _Avoid_: layer, mode
+
+**Terrain colouring**:
+An **Overlay** that colours the ground by one property of the terrain: **Slope angle**, **Gradient**, **Aspect** or **Height tint**. Only one is on at a time, since two over each other can't be read.
+_Avoid_: terrain layer, shading
+
+**Slope angle**:
+The **Terrain colouring** that shades ground steeper than 30° in four bands, 30, 35, 40 and 45° and up, as avalanche maps do. It shows where slab avalanches can start, not how likely they are today.
+_Avoid_: avalanche overlay, avalanche terrain, steepness
+
+**Gradient**:
+The **Terrain colouring** that colours all ground by how steep it is, on one smooth scale from flat to vertical.
+_Avoid_: steepness, Slope angle (that is the banded one)
+
+**Aspect**:
+The compass direction a slope faces, as one of the eight that avalanche bulletins use: N, NE, E, SE, S, SW, W or NW. Ground under 5° has none. The Aspect **Terrain colouring** colours every other slope by it, cold blues facing north and warm oranges facing south.
+_Avoid_: exposure, orientation, facing
+
+**Flats**:
+The **Overlay** that paints ground under 5°, about where skis stop gliding and a skier has to skate, pole or skin.
+_Avoid_: flat areas, low-angle terrain
+
+**Height tint**:
+The **Terrain colouring** that colours all ground by its height, on one fixed scale for the whole world, so a colour means the same height everywhere. It shows the map's terrain, which can disagree by tens of metres with the **Ground elevation** a forecast is for.
+_Avoid_: elevation (as this Overlay's name), elevation overlay, hypsometric tint
 
 **Ski map**:
 The **Overlay** that draws every **Run** and **Lift** around the point on the map.

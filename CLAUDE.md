@@ -48,12 +48,12 @@ npm run build
 - `utils/starterResort.ts` picks the Starter resort: the resort page landed on, else the nearest to the visitor, else random
 - The visitor's location comes from `frontend/netlify/edge-functions/geo.ts` at `/api/geo`, the only server-side code; under plain `vite` it is absent, so dev always falls back to random
 
-### The map (see docs/adr/0007-map-layers-from-keyless-openly-licensed-sources.md)
-- `components/map/ResortMap.tsx` - the detail view's Leaflet map; its layers button opens `MapLayersPanel`. The visitor's Base map and Overlays (`utils/mapLayers.ts`) are one localStorage choice for every map
-- `SatelliteBaseMap.tsx` - EOX Sentinel-2 everywhere, with national aerial photos (swisstopo, IGN, basemap.at, USGS, GSI) over it inside rectangles around their countries
-- `TerrainOverlay.tsx` - contours, hillshade and slope angle, drawn on canvas tiles from AWS Terrain Tiles (`utils/terrainTiles.ts`, `utils/terrainRendering.ts`)
-- `SkiMapOverlay.tsx` - Runs and Lifts from the Overpass API by zoom-12 square, cached a week in IndexedDB (`utils/skiMapData.ts`), coloured by `utils/difficultyColours.ts`; it also works out what a Custom location is on
-- `ResortMap3D.tsx` - the 3D map behind the map's "3D" button, lazy-loaded with MapLibre (docs/adr/0008): the Standard Base map, shaded and draped over Mapterhorn terrain, with an exaggeration slider and Height lines traced by `utils/heightLines.ts`. It and the flat map share markers and popups through `mapMarkers.tsx`; the 3D choice is never remembered
+### The map (see docs/adr/0007-map-layers-from-keyless-openly-licensed-sources.md and docs/adr/0009)
+- `components/map/ResortMap.tsx` - the detail view's Leaflet map and the buttons around both maps; the layers button opens `MapLayersPanel` on either map. The visitor's Base map and Overlays (`utils/mapLayers.ts`) are one localStorage choice for every map, flat and 3D, with at most one Terrain colouring (Slope angle, Gradient, Aspect, Height tint); `MapLegend.tsx` explains it along the bottom
+- `utils/satelliteImagery.ts` - the Satellite Base map's sources: EOX Sentinel-2 everywhere, with national aerial photos (swisstopo, IGN, basemap.at, USGS, GSI) over it inside rectangles around their countries; `SatelliteBaseMap.tsx` draws them on the flat map
+- `utils/terrainOverlays.ts` - draws a tile of any terrain Overlay (hillshade, contours, Flats and the Terrain colourings) from Mapterhorn's heights (`utils/terrainTiles.ts`, `utils/terrainRendering.ts`), for the flat map's `TerrainOverlay.tsx` and the 3D map's `terrain-overlay://` tiles. Steepness-based ones need zoom 12 (about 30 m terrain)
+- `SkiMapOverlay.tsx` - Runs and Lifts from the Overpass API by zoom-12 square, cached a week in IndexedDB (`utils/skiMapData.ts`), coloured by `utils/difficultyColours.ts`; `skiMapFeatures.ts` holds what it shares with the 3D map's `SkiMap3D.ts`: loading, naming, and working out what a Custom location is on
+- `ResortMap3D.tsx` - the 3D map behind the map's "3D" button, lazy-loaded with MapLibre (docs/adr/0008): the visitor's Base map and Overlays draped over Mapterhorn terrain, always hillshaded, with an exaggeration slider and Height lines traced by `utils/heightLines.ts`. Right-drag turns it Linear or Orbital (`utils/mapRotation.ts`, set on the Settings page and in the command palette). It and the flat map share markers and popups through `mapMarkers.tsx`; the 3D choice is never remembered
 
 ### Frontend Data Flow
 1. `useWeatherData(selectedResorts)` loads forecasts into `AllWeatherData` and reports queued resorts

@@ -2,7 +2,7 @@
 
 Every **Base map** and **Overlay** on the map of a **Resort** or **Saved location** loads straight from a public source that needs no account, no API key and no server of ours, and whose licence allows a site like this one to use it. That follows from ADR 0001, which removed the backend, so a key would ship in the page for anyone to copy. It also follows from the earlier decision not to use OpenSkiMap's tiles because its terms forbid other sites using them.
 
-So the Satellite **Base map** is assembled from national aerial photos where they are open: USGS in the US, swisstopo in Switzerland, IGN in France, basemap.at in Austria and GSI in Japan. Under them, EOX Sentinel-2 cloudless covers the rest of the world at 10 m. Contours, hillshade and slope angle are drawn in the browser from AWS Terrain Tiles (an AWS Open Data dataset, served with open CORS). The **Ski map** is drawn from OpenStreetMap data that each visitor's browser fetches from the public Overpass API for the area on screen.
+So the Satellite **Base map** is assembled from national aerial photos where they are open: USGS in the US, swisstopo in Switzerland, IGN in France, basemap.at in Austria and GSI in Japan. Under them, EOX Sentinel-2 cloudless covers the rest of the world at 10 m. Contours, hillshade and slope angle are drawn in the browser from AWS Terrain Tiles (an AWS Open Data dataset, served with open CORS). Since ADR 0009 they, and the terrain Overlays added with it, come from Mapterhorn's terrain instead, which is just as open. The **Ski map** is drawn from OpenStreetMap data that each visitor's browser fetches from the public Overpass API for the area on screen.
 
 ## Considered options
 
