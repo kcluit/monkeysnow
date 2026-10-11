@@ -4,6 +4,16 @@ Ski resort weather forecasts with snow-quality estimates, fetched from Open-Mete
 
 ## Language
 
+### Pages
+
+**Main page**:
+The page that shows the **Selection** as cards, one per **Resort** or **Saved location**, each forecast by its **Card model**.
+_Avoid_: home page, dashboard, overview
+
+**Detail view**:
+The page for one **Resort**, **Saved location** or **Custom location**, with its **Charts** of the **Comparison models** and its map.
+_Avoid_: resort page (it shows Saved and Custom locations too), forecast page, details page
+
 ### Resorts
 
 **Ski area**:
