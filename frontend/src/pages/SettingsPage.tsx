@@ -130,7 +130,7 @@ const MAP_TILT_DESCRIPTIONS: Record<MapTilt, string> = {
 const SETTING_GROUPS = [
     { id: 'settings-general', title: 'General' },
     { id: 'settings-main-page', title: 'Main page' },
-    { id: 'settings-detail-view', title: 'Detail view' },
+    { id: 'settings-detailed-view', title: 'Detailed view' },
     { id: 'settings-appearance', title: 'Appearance' },
     { id: 'settings-advanced', title: 'Advanced' },
 ] as const;
@@ -474,7 +474,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                     </SettingSection>
                 </SettingGroup>
 
-                <SettingGroup id="settings-detail-view">
+                <SettingGroup id="settings-detailed-view">
                     <SettingSection title="Charts" icon={icons.lineChart}>
                         <div className="settings-subsection">
                             <span className="settings-subsection-label">Model styles</span>
