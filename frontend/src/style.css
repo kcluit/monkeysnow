@@ -166,12 +166,11 @@ h1.title-color-text,
     gap: 1rem;
 }
 
+/* Like the page's title, a step smaller */
 .settings-group-title {
-    font-size: 0.8125rem;
+    font-size: 1.375rem;
     font-weight: var(--weight-semibold);
-    color: var(--textSecondary);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    color: var(--textPrimary);
     scroll-margin-top: 1rem;
 }
 
