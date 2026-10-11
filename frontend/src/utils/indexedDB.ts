@@ -43,6 +43,20 @@ export async function idbDelete(key: string): Promise<void> {
     });
 }
 
+// The highest character a string key can hold
+const LAST_CHARACTER = String.fromCharCode(0xffff);
+
+export async function idbDeleteKeysStartingWith(prefix: string): Promise<void> {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        // Every string key starting with the prefix sorts between it and the prefix followed by the highest character
+        tx.objectStore(STORE_NAME).delete(IDBKeyRange.bound(prefix, prefix + LAST_CHARACTER));
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+    });
+}
+
 export async function idbClear(): Promise<void> {
     const db = await openDB();
     return new Promise((resolve, reject) => {

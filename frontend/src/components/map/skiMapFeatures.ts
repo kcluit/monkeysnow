@@ -4,10 +4,9 @@
  */
 
 import {
-    fetchSquares,
+    fetchSquare,
     readSquares,
     squaresCovering,
-    MAX_SQUARES_PER_QUERY,
     SKI_MAP_MIN_ZOOM,
     type RunKind,
     type SkiMapFeature,
@@ -39,6 +38,8 @@ const LIFT_NAMES: Record<string, string> = {
     platter: 'platter lift',
     rope_tow: 'rope tow',
     magic_carpet: 'magic carpet',
+    funicular: 'funicular',
+    railway: 'mountain railway',
 };
 
 export const LIFT_COLOUR = '#1f2937';
@@ -136,8 +137,9 @@ export interface SkiMapView {
 }
 
 /**
- * Loads the Runs and Lifts of the view, from IndexedDB and then Overpass, and again whenever
- * `update` is called as the map moves. Overpass failing backs off from 30 s to 5 minutes.
+ * Loads the Runs and Lifts of the view, from IndexedDB and then the site's square files, and again
+ * whenever `update` is called as the map moves. A square failing to load, as when offline, backs off
+ * from 30 s to 5 minutes.
  */
 export function startSkiMapLoader({ view, onFeatures, onStatus }: {
     view: () => SkiMapView;
@@ -171,16 +173,20 @@ export function startSkiMapLoader({ view, onFeatures, onStatus }: {
                 onStatus('ready');
                 return;
             }
-            // Overpass just failed: show what's known, and wait for the retry rather than asking again on every pan
+            // A square just failed: show what's known, and wait for the retry rather than asking again on every pan
             if (Date.now() < retryAt) {
                 onStatus('unavailable');
                 return;
             }
             onStatus('loading');
-            onFeatures(await fetchSquares(needed.slice(0, MAX_SQUARES_PER_QUERY), controller.signal));
+            const fetched = await Promise.allSettled(needed.map(square => fetchSquare(square, controller.signal)));
+            if (controller.signal.aborted) return;
+            // Drawn together, so the 3D map redraws once rather than once a square
+            onFeatures(fetched.flatMap(result => (result.status === 'fulfilled' ? result.value : [])));
+            const failed = fetched.find(result => result.status === 'rejected');
+            if (failed) throw failed.reason;
             failures = 0;
-            if (needed.length > MAX_SQUARES_PER_QUERY) runAgain = true;
-            else onStatus('ready');
+            onStatus('ready');
         } catch {
             if (controller.signal.aborted) return;
             // 30 s, then doubling up to 5 minutes

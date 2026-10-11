@@ -59,6 +59,8 @@ export function withTerrainColouring(layers: MapLayers, colouring: TerrainColour
 
 // The Standard Base map and the Ski map both use OpenStreetMap; one string, so the map credits it once
 export const OSM_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+// The Ski map's Runs and Lifts are OpenStreetMap's, built into squares from OpenSkiData (docs/adr/0010)
+export const OPENSKIDATA_ATTRIBUTION = '<a href="https://openskidata.org/">OpenSkiData</a>';
 
 export const MAP_LAYERS_STORAGE_KEY = 'mapLayers';
 

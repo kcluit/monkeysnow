@@ -207,7 +207,7 @@ export function AboutPage(): JSX.Element {
                     </a>
                 </p>
                 <p>
-                    Ski resort data from{' '}
+                    Ski resort, run and lift data from{' '}
                     <a
                         href="https://openskidata.org/"
                         target="_blank"
@@ -234,7 +234,16 @@ export function AboutPage(): JSX.Element {
                     >
                         resort list
                     </a>
-                    {' '}is available under the{' '}
+                    {' '}and{' '}
+                    <a
+                        href="https://github.com/kcluit/monkeysnow/tree/main/frontend/public/skimap"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="about-link"
+                    >
+                        ski map data
+                    </a>
+                    {' '}are available under the{' '}
                     <a
                         href="https://opendatacommons.org/licenses/odbl/"
                         target="_blank"
@@ -246,16 +255,7 @@ export function AboutPage(): JSX.Element {
                     .
                 </p>
                 <p>
-                    Map runs and lifts from OpenStreetMap through the{' '}
-                    <a
-                        href="https://overpass-api.de/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="about-link"
-                    >
-                        Overpass API
-                    </a>
-                    ; satellite photos from{' '}
+                    Map satellite photos from{' '}
                     {[
                         ['EOxCloudless', 'https://cloudless.eox.at/'],
                         ['swisstopo', 'https://www.swisstopo.admin.ch/'],

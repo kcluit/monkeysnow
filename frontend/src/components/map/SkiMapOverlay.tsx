@@ -3,7 +3,7 @@ import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import type { SkiMapFeature } from '../../utils/skiMapData';
 import type { DifficultyConvention } from '../../utils/difficultyColours';
-import { OSM_ATTRIBUTION } from '../../utils/mapLayers';
+import { OPENSKIDATA_ATTRIBUTION, OSM_ATTRIBUTION } from '../../utils/mapLayers';
 import {
     LIFT_COLOUR,
     describeCustomLocationOn,
@@ -92,6 +92,7 @@ export function SkiMapOverlay({ convention, customLocation, onStatusChange, onCu
         const canHover = window.matchMedia('(hover: hover)').matches;
         const drawn = new Map<string, SkiMapFeature>();
         map.attributionControl?.addAttribution(OSM_ATTRIBUTION);
+        map.attributionControl?.addAttribution(OPENSKIDATA_ATTRIBUTION);
 
         // Where a Lift crosses a Run, hovering names the Lift, which is drawn on top
         const liftHoverLayers: L.Path[] = [];
@@ -130,6 +131,7 @@ export function SkiMapOverlay({ convention, customLocation, onStatusChange, onCu
             group.remove();
             Object.values(renderers).forEach(renderer => renderer.remove());
             map.attributionControl?.removeAttribution(OSM_ATTRIBUTION);
+            map.attributionControl?.removeAttribution(OPENSKIDATA_ATTRIBUTION);
             setFeatures(new Map());
         };
     }, [map, convention]);

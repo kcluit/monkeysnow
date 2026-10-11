@@ -9,6 +9,12 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src')
     }
   },
+  server: {
+    watch: {
+      // The Ski map's 21,000 square files only change when npm run import-ski-map regenerates them
+      ignored: ['**/public/skimap/**']
+    }
+  },
   build: {
     rollupOptions: {
       output: {
