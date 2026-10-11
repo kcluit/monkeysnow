@@ -167,3 +167,7 @@ _Avoid_: aerialway, ski lift (as the general term)
 **Difficulty colours**:
 The colours a downhill **Run** is drawn in to show how hard it is. They follow the convention of the **Resort**'s country (for a **Saved location**, the country of the **Resort** nearest to it), so an intermediate **Run** is blue in Canada and red in France.
 _Avoid_: piste colours, run grades
+
+**Height line**:
+A line on the 3D map that follows the terrain at one forecast height, near the point being forecast and fading out a few kilometres from it: each **Elevation band**'s for a **Resort**, or the one height a **Saved location** or **Custom location** is forecast at. The line at the height the charts are for is bold, even where it misses the point it belongs to, because Open-Meteo's ground and the map's terrain disagree. It is not an **Overlay**: it is always drawn, and only at the heights being forecast.
+_Avoid_: contour (that is the Overlay's evenly spaced lines), elevation line
