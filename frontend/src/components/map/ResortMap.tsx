@@ -19,7 +19,7 @@ import { SKI_MAP_MIN_ZOOM } from '../../utils/skiMapData';
 import { CONTOURS_MIN_ZOOM, STEEPNESS_MIN_ZOOM } from '../../utils/terrainRendering';
 import type { UnitSystem } from '../../utils/unitConversion';
 import type { HeightLine } from '../../utils/heightLines';
-import type { MapRotation } from '../../utils/mapRotation';
+import type { MapRotation, MapTilt } from '../../utils/mapRotation';
 import type { MapView } from './ResortMap3D';
 import { SatelliteBaseMap } from './SatelliteBaseMap';
 import { TerrainOverlay } from './TerrainOverlay';
@@ -98,8 +98,9 @@ interface ResortMapProps {
     unitSystem: UnitSystem;
     /** Drawn on the 3D map only */
     heightLines: readonly HeightLine[];
-    /** How a sideways right-drag turns the 3D map */
+    /** How a right-drag turns and tilts the 3D map */
     rotation: MapRotation;
+    tilt: MapTilt;
 }
 
 // Reports the zoom whenever it changes, so the layers panel can say when an Overlay needs the map closer in
@@ -181,6 +182,7 @@ export function ResortMap({
     unitSystem,
     heightLines,
     rotation,
+    tilt,
 }: ResortMapProps): JSX.Element {
     const { t } = useLanguage();
     const hasCustomLocation = customLocation !== null && customLocation !== undefined;
@@ -266,6 +268,8 @@ export function ResortMap({
         pointAt(null);
         // The flat map comes back where the 3D map was, which the zoom hints must know
         if (is3D) setZoom(Math.round(view.current.zoom));
+        // The next 3D map starts facing north at its usual tilt, like the flat map it is switched from
+        view.current = { lat: view.current.lat, lon: view.current.lon, zoom: view.current.zoom };
         setIs3D(!is3D);
     }, [is3D, pointAt]);
 
@@ -276,9 +280,9 @@ export function ResortMap({
                 {is3D ? (
                     <Map3DErrorBoundary message={t('map.failed3d')}>
                         <Suspense fallback={<div className="resort-map-message">{t('map.loading3d')}</div>}>
-                            {/* Remade when the rotation setting changes, which MapLibre only takes when a map is created */}
+                            {/* Remade, facing the same way, when a drag setting changes, which MapLibre only takes when a map is created */}
                             <ResortMap3D
-                                key={rotation}
+                                key={`${rotation}-${tilt}`}
                                 initialView={view.current}
                                 onViewChange={setView3D}
                                 lat={lat}
@@ -293,6 +297,7 @@ export function ResortMap({
                                 unitSystem={unitSystem}
                                 convention={convention}
                                 rotation={rotation}
+                                tilt={tilt}
                                 onSkiMapStatusChange={setSkiMapStatus}
                                 customLocationOn={customLocationOn}
                                 onCustomLocationOnChange={setCustomLocationOn}

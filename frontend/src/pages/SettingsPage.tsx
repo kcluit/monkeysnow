@@ -6,7 +6,7 @@ import { useCardModelsSummary } from '../components/CardModelsModal';
 import type { Theme } from '../types/themes';
 import type { Font } from '../types/fonts';
 import type { Language } from '../types/i18n';
-import type { MapRotation } from '../utils/mapRotation';
+import type { MapRotation, MapTilt } from '../utils/mapRotation';
 import type {
     ElevationLevel,
     SortOption,
@@ -55,6 +55,8 @@ export interface SettingsPageProps {
     // 3D map
     mapRotation: MapRotation;
     setMapRotation: (rotation: MapRotation) => void;
+    mapTilt: MapTilt;
+    setMapTilt: (tilt: MapTilt) => void;
     // Weather display
     selectedElevation: ElevationLevel;
     setSelectedElevation: (e: ElevationLevel) => void;
@@ -112,6 +114,17 @@ function SettingSection({ title, icon, children }: SettingSectionProps): JSX.Ele
         </section>
     );
 }
+
+// What a right-drag does on the 3D map with each choice, shown under the choices
+const MAP_ROTATION_DESCRIPTIONS: Record<MapRotation, string> = {
+    linear: 'Right-dragging sideways turns your view that way, wherever the pointer is',
+    linearReversed: 'Right-dragging sideways turns your view the other way, so the far mountains follow the pointer, wherever it is',
+    orbital: 'Right-dragging turns the map like spinning a globe, so opposite ways above and below its middle',
+};
+const MAP_TILT_DESCRIPTIONS: Record<MapTilt, string> = {
+    dragUp: 'Right-dragging up tilts the view toward the horizon',
+    dragDown: 'Right-dragging down tilts the view toward the horizon',
+};
 
 // The page's groups, by where their settings take effect, in page order
 const SETTING_GROUPS = [
@@ -262,6 +275,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
         isFPSEnabled, setFPSEnabled,
         chartZoomSyncEnabled, setChartZoomSyncEnabled,
         mapRotation, setMapRotation,
+        mapTilt, setMapTilt,
         selectedElevation, setSelectedElevation,
         selectedSort, setSelectedSort,
         selectedSortDay, setSelectedSortDay, sortDayData,
@@ -484,13 +498,18 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                             <span className="settings-subsection-label">3D map rotation</span>
                             <div className="settings-options-row">
                                 <OptionButton label="Linear" isSelected={mapRotation === 'linear'} onClick={() => setMapRotation('linear')} />
+                                <OptionButton label="Linear reversed" isSelected={mapRotation === 'linearReversed'} onClick={() => setMapRotation('linearReversed')} />
                                 <OptionButton label="Orbital" isSelected={mapRotation === 'orbital'} onClick={() => setMapRotation('orbital')} />
                             </div>
-                            <span className="text-sm text-theme-textSecondary">
-                                {mapRotation === 'linear'
-                                    ? 'Right-dragging sideways always turns the map the same way, wherever the pointer is'
-                                    : 'Right-dragging turns the map like spinning a globe, so opposite ways above and below its middle'}
-                            </span>
+                            <span className="text-sm text-theme-textSecondary">{MAP_ROTATION_DESCRIPTIONS[mapRotation]}</span>
+                        </div>
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">3D map tilt</span>
+                            <div className="settings-options-row">
+                                <OptionButton label="Drag up" isSelected={mapTilt === 'dragUp'} onClick={() => setMapTilt('dragUp')} />
+                                <OptionButton label="Drag down" isSelected={mapTilt === 'dragDown'} onClick={() => setMapTilt('dragDown')} />
+                            </div>
+                            <span className="text-sm text-theme-textSecondary">{MAP_TILT_DESCRIPTIONS[mapTilt]}</span>
                         </div>
                     </SettingSection>
                 </SettingGroup>

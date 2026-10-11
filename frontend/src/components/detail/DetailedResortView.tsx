@@ -26,15 +26,16 @@ import type { ChartSettingsTab } from '../../types/chartSettings';
 import type { UnitSystem } from '../../types';
 import { formatElevation } from '../../utils/unitConversion';
 import type { HeightLine } from '../../utils/heightLines';
-import type { MapRotation } from '../../utils/mapRotation';
+import type { MapRotation, MapTilt } from '../../utils/mapRotation';
 import { interpolate } from '../../locales';
 
 interface DetailedResortViewPropsWithUnits extends DetailedResortViewProps {
     unitSystem: UnitSystem;
     showUtilityBar: boolean;
     utilityBarStyle: import('../../types').UtilityBarStyle;
-    /** How a sideways right-drag turns the 3D map */
+    /** How a right-drag turns and tilts the 3D map */
     mapRotation: MapRotation;
+    mapTilt: MapTilt;
     onBack: () => void;
     /** Keeps the Custom location being shown as a new Saved location */
     onSaveLocation: (input: SavedLocationInput) => void;
@@ -73,6 +74,7 @@ export function DetailedResortView({
     showUtilityBar,
     utilityBarStyle,
     mapRotation,
+    mapTilt,
     onBack,
     onSaveLocation,
     onDeleteSavedLocation,
@@ -309,6 +311,7 @@ export function DetailedResortView({
                     unitSystem={unitSystem}
                     heightLines={heightLines}
                     rotation={mapRotation}
+                    tilt={mapTilt}
                 />
             </div>
 

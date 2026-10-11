@@ -39,7 +39,7 @@ import {
     extentIntersects,
 } from '../../utils/satelliteImagery';
 import { OSM_ATTRIBUTION, type MapLayers } from '../../utils/mapLayers';
-import type { MapRotation } from '../../utils/mapRotation';
+import { mapDragOptions, type MapRotation, type MapTilt } from '../../utils/mapRotation';
 import type { TerrainPoint } from '../../utils/terrainAtPoint';
 import type { DifficultyConvention } from '../../utils/difficultyColours';
 import type { UnitSystem } from '../../utils/unitConversion';
@@ -61,6 +61,9 @@ export interface MapView {
     lat: number;
     lon: number;
     zoom: number;
+    /** Which way the 3D map faces and how far it is tilted, kept only while it stays 3D */
+    bearing?: number;
+    pitch?: number;
 }
 
 const INITIAL_PITCH = 55;
@@ -298,8 +301,9 @@ export interface ResortMap3DProps {
     unitSystem: UnitSystem;
     /** How downhill Runs are coloured: the convention of the Resort's country */
     convention: DifficultyConvention;
-    /** How a sideways right-drag turns the map; fixed for the map's life, so the parent keys it by this */
+    /** How a right-drag turns and tilts the map; fixed for the map's life, so the parent keys it by these */
     rotation: MapRotation;
+    tilt: MapTilt;
     onSkiMapStatusChange: (status: SkiMapStatus) => void;
     /** What the Custom location is on, e.g. "On Peak to Creek, blue run", reported to and shown back from the parent */
     customLocationOn: string | null;
@@ -323,6 +327,7 @@ export default function ResortMap3D({
     unitSystem,
     convention,
     rotation,
+    tilt,
     onSkiMapStatusChange,
     customLocationOn,
     onCustomLocationOnChange,
@@ -352,7 +357,7 @@ export default function ResortMap3D({
     const onSatelliteRef = useRef(onSatellite);
     onSatelliteRef.current = onSatellite;
 
-    // Create the map once; the parent keys this component by Resort and by rotation
+    // Create the map once; the parent keys this component by Resort and by the drag settings
     useEffect(() => {
         const container = containerRef.current;
         if (!container) return;
@@ -361,11 +366,11 @@ export default function ResortMap3D({
             style: buildStyle({ unitSystem, onSatellite }, layers.overlays),
             center: [initialView.lon, initialView.lat],
             zoom: initialView.zoom - 1,
-            pitch: INITIAL_PITCH,
-            bearing: 0,
+            pitch: initialView.pitch ?? INITIAL_PITCH,
+            bearing: initialView.bearing ?? 0,
             maxZoom: MAX_ZOOM,
             maxPitch: MAX_PITCH,
-            aroundCenter: rotation === 'orbital',
+            ...mapDragOptions(rotation, tilt),
             attributionControl: { compact: true },
         });
         setStyleReady(new Promise((resolve) => created.once('style.load', () => resolve())));
@@ -411,7 +416,13 @@ export default function ResortMap3D({
         created.on('zoom', hideLabelsWhenFar);
         created.on('moveend', () => {
             const centre = created.getCenter();
-            onViewChangeRef.current({ lat: centre.lat, lon: centre.lng, zoom: created.getZoom() + 1 });
+            onViewChangeRef.current({
+                lat: centre.lat,
+                lon: centre.lng,
+                zoom: created.getZoom() + 1,
+                bearing: created.getBearing(),
+                pitch: created.getPitch(),
+            });
             if (created.isStyleLoaded()) showBaseMap(created, onSatelliteRef.current);
         });
 
