@@ -473,15 +473,17 @@ export class ChartManager {
         // Build plugins
         const plugins: uPlot.Plugin[] = [];
 
-        if (dataZoom?.enabled) {
-            const onZoomChange = (min: number, max: number) => {
-                if (isChartZoomSyncEnabled(this.chartId)) {
-                    broadcastZoomChange(min, max, this.chartId);
-                }
-            };
+        const canZoom = !!dataZoom?.enabled;
+        const onZoomChange = (min: number, max: number) => {
+            if (isChartZoomSyncEnabled(this.chartId)) {
+                broadcastZoomChange(min, max, this.chartId);
+            }
+        };
+        if (canZoom) {
             plugins.push(createZoomPlugin({ onZoom: onZoomChange }));
-            plugins.push(createTouchPlugin({ onZoom: onZoomChange }));
         }
+        // Every chart, so a tap never reaches uPlot as an emulated mouse that leaves its line focused
+        plugins.push(createTouchPlugin({ canZoom, onZoom: onZoomChange }));
 
         if (series.some((s) => s.type === 'band' && s.bandData)) {
             plugins.push(createBandFillPlugin({ getConfig }));
