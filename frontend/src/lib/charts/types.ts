@@ -38,6 +38,8 @@ export interface ChartTheme {
     accent: string;
     tooltipBg: string;
     tooltipBorder: string;
+    /** Rainbow text's colours, comma-separated, or '' while it is off */
+    rainbowText: string;
 }
 
 /** Configuration for a single data series */

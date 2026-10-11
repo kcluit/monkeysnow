@@ -121,7 +121,7 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
                                             <div className="p-2.5 rounded-2xl" style={{ backgroundColor: 'var(--cardBg)' }}>
                                                 <div className="text-sm">
                                                     <div className="text-theme-textPrimary font-bold">Freezing Elevation: {day.freezingLevel}</div>
-                                                    <div className={`${day.snowCondition.isRainbow ? 'rainbow-text' : day.snowCondition.isSecondary ? 'text-theme-textSecondary' : 'text-theme-accent'} font-semibold mt-0.5`}>{day.snowCondition.text}</div>
+                                                    <div className={`${day.snowCondition.isHighlight ? 'special-color-text' : day.snowCondition.isSecondary ? 'text-theme-textSecondary' : 'text-theme-accent'} font-semibold mt-0.5`}>{day.snowCondition.text}</div>
                                                 </div>
                                             </div>
                                         </div>

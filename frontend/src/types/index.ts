@@ -118,7 +118,7 @@ export interface AllWeatherData {
 // Snow condition type
 export interface SnowCondition {
     text: string;
-    isRainbow: boolean;
+    isHighlight: boolean;
     isSecondary?: boolean;  // true for N/A display
 }
 

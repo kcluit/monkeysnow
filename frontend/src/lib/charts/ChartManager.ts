@@ -10,6 +10,7 @@ import 'uplot/dist/uPlot.min.css';
 import type { ChartConfig } from './types';
 import { createZoomPlugin, createTouchPlugin, createBandFillPlugin, createBoxWhiskerPlugin, createHeatmapPlugin, createWindArrowPlugin, createZeroAxisPlugin, createElevationLinesPlugin, createTooltipPlugin, createLegendPlugin, createSeriesFocusPlugin } from './plugins';
 import { colorWithOpacity } from './utils/colorUtils';
+import { chartTextFill } from './theme';
 import {
     subscribeToZoomChanges,
     broadcastZoomChange,
@@ -47,6 +48,8 @@ function getStructuralKey(config: ChartConfig): string {
         // Theme affects colors
         themeAccent: config.theme.accent,
         themeBackground: config.theme.background,
+        // Axis text is filled when the chart is built
+        themeRainbowText: config.theme.rainbowText,
     });
 }
 
@@ -233,11 +236,13 @@ function createClockAlignedSplits(getConfig: () => ChartConfig) {
  */
 function buildUPlotAxes(config: ChartConfig, getConfig: () => ChartConfig): uPlot.Axis[] {
     const { xAxis, yAxisSecondary, theme } = config;
+    // Labels are text, so they turn rainbow with Rainbow text
+    const labelFill: uPlot.Axis.Stroke = (u) => chartTextFill(u.ctx, theme, theme.textSecondary);
 
     const axes: uPlot.Axis[] = [
         {
             scale: 'x',
-            stroke: theme.textSecondary,
+            stroke: labelFill,
             grid: { show: true, stroke: theme.gridColor, width: 1 },
             ticks: { show: true, stroke: theme.gridColor, size: 5 },
             border: { show: true, stroke: theme.textSecondary, width: 2 },
@@ -252,7 +257,7 @@ function buildUPlotAxes(config: ChartConfig, getConfig: () => ChartConfig): uPlo
             font: '11px system-ui, -apple-system, sans-serif',
         },
         {
-            stroke: theme.textSecondary,
+            stroke: labelFill,
             grid: { show: true, stroke: theme.gridColor, width: 1 },
             ticks: { show: true, stroke: theme.gridColor, size: 5 },
             border: { show: true, stroke: theme.textSecondary, width: 2 },
@@ -271,7 +276,7 @@ function buildUPlotAxes(config: ChartConfig, getConfig: () => ChartConfig): uPlo
 
     if (yAxisSecondary) {
         axes.push({
-            stroke: theme.textSecondary,
+            stroke: labelFill,
             grid: { show: false },
             ticks: { show: true, stroke: theme.gridColor, size: 5 },
             values: (u, vals) => {

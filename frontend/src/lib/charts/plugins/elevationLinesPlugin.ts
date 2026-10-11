@@ -8,6 +8,7 @@
 
 import uPlot from 'uplot';
 import type { ChartConfig } from '../types';
+import { chartTextFill } from '../theme';
 
 export interface ElevationLinesPluginOptions {
     /** Latest chart configuration; lines come from its elevationLines (already in display units) */
@@ -44,7 +45,7 @@ export function createElevationLinesPlugin(options: ElevationLinesPluginOptions)
         const pxRatio = uPlot.pxRatio;
         ctx.strokeStyle = theme.textSecondary;
         ctx.lineWidth = lineWidth * pxRatio;
-        ctx.fillStyle = theme.textSecondary;
+        ctx.fillStyle = chartTextFill(ctx, theme, theme.textSecondary);
         ctx.font = `${11 * pxRatio}px system-ui, -apple-system, sans-serif`;
         ctx.textAlign = 'right';
         ctx.textBaseline = 'bottom';

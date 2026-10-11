@@ -136,12 +136,12 @@ export function getTemperatureStyle(temp: number): { className?: string; style?:
 }
 
 /**
- * Gets snow amount color class (rainbow for significant amounts).
- * Thresholds are based on cm values: 20cm+ rainbow, 10cm+ apple-rainbow.
+ * Gets snow amount color class (the theme's highlight colours for significant amounts).
+ * Thresholds are based on cm values: 20cm+ special colour, 10cm+ title colour.
  */
 export function getSnowClass(snowCm: number): string {
-    if (snowCm >= 20) return 'rainbow-text';
-    if (snowCm >= 10) return 'apple-rainbow-text';
+    if (snowCm >= 20) return 'special-color-text';
+    if (snowCm >= 10) return 'title-color-text';
     return 'text-theme-accent';
 }
 

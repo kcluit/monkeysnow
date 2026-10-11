@@ -56,8 +56,8 @@ body,
     max-width: 100vw;
 }
 
-h1.apple-rainbow-text,
-.apple-rainbow-text {
+h1.title-color-text,
+.title-color-text {
     background: var(--titleColor) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
@@ -362,16 +362,16 @@ h1.apple-rainbow-text,
     opacity: 0.9;
 }
 
-.rainbow-text {
+.special-color-text {
     background: var(--specialColor);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
     background-size: 200% auto;
-    animation: rainbow 8s linear infinite;
+    animation: special-color-drift 8s linear infinite;
 }
 
-@keyframes rainbow {
+@keyframes special-color-drift {
     to {
         background-position: 200% center;
     }
@@ -1113,123 +1113,75 @@ input[type="checkbox"] {
     text-transform: uppercase;
 }
 
-/* Rainbow Text Mode - Overrides theme text colors when enabled */
-.rainbow-mode {
-    --rainbow-gradient: linear-gradient(90deg,
-            #FF375F,
-            #FF453A,
-            #FF9F0A,
-            #FFD60A,
-            #30D158,
-            #66D4CF,
-            #40C8E0,
-            #0A84FF,
-            #5E5CE6,
-            #BF5AF2,
-            #FF375F);
+/* Rainbow text - every piece of text shows one rainbow pinned to the screen, drifting sideways.
+   utils/rainbowText.ts marks the elements that hold text with data-rainbow, since CSS can't
+   select them. The rainbow is a background cut out by the letters, over the element's own fill.
+   It drifts inside an animated SVG: animating anything in CSS here would restyle the whole page
+   every frame. */
+:root.rainbow-mode {
+    /* Apple's dark-mode system colours, also in assets/rainbow-dark.svg; chart text reads them */
+    --rainbow-colors: #FF375F, #FF453A, #FF9F0A, #FFD60A, #30D158, #66D4CF, #40C8E0, #0A84FF, #5E5CE6, #BF5AF2, #FF375F;
+    --rainbow-image: url('./assets/rainbow-dark.svg');
+    /* A square tile holding the rainbow twice, diagonally, so tiles meet seamlessly */
+    --rainbow-tile: 1600px;
+    /* Laid over the rainbow on secondary text, fading it toward the background */
+    --rainbow-veil: linear-gradient(color-mix(in srgb, var(--background) 45%, transparent) 0 0);
 }
 
-/* Rainbow text for primary text elements */
-.rainbow-mode h1,
-.rainbow-mode h2,
-.rainbow-mode h3,
-.rainbow-mode h4,
-.rainbow-mode h5,
-.rainbow-mode h6 {
-    background: var(--rainbow-gradient);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    animation: rainbow 8s linear infinite;
+/* Apple's increased-contrast light-mode colours, readable on white */
+:root.rainbow-mode:not(.dark) {
+    --rainbow-colors: #D30F45, #D70015, #C93400, #B25000, #248A3D, #0C817B, #0071A4, #0040DD, #3634A3, #8944AB, #D30F45;
+    --rainbow-image: url('./assets/rainbow-light.svg');
 }
 
-/* Rainbow text for body text */
-.rainbow-mode .rainbow-text-primary {
-    background: var(--rainbow-gradient);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    animation: rainbow 8s linear infinite;
+@media (max-width: 640px) {
+    :root.rainbow-mode {
+        --rainbow-tile: 800px;
+    }
 }
 
-/* Rainbow accent elements - buttons, links, accents */
-.rainbow-mode .text-accent,
-.rainbow-mode [class*="text-blue-"],
-.rainbow-mode [class*="text-indigo-"],
-.rainbow-mode a:not(.no-rainbow) {
-    background: var(--rainbow-gradient);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    animation: rainbow 8s linear infinite;
+/* The same rainbow, standing still */
+@media (prefers-reduced-motion: reduce) {
+    :root.rainbow-mode {
+        --rainbow-image: repeating-linear-gradient(135deg, var(--rainbow-colors) 50%);
+    }
 }
 
-/* Rainbow borders and accents */
-.rainbow-mode .rainbow-border {
-    border-image: var(--rainbow-gradient) 1;
-    border-image-slice: 1;
+/* !important to win over theme gradient text (.title-color-text) and inline colours */
+:root.rainbow-mode [data-rainbow="on"] {
+    background-image: var(--rainbow-image), none !important;
+    background-size: var(--rainbow-tile) var(--rainbow-tile), auto !important;
+    background-repeat: repeat, no-repeat !important;
+    background-attachment: fixed, scroll !important;
+    background-position: 0 0, 0 0 !important;
+    -webkit-background-clip: text, border-box !important;
+    background-clip: text, border-box !important;
+    -webkit-text-fill-color: transparent !important;
+    text-shadow: none !important;
 }
 
-/* Rainbow background accent (for cards, buttons, etc.) */
-.rainbow-mode .rainbow-bg-accent {
-    background: var(--rainbow-gradient);
-    background-size: 200% auto;
-    animation: rainbow 8s linear infinite;
+:root.rainbow-mode [data-rainbow="dim"] {
+    background-image: var(--rainbow-veil), var(--rainbow-image), none !important;
+    background-size: auto, var(--rainbow-tile) var(--rainbow-tile), auto !important;
+    background-repeat: no-repeat, repeat, no-repeat !important;
+    background-attachment: scroll, fixed, scroll !important;
+    background-position: 0 0, 0 0, 0 0 !important;
+    -webkit-background-clip: text, text, border-box !important;
+    background-clip: text, text, border-box !important;
+    -webkit-text-fill-color: transparent !important;
+    text-shadow: none !important;
 }
 
-/* Override accent color variable in rainbow mode */
-.rainbow-mode {
-    --accent: linear-gradient(90deg, #FF375F, #BF5AF2);
+/* Inside a rainbow element, but painting its own text */
+:root.rainbow-mode [data-rainbow="off"] {
+    -webkit-text-fill-color: currentcolor !important;
 }
 
-/* Resort card text in rainbow mode */
-.rainbow-mode .resort-card h2,
-.rainbow-mode .resort-card h3,
-.rainbow-mode .resort-card .text-lg,
-.rainbow-mode .resort-card .text-xl,
-.rainbow-mode .resort-card .text-2xl {
-    background: var(--rainbow-gradient);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    animation: rainbow 8s linear infinite;
-}
-
-/* Command palette accent in rainbow mode */
-.rainbow-mode .command-item.selected {
-    background: linear-gradient(90deg, #5E5CE6, #BF5AF2, #FF375F);
-    background-size: 200% auto;
-    animation: rainbow 8s linear infinite;
-}
-
-/* FPS counter accent in rainbow mode */
-.rainbow-mode .fps-value {
-    background: var(--rainbow-gradient);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    animation: rainbow 8s linear infinite;
-}
-
-/* Logo in rainbow mode - inherits from apple-rainbow-text already */
-.rainbow-mode .logo-text {
-    background: var(--rainbow-gradient);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    animation: rainbow 8s linear infinite;
+/* The rainbow only fills an element's box, and the subtitle's 0.1 line box is a sliver of its
+   letters: a full one, moved down to keep the letters in place */
+:root.rainbow-mode .logo-text .subtitle {
+    bottom: 0.05em;
+    line-height: 1;
 }
 
 /* Resort Selection Modal Styles */
@@ -1380,23 +1332,6 @@ input[type="checkbox"] {
 .resort-selection-cap-notice + .resort-grid-clear-btn,
 .resort-selection-cap-notice + .resort-selection-count {
     margin-left: 8px;
-}
-
-/* Rainbow mode for resort selection */
-.rainbow-mode .resort-checkbox.checked,
-.rainbow-mode .resort-checkbox.indeterminate {
-    background: linear-gradient(90deg, #5E5CE6, #BF5AF2);
-    border-color: transparent;
-}
-
-.rainbow-mode .resort-tree-item.selected {
-    background: linear-gradient(90deg, #5E5CE6, #BF5AF2, #FF375F);
-    background-size: 200% auto;
-    animation: rainbow 8s linear infinite;
-}
-
-.rainbow-mode .resort-selection-count {
-    background: linear-gradient(90deg, #5E5CE6, #BF5AF2);
 }
 
 /* Resort Grid Modal Styles - Large fullscreen-like modal */
@@ -1749,19 +1684,6 @@ input[type="checkbox"] {
 .resort-grid-checkbox.indeterminate {
     background: var(--accent, #0a84ff);
     border-color: var(--accent, #0a84ff);
-    color: #ffffff;
-}
-
-/* Rainbow mode for grid modal */
-.rainbow-mode .resort-grid-checkbox.checked,
-.rainbow-mode .resort-grid-checkbox.indeterminate {
-    background: linear-gradient(90deg, #5E5CE6, #BF5AF2);
-    border-color: transparent;
-}
-
-.rainbow-mode .resort-grid-close-btn:hover,
-.rainbow-mode .resort-grid-clear-btn:hover {
-    background: linear-gradient(90deg, #5E5CE6, #BF5AF2);
     color: #ffffff;
 }
 
@@ -3320,22 +3242,6 @@ input[type="checkbox"] {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(13em, 1fr));
     gap: 0.25rem 1rem;
-}
-
-/* Rainbow mode for about page */
-.rainbow-mode .about-section-title,
-.rainbow-mode .about-subsection-title {
-    background: var(--rainbow-gradient);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    animation: rainbow 8s linear infinite;
-}
-
-.rainbow-mode .about-contact-btn {
-    background: linear-gradient(90deg, #5E5CE6, #BF5AF2);
 }
 
 /* Responsive adjustments */
