@@ -1,6 +1,6 @@
 /**
  * The Model styles tab of a chart's gear modal: the Model style of every Forecast model
- * (Preferred models first, the rest folded away) and Aggregation, the band fills, and
+ * (Selected models first, the rest folded away) and Aggregation, the band fills, and
  * hiding the model lines. Its changes reach every chart.
  */
 
@@ -26,7 +26,7 @@ interface ModelStylesTabProps {
     /** The styles being edited, applied only when the modal's Apply is pressed */
     styles: ModelStyles;
     onChange: (styles: ModelStyles) => void;
-    preferredModels: WeatherModel[];
+    selectedModels: WeatherModel[];
     selectedAggregations: AggregationType[];
     /** Which models are drawn at the point being forecast; left out where there is no chart */
     modelAvailability?: ModelAvailabilityContext;
@@ -213,14 +213,14 @@ function Toggle({ label, description, checked, onChange }: {
 export function ModelStylesTab({
     styles,
     onChange,
-    preferredModels,
+    selectedModels,
     selectedAggregations,
     modelAvailability,
 }: ModelStylesTabProps): JSX.Element {
     const [showOtherModels, setShowOtherModels] = useState(false);
-    const models = inCatalogueOrder(preferredModels.filter(isKnownModel));
+    const models = inCatalogueOrder(selectedModels.filter(isKnownModel));
 
-    // Every Forecast model that isn't a Preferred model, by Provider, so it is styled before it's picked
+    // Every Forecast model that isn't a Selected model, by Provider, so it is styled before it's picked
     const otherModelsByProvider = modelProviders
         .map((provider) => ({
             provider,
@@ -229,7 +229,7 @@ export function ModelStylesTab({
         .filter(({ others }) => others.length > 0);
     const otherModelCount = otherModelsByProvider.reduce((count, { others }) => count + others.length, 0);
 
-    // The "All Preferred models" row shows what they share, and sets it on each of them
+    // The "All selected models" row shows what they share, and sets it on each of them
     const boldCount = models.filter((model) => styles.models[model]?.bold).length;
     const allBold = boldCount === 0 ? false : boldCount === models.length ? true : 'mixed';
     const opacities = new Set(models.map((model) => styles.models[model]?.opacity));
@@ -261,15 +261,15 @@ export function ModelStylesTab({
             <p className="model-styles-intro">These apply to every chart, for every resort.</p>
 
             <div className="chart-settings-section">
-                <h3 className="chart-settings-section-title">Preferred models</h3>
+                <h3 className="chart-settings-section-title">Selected models</h3>
                 {models.length === 0 ? (
-                    <p className="model-styles-intro">No Preferred models yet.</p>
+                    <p className="model-styles-intro">No models selected yet.</p>
                 ) : (
                     <div className="model-style-grid">
                         <div className="model-style-row model-style-all">
                             <div className="model-style-main">
                                 <span className="model-style-color-placeholder" />
-                                <span className="model-style-name">All Preferred models</span>
+                                <span className="model-style-name">All selected models</span>
                                 <StyleControls
                                     bold={allBold}
                                     opacity={sharedOpacity}

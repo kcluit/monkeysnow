@@ -22,7 +22,7 @@ import type { ChartDisplayType, ChartSettingsTab } from '../../types/chartSettin
 
 interface WeatherChartComponentProps extends WeatherChartProps {
     /** For the Models tab of the gear modal */
-    preferredModels: WeatherModel[];
+    selectedModels: WeatherModel[];
     modelAvailability: ModelAvailabilityContext;
     /** The gear modal is opened from outside too (the model picker, the command palette) */
     isSettingsOpen: boolean;
@@ -42,7 +42,7 @@ const MIN_CHART_HEIGHT = 200;
 export function WeatherChart({
     data,
     timeAxis,
-    selectedModels,
+    comparisonModels,
     selectedAggregations,
     variable,
     unitSystem,
@@ -50,7 +50,7 @@ export function WeatherChart({
     isLoading,
     onToggleVisibility,
     location,
-    preferredModels,
+    selectedModels,
     modelAvailability,
     isSettingsOpen,
     settingsTab,
@@ -62,13 +62,13 @@ export function WeatherChart({
     // Many variables come from only a few models; draw just the ones that provide this one
     const providingModels = useMemo(() => {
         const variables = [variable, ...getOverlayVariablesFor(variable)];
-        return selectedModels.filter((model) =>
+        return comparisonModels.filter((model) =>
             data.get(model)?.some((point) =>
                 variables.some((v) => typeof point[v] === 'number' && Number.isFinite(point[v]))
             )
         );
-    }, [data, selectedModels, variable]);
-    const loadedModelCount = selectedModels.filter((model) => data.has(model)).length;
+    }, [data, comparisonModels, variable]);
+    const loadedModelCount = comparisonModels.filter((model) => data.has(model)).length;
 
     // Chart settings from localStorage
     const [chartType, setChartType] = useLocalStorage<ChartDisplayType>(
@@ -133,7 +133,7 @@ export function WeatherChart({
             {
                 data,
                 timeAxis,
-                selectedModels: providingModels,
+                comparisonModels: providingModels,
                 selectedAggregations,
                 variable,
                 unitSystem,
@@ -172,7 +172,7 @@ export function WeatherChart({
             onClose={onCloseSettings}
             variable={variable}
             initialTab={settingsTab}
-            preferredModels={preferredModels}
+            selectedModels={selectedModels}
             selectedAggregations={selectedAggregations}
             modelAvailability={modelAvailability}
             chartType={chartType}

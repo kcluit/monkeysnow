@@ -28,7 +28,7 @@ interface ChartSettingsModalProps {
     /** The tab to open on; left out, the one last used */
     initialTab?: ChartSettingsTab;
     // Model styles tab
-    preferredModels: WeatherModel[];
+    selectedModels: WeatherModel[];
     selectedAggregations: AggregationType[];
     modelAvailability: ModelAvailabilityContext;
     // Chart type
@@ -68,7 +68,7 @@ export function ChartSettingsModal({
     onClose,
     variable,
     initialTab,
-    preferredModels,
+    selectedModels,
     selectedAggregations,
     modelAvailability,
     chartType,
@@ -167,7 +167,7 @@ export function ChartSettingsModal({
                         <ModelStylesTab
                             styles={localModelStyles}
                             onChange={setLocalModelStyles}
-                            preferredModels={preferredModels}
+                            selectedModels={selectedModels}
                             selectedAggregations={selectedAggregations}
                             modelAvailability={modelAvailability}
                         />

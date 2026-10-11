@@ -12,10 +12,10 @@ import type { DetailChartGridProps } from '../../types/detailView';
 export function DetailChartGrid({
     data,
     timeAxis,
-    selectedModels,
+    comparisonModels,
     selectedVariables,
     selectedAggregations,
-    preferredModels,
+    selectedModels,
     modelAvailability,
     openSettings,
     onOpenSettings,
@@ -34,7 +34,7 @@ export function DetailChartGrid({
                     key={variable}
                     data={data}
                     timeAxis={timeAxis}
-                    selectedModels={selectedModels}
+                    comparisonModels={comparisonModels}
                     selectedAggregations={selectedAggregations}
                     variable={variable}
                     unitSystem={unitSystem}
@@ -44,7 +44,7 @@ export function DetailChartGrid({
                         onToggleVariable ? () => onToggleVariable(variable) : undefined
                     }
                     location={location}
-                    preferredModels={preferredModels}
+                    selectedModels={selectedModels}
                     modelAvailability={modelAvailability}
                     isSettingsOpen={openSettings?.variable === variable}
                     settingsTab={openSettings?.variable === variable ? openSettings.tab : undefined}

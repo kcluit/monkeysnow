@@ -1583,7 +1583,7 @@ input[type="checkbox"] {
     margin-left: 4px;
 }
 
-/* Preferred model that isn't drawn at the current point (outside Coverage, no data, Clone) */
+/* Selected model that isn't drawn at the current point (outside Coverage, no data, Clone) */
 .model-grid-item-unavailable {
     opacity: 0.45;
 }

@@ -7,12 +7,12 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useOverlay } from '../../hooks/useOverlay';
-import { usePreferredModels, useSelectedAggregations } from '../../hooks/usePreferredModels';
+import { useSelectedModels, useSelectedAggregations } from '../../hooks/useSelectedModels';
 import { getModelStyles, setModelStyles } from '../../utils/modelStyles';
 import { ModelStylesTab } from './ModelStylesTab';
 
 export function ModelStylesModal({ onClose }: { onClose: () => void }): JSX.Element {
-    const [preferredModels] = usePreferredModels();
+    const [selectedModels] = useSelectedModels();
     const [selectedAggregations] = useSelectedAggregations();
     const [localModelStyles, setLocalModelStyles] = useState(getModelStyles);
 
@@ -42,7 +42,7 @@ export function ModelStylesModal({ onClose }: { onClose: () => void }): JSX.Elem
                     <ModelStylesTab
                         styles={localModelStyles}
                         onChange={setLocalModelStyles}
-                        preferredModels={preferredModels}
+                        selectedModels={selectedModels}
                         selectedAggregations={selectedAggregations}
                     />
                 </div>

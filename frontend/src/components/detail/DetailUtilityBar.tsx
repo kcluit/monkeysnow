@@ -22,7 +22,7 @@ function LargeDetailUtilityBar({
     onBack,
     unitSystem,
     shownModelCount,
-    preferredModelCount,
+    selectedModelCount,
     aggregationCount,
     onOpenModels,
     selectedVariables,
@@ -115,9 +115,9 @@ function LargeDetailUtilityBar({
         }
     };
 
-    // Get model button text: Comparison models shown here / Preferred models
+    // Get model button text: Comparison models shown here / Selected models
     const getModelButtonText = (): string => {
-        const modelCount = `${shownModelCount}/${preferredModelCount}`;
+        const modelCount = `${shownModelCount}/${selectedModelCount}`;
         if (aggregationCount > 0) {
             return `Models (${modelCount} + ${aggregationCount})`;
         }

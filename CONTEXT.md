@@ -42,7 +42,7 @@ _Avoid_: custom resort, favourite, pin
 
 **Selection**:
 The set of **Resorts** and **Saved locations** a visitor has chosen to see on the main page.
-_Avoid_: favourites, watchlist
+_Avoid_: favourites, watchlist, **Selected models** (those are **Forecast models**)
 
 **Starter resort**:
 The one **Resort** a first-time visitor's **Selection** begins with. It is the **Resort** whose page they arrived on, otherwise the one nearest to where they appear to be, otherwise a random one. From then on it is an ordinary member of the **Selection**.
@@ -128,17 +128,17 @@ _Avoid_: model override, country setting
 How many days ahead a forecast is asked for: fourteen on the main page, and whatever the visitor picks in the detail view. A card shows fewer days when its **Card model**'s **Range** ends sooner.
 _Avoid_: forecast days, forecast length
 
-**Preferred models**:
-A visitor's own list of **Forecast models**, one list for every **Resort**. Every visitor starts with the **Recommended models**.
-_Avoid_: selected models, default models, **Selection** (that is **Resorts**)
+**Selected models**:
+The **Forecast models** a visitor has ticked for the detail view, one list for every **Resort**. Every visitor starts with the **Recommended models**.
+_Avoid_: preferred models, default models, **Selection** (that is **Resorts**)
 
 **Recommended models**:
-The **Preferred models** a visitor starts with: two global **Forecast models** from different **Providers**, so every **Resort** and **Custom location** opens on two forecasts that never copy each other.
+The **Selected models** a visitor starts with: two global **Forecast models** from different **Providers**, so every **Resort** and **Custom location** opens on two forecasts that never copy each other.
 _Avoid_: default models, defaults
 
 **Comparison models**:
-The **Preferred models** whose **Coverage** includes the point being forecast (a **Resort**, a **Saved location** or a **Custom location**), minus **Clones**. These are the models drawn side by side in the detail view.
-_Avoid_: selected models, model selection
+The **Selected models** whose **Coverage** includes the point being forecast (a **Resort**, a **Saved location** or a **Custom location**), minus **Clones**. These are the models drawn side by side in the detail view.
+_Avoid_: **Selected models** (those include ones not drawn here), model selection
 
 **Aggregation**:
 A line computed hour by hour across the **Comparison models**: median, mean, min, max, or the 25th or 75th percentile. An Aggregation of an **Accumulation** is taken across the models' running totals, never the running total of the hourly Aggregation, and only at hours where every Comparison model has one.

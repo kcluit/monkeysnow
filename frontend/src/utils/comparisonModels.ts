@@ -1,5 +1,5 @@
 /**
- * Turns the fetched Preferred models into the Comparison models: drops models that
+ * Turns the fetched Selected models into the Comparison models: drops models that
  * came back with no data and Clones (see CONTEXT.md and docs/adr/0003).
  */
 
@@ -103,7 +103,7 @@ export function resolveComparisonModels(
 }
 
 /**
- * Why a Preferred model isn't drawn at the point being forecast, or null when it is (or
+ * Why a Selected model isn't drawn at the point being forecast, or null when it is (or
  * would be, once loaded).
  */
 export function getUnavailableReason(model: WeatherModel, availability: ModelAvailabilityContext): string | null {
