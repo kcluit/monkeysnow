@@ -15,8 +15,11 @@ export interface SlopeBand {
 
 export const MAX_SLOPE_ANGLE = 90;
 
-// Most slab avalanches start between 30 and 45 degrees
-export const DEFAULT_SLOPE_BANDS: readonly SlopeBand[] = [{ from: 30, to: 45, colour: '#e51e25' }];
+// Most slab avalanches start between 30 and 45 degrees; steeper ground is purple, as on swisstopo's slope maps
+export const DEFAULT_SLOPE_BANDS: readonly SlopeBand[] = [
+    { from: 30, to: 45, colour: '#e51e25' },
+    { from: 45, to: MAX_SLOPE_ANGLE, colour: '#9433c5' },
+];
 
 // Each band added takes the first of these not yet used: swisstopo's slope colours, then a blue and a green
 const NEW_BAND_COLOURS: readonly string[] = ['#ffdd00', '#ff8c00', '#9433c5', '#e51e25', '#2b83ba', '#1a9850'];

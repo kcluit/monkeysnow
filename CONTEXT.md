@@ -201,7 +201,7 @@ An **Overlay** that colours the ground by one property of the terrain: **Slope a
 _Avoid_: terrain layer, shading
 
 **Slope angle**:
-How steep the ground is, in degrees from flat. The Slope angle **Terrain colouring** shades ground in the visitor's **Slope bands**, by default one band of red from 30 to 45°, where most slab avalanches start. It shows where they can start, not how likely they are today. The same Slope bands show on the flat map and the 3D map.
+How steep the ground is, in degrees from flat. The Slope angle **Terrain colouring** shades ground in the visitor's **Slope bands**, by default red from 30 to 45°, where most slab avalanches start, and purple from 45° up. It shows where they can start, not how likely they are today. The same Slope bands show on the flat map and the 3D map.
 _Avoid_: avalanche overlay, avalanche terrain, steepness
 
 **Slope band**:
