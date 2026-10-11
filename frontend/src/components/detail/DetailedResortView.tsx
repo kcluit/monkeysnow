@@ -1,5 +1,6 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { usePreferredModels, useSelectedAggregations } from '../../hooks/usePreferredModels';
 import { useDetailedWeatherData } from '../../hooks/useDetailedWeatherData';
 import { useBudgetPause } from '../../hooks/useBudgetPause';
 import { useModelHierarchy } from '../../hooks/useModelHierarchy';
@@ -13,25 +14,20 @@ import { ResortMap } from '../map/ResortMap';
 import { suggestedName, updateSavedLocation, type SavedLocationInput } from '../../utils/savedLocations';
 import { MAX_SELECTED_RESORTS } from '../../hooks/useResortHierarchy';
 import { DEFAULT_VARIABLES } from '../../utils/chartConfigurations';
-import {
-    aggregationOptions,
-    RECOMMENDED_MODELS,
-    coversPoint,
-    inCatalogueOrder,
-    isKnownModel,
-} from '../../data/modelHierarchy';
+import { coversPoint, inCatalogueOrder, isKnownModel } from '../../data/modelHierarchy';
 import { resolveComparisonModels } from '../../utils/comparisonModels';
+import { registerModelStylesOpener } from '../../utils/modelStyles';
 import { buildTimeAxis } from '../../utils/timeAxis';
 import type { DetailedResortViewProps, ElevationSelection, CustomLocation } from '../../types/detailView';
-import type { WeatherModel, WeatherVariable, AggregationType } from '../../types/openMeteo';
-import type { UnitSystem, ModelLineOpacity } from '../../types';
+import type { WeatherVariable } from '../../types/openMeteo';
+import type { ChartSettingsTab } from '../../types/chartSettings';
+import type { UnitSystem } from '../../types';
 import { formatElevation } from '../../utils/unitConversion';
 
 interface DetailedResortViewPropsWithUnits extends DetailedResortViewProps {
     unitSystem: UnitSystem;
     showUtilityBar: boolean;
     utilityBarStyle: import('../../types').UtilityBarStyle;
-    modelLineOpacity: ModelLineOpacity;
     onBack: () => void;
     /** Keeps the Custom location being shown as a new Saved location */
     onSaveLocation: (input: SavedLocationInput) => void;
@@ -41,16 +37,6 @@ interface DetailedResortViewPropsWithUnits extends DetailedResortViewProps {
     selectionWasFull?: boolean;
     onDismissSelectionWasFull?: () => void;
 }
-
-// Default aggregation colors
-const DEFAULT_AGGREGATION_COLORS: Record<AggregationType, string> = {
-    median: aggregationOptions.find(a => a.id === 'median')?.defaultColor ?? '#a855f7',
-    mean: aggregationOptions.find(a => a.id === 'mean')?.defaultColor ?? '#ec4899',
-    min: aggregationOptions.find(a => a.id === 'min')?.defaultColor ?? '#14b8a6',
-    max: aggregationOptions.find(a => a.id === 'max')?.defaultColor ?? '#f97316',
-    p25: aggregationOptions.find(a => a.id === 'p25')?.defaultColor ?? '#3b82f6',
-    p75: aggregationOptions.find(a => a.id === 'p75')?.defaultColor ?? '#10b981',
-};
 
 /** Shown in place of the charts when there is nothing to draw, with a way to pick other models. */
 function NoChartsNotice({ message, actionLabel, onAction }: {
@@ -79,7 +65,6 @@ export function DetailedResortView({
     unitSystem,
     showUtilityBar,
     utilityBarStyle,
-    modelLineOpacity,
     onBack,
     onSaveLocation,
     onDeleteSavedLocation,
@@ -88,12 +73,7 @@ export function DetailedResortView({
 }: DetailedResortViewPropsWithUnits): JSX.Element {
     const { t } = useLanguage();
 
-    // The visitor's Preferred models: one list for every Resort, starting as the Recommended models.
-    // New keys wipe saved model lists and Aggregations once (docs/adr/0003, docs/adr/0005).
-    const [preferredModels, setPreferredModels] = useLocalStorage<WeatherModel[]>(
-        'detailPreferredModelsV2',
-        RECOMMENDED_MODELS
-    );
+    const [preferredModels, setPreferredModels] = usePreferredModels();
 
     // State for selected variables - default selection
     const [selectedVariables, setSelectedVariables] = useLocalStorage<WeatherVariable[]>(
@@ -101,34 +81,7 @@ export function DetailedResortView({
         DEFAULT_VARIABLES
     );
 
-    // State for selected aggregations - none by default, since two models have no useful median (docs/adr/0005)
-    const [selectedAggregations, setSelectedAggregations] = useLocalStorage<AggregationType[]>(
-        'detailSelectedAggregationsV2',
-        []
-    );
-
-    // State for aggregation colors (user configurable)
-    const [aggregationColors, setAggregationColors] = useLocalStorage<Record<AggregationType, string>>(
-        'detailAggregationColors',
-        DEFAULT_AGGREGATION_COLORS
-    );
-
-    // State for hiding aggregation members (individual model lines)
-    const [hideAggregationMembers, setHideAggregationMembers] = useLocalStorage<boolean>(
-        'detailHideAggregationMembers',
-        false
-    );
-
-    // State for band fill visibility (disabled by default)
-    const [showMinMaxFill, setShowMinMaxFill] = useLocalStorage<boolean>(
-        'detailShowMinMaxFill',
-        false
-    );
-
-    const [showPercentileFill, setShowPercentileFill] = useLocalStorage<boolean>(
-        'detailShowPercentileFill',
-        false
-    );
+    const [selectedAggregations, setSelectedAggregations] = useSelectedAggregations();
 
     // State for elevation selection - can be 'base', 'mid', 'top', or a custom number
     // Default to 'base' so it dynamically uses each resort's base elevation
@@ -267,8 +220,6 @@ export function DetailedResortView({
         onModelsChange: setPreferredModels,
         selectedAggregations,
         onAggregationsChange: setSelectedAggregations,
-        aggregationColors,
-        onAggregationColorsChange: setAggregationColors,
     });
 
     // One time axis for every chart, spanning the Comparison models' forecasts
@@ -295,6 +246,19 @@ export function DetailedResortView({
     const pause = useBudgetPause();
     const pendingModels = coveringModels.filter((model) => loadingModels.has(model)).length;
     const isLoading = pendingModels > 0;
+    const showsCharts = coveringModels.length > 0 && (isLoading || comparisonModels.length > 0);
+
+    // The chart whose gear modal is open, and the tab to open it on (left out: the one last used)
+    const [openChartSettings, setOpenChartSettings] = useState<{ variable: WeatherVariable; tab?: ChartSettingsTab } | null>(null);
+    const handleOpenChartSettings = useCallback((variable: WeatherVariable) => setOpenChartSettings({ variable }), []);
+    const handleCloseChartSettings = useCallback(() => setOpenChartSettings(null), []);
+
+    // While charts are shown, the model picker and the command palette open the Models tab in the first one's gear modal
+    const firstVariable = selectedVariables[0];
+    useEffect(() => {
+        if (!showsCharts || !firstVariable) return;
+        return registerModelStylesOpener(() => setOpenChartSettings({ variable: firstVariable, tab: 'models' }));
+    }, [showsCharts, firstVariable]);
 
     return (
         <div>
@@ -453,7 +417,7 @@ export function DetailedResortView({
                     actionLabel={t('detail.chooseModels')}
                     onAction={modelHierarchy.openModal}
                 />
-            ) : !isLoading && comparisonModels.length === 0 ? (
+            ) : !showsCharts ? (
                 <NoChartsNotice
                     message={t('detail.noModelHasData')}
                     actionLabel={t('detail.chooseModels')}
@@ -467,11 +431,11 @@ export function DetailedResortView({
                         selectedModels={comparisonModels}
                         selectedVariables={selectedVariables}
                         selectedAggregations={selectedAggregations}
-                        aggregationColors={aggregationColors}
-                        hideAggregationMembers={hideAggregationMembers}
-                        showMinMaxFill={showMinMaxFill}
-                        showPercentileFill={showPercentileFill}
-                        modelLineOpacity={modelLineOpacity}
+                        preferredModels={preferredModels}
+                        modelAvailability={modelAvailability}
+                        openSettings={openChartSettings}
+                        onOpenSettings={handleOpenChartSettings}
+                        onCloseSettings={handleCloseChartSettings}
                         unitSystem={unitSystem}
                         isChartLocked={isChartLocked}
                         isLoading={isLoading}
@@ -498,12 +462,6 @@ export function DetailedResortView({
             <ModelSelectionGridModal
                 hierarchy={modelHierarchy}
                 modelAvailability={modelAvailability}
-                hideAggregationMembers={hideAggregationMembers}
-                onToggleHideMembers={() => setHideAggregationMembers(!hideAggregationMembers)}
-                showMinMaxFill={showMinMaxFill}
-                onToggleMinMaxFill={() => setShowMinMaxFill(!showMinMaxFill)}
-                showPercentileFill={showPercentileFill}
-                onTogglePercentileFill={() => setShowPercentileFill(!showPercentileFill)}
             />
 
             {dialog === 'save' && customLocation && (

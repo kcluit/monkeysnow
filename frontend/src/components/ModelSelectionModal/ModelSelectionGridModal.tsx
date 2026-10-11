@@ -2,24 +2,23 @@
  * Model Selection Grid Modal component.
  * Displays all models in a multi-column grid layout organized by Provider > Models.
  * All providers are expanded by default but collapsible.
- * Aggregations section at the top with color pickers.
+ * Aggregations section at the top, linking to the Models tab where lines are styled.
  */
 
 import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
 import { useOverlay } from '../../hooks/useOverlay';
+import { useModelStyles } from '../../hooks/useModelStyles';
 import { shouldAutoFocusSearch } from '../../utils/autoFocus';
 import {
   buildModelHierarchyTree,
   getModelsUnderNode,
   getAggregationsUnderNode,
-  coversPoint,
   type ModelHierarchyNode,
 } from '../../data/modelHierarchy';
-import { getModelConfig } from '../../utils/chartConfigurations';
+import { getUnavailableReason } from '../../utils/comparisonModels';
+import { aggregationColor, modelColor, openModelStyles, type ModelStyles } from '../../utils/modelStyles';
 import type { UseModelHierarchyReturn } from '../../hooks/useModelHierarchy';
 import type { WeatherModel, AggregationType } from '../../types/openMeteo';
 import type { ModelAvailabilityContext } from '../../types/detailView';
@@ -28,21 +27,7 @@ interface ModelSelectionGridModalProps {
   hierarchy: UseModelHierarchyReturn;
   /** Which models are drawn at the point being forecast, for dimming the rest */
   modelAvailability: ModelAvailabilityContext;
-  hideAggregationMembers?: boolean;
-  onToggleHideMembers?: () => void;
-  showMinMaxFill?: boolean;
-  onToggleMinMaxFill?: () => void;
-  showPercentileFill?: boolean;
-  onTogglePercentileFill?: () => void;
 }
-
-// Color picker presets
-const COLOR_PRESETS = [
-  '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16',
-  '#22c55e', '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9',
-  '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef',
-  '#ec4899', '#f43f5e', '#78716c', '#71717a', '#64748b',
-];
 
 // Get all node IDs from the hierarchy tree for default expansion
 function getAllNodeIds(nodes: ModelHierarchyNode[]): Set<string> {
@@ -122,33 +107,21 @@ const Checkbox = memo(function Checkbox({
   );
 });
 
-/**
- * Why a model isn't drawn at the point being forecast, or null when it is (or would be).
- * Models stay tickable either way: Preferred models are one list for every Resort.
- */
-function getUnavailableReason(modelId: WeatherModel, availability: ModelAvailabilityContext): string | null {
-  const { point, droppedModels } = availability;
-  if (!coversPoint(modelId, point.lat, point.lon)) return 'Outside its coverage';
-  const dropped = droppedModels.get(modelId);
-  if (dropped?.reason === 'no-data') return 'No data here';
-  if (dropped?.reason === 'clone') return `Same as ${getModelConfig(dropped.of).name} here`;
-  return null;
-}
-
-// Model item component
+// Model item component; unavailable ones stay tickable, since Preferred models are one list for every Resort
 const ModelItem = memo(function ModelItem({
   node,
   isSelected,
+  color,
   unavailableReason,
   onToggle,
 }: {
   node: ModelHierarchyNode;
   isSelected: boolean;
+  /** Its colour in the visitor's Model styles */
+  color: string;
   unavailableReason: string | null;
   onToggle: () => void;
 }) {
-  const color = node.modelId ? getModelConfig(node.modelId).color : '#6b7280';
-
   return (
     <label
       className={`resort-grid-item ${unavailableReason ? 'model-grid-item-unavailable' : ''}`}
@@ -173,44 +146,25 @@ const ModelItem = memo(function ModelItem({
   );
 });
 
-// Aggregation item component with color picker
+// Aggregation item component; its colour is set in the Models tab
 const AggregationItem = memo(function AggregationItem({
   node,
   isSelected,
   color,
   onToggle,
-  onColorChange,
 }: {
   node: ModelHierarchyNode;
   isSelected: boolean;
   color: string;
   onToggle: () => void;
-  onColorChange: (color: string) => void;
 }) {
-  const [showColorPicker, setShowColorPicker] = useState(false);
-
-  const handleColorClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    setShowColorPicker(!showColorPicker);
-  }, [showColorPicker]);
-
-  const handleColorSelect = useCallback((newColor: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    onColorChange(newColor);
-    setShowColorPicker(false);
-  }, [onColorChange]);
-
   return (
     <div className="model-aggregation-item">
       <label className="resort-grid-item" onClick={(e) => { e.preventDefault(); onToggle(); }}>
         <Checkbox state={isSelected ? 'all' : 'none'} onClick={(e) => { e.stopPropagation(); onToggle(); }} />
         <span
-          className="model-color-dot model-color-clickable"
+          className="model-color-dot"
           style={{ backgroundColor: color }}
-          onClick={handleColorClick}
-          title="Click to change color"
         />
         <div className="model-tree-info">
           <span className="resort-grid-item-name">{node.name}</span>
@@ -219,21 +173,6 @@ const AggregationItem = memo(function AggregationItem({
           )}
         </div>
       </label>
-      {showColorPicker && (
-        <div className="model-color-picker-dropdown" onClick={(e) => e.stopPropagation()}>
-          <div className="model-color-picker-grid">
-            {COLOR_PRESETS.map((presetColor) => (
-              <button
-                key={presetColor}
-                type="button"
-                className={`model-color-swatch ${color === presetColor ? 'selected' : ''}`}
-                style={{ backgroundColor: presetColor }}
-                onClick={(e) => handleColorSelect(presetColor, e)}
-              />
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 });
@@ -245,19 +184,13 @@ const ProviderSection = memo(function ProviderSection({
   onToggleExpand,
   selectedModels,
   selectedAggregations,
-  aggregationColors,
+  modelStyles,
   onToggleModel,
   onToggleAggregation,
   onSelectAll,
   onDeselectAll,
   getSelectionState,
-  onColorChange,
-  hideAggregationMembers,
-  onToggleHideMembers,
-  showMinMaxFill,
-  onToggleMinMaxFill,
-  showPercentileFill,
-  onTogglePercentileFill,
+  onOpenModelStyles,
   modelAvailability,
 }: {
   node: ModelHierarchyNode;
@@ -266,19 +199,13 @@ const ProviderSection = memo(function ProviderSection({
   onToggleExpand: (id: string) => void;
   selectedModels: WeatherModel[];
   selectedAggregations: AggregationType[];
-  aggregationColors: Record<AggregationType, string>;
+  modelStyles: ModelStyles;
   onToggleModel: (modelId: WeatherModel) => void;
   onToggleAggregation: (aggType: AggregationType) => void;
   onSelectAll: (node: ModelHierarchyNode) => void;
   onDeselectAll: (node: ModelHierarchyNode) => void;
   getSelectionState: (node: ModelHierarchyNode) => 'all' | 'some' | 'none';
-  onColorChange: (aggType: AggregationType, color: string) => void;
-  hideAggregationMembers?: boolean;
-  onToggleHideMembers?: () => void;
-  showMinMaxFill?: boolean;
-  onToggleMinMaxFill?: () => void;
-  showPercentileFill?: boolean;
-  onTogglePercentileFill?: () => void;
+  onOpenModelStyles: () => void;
 }) {
   const isExpanded = expandedNodes.has(node.id);
   const selectionState = getSelectionState(node);
@@ -322,13 +249,14 @@ const ProviderSection = memo(function ProviderSection({
         <span className="resort-grid-count">
           {selectedCount}/{totalItems}
         </span>
-        {isAggregationsSection && onToggleHideMembers && (
+        {isAggregationsSection && (
           <button
-            className={`aggregation-hide-toggle ${hideAggregationMembers ? 'active' : ''}`}
-            onClick={(e) => { e.stopPropagation(); onToggleHideMembers(); }}
-            title={hideAggregationMembers ? 'Show individual model lines' : 'Hide individual model lines'}
+            type="button"
+            className="model-styles-link"
+            onClick={(e) => { e.stopPropagation(); onOpenModelStyles(); }}
+            title="Colours, bold and opacity of every line, the fills, and hiding model lines"
           >
-            <FontAwesomeIcon icon={hideAggregationMembers ? faEyeSlash : faEye} />
+            Colours & lines
           </button>
         )}
       </div>
@@ -341,9 +269,8 @@ const ProviderSection = memo(function ProviderSection({
                   key={child.id}
                   node={child}
                   isSelected={selectedAggregations.includes(child.aggregationType)}
-                  color={aggregationColors[child.aggregationType] ?? '#8b5cf6'}
+                  color={aggregationColor(modelStyles, child.aggregationType)}
                   onToggle={() => onToggleAggregation(child.aggregationType!)}
-                  onColorChange={(color) => onColorChange(child.aggregationType!, color)}
                 />
               );
             } else if (child.type === 'model' && child.modelId) {
@@ -352,6 +279,7 @@ const ProviderSection = memo(function ProviderSection({
                   key={child.id}
                   node={child}
                   isSelected={selectedModels.includes(child.modelId)}
+                  color={modelColor(modelStyles, child.modelId)}
                   unavailableReason={getUnavailableReason(child.modelId, modelAvailability)}
                   onToggle={() => onToggleModel(child.modelId!)}
                 />
@@ -359,28 +287,6 @@ const ProviderSection = memo(function ProviderSection({
             }
             return null;
           })}
-          {/* Band fill toggle options - only in Aggregations section */}
-          {isAggregationsSection && (
-            <>
-              <div className="model-fill-options-divider" />
-              <label className="resort-grid-item fill-option-item" onClick={(e) => { e.preventDefault(); onToggleMinMaxFill?.(); }}>
-                <Checkbox state={showMinMaxFill ? 'all' : 'none'} onClick={(e) => { e.stopPropagation(); onToggleMinMaxFill?.(); }} />
-                <span className="fill-option-icon">▒</span>
-                <div className="model-tree-info">
-                  <span className="resort-grid-item-name">Min-Max Fill</span>
-                  <span className="model-tree-description">Shaded area between min and max lines</span>
-                </div>
-              </label>
-              <label className="resort-grid-item fill-option-item" onClick={(e) => { e.preventDefault(); onTogglePercentileFill?.(); }}>
-                <Checkbox state={showPercentileFill ? 'all' : 'none'} onClick={(e) => { e.stopPropagation(); onTogglePercentileFill?.(); }} />
-                <span className="fill-option-icon">▒</span>
-                <div className="model-tree-info">
-                  <span className="resort-grid-item-name">25th-75th Fill</span>
-                  <span className="model-tree-description">Shaded area between percentile lines</span>
-                </div>
-              </label>
-            </>
-          )}
         </div>
       )}
     </div>
@@ -391,36 +297,29 @@ const ProviderSection = memo(function ProviderSection({
 export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
   hierarchy,
   modelAvailability,
-  hideAggregationMembers,
-  onToggleHideMembers,
-  showMinMaxFill,
-  onToggleMinMaxFill,
-  showPercentileFill,
-  onTogglePercentileFill,
 }: ModelSelectionGridModalProps): JSX.Element | null {
   const {
     isOpen,
-    closeModal: hierarchyCloseModal,
+    closeModal,
     selectedModels,
     selectedAggregations,
-    aggregationColors,
     toggleModel,
     toggleAggregation,
     selectAllInNode,
     deselectAllInNode,
     getSelectionState,
-    setAggregationColor,
     searchTerm,
     setSearchTerm,
   } = hierarchy;
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const modelStyles = useModelStyles();
 
-  // Local state for fill toggles (deferred until close)
-  const [localHideMembers, setLocalHideMembers] = useState(hideAggregationMembers ?? false);
-  const [localMinMaxFill, setLocalMinMaxFill] = useState(showMinMaxFill ?? false);
-  const [localPercentileFill, setLocalPercentileFill] = useState(showPercentileFill ?? false);
-  const hasLocalChangesRef = useRef(false);
+  // Closing keeps the picks made here, so the Models tab lists them
+  const handleOpenModelStyles = useCallback(() => {
+    closeModal();
+    openModelStyles();
+  }, [closeModal]);
 
   // Build hierarchy tree once
   const hierarchyTree = useMemo(() => buildModelHierarchyTree(), []);
@@ -435,52 +334,8 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
   useEffect(() => {
     if (isOpen) {
       setExpandedNodes(new Set(allNodeIds));
-      // Initialize local fill toggles from props
-      setLocalHideMembers(hideAggregationMembers ?? false);
-      setLocalMinMaxFill(showMinMaxFill ?? false);
-      setLocalPercentileFill(showPercentileFill ?? false);
-      hasLocalChangesRef.current = false;
     }
-  }, [isOpen, allNodeIds, hideAggregationMembers, showMinMaxFill, showPercentileFill]);
-
-  // Wrapper to apply local changes on close
-  const closeModal = useCallback(() => {
-    // Apply local fill toggle changes
-    if (hasLocalChangesRef.current) {
-      if (localHideMembers !== hideAggregationMembers && onToggleHideMembers) {
-        onToggleHideMembers();
-      }
-      if (localMinMaxFill !== showMinMaxFill && onToggleMinMaxFill) {
-        onToggleMinMaxFill();
-      }
-      if (localPercentileFill !== showPercentileFill && onTogglePercentileFill) {
-        onTogglePercentileFill();
-      }
-    }
-    hasLocalChangesRef.current = false;
-    hierarchyCloseModal();
-  }, [
-    localHideMembers, hideAggregationMembers, onToggleHideMembers,
-    localMinMaxFill, showMinMaxFill, onToggleMinMaxFill,
-    localPercentileFill, showPercentileFill, onTogglePercentileFill,
-    hierarchyCloseModal,
-  ]);
-
-  // Local toggle handlers
-  const handleToggleHideMembers = useCallback(() => {
-    hasLocalChangesRef.current = true;
-    setLocalHideMembers(prev => !prev);
-  }, []);
-
-  const handleToggleMinMaxFill = useCallback(() => {
-    hasLocalChangesRef.current = true;
-    setLocalMinMaxFill(prev => !prev);
-  }, []);
-
-  const handleTogglePercentileFill = useCallback(() => {
-    hasLocalChangesRef.current = true;
-    setLocalPercentileFill(prev => !prev);
-  }, []);
+  }, [isOpen, allNodeIds]);
 
   // Filter hierarchy based on search
   const filteredHierarchy = useMemo(
@@ -577,19 +432,13 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
                   onToggleExpand={handleToggleExpand}
                   selectedModels={selectedModels}
                   selectedAggregations={selectedAggregations}
-                  aggregationColors={aggregationColors}
+                  modelStyles={modelStyles}
                   onToggleModel={toggleModel}
                   onToggleAggregation={toggleAggregation}
                   onSelectAll={selectAllInNode}
                   onDeselectAll={deselectAllInNode}
                   getSelectionState={getSelectionState}
-                  onColorChange={setAggregationColor}
-                  hideAggregationMembers={localHideMembers}
-                  onToggleHideMembers={handleToggleHideMembers}
-                  showMinMaxFill={localMinMaxFill}
-                  onToggleMinMaxFill={handleToggleMinMaxFill}
-                  showPercentileFill={localPercentileFill}
-                  onTogglePercentileFill={handleTogglePercentileFill}
+                  onOpenModelStyles={handleOpenModelStyles}
                 />
               ))}
             </div>
@@ -599,7 +448,7 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
         {/* Footer */}
         <div className="command-palette-footer model-grid-footer">
           <div className="model-grid-footer-note">
-            Note: Your models apply to every resort. Dimmed ones aren't drawn here: they don't cover this point, sent no data, or repeat another model's numbers. Seamless blends a provider's models into one forecast. Click <FontAwesomeIcon icon={faEye} /> to hide aggregation members.
+            Note: Your models apply to every resort. Dimmed ones aren't drawn here: they don't cover this point, sent no data, or repeat another model's numbers. Seamless blends a provider's models into one forecast. Colours & lines sets how each one is drawn.
           </div>
           <div className="model-grid-footer-actions">
             <span className="command-hint">

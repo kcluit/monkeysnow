@@ -33,6 +33,9 @@ function getStructuralKey(config: ChartConfig): string {
         seriesColors: config.series.map(s => s.color),
         // Line styles are baked into the uPlot series when the chart is built
         seriesOpacity: config.series.map(s => s.opacity ?? 1),
+        seriesWidths: config.series.map(s => s.lineWidth ?? 2),
+        // The legend is drawn once, when the chart is built
+        seriesBold: config.series.map(s => !!s.bold),
         seriesYAxisIndex: config.series.map(s => s.yAxisIndex ?? 0),
         hasBandData: config.series.map(s => !!s.bandData),
         hasSecondaryAxis: !!config.yAxisSecondary,

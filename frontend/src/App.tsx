@@ -16,6 +16,7 @@ const CompactCard = lazy(() => import('./components/cards/CompactCard').then(m =
 
 // Lazy load DetailedResortView - imports uplot (~80KB) and chart configs
 const DetailedResortView = lazy(() => import('./components/detail/DetailedResortView').then(m => ({ default: m.DetailedResortView })));
+const ModelStylesModal = lazy(() => import('./components/detail/ModelStylesModal').then(m => ({ default: m.ModelStylesModal })));
 import { FPSCounter } from './components/FPSCounter';
 import { ResortSelectionGridModal } from './components/ResortSelectionModal';
 import { CardModelsModal } from './components/CardModelsModal';
@@ -49,6 +50,7 @@ import { getSortDayData } from './utils/sortDayHelpers';
 import { getResortLocation } from './utils/openMeteoClient';
 import { resolveResortId } from './data/resortLocations';
 import { pickStarterResort } from './utils/starterResort';
+import { openModelStyles, registerModelStylesOpener } from './utils/modelStyles';
 import {
     deleteSavedLocation,
     isSavedLocationId,
@@ -75,14 +77,12 @@ import type {
     SnowfallEstimateMode,
     UtilityBarStyle,
     ResortDisplayLimit,
-    ModelLineOpacity
 } from './types';
 
 interface DetailRouteProps {
     unitSystem: 'metric' | 'imperial';
     showUtilityBar: boolean;
     utilityBarStyle: UtilityBarStyle;
-    modelLineOpacity: ModelLineOpacity;
     onSaveLocation: (input: SavedLocationInput) => void;
 }
 
@@ -91,7 +91,6 @@ function ResortDetailRoute({
     unitSystem,
     showUtilityBar,
     utilityBarStyle,
-    modelLineOpacity,
     onSaveLocation,
     getDisplayName,
 }: DetailRouteProps & {
@@ -142,7 +141,6 @@ function ResortDetailRoute({
                 unitSystem={unitSystem}
                 showUtilityBar={showUtilityBar}
                 utilityBarStyle={utilityBarStyle}
-                modelLineOpacity={modelLineOpacity}
                 onBack={handleBack}
                 onSaveLocation={onSaveLocation}
             />
@@ -155,7 +153,6 @@ function SavedLocationRoute({
     unitSystem,
     showUtilityBar,
     utilityBarStyle,
-    modelLineOpacity,
     onSaveLocation,
     onDeleteSavedLocation,
 }: DetailRouteProps & {
@@ -203,7 +200,6 @@ function SavedLocationRoute({
                 unitSystem={unitSystem}
                 showUtilityBar={showUtilityBar}
                 utilityBarStyle={utilityBarStyle}
-                modelLineOpacity={modelLineOpacity}
                 onBack={handleBack}
                 onSaveLocation={onSaveLocation}
                 onDeleteSavedLocation={onDeleteSavedLocation}
@@ -276,7 +272,6 @@ function App(): JSX.Element {
     const [chartZoomSyncEnabled, setChartZoomSyncEnabled] = useLocalStorage<boolean>('chartZoomSync', true);
     const [unitSystem, setUnitSystem] = useUnitSystem();
     const [resortDisplayLimit, setResortDisplayLimit] = useLocalStorage<ResortDisplayLimit>('resortDisplayLimit', 'auto');
-    const [modelLineOpacity, setModelLineOpacity] = useLocalStorage<ModelLineOpacity>('modelLineOpacity', 'auto');
 
     // Sync chart zoom sync setting to registry
     useEffect(() => {
@@ -297,6 +292,11 @@ function App(): JSX.Element {
     const [isCardModelsOpen, setCardModelsOpen] = useState(false);
     const openCardModels = useCallback(() => setCardModelsOpen(true), []);
     const closeCardModels = useCallback(() => setCardModelsOpen(false), []);
+
+    // The Models tab on its own, wherever no chart's gear modal can show it; the detail view, loaded lazily, registers later and wins
+    const [isModelStylesOpen, setModelStylesOpen] = useState(false);
+    const closeModelStyles = useCallback(() => setModelStylesOpen(false), []);
+    useEffect(() => registerModelStylesOpener(() => setModelStylesOpen(true)), []);
 
     // Open resort modal and auto-dismiss the banner
     const openResortModalAndDismissBanner = useCallback(() => {
@@ -344,7 +344,6 @@ function App(): JSX.Element {
         resortDisplayLimit, setResortDisplayLimit,
         openResortModalAndDismissBanner,
         language.id, setLanguage, availableLanguages,
-        modelLineOpacity, setModelLineOpacity,
     ];
 
     // Command factory for lazy generation - commands only built when palette opens
@@ -558,8 +557,7 @@ function App(): JSX.Element {
             languageId: language.id,
             setLanguage,
             availableLanguages,
-            modelLineOpacity,
-            setModelLineOpacity,
+            openModelStyles,
         });
 
         // No Fullscreen command where the page can't go fullscreen (iPhone)
@@ -977,8 +975,7 @@ function App(): JSX.Element {
         availableLanguages,
         resortDisplayLimit,
         setResortDisplayLimit,
-        modelLineOpacity,
-        setModelLineOpacity,
+        openModelStyles,
         openResortSelector: openResortModalAndDismissBanner,
     };
 
@@ -1002,6 +999,13 @@ function App(): JSX.Element {
 
             {/* Main page models */}
             <CardModelsModal isOpen={isCardModelsOpen} onClose={closeCardModels} selectedResorts={selectedResorts} />
+
+            {/* Model styles, opened from the Settings page or the command palette */}
+            {isModelStylesOpen && (
+                <Suspense fallback={null}>
+                    <ModelStylesModal onClose={closeModelStyles} />
+                </Suspense>
+            )}
 
             {/* FPS Counter */}
             <FPSCounter fps={fps} isVisible={isFPSEnabled} />
@@ -1030,7 +1034,6 @@ function App(): JSX.Element {
                             unitSystem={unitSystem}
                             showUtilityBar={showUtilityBar}
                             utilityBarStyle={utilityBarStyle}
-                            modelLineOpacity={modelLineOpacity}
                             onSaveLocation={handleSaveLocation}
                             getDisplayName={getDisplayName}
                         />
@@ -1047,7 +1050,6 @@ function App(): JSX.Element {
                             unitSystem={unitSystem}
                             showUtilityBar={showUtilityBar}
                             utilityBarStyle={utilityBarStyle}
-                            modelLineOpacity={modelLineOpacity}
                             onSaveLocation={handleSaveLocation}
                             onDeleteSavedLocation={handleDeleteSavedLocation}
                         />

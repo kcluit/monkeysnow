@@ -129,3 +129,7 @@ _Avoid_: selected models, model selection
 **Aggregation**:
 A line computed hour by hour across the **Comparison models**: median, mean, min, max, or the 25th or 75th percentile.
 _Avoid_: ensemble, consensus
+
+**Model style**:
+How a visitor has chosen to draw the line of one **Forecast model** or **Aggregation**: its colour, whether it is bold, and its opacity. It is the same on every chart, for every **Resort** and location. A bold line is drawn thicker and above the others of its kind; a model whose opacity is Auto is faded only while **Aggregations** are drawn.
+_Avoid_: line style, model settings, model appearance

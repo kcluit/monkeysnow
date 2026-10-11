@@ -3,7 +3,7 @@
  * Generates commands with checkmarks based on current state.
  */
 
-import type { Command, ElevationLevel, SortOption, SortDay, SortDayData, ViewMode, TemperatureMetric, SnowfallEstimateMode, UtilityBarStyle, UnitSystem, ResortDisplayLimit, ModelLineOpacity } from '../types';
+import type { Command, ElevationLevel, SortOption, SortDay, SortDayData, ViewMode, TemperatureMetric, SnowfallEstimateMode, UtilityBarStyle, UnitSystem, ResortDisplayLimit } from '../types';
 import type { Language } from '../types/i18n';
 import { icons } from '../constants/icons';
 
@@ -50,9 +50,8 @@ export interface ControlCommandParams {
   languageId: string;
   setLanguage: (id: string) => void;
   availableLanguages: Language[];
-  // Model line opacity
-  modelLineOpacity: ModelLineOpacity;
-  setModelLineOpacity: (opacity: ModelLineOpacity) => void;
+  // Model styles
+  openModelStyles: () => void;
 }
 
 /**
@@ -369,31 +368,6 @@ export function generateLanguageCommands(
 }
 
 /**
- * Generate model line opacity submenu commands with checkmarks.
- */
-export function generateModelLineOpacityCommands(
-  currentOpacity: ModelLineOpacity,
-  setOpacity: (opacity: ModelLineOpacity) => void
-): Command[] {
-  const presets: { value: ModelLineOpacity; name: string }[] = [
-    { value: 'auto', name: 'Auto' },
-    { value: 0.05, name: '5%' },
-    { value: 0.1, name: '10%' },
-    { value: 0.2, name: '20%' },
-    { value: 0.35, name: '35%' },
-    { value: 0.5, name: '50%' },
-    { value: 1, name: '100%' },
-  ];
-
-  return presets.map(({ value, name }) => ({
-    id: `model-opacity-${value}`,
-    name,
-    icon: currentOpacity === value ? icons.check : undefined,
-    action: () => setOpacity(value),
-  }));
-}
-
-/**
  * Generate all control-related commands for the command palette.
  * This is the main entry point for command generation.
  */
@@ -522,13 +496,10 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
       ),
     },
     {
-      id: 'model-line-opacity',
-      name: 'Model line opacity',
+      id: 'model-styles',
+      name: 'Model styles',
       icon: icons.chart,
-      subCommands: generateModelLineOpacityCommands(
-        params.modelLineOpacity,
-        params.setModelLineOpacity
-      ),
+      action: params.openModelStyles,
     },
   ];
 }

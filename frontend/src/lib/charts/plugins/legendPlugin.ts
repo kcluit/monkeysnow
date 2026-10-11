@@ -62,6 +62,7 @@ export function createLegendPlugin(options: LegendPluginOptions): uPlot.Plugin {
             label.style.fontSize = '12px';
             label.style.color = config.theme.textPrimary;
             label.style.whiteSpace = 'nowrap';
+            if (seriesConfig.bold) label.style.fontWeight = '700';
 
             item.appendChild(bullet);
             item.appendChild(label);

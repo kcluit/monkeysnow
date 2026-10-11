@@ -9,12 +9,12 @@
 import type { ChartConfig, ChartType, SeriesConfig, ChartTheme, BoxWhiskerData, HeatmapData, WindArrowData } from '../lib/charts';
 import type { WeatherChartProps } from '../types/detailView';
 import type { WeatherModel, HourlyDataPoint, AggregationType } from '../types/openMeteo';
-import type { UnitSystem, ModelLineOpacity } from '../types';
+import type { UnitSystem } from '../types';
 import { supportsAccumulation } from '../types/chartSettings';
 import type { ChartDisplayType } from '../types/chartSettings';
 import { getModelConfig, getVariableConfig, getOverlayConfig, hasOverlays } from './chartConfigurations';
 import { getUPlotTheme } from '../lib/charts';
-import { aggregationOptions } from '../data/modelHierarchy';
+import { DEFAULT_MODEL_STYLES, aggregationColor, modelColor, type ModelStyles } from './modelStyles';
 import { axisIndexOf, type TimeAxis } from './timeAxis';
 
 /** Additional chart settings passed from WeatherChart component */
@@ -25,6 +25,16 @@ export interface ChartBuildSettings {
     showOverlays?: boolean;
     /** Custom chart height in pixels (default: 300, or 300 for heatmaps) */
     customHeight?: number;
+    /** The visitor's Model styles, fills and hidden model lines */
+    modelStyles?: ModelStyles;
+}
+
+const LINE_WIDTH = 2;
+const BOLD_LINE_WIDTH = 3.5;
+
+/** Bold lines last, so they are drawn above the others in their group. */
+function boldOnTop(series: SeriesConfig[]): SeriesConfig[] {
+    return [...series.filter((s) => !s.bold), ...series.filter((s) => s.bold)];
 }
 
 /** One value per point of the time axis; null leaves a gap in the chart. */
@@ -144,31 +154,27 @@ function getAggregationDisplayName(aggType: AggregationType): string {
 }
 
 /**
- * Get default color for aggregation type.
- * Uses the single source of truth from aggregationOptions.
- */
-function getDefaultAggregationColor(aggType: AggregationType): string {
-    return aggregationOptions.find(a => a.id === aggType)?.defaultColor ?? '#8b5cf6';
-}
-
-/**
  * Aggregation lines (median, mean, ...) drawn on top of the model lines.
  */
 function buildAggregationSeries(
     statistics: Map<AggregationType, Series>,
     aggregations: AggregationType[],
-    aggregationColors: Record<AggregationType, string>,
+    styles: ModelStyles,
     chartType: ChartType
 ): SeriesConfig[] {
-    return aggregations.map((aggType) => ({
-        id: aggType,
-        name: getAggregationDisplayName(aggType),
-        color: aggregationColors[aggType] ?? getDefaultAggregationColor(aggType),
-        type: chartType,
-        data: statistics.get(aggType)!,
-        lineWidth: 2, // Same width as models, distinguished by opacity
-        opacity: 1,
-        zIndex: 100, // Render on top
+    return boldOnTop(aggregations.map((aggType) => {
+        const style = styles.aggregations[aggType];
+        return {
+            id: aggType,
+            name: getAggregationDisplayName(aggType),
+            color: aggregationColor(styles, aggType),
+            type: chartType,
+            data: statistics.get(aggType)!,
+            lineWidth: style?.bold ? BOLD_LINE_WIDTH : LINE_WIDTH,
+            bold: style?.bold,
+            opacity: style?.opacity ?? 1,
+            zIndex: 100, // Render on top
+        };
     }));
 }
 
@@ -179,7 +185,7 @@ function buildBandSeries(
     statistics: Map<AggregationType, Series>,
     showMinMax: boolean,
     showPercentiles: boolean,
-    aggregationColors: Record<AggregationType, string>
+    styles: ModelStyles
 ): SeriesConfig[] {
     const bands: SeriesConfig[] = [];
 
@@ -188,7 +194,7 @@ function buildBandSeries(
         bands.push({
             id: 'band_min_max',
             name: 'Min-Max Range',
-            color: aggregationColors['max'] ?? getDefaultAggregationColor('max'),
+            color: aggregationColor(styles, 'max'),
             type: 'band',
             data: maxData, // Use max data for y-scale calculation
             fillOpacity: 0.05,
@@ -202,7 +208,7 @@ function buildBandSeries(
         bands.push({
             id: 'band_p25_p75',
             name: '25th-75th Percentile',
-            color: aggregationColors['p75'] ?? getDefaultAggregationColor('p75'),
+            color: aggregationColor(styles, 'p75'),
             type: 'band',
             data: p75Data, // Use p75 data for y-scale calculation
             fillOpacity: 0.05,
@@ -215,60 +221,55 @@ function buildBandSeries(
 }
 
 /**
- * Calculate model line opacity based on number of selected models.
- * More models = lower opacity so aggregation lines stand out.
+ * A model line's opacity on Auto: fully opaque on its own, and faded while Aggregations
+ * are drawn, more so the more models there are, so the Aggregation lines stand out.
  */
-function calculateModelOpacity(modelCount: number): number {
-    // Scale opacity: fewer models = more visible, more models = more faded
+function autoModelOpacity(modelCount: number, hasAggregations: boolean): number {
     // Uses sqrt scaling for a smooth curve
-    return Math.max(0.05, 0.5 / Math.sqrt(modelCount));
+    return hasAggregations ? Math.max(0.05, 0.5 / Math.sqrt(modelCount)) : 1;
 }
 
 /**
- * Build series configurations from weather model data.
+ * Build series configurations from weather model data, each in its Model style.
  * Skips models with no data or empty data arrays.
- * @param hideAggregationMembers - If true and aggregations are present, skip model series entirely
  */
 function buildSeriesConfigs(
     seriesData: Map<WeatherModel, Series>,
     selectedModels: WeatherModel[],
     chartType: ChartType,
     hasAggregations: boolean,
-    hideAggregationMembers: boolean = false,
-    modelLineOpacity: ModelLineOpacity = 'auto'
+    styles: ModelStyles
 ): SeriesConfig[] {
-    // Skip model series entirely if hiding members and aggregations are active
-    if (hideAggregationMembers && hasAggregations) {
+    // Skip model series entirely if hiding them behind the aggregations
+    if (styles.hideModelLines && hasAggregations) {
         return [];
     }
 
     const configs: SeriesConfig[] = [];
-    const modelOpacity = hasAggregations
-        ? (modelLineOpacity === 'auto' ? calculateModelOpacity(selectedModels.length) : modelLineOpacity)
-        : 1;
+    const autoOpacity = autoModelOpacity(selectedModels.length, hasAggregations);
 
     for (const model of selectedModels) {
         const data = seriesData.get(model);
         // Skip if no data or empty array
         if (!data || data.length === 0) continue;
 
-        const modelConfig = getModelConfig(model);
+        const style = styles.models[model];
 
         configs.push({
             id: model,
-            name: modelConfig.name,
-            color: modelConfig.color,
+            name: getModelConfig(model).name,
+            color: modelColor(styles, model),
             type: chartType,
             data,
             fillOpacity: chartType === 'area' ? 0.3 : undefined,
-            // Reduce opacity when aggregations are enabled, scaled by model count
-            opacity: modelOpacity,
-            lineWidth: 2,
+            opacity: style?.opacity ?? autoOpacity,
+            lineWidth: style?.bold ? BOLD_LINE_WIDTH : LINE_WIDTH,
+            bold: style?.bold,
             zIndex: 2,
         });
     }
 
-    return configs;
+    return boldOnTop(configs);
 }
 
 /**
@@ -290,12 +291,13 @@ function calculateAccumulation(values: Series): Series {
 
 /**
  * Build accumulation series from model data.
- * Creates a cumulative sum line for each model, plotted on the secondary Y-axis.
- * Returns multiple series (one per model) with solid lines.
+ * Creates a cumulative sum line for each model, plotted on the secondary Y-axis,
+ * in its model's style. Returns multiple series (one per model) with solid lines.
  */
 function buildAccumulationSeries(
     seriesData: Map<WeatherModel, Series>,
-    selectedModels: WeatherModel[]
+    selectedModels: WeatherModel[],
+    styles: ModelStyles
 ): SeriesConfig[] {
     if (seriesData.size === 0) return [];
 
@@ -305,23 +307,25 @@ function buildAccumulationSeries(
         const modelData = seriesData.get(model);
         if (!modelData || modelData.length === 0) continue;
 
-        const modelConfig = getModelConfig(model);
+        const style = styles.models[model];
 
         accumulationSeries.push({
             id: `accumulation_${model}`,
-            name: `${modelConfig.name} (Accum)`,
-            color: modelConfig.color,
+            name: `${getModelConfig(model).name} (Accum)`,
+            color: modelColor(styles, model),
             type: 'line',
             data: calculateAccumulation(modelData),
-            lineWidth: 2,
-            opacity: 0.9,
+            lineWidth: style?.bold ? BOLD_LINE_WIDTH : LINE_WIDTH,
+            bold: style?.bold,
+            // Auto is 90%, with or without Aggregations
+            opacity: style?.opacity ?? 0.9,
             zIndex: 50, // Above model series but below aggregations
             lineStyle: 'solid',
             yAxisIndex: 1, // Use secondary Y-axis (right side)
         });
     }
 
-    return accumulationSeries;
+    return boldOnTop(accumulationSeries);
 }
 
 /**
@@ -424,26 +428,17 @@ export function buildWeatherChartConfig(
     theme?: ChartTheme,
     settings?: ChartBuildSettings
 ): ChartConfig | null {
-    // Build default colors from single source of truth
-    const defaultAggregationColors = Object.fromEntries(
-        aggregationOptions.map(a => [a.id, a.defaultColor])
-    ) as Record<AggregationType, string>;
-
     const {
         data,
         timeAxis,
         selectedModels,
         selectedAggregations = [],
-        aggregationColors = defaultAggregationColors,
-        hideAggregationMembers = false,
-        showMinMaxFill = false,
-        showPercentileFill = false,
-        modelLineOpacity = 'auto',
         variable,
         unitSystem,
         isChartLocked,
         location,
     } = props;
+    const styles = settings?.modelStyles ?? DEFAULT_MODEL_STYLES;
 
     // Handle empty data
     if (!timeAxis || timeAxis.timestamps.length === 0 || data.size === 0) {
@@ -463,8 +458,8 @@ export function buildWeatherChartConfig(
 
     // Determine if we have aggregations enabled
     const hasAggregations = selectedAggregations.length > 0 && multipleModels;
-    const showMinMax = multipleModels && showMinMaxFill && selectedAggregations.includes('min') && selectedAggregations.includes('max');
-    const showPercentiles = multipleModels && showPercentileFill && selectedAggregations.includes('p25') && selectedAggregations.includes('p75');
+    const showMinMax = multipleModels && styles.showMinMaxFill && selectedAggregations.includes('min') && selectedAggregations.includes('max');
+    const showPercentiles = multipleModels && styles.showPercentileFill && selectedAggregations.includes('p25') && selectedAggregations.includes('p75');
     const showBoxWhisker = chartType === 'boxwhisker' && multipleModels;
 
     // Every statistic this chart draws, computed in one pass
@@ -475,12 +470,12 @@ export function buildWeatherChartConfig(
     if (showBoxWhisker) ['min', 'p25', 'median', 'p75', 'max'].forEach((a) => wantedStatistics.add(a as AggregationType));
     const statistics = computeStatistics(allSeriesValues, timePoints, wantedStatistics);
 
-    // Build model series (with reduced opacity if aggregations enabled, or hidden if hideAggregationMembers)
-    const modelSeries = buildSeriesConfigs(seriesData, selectedModels, chartType, hasAggregations, hideAggregationMembers, modelLineOpacity);
+    // Build model series (faded on Auto while aggregations are drawn, or hidden behind them)
+    const modelSeries = buildSeriesConfigs(seriesData, selectedModels, chartType, hasAggregations, styles);
     const aggregationSeries = hasAggregations
-        ? buildAggregationSeries(statistics, selectedAggregations, aggregationColors, chartType)
+        ? buildAggregationSeries(statistics, selectedAggregations, styles, chartType)
         : [];
-    const bandSeries = buildBandSeries(statistics, showMinMax, showPercentiles, aggregationColors);
+    const bandSeries = buildBandSeries(statistics, showMinMax, showPercentiles, styles);
 
     // Build box & whisker series if chart type is boxwhisker
     const boxWhiskerSeriesList: SeriesConfig[] = [];
@@ -495,7 +490,7 @@ export function buildWeatherChartConfig(
         boxWhiskerSeriesList.push({
             id: 'ensemble_boxwhisker',
             name: 'Ensemble Spread',
-            color: aggregationColors['median'] ?? variableConfig.color,
+            color: aggregationColor(styles, 'median'),
             type: 'boxwhisker',
             data: boxWhiskerData.median, // Use median for y-scale calculation
             boxWhiskerData,
@@ -536,7 +531,7 @@ export function buildWeatherChartConfig(
 
     // Add accumulation series if enabled and variable supports it
     if (settings?.showAccumulation && supportsAccumulation(variable as any)) {
-        const accSeries = buildAccumulationSeries(seriesData, selectedModels);
+        const accSeries = buildAccumulationSeries(seriesData, selectedModels, styles);
         if (accSeries.length > 0) {
             allSeries.push(...accSeries);
             hasAccumulation = true;

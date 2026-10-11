@@ -15,11 +15,11 @@ export function DetailChartGrid({
     selectedModels,
     selectedVariables,
     selectedAggregations,
-    aggregationColors,
-    hideAggregationMembers,
-    showMinMaxFill,
-    showPercentileFill,
-    modelLineOpacity,
+    preferredModels,
+    modelAvailability,
+    openSettings,
+    onOpenSettings,
+    onCloseSettings,
     unitSystem,
     isChartLocked,
     isLoading,
@@ -36,11 +36,6 @@ export function DetailChartGrid({
                     timeAxis={timeAxis}
                     selectedModels={selectedModels}
                     selectedAggregations={selectedAggregations}
-                    aggregationColors={aggregationColors}
-                    hideAggregationMembers={hideAggregationMembers}
-                    showMinMaxFill={showMinMaxFill}
-                    showPercentileFill={showPercentileFill}
-                    modelLineOpacity={modelLineOpacity}
                     variable={variable}
                     unitSystem={unitSystem}
                     isChartLocked={isChartLocked}
@@ -49,6 +44,12 @@ export function DetailChartGrid({
                         onToggleVariable ? () => onToggleVariable(variable) : undefined
                     }
                     location={location}
+                    preferredModels={preferredModels}
+                    modelAvailability={modelAvailability}
+                    isSettingsOpen={openSettings?.variable === variable}
+                    settingsTab={openSettings?.variable === variable ? openSettings.tab : undefined}
+                    onOpenSettings={() => onOpenSettings(variable)}
+                    onCloseSettings={onCloseSettings}
                 />
             ))}
         </div>

@@ -9,16 +9,27 @@ import { useState, useMemo, useEffect } from 'react';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useChartTheme } from '../../hooks/useChartTheme';
 import { useFullscreenView } from '../../hooks/useFullscreenView';
+import { useModelStyles } from '../../hooks/useModelStyles';
 import { UPlotChart } from '../../lib/charts';
 import { setChartZoomSyncExclusion } from '../../lib/charts/chartRegistry';
 import { buildWeatherChartConfig } from '../../utils/chartBuilder';
 import { ChartSettingsModal } from './ChartSettingsModal';
 import { getVariableConfig, hasOverlays, getOverlayVariablesFor } from '../../utils/chartConfigurations';
-import type { WeatherChartProps } from '../../types/detailView';
+import type { ModelAvailabilityContext, WeatherChartProps } from '../../types/detailView';
+import type { WeatherModel } from '../../types/openMeteo';
 import { supportsAccumulation } from '../../types/chartSettings';
-import type { ChartDisplayType } from '../../types/chartSettings';
+import type { ChartDisplayType, ChartSettingsTab } from '../../types/chartSettings';
 
 interface WeatherChartComponentProps extends WeatherChartProps {
+    /** For the Models tab of the gear modal */
+    preferredModels: WeatherModel[];
+    modelAvailability: ModelAvailabilityContext;
+    /** The gear modal is opened from outside too (the model picker, the command palette) */
+    isSettingsOpen: boolean;
+    /** The tab to open it on; left out, the one last used */
+    settingsTab?: ChartSettingsTab;
+    onOpenSettings: () => void;
+    onCloseSettings: () => void;
 }
 
 // Marks the history entry pushed on entering fullscreen, so Back leaves fullscreen instead of the page
@@ -33,17 +44,18 @@ export function WeatherChart({
     timeAxis,
     selectedModels,
     selectedAggregations,
-    aggregationColors,
-    hideAggregationMembers,
-    showMinMaxFill,
-    showPercentileFill,
-    modelLineOpacity,
     variable,
     unitSystem,
     isChartLocked,
     isLoading,
     onToggleVisibility,
     location,
+    preferredModels,
+    modelAvailability,
+    isSettingsOpen,
+    settingsTab,
+    onOpenSettings,
+    onCloseSettings,
 }: WeatherChartComponentProps): JSX.Element {
     const variableConfig = getVariableConfig(variable);
 
@@ -109,11 +121,11 @@ export function WeatherChart({
         return () => setChartZoomSyncExclusion(variable, false);
     }, [variable, zoomSyncExcluded]);
 
-    // Settings modal state
-    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-
     // Get theme
     const theme = useChartTheme();
+
+    // The same on every chart
+    const modelStyles = useModelStyles();
 
     // Build chart config (memoized for performance)
     const chartConfig = useMemo(() => {
@@ -123,11 +135,6 @@ export function WeatherChart({
                 timeAxis,
                 selectedModels: providingModels,
                 selectedAggregations,
-                aggregationColors,
-                hideAggregationMembers,
-                showMinMaxFill,
-                showPercentileFill,
-                modelLineOpacity,
                 variable,
                 unitSystem,
                 isChartLocked,
@@ -139,6 +146,7 @@ export function WeatherChart({
                 showAccumulation,
                 showOverlays,
                 customHeight: displayHeight,
+                modelStyles,
             }
         );
     }, [
@@ -146,11 +154,7 @@ export function WeatherChart({
         timeAxis,
         providingModels,
         selectedAggregations,
-        aggregationColors,
-        hideAggregationMembers,
-        showMinMaxFill,
-        showPercentileFill,
-        modelLineOpacity,
+        modelStyles,
         variable,
         unitSystem,
         isChartLocked,
@@ -161,6 +165,30 @@ export function WeatherChart({
         showOverlays,
         displayHeight,
     ]);
+
+    // Also on an empty chart, which the model picker and command palette can open it on
+    const settingsModal = isSettingsOpen && (
+        <ChartSettingsModal
+            onClose={onCloseSettings}
+            variable={variable}
+            initialTab={settingsTab}
+            preferredModels={preferredModels}
+            selectedAggregations={selectedAggregations}
+            modelAvailability={modelAvailability}
+            chartType={chartType}
+            onChartTypeChange={setChartType}
+            showAccumulation={showAccumulation}
+            onAccumulationChange={setShowAccumulation}
+            showOverlays={showOverlays}
+            onOverlaysChange={setShowOverlays}
+            zoomSyncExcluded={zoomSyncExcluded}
+            onZoomSyncExcludedChange={setZoomSyncExcluded}
+            chartHeight={chartHeight}
+            onChartHeightChange={setChartHeight}
+            chartWidth={chartWidth}
+            onChartWidthChange={setChartWidth}
+        />
+    );
 
     // Handle no data
     if (!chartConfig || providingModels.length === 0) {
@@ -196,6 +224,7 @@ export function WeatherChart({
                 <div className="weather-chart-no-data">
                     <p>{emptyMessage}</p>
                 </div>
+                {settingsModal}
             </div>
         );
     }
@@ -272,7 +301,7 @@ export function WeatherChart({
                     <button
                         type="button"
                         className="weather-chart-btn"
-                        onClick={() => setIsSettingsOpen(true)}
+                        onClick={onOpenSettings}
                         title="Chart settings"
                     >
                         <svg
@@ -333,24 +362,7 @@ export function WeatherChart({
                 chartKey={variable}
             />
 
-            {/* Settings Modal */}
-            <ChartSettingsModal
-                isOpen={isSettingsOpen}
-                onClose={() => setIsSettingsOpen(false)}
-                variable={variable}
-                chartType={chartType}
-                onChartTypeChange={setChartType}
-                showAccumulation={showAccumulation}
-                onAccumulationChange={setShowAccumulation}
-                showOverlays={showOverlays}
-                onOverlaysChange={setShowOverlays}
-                zoomSyncExcluded={zoomSyncExcluded}
-                onZoomSyncExcludedChange={setZoomSyncExcluded}
-                chartHeight={chartHeight}
-                onChartHeightChange={setChartHeight}
-                chartWidth={chartWidth}
-                onChartWidthChange={setChartWidth}
-            />
+            {settingsModal}
         </div>
     );
 }

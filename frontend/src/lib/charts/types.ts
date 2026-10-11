@@ -48,6 +48,8 @@ export interface SeriesConfig {
     type: ChartType;
     data: (number | null)[];
     lineWidth?: number;
+    /** Named in bold in the legend and tooltip */
+    bold?: boolean;
     opacity?: number;
     fillOpacity?: number;
     lineStyle?: LineStyle;

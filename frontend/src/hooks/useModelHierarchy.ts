@@ -21,8 +21,6 @@ export interface UseModelHierarchyProps {
   onModelsChange: (models: WeatherModel[] | ((prev: WeatherModel[]) => WeatherModel[])) => void;
   selectedAggregations: AggregationType[];
   onAggregationsChange: (aggregations: AggregationType[] | ((prev: AggregationType[]) => AggregationType[])) => void;
-  aggregationColors: Record<AggregationType, string>;
-  onAggregationColorsChange: (colors: Record<AggregationType, string>) => void;
 }
 
 export interface UseModelHierarchyReturn {
@@ -41,13 +39,11 @@ export interface UseModelHierarchyReturn {
   // Selection
   selectedModels: WeatherModel[];
   selectedAggregations: AggregationType[];
-  aggregationColors: Record<AggregationType, string>;
   toggleModel: (modelId: WeatherModel) => void;
   toggleAggregation: (aggType: AggregationType) => void;
   selectAllInNode: (node: ModelHierarchyNode) => void;
   deselectAllInNode: (node: ModelHierarchyNode) => void;
   getSelectionState: (node: ModelHierarchyNode) => 'all' | 'some' | 'none';
-  setAggregationColor: (aggType: AggregationType, color: string) => void;
 
   // Keyboard navigation
   selectedIndex: number;
@@ -68,8 +64,6 @@ export function useModelHierarchy({
   onModelsChange,
   selectedAggregations,
   onAggregationsChange,
-  aggregationColors,
-  onAggregationColorsChange,
 }: UseModelHierarchyProps): UseModelHierarchyReturn {
   // Build hierarchy tree once
   const hierarchyTree = useMemo(() => buildModelHierarchyTree(), []);
@@ -80,7 +74,6 @@ export function useModelHierarchy({
   // Local (deferred) state - changes are buffered here while modal is open
   const [localModels, setLocalModels] = useState<WeatherModel[]>(selectedModels);
   const [localAggregations, setLocalAggregations] = useState<AggregationType[]>(selectedAggregations);
-  const [localColors, setLocalColors] = useState<Record<AggregationType, string>>(aggregationColors);
 
   // Track if we need to apply changes on close
   const hasChangesRef = useRef(false);
@@ -133,27 +126,25 @@ export function useModelHierarchy({
     // Initialize local state from parent state when opening
     setLocalModels(selectedModels);
     setLocalAggregations(selectedAggregations);
-    setLocalColors(aggregationColors);
     hasChangesRef.current = false;
     setIsOpen(true);
     setNavigationStack([]);
     setSearchTerm('');
     setSelectedIndex(0);
-  }, [selectedModels, selectedAggregations, aggregationColors]);
+  }, [selectedModels, selectedAggregations]);
 
   const closeModal = useCallback(() => {
     // Apply deferred changes to parent state on close
     if (hasChangesRef.current) {
       onModelsChange(localModels);
       onAggregationsChange(localAggregations);
-      onAggregationColorsChange(localColors);
     }
     hasChangesRef.current = false;
     setIsOpen(false);
     setNavigationStack([]);
     setSearchTerm('');
     setSelectedIndex(0);
-  }, [localModels, localAggregations, localColors, onModelsChange, onAggregationsChange, onAggregationColorsChange]);
+  }, [localModels, localAggregations, onModelsChange, onAggregationsChange]);
 
   // Navigation
   const navigateTo = useCallback((node: ModelHierarchyNode) => {
@@ -276,15 +267,6 @@ export function useModelHierarchy({
     return 'some';
   }, [localModels, localAggregations]);
 
-  // Color management - operate on local state
-  const setAggregationColor = useCallback((aggType: AggregationType, color: string) => {
-    hasChangesRef.current = true;
-    setLocalColors((prev) => ({
-      ...prev,
-      [aggType]: color,
-    }));
-  }, []);
-
   // Keyboard navigation
   const navigateUp = useCallback(() => {
     setSelectedIndex((prev) =>
@@ -356,13 +338,11 @@ export function useModelHierarchy({
     // Selection - expose local state while modal is open
     selectedModels: localModels,
     selectedAggregations: localAggregations,
-    aggregationColors: localColors,
     toggleModel,
     toggleAggregation,
     selectAllInNode,
     deselectAllInNode,
     getSelectionState,
-    setAggregationColor,
 
     // Keyboard navigation
     selectedIndex,

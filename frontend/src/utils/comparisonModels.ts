@@ -4,7 +4,8 @@
  */
 
 import type { WeatherModel, HourlyDataPoint } from '../types/openMeteo';
-import { hasGlobalCoverage, inCatalogueOrder } from '../data/modelHierarchy';
+import { coversPoint, getModelInfo, hasGlobalCoverage, inCatalogueOrder } from '../data/modelHierarchy';
+import type { ModelAvailabilityContext } from '../types/detailView';
 
 export type DroppedModel =
     | { reason: 'no-data' }
@@ -99,4 +100,17 @@ export function resolveComparisonModels(
         comparisonModels: fetchedModels.filter((model) => keptSet.has(model)),
         dropped,
     };
+}
+
+/**
+ * Why a Preferred model isn't drawn at the point being forecast, or null when it is (or
+ * would be, once loaded).
+ */
+export function getUnavailableReason(model: WeatherModel, availability: ModelAvailabilityContext): string | null {
+    const { point, droppedModels } = availability;
+    if (!coversPoint(model, point.lat, point.lon)) return 'Outside its coverage';
+    const dropped = droppedModels.get(model);
+    if (dropped?.reason === 'no-data') return 'No data here';
+    if (dropped?.reason === 'clone') return `Same as ${getModelInfo(dropped.of)?.label ?? dropped.of} here`;
+    return null;
 }
