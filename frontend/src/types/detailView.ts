@@ -121,6 +121,8 @@ export interface DetailChartGridProps {
     timeAxis: TimeAxis | null;
     comparisonModels: WeatherModel[];
     selectedVariables: WeatherVariable[];
+    /** Saves the order a chart was dragged into; the Variables picker edits the same order */
+    onReorderVariables: (variables: WeatherVariable[]) => void;
     selectedAggregations: AggregationType[];
     /** Every Selected model, listed in the Model styles tab of each chart's gear modal */
     selectedModels: WeatherModel[];

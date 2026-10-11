@@ -152,6 +152,10 @@ _Avoid_: cumulative, total, sum
 How a visitor has chosen to draw the line of one **Forecast model** or **Aggregation**: its colour, whether it is bold, and its opacity. It is the same on every chart, for every **Resort** and location. A bold line is drawn thicker and above the others of its kind; a model whose opacity is Auto is faded only while **Aggregations** are drawn.
 _Avoid_: line style, model settings, model appearance
 
+**Chart**:
+One weather variable, such as snowfall or wind, drawn across the **Comparison models** in the detail view. A visitor picks which Charts show and in what order, one list for every **Resort** and location.
+_Avoid_: graph, plot
+
 **Focused line**:
 The line a visitor is pointing at, in a detail-view chart or its legend, drawn at full strength while every other line fades. A **Comparison model**'s hourly and **Accumulation** lines are focused together.
 _Avoid_: highlighted series, selected line

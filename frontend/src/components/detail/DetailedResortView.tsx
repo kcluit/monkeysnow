@@ -458,6 +458,7 @@ export function DetailedResortView({
                         timeAxis={timeAxis}
                         comparisonModels={comparisonModels}
                         selectedVariables={selectedVariables}
+                        onReorderVariables={setSelectedVariables}
                         selectedAggregations={selectedAggregations}
                         selectedModels={selectedModels}
                         modelAvailability={modelAvailability}

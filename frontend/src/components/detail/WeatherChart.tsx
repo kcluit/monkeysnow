@@ -5,7 +5,7 @@
  * Includes settings modal for chart type and overlay options.
  */
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, type ReactNode } from 'react';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useChartTheme } from '../../hooks/useChartTheme';
 import { useFullscreenView } from '../../hooks/useFullscreenView';
@@ -20,7 +20,7 @@ import type { WeatherModel } from '../../types/openMeteo';
 import { supportsAccumulation } from '../../types/chartSettings';
 import type { ChartDisplayType, ChartSettingsTab } from '../../types/chartSettings';
 
-interface WeatherChartComponentProps extends WeatherChartProps {
+export interface WeatherChartComponentProps extends WeatherChartProps {
     /** For the Models tab of the gear modal */
     selectedModels: WeatherModel[];
     modelAvailability: ModelAvailabilityContext;
@@ -30,6 +30,8 @@ interface WeatherChartComponentProps extends WeatherChartProps {
     settingsTab?: ChartSettingsTab;
     onOpenSettings: () => void;
     onCloseSettings: () => void;
+    /** The grip the chart is dragged by, at the start of its header; not shown in fullscreen */
+    dragHandle?: ReactNode;
 }
 
 // Marks the history entry pushed on entering fullscreen, so Back leaves fullscreen instead of the page
@@ -56,6 +58,7 @@ export function WeatherChart({
     settingsTab,
     onOpenSettings,
     onCloseSettings,
+    dragHandle,
 }: WeatherChartComponentProps): JSX.Element {
     const variableConfig = getVariableConfig(variable);
 
@@ -202,6 +205,7 @@ export function WeatherChart({
             <div className="weather-chart weather-chart-empty">
                 <div className="weather-chart-header">
                     <div className="weather-chart-title">
+                        {!isFullscreen && dragHandle}
                         <span
                             className="weather-chart-color-indicator"
                             style={{ backgroundColor: variableConfig.color }}
@@ -242,6 +246,7 @@ export function WeatherChart({
             {/* Header */}
             <div className="weather-chart-header">
                 <div className="weather-chart-title">
+                    {!isFullscreen && dragHandle}
                     <span
                         className="weather-chart-color-indicator"
                         style={{ backgroundColor: variableConfig.color }}

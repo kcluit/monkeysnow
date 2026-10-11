@@ -67,6 +67,7 @@ npm run build
 - Theming via CSS custom properties, themes in `types/themes.ts`
 - UI strings in `locales/en.ts` (keys typed in `types/i18n.ts`); `interpolate()` fills `{placeholders}`
 - Resort picker (`components/ResortSelectionModal/ResortSelectionGridModal.tsx`) opens with continents open and the rest closed; its search (`utils/resortSearch.ts`) matches names, Regions and countries, ignoring accents, punctuation and word order; `useResortHierarchy` holds the draft Selection being edited and the search term
+- The detail view's Charts are one column (`components/detail/DetailChartGrid.tsx`) in the order of the `detailSelectedVariables` list, which both dragging a Chart's header grip and the Variables picker rewrite
 - Model styles (`utils/modelStyles.ts`): each Forecast model's and Aggregation's colour, bold and opacity, plus the band fills and hiding model lines, kept in localStorage. They are edited in the Model styles tab of every chart's gear modal (`components/detail/ChartSettingsModal.tsx`, which widens to the model picker's size on that tab), or in `ModelStylesModal` on its own from the Settings page and the command palette where no chart is showing; `openModelStyles()` picks which. The tab lists every Forecast model: Selected models first, the rest folded under "Other models"
 
 ### Type System (`frontend/src/types/`)
