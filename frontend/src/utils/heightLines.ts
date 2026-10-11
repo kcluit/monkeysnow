@@ -7,14 +7,10 @@
  */
 
 import type { FeatureCollection, LineString } from 'geojson';
-
-/** Mapterhorn's open terrain: Terrarium-encoded heights in 512-pixel WebP tiles, with no key */
-export const TERRAIN_TILE_URL = 'https://tiles.mapterhorn.com/{z}/{x}/{y}.webp';
-export const TERRAIN_TILE_SIZE = 512;
-export const TERRAIN_ATTRIBUTION = '<a href="https://mapterhorn.com/attribution" target="_blank" rel="noopener noreferrer">&copy; Mapterhorn</a>';
+import { loadDemTile, TERRAIN_BASE_ZOOM, TERRAIN_TILE_SIZE } from './terrainTiles';
 
 /** Every point has tiles down to z12 (about 30 m data), so lines are traced at that zoom everywhere */
-const TRACE_ZOOM = 12;
+const TRACE_ZOOM = TERRAIN_BASE_ZOOM;
 const WORLD_SIZE = TERRAIN_TILE_SIZE * 2 ** TRACE_ZOOM;
 export const EARTH_CIRCUMFERENCE = 40075016.686;
 export const METRES_PER_DEGREE = EARTH_CIRCUMFERENCE / 360;
@@ -61,34 +57,6 @@ export const NO_HEIGHT_LINES: TracedHeightLines = {
     labels: [],
 };
 
-/** A tile's heights in metres, row by row, or null where Mapterhorn has no tile */
-async function fetchTileHeights(x: number, y: number, signal: AbortSignal): Promise<Float32Array | null> {
-    const url = TERRAIN_TILE_URL
-        .replace('{z}', String(TRACE_ZOOM))
-        .replace('{x}', String(x))
-        .replace('{y}', String(y));
-    const response = await fetch(url, { signal });
-    if (!response.ok) return null;
-    // Heights are packed into the colour channels, so the browser must not adjust the colours
-    const bitmap = await createImageBitmap(await response.blob(), {
-        premultiplyAlpha: 'none',
-        colorSpaceConversion: 'none',
-    });
-    const canvas = document.createElement('canvas');
-    canvas.width = bitmap.width;
-    canvas.height = bitmap.height;
-    const context = canvas.getContext('2d', { willReadFrequently: true });
-    if (!context) return null;
-    context.drawImage(bitmap, 0, 0);
-    bitmap.close();
-    const { data } = context.getImageData(0, 0, canvas.width, canvas.height);
-    const heights = new Float32Array(canvas.width * canvas.height);
-    for (let i = 0; i < heights.length; i++) {
-        heights[i] = data[i * 4] * 256 + data[i * 4 + 1] + data[i * 4 + 2] / 256 - 32768;
-    }
-    return heights;
-}
-
 /** The heights in a square of pixels at TRACE_ZOOM, NaN where a tile is missing */
 interface HeightGrid {
     /** Global pixel of the grid's first sample */
@@ -99,7 +67,7 @@ interface HeightGrid {
     values: Float32Array;
 }
 
-async function loadHeightGrid(x0: number, y0: number, size: number, signal: AbortSignal): Promise<HeightGrid> {
+async function loadHeightGrid(x0: number, y0: number, size: number): Promise<HeightGrid> {
     const values = new Float32Array(size * size).fill(NaN);
     const firstTileX = Math.floor(x0 / TERRAIN_TILE_SIZE);
     const lastTileX = Math.floor((x0 + size - 1) / TERRAIN_TILE_SIZE);
@@ -109,7 +77,8 @@ async function loadHeightGrid(x0: number, y0: number, size: number, signal: Abor
     const loads: Promise<void>[] = [];
     for (let tileY = firstTileY; tileY <= lastTileY; tileY++) {
         for (let tileX = firstTileX; tileX <= lastTileX; tileX++) {
-            loads.push(fetchTileHeights(tileX, tileY, signal).then((tile) => {
+            // Shared with the terrain Overlays, so the same tiles are fetched once
+            loads.push(loadDemTile(TRACE_ZOOM, tileX, tileY).then((tile) => {
                 if (!tile) return;
                 // Copy the part of the tile that falls inside the grid
                 const left = Math.max(x0, tileX * TERRAIN_TILE_SIZE);
@@ -275,7 +244,9 @@ export async function traceHeightLines(
     const centreY = ((1 - Math.log(Math.tan(Math.PI / 4 + latRadians / 2)) / Math.PI) / 2) * WORLD_SIZE;
     const metresPerPixel = (EARTH_CIRCUMFERENCE * Math.cos(latRadians)) / WORLD_SIZE;
     const radius = Math.ceil(FADE_END / metresPerPixel);
-    const grid = await loadHeightGrid(Math.floor(centreX) - radius, Math.floor(centreY) - radius, 2 * radius + 1, signal);
+    const grid = await loadHeightGrid(Math.floor(centreX) - radius, Math.floor(centreY) - radius, 2 * radius + 1);
+    // The point moved on while the tiles loaded, so the tracing isn't wanted
+    if (signal.aborted) return NO_HEIGHT_LINES;
 
     const metresPerLonDegree = METRES_PER_DEGREE * Math.cos(latRadians);
     const distanceTo = (lon: number, lat: number): number =>

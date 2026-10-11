@@ -6,6 +6,7 @@ import { useCardModelsSummary } from '../components/CardModelsModal';
 import type { Theme } from '../types/themes';
 import type { Font } from '../types/fonts';
 import type { Language } from '../types/i18n';
+import type { MapRotation } from '../utils/mapRotation';
 import type {
     ElevationLevel,
     SortOption,
@@ -51,6 +52,9 @@ export interface SettingsPageProps {
     // Chart zoom
     chartZoomSyncEnabled: boolean;
     setChartZoomSyncEnabled: (enabled: boolean) => void;
+    // 3D map
+    mapRotation: MapRotation;
+    setMapRotation: (rotation: MapRotation) => void;
     // Weather display
     selectedElevation: ElevationLevel;
     setSelectedElevation: (e: ElevationLevel) => void;
@@ -231,6 +235,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
         isFullscreen, enterFullscreen, exitFullscreen,
         isFPSEnabled, setFPSEnabled,
         chartZoomSyncEnabled, setChartZoomSyncEnabled,
+        mapRotation, setMapRotation,
         selectedElevation, setSelectedElevation,
         selectedSort, setSelectedSort,
         selectedSortDay, setSelectedSortDay, sortDayData,
@@ -482,6 +487,18 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                                 />
                             ))}
                         </div>
+                    </div>
+                    <div className="settings-subsection">
+                        <span className="settings-subsection-label">3D map rotation</span>
+                        <div className="settings-options-row">
+                            <OptionButton label="Linear" isSelected={mapRotation === 'linear'} onClick={() => setMapRotation('linear')} />
+                            <OptionButton label="Orbital" isSelected={mapRotation === 'orbital'} onClick={() => setMapRotation('orbital')} />
+                        </div>
+                        <span className="text-sm text-theme-textSecondary">
+                            {mapRotation === 'linear'
+                                ? 'Right-dragging sideways always turns the map the same way, wherever the pointer is'
+                                : 'Right-dragging turns the map like spinning a globe, so opposite ways above and below its middle'}
+                        </span>
                     </div>
                     <div className="settings-subsection">
                         <span className="settings-subsection-label">Model styles</span>

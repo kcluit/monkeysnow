@@ -37,6 +37,7 @@ import { useResortHierarchy, MAX_SELECTED_RESORTS } from './hooks/useResortHiera
 import { FetchStatus } from './components/FetchStatus';
 import { useBudgetPause } from './hooks/useBudgetPause';
 import { useUnitSystem } from './hooks/useUnitSystem';
+import { DEFAULT_MAP_ROTATION, MAP_ROTATION_STORAGE_KEY, type MapRotation } from './utils/mapRotation';
 import { useIsMobile } from './hooks/useIsMobile';
 import { useLanguage } from './hooks/useLanguage';
 import { useHierarchy } from './contexts/HierarchyContext';
@@ -82,6 +83,7 @@ interface DetailRouteProps {
     unitSystem: 'metric' | 'imperial';
     showUtilityBar: boolean;
     utilityBarStyle: UtilityBarStyle;
+    mapRotation: MapRotation;
     onSaveLocation: (input: SavedLocationInput) => void;
 }
 
@@ -90,6 +92,7 @@ function ResortDetailRoute({
     unitSystem,
     showUtilityBar,
     utilityBarStyle,
+    mapRotation,
     onSaveLocation,
     getDisplayName,
 }: DetailRouteProps & {
@@ -140,6 +143,7 @@ function ResortDetailRoute({
                 unitSystem={unitSystem}
                 showUtilityBar={showUtilityBar}
                 utilityBarStyle={utilityBarStyle}
+                mapRotation={mapRotation}
                 onBack={handleBack}
                 onSaveLocation={onSaveLocation}
             />
@@ -152,6 +156,7 @@ function SavedLocationRoute({
     unitSystem,
     showUtilityBar,
     utilityBarStyle,
+    mapRotation,
     onSaveLocation,
     onDeleteSavedLocation,
 }: DetailRouteProps & {
@@ -199,6 +204,7 @@ function SavedLocationRoute({
                 unitSystem={unitSystem}
                 showUtilityBar={showUtilityBar}
                 utilityBarStyle={utilityBarStyle}
+                mapRotation={mapRotation}
                 onBack={handleBack}
                 onSaveLocation={onSaveLocation}
                 onDeleteSavedLocation={onDeleteSavedLocation}
@@ -268,6 +274,7 @@ function App(): JSX.Element {
     const [selectedTemperatureMetric, setSelectedTemperatureMetric] = useLocalStorage<TemperatureMetric>('temperatureMetric', defaultTemperatureMetric);
     const [snowfallEstimateMode, setSnowfallEstimateMode] = useLocalStorage<SnowfallEstimateMode>('snowfallEstimateMode', 'model');
     const [chartZoomSyncEnabled, setChartZoomSyncEnabled] = useLocalStorage<boolean>('chartZoomSync', true);
+    const [mapRotation, setMapRotation] = useLocalStorage<MapRotation>(MAP_ROTATION_STORAGE_KEY, DEFAULT_MAP_ROTATION);
     const [unitSystem, setUnitSystem] = useUnitSystem();
     const [resortDisplayLimit, setResortDisplayLimit] = useLocalStorage<ResortDisplayLimit>('resortDisplayLimit', 'auto');
 
@@ -326,6 +333,7 @@ function App(): JSX.Element {
         isHideBordersEnabled, setHideBordersEnabled,
         isShowDateEnabled, setShowDateEnabled,
         chartZoomSyncEnabled, setChartZoomSyncEnabled,
+        mapRotation, setMapRotation,
         selectedElevation, setSelectedElevation,
         selectedSort, setSelectedSort,
         selectedSortDay, setSelectedSortDay,
@@ -500,6 +508,25 @@ function App(): JSX.Element {
                         name: 'Off',
                         icon: !chartZoomSyncEnabled ? icons.check : undefined,
                         action: () => setChartZoomSyncEnabled(false),
+                    },
+                ],
+            },
+            {
+                id: 'map-rotation',
+                name: '3D map rotation',
+                icon: icons.rotate,
+                subCommands: [
+                    {
+                        id: 'map-rotation-linear',
+                        name: 'Linear',
+                        icon: mapRotation === 'linear' ? icons.check : undefined,
+                        action: () => setMapRotation('linear'),
+                    },
+                    {
+                        id: 'map-rotation-orbital',
+                        name: 'Orbital',
+                        icon: mapRotation === 'orbital' ? icons.check : undefined,
+                        action: () => setMapRotation('orbital'),
                     },
                 ],
             },
@@ -924,6 +951,8 @@ function App(): JSX.Element {
         setFPSEnabled,
         chartZoomSyncEnabled,
         setChartZoomSyncEnabled,
+        mapRotation,
+        setMapRotation,
         selectedElevation,
         setSelectedElevation,
         selectedSort,
@@ -1010,6 +1039,7 @@ function App(): JSX.Element {
                             unitSystem={unitSystem}
                             showUtilityBar={showUtilityBar}
                             utilityBarStyle={utilityBarStyle}
+                            mapRotation={mapRotation}
                             onSaveLocation={handleSaveLocation}
                             getDisplayName={getDisplayName}
                         />
@@ -1026,6 +1056,7 @@ function App(): JSX.Element {
                             unitSystem={unitSystem}
                             showUtilityBar={showUtilityBar}
                             utilityBarStyle={utilityBarStyle}
+                            mapRotation={mapRotation}
                             onSaveLocation={handleSaveLocation}
                             onDeleteSavedLocation={handleDeleteSavedLocation}
                         />
