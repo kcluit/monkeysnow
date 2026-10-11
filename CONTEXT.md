@@ -233,7 +233,7 @@ A marked snow route as OpenStreetMap maps it: downhill, nordic, ski touring, ter
 _Avoid_: piste, trail, slope
 
 **Lift**:
-Anything that carries skiers uphill, from a gondola or chairlift down to a rope tow or magic carpet.
+Anything that carries skiers uphill, from a funicular, mountain railway, gondola or chairlift down to a rope tow or magic carpet. A funicular or railway is a Lift only inside a **Ski area**; the rest run through towns and valleys, not ski terrain.
 _Avoid_: aerialway, ski lift (as the general term)
 
 **Difficulty colours**:
