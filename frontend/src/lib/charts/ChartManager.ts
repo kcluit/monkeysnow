@@ -15,9 +15,6 @@ import {
     subscribeToZoomChanges,
     broadcastZoomChange,
     isChartZoomSyncEnabled,
-    getLockedLine,
-    setLockedLine,
-    subscribeToLockedLines,
 } from './chartRegistry';
 
 /**
@@ -384,10 +381,6 @@ export class ChartManager {
     private unsubscribeZoom: (() => void) | null = null;
     private isApplyingExternalZoom: boolean = false;
 
-    // The Locked line, which another chart in zoom sync may change
-    private unsubscribeLockedLines: (() => void) | null = null;
-    private refreshFocus: (() => void) | null = null;
-
     /** Axes and plugins call this while drawing; a chart only exists once a config has been set. */
     private readonly getConfig = (): ChartConfig => this.currentConfig!;
 
@@ -403,8 +396,6 @@ export class ChartManager {
                 this.applyExternalZoom(min, max);
             }
         });
-
-        this.unsubscribeLockedLines = subscribeToLockedLines(() => this.refreshFocus?.());
 
         // Set up resize observer
         this.resizeObserver = new ResizeObserver(() => {
@@ -446,7 +437,6 @@ export class ChartManager {
             this.chart.destroy();
             this.chart = null;
         }
-        this.refreshFocus = null;
 
         this.structuralKey = newStructuralKey;
         this.createChart(config);
@@ -511,19 +501,14 @@ export class ChartManager {
         }
 
         // Series focus plugin - fades everything but the Focused line: the legend entry pointed at,
-        // the Locked line, or the line nearest the cursor
-        const seriesFocus = createSeriesFocusPlugin({
-            getConfig,
-            getLockedLine: () => getLockedLine(this.chartId),
-            setLockedLine: (line) => setLockedLine(this.chartId, line),
-        });
+        // or the line nearest the cursor
+        const seriesFocus = createSeriesFocusPlugin({ getConfig });
         plugins.push(seriesFocus.plugin);
-        this.refreshFocus = seriesFocus.refresh;
 
         // Tooltip plugin - shows values at cursor position
         plugins.push(createTooltipPlugin({ getConfig }));
 
-        // Legend plugin - interactive series toggle, hover preview and line locking
+        // Legend plugin - interactive series toggle and hover preview
         plugins.push(createLegendPlugin({ getConfig, seriesFocus }));
 
         // Build uPlot options
@@ -610,12 +595,6 @@ export class ChartManager {
             this.unsubscribeZoom();
             this.unsubscribeZoom = null;
         }
-
-        if (this.unsubscribeLockedLines) {
-            this.unsubscribeLockedLines();
-            this.unsubscribeLockedLines = null;
-        }
-        this.refreshFocus = null;
 
         if (this.resizeObserver) {
             this.resizeObserver.disconnect();

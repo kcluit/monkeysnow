@@ -254,10 +254,10 @@ export function ChartSettingsModal({
                                         onChange={(e) => setLocalZoomSyncExcluded(!e.target.checked)}
                                     />
                                     <span className="chart-settings-toggle-label">
-                                        Sync zoom and locked line with other charts
+                                        Sync zoom with other charts
                                     </span>
                                     <span className="chart-settings-toggle-desc">
-                                        When enabled, zooming this chart or locking a line on it does the same on other charts
+                                        When enabled, zooming this chart also zooms other charts
                                     </span>
                                 </label>
                             </div>

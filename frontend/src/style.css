@@ -3246,11 +3246,11 @@ input[type="checkbox"] {
 
 .uplot-legend-item {
     user-select: none;
-    /* Lets a double-tap lock a line instead of zooming the page */
+    /* Two quick taps toggle a line twice instead of zooming the page */
     touch-action: manipulation;
 }
 
-/* Hovered or locked; the chart behind is --cardBg, so the tint comes from the text colour */
+/* Hovered; the chart behind is --cardBg, so the tint comes from the text colour */
 .uplot-legend-item-tinted {
     background-color: color-mix(in srgb, var(--textPrimary) 10%, transparent);
 }
