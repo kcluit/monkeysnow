@@ -327,6 +327,16 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                             ))}
                         </div>
                     </SettingSection>
+
+                    <SettingSection title="Theme" icon={icons.theme}>
+                        <ThemePicker
+                            themes={availableThemes}
+                            currentThemeId={currentThemeId}
+                            setTheme={setTheme}
+                            applyTheme={applyTheme}
+                            resetThemePreview={resetThemePreview}
+                        />
+                    </SettingSection>
                 </SettingGroup>
 
                 <SettingGroup id="settings-main-page">
@@ -486,16 +496,6 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                 </SettingGroup>
 
                 <SettingGroup id="settings-appearance">
-                    <SettingSection title="Theme" icon={icons.theme}>
-                        <ThemePicker
-                            themes={availableThemes}
-                            currentThemeId={currentThemeId}
-                            setTheme={setTheme}
-                            applyTheme={applyTheme}
-                            resetThemePreview={resetThemePreview}
-                        />
-                    </SettingSection>
-
                     <SettingSection title="Font" icon={icons.font}>
                         <div className="settings-options-grid" onMouseLeave={resetFontPreview}>
                             {availableFonts.map(f => (
