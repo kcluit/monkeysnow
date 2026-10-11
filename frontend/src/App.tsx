@@ -37,7 +37,14 @@ import { useResortHierarchy, MAX_SELECTED_RESORTS } from './hooks/useResortHiera
 import { FetchStatus } from './components/FetchStatus';
 import { useBudgetPause } from './hooks/useBudgetPause';
 import { useUnitSystem } from './hooks/useUnitSystem';
-import { DEFAULT_MAP_ROTATION, MAP_ROTATION_STORAGE_KEY, type MapRotation } from './utils/mapRotation';
+import {
+    DEFAULT_MAP_ROTATION,
+    DEFAULT_MAP_TILT,
+    MAP_ROTATION_STORAGE_KEY,
+    MAP_TILT_STORAGE_KEY,
+    type MapRotation,
+    type MapTilt,
+} from './utils/mapRotation';
 import { useIsMobile } from './hooks/useIsMobile';
 import { useLanguage } from './hooks/useLanguage';
 import { useHierarchy } from './contexts/HierarchyContext';
@@ -84,6 +91,7 @@ interface DetailRouteProps {
     showUtilityBar: boolean;
     utilityBarStyle: UtilityBarStyle;
     mapRotation: MapRotation;
+    mapTilt: MapTilt;
     onSaveLocation: (input: SavedLocationInput) => void;
 }
 
@@ -93,6 +101,7 @@ function ResortDetailRoute({
     showUtilityBar,
     utilityBarStyle,
     mapRotation,
+    mapTilt,
     onSaveLocation,
     getDisplayName,
 }: DetailRouteProps & {
@@ -144,6 +153,7 @@ function ResortDetailRoute({
                 showUtilityBar={showUtilityBar}
                 utilityBarStyle={utilityBarStyle}
                 mapRotation={mapRotation}
+                mapTilt={mapTilt}
                 onBack={handleBack}
                 onSaveLocation={onSaveLocation}
             />
@@ -157,6 +167,7 @@ function SavedLocationRoute({
     showUtilityBar,
     utilityBarStyle,
     mapRotation,
+    mapTilt,
     onSaveLocation,
     onDeleteSavedLocation,
 }: DetailRouteProps & {
@@ -205,6 +216,7 @@ function SavedLocationRoute({
                 showUtilityBar={showUtilityBar}
                 utilityBarStyle={utilityBarStyle}
                 mapRotation={mapRotation}
+                mapTilt={mapTilt}
                 onBack={handleBack}
                 onSaveLocation={onSaveLocation}
                 onDeleteSavedLocation={onDeleteSavedLocation}
@@ -275,6 +287,7 @@ function App(): JSX.Element {
     const [snowfallEstimateMode, setSnowfallEstimateMode] = useLocalStorage<SnowfallEstimateMode>('snowfallEstimateMode', 'model');
     const [chartZoomSyncEnabled, setChartZoomSyncEnabled] = useLocalStorage<boolean>('chartZoomSync', true);
     const [mapRotation, setMapRotation] = useLocalStorage<MapRotation>(MAP_ROTATION_STORAGE_KEY, DEFAULT_MAP_ROTATION);
+    const [mapTilt, setMapTilt] = useLocalStorage<MapTilt>(MAP_TILT_STORAGE_KEY, DEFAULT_MAP_TILT);
     const [unitSystem, setUnitSystem] = useUnitSystem();
     const [resortDisplayLimit, setResortDisplayLimit] = useLocalStorage<ResortDisplayLimit>('resortDisplayLimit', 'auto');
 
@@ -334,6 +347,7 @@ function App(): JSX.Element {
         isShowDateEnabled, setShowDateEnabled,
         chartZoomSyncEnabled, setChartZoomSyncEnabled,
         mapRotation, setMapRotation,
+        mapTilt, setMapTilt,
         selectedElevation, setSelectedElevation,
         selectedSort, setSelectedSort,
         selectedSortDay, setSelectedSortDay,
@@ -523,10 +537,35 @@ function App(): JSX.Element {
                         action: () => setMapRotation('linear'),
                     },
                     {
+                        id: 'map-rotation-linear-reversed',
+                        name: 'Linear reversed',
+                        icon: mapRotation === 'linearReversed' ? icons.check : undefined,
+                        action: () => setMapRotation('linearReversed'),
+                    },
+                    {
                         id: 'map-rotation-orbital',
                         name: 'Orbital',
                         icon: mapRotation === 'orbital' ? icons.check : undefined,
                         action: () => setMapRotation('orbital'),
+                    },
+                ],
+            },
+            {
+                id: 'map-tilt',
+                name: '3D map tilt',
+                icon: icons.tilt,
+                subCommands: [
+                    {
+                        id: 'map-tilt-drag-up',
+                        name: 'Drag up',
+                        icon: mapTilt === 'dragUp' ? icons.check : undefined,
+                        action: () => setMapTilt('dragUp'),
+                    },
+                    {
+                        id: 'map-tilt-drag-down',
+                        name: 'Drag down',
+                        icon: mapTilt === 'dragDown' ? icons.check : undefined,
+                        action: () => setMapTilt('dragDown'),
                     },
                 ],
             },
@@ -953,6 +992,8 @@ function App(): JSX.Element {
         setChartZoomSyncEnabled,
         mapRotation,
         setMapRotation,
+        mapTilt,
+        setMapTilt,
         selectedElevation,
         setSelectedElevation,
         selectedSort,
@@ -1040,6 +1081,7 @@ function App(): JSX.Element {
                             showUtilityBar={showUtilityBar}
                             utilityBarStyle={utilityBarStyle}
                             mapRotation={mapRotation}
+                            mapTilt={mapTilt}
                             onSaveLocation={handleSaveLocation}
                             getDisplayName={getDisplayName}
                         />
@@ -1057,6 +1099,7 @@ function App(): JSX.Element {
                             showUtilityBar={showUtilityBar}
                             utilityBarStyle={utilityBarStyle}
                             mapRotation={mapRotation}
+                            mapTilt={mapTilt}
                             onSaveLocation={handleSaveLocation}
                             onDeleteSavedLocation={handleDeleteSavedLocation}
                         />

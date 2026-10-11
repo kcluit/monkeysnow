@@ -157,6 +157,7 @@ export const icons = {
 
   // 3D map rotation
   rotate: faArrowsRotate,
+  tilt: faArrowsUpDown,
 
   // Lock icons
   lock: faLock,
