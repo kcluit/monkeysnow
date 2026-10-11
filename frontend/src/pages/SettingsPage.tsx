@@ -102,14 +102,40 @@ interface SettingSectionProps {
 function SettingSection({ title, icon, children }: SettingSectionProps): JSX.Element {
     return (
         <section className="settings-section">
-            <h3 className="settings-section-title">
+            <h4 className="settings-section-title">
                 <Icon icon={icon} className="settings-section-icon" />
                 {title}
-            </h3>
+            </h4>
             <div className="settings-section-content">
                 {children}
             </div>
         </section>
+    );
+}
+
+// The page's groups, by where their settings take effect, in page order
+const SETTING_GROUPS = [
+    { id: 'settings-general', title: 'General' },
+    { id: 'settings-main-page', title: 'Main page' },
+    { id: 'settings-detail-view', title: 'Detail view' },
+    { id: 'settings-appearance', title: 'Appearance' },
+    { id: 'settings-advanced', title: 'Advanced' },
+] as const;
+
+type SettingGroupId = typeof SETTING_GROUPS[number]['id'];
+
+interface SettingGroupProps {
+    id: SettingGroupId;
+    children: React.ReactNode;
+}
+
+function SettingGroup({ id, children }: SettingGroupProps): JSX.Element {
+    const title = SETTING_GROUPS.find(g => g.id === id)?.title;
+    return (
+        <div className="settings-group">
+            <h3 id={id} className="settings-group-title">{title}</h3>
+            {children}
+        </div>
     );
 }
 
@@ -257,268 +283,296 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
     return (
         <div className="settings-page">
             <h2 className="settings-title">Settings</h2>
-            <p className="settings-subtitle">Tip: You can also change all these settings quickly using the commmand palette (Esc or Tab or Ctrl+Shift+P)</p>
+            <p className="settings-subtitle">Tip: You can also change all these settings quickly using the command palette (Esc or Tab or Ctrl+Shift+P)</p>
+
+            <nav className="settings-jump" aria-label="Settings groups">
+                {SETTING_GROUPS.map(g => (
+                    <button
+                        key={g.id}
+                        type="button"
+                        className="settings-option-btn"
+                        onClick={() => document.getElementById(g.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                    >
+                        {g.title}
+                    </button>
+                ))}
+            </nav>
 
             <div className="settings-grid">
-                {/* Units & Language */}
-                <SettingSection title="Units" icon={icons.units}>
-                    <div className="settings-options-row">
-                        <OptionButton
-                            label="Metric (°C, cm, km/h)"
-                            isSelected={unitSystem === 'metric'}
-                            onClick={() => { setUnitSystem('metric'); window.location.reload(); }}
-                        />
-                        <OptionButton
-                            label="Imperial (°F, in, mph)"
-                            isSelected={unitSystem === 'imperial'}
-                            onClick={() => { setUnitSystem('imperial'); window.location.reload(); }}
-                        />
-                    </div>
-                </SettingSection>
-
-                <SettingSection title="Language" icon={icons.language}>
-                    <div className="settings-options-grid">
-                        {availableLanguages.map(lang => (
+                <SettingGroup id="settings-general">
+                    <SettingSection title="Units" icon={icons.units}>
+                        <div className="settings-options-row">
                             <OptionButton
-                                key={lang.id}
-                                label={lang.name === lang.nativeName ? lang.name : `${lang.name} (${lang.nativeName})`}
-                                isSelected={language.id === lang.id}
-                                onClick={() => setLanguage(lang.id)}
+                                label="Metric (°C, cm, km/h)"
+                                isSelected={unitSystem === 'metric'}
+                                onClick={() => { setUnitSystem('metric'); window.location.reload(); }}
                             />
-                        ))}
-                    </div>
-                </SettingSection>
-
-                {/* Appearance Section */}
-                <SettingSection title="Theme" icon={icons.theme}>
-                    <ThemePicker
-                        themes={availableThemes}
-                        currentThemeId={currentThemeId}
-                        setTheme={setTheme}
-                        applyTheme={applyTheme}
-                        resetThemePreview={resetThemePreview}
-                    />
-                </SettingSection>
-
-                <SettingSection title="Font" icon={icons.font}>
-                    <div className="settings-options-grid" onMouseLeave={resetFontPreview}>
-                        {availableFonts.map(f => (
                             <OptionButton
-                                key={f.id}
-                                label={f.name}
-                                isSelected={currentFontId === f.id}
-                                onClick={() => setFont(f.id)}
-                                icon={f.isMonospace ? icons.monospace : icons.regular}
-                                onHover={() => applyFont(f)}
-                                onHoverEnd={resetFontPreview}
+                                label="Imperial (°F, in, mph)"
+                                isSelected={unitSystem === 'imperial'}
+                                onClick={() => { setUnitSystem('imperial'); window.location.reload(); }}
                             />
-                        ))}
-                    </div>
-                </SettingSection>
+                        </div>
+                    </SettingSection>
 
-                {/* Display Toggles */}
-                <SettingSection title="Display" icon={icons.view}>
-                    <div className="settings-toggles">
-                        <Toggle
-                            label="Rainbow text"
-                            isEnabled={isRainbowEnabled}
-                            onToggle={setRainbowEnabled}
-                            icon={icons.rainbow}
-                        />
-                        <Toggle
-                            label="Bold text"
-                            isEnabled={isBoldTextEnabled}
-                            onToggle={setBoldTextEnabled}
-                            icon={icons.bold}
-                        />
-                        <Toggle
-                            label="Show borders"
-                            isEnabled={!isHideBordersEnabled}
-                            onToggle={(enabled) => setHideBordersEnabled(!enabled)}
-                            icon={icons.borders}
-                        />
-                        <Toggle
-                            label="Show date"
-                            isEnabled={isShowDateEnabled}
-                            onToggle={setShowDateEnabled}
-                            icon={icons.date}
-                        />
-                        {/* Not offered where the page can't go fullscreen (iPhone) */}
-                        {isFullscreenSupported && (
+                    <SettingSection title="Language" icon={icons.language}>
+                        <div className="settings-options-grid">
+                            {availableLanguages.map(lang => (
+                                <OptionButton
+                                    key={lang.id}
+                                    label={lang.name === lang.nativeName ? lang.name : `${lang.name} (${lang.nativeName})`}
+                                    isSelected={language.id === lang.id}
+                                    onClick={() => setLanguage(lang.id)}
+                                />
+                            ))}
+                        </div>
+                    </SettingSection>
+                </SettingGroup>
+
+                <SettingGroup id="settings-main-page">
+                    <SettingSection title="Resorts" icon={icons.resort}>
+                        <button
+                            onClick={openResortSelector}
+                            className="settings-action-btn"
+                        >
+                            <Icon icon={icons.resort} />
+                            <span>Select resorts</span>
+                        </button>
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">Resort display limit</span>
+                            <div className="settings-options-grid">
+                                {([
+                                    { value: 'auto' as ResortDisplayLimit, label: 'Auto (100 on mobile)' },
+                                    { value: 50 as ResortDisplayLimit, label: '50' },
+                                    { value: 100 as ResortDisplayLimit, label: '100' },
+                                    { value: 200 as ResortDisplayLimit, label: '200' },
+                                    { value: 500 as ResortDisplayLimit, label: '500' },
+                                    { value: 0 as ResortDisplayLimit, label: 'No limit' },
+                                ]).map(option => (
+                                    <OptionButton
+                                        key={String(option.value)}
+                                        label={option.label}
+                                        isSelected={resortDisplayLimit === option.value}
+                                        onClick={() => setResortDisplayLimit(option.value)}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    </SettingSection>
+
+                    <SettingSection title="Cards" icon={icons.view}>
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">View mode</span>
+                            <div className="settings-options-row">
+                                <OptionButton label="Default" isSelected={viewMode === 'default'} onClick={() => setViewMode('default')} />
+                                <OptionButton label="Full" isSelected={viewMode === 'full'} onClick={() => setViewMode('full')} />
+                                <OptionButton label="Compact" isSelected={viewMode === 'compact'} onClick={() => setViewMode('compact')} />
+                            </div>
+                        </div>
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">Elevation</span>
+                            <div className="settings-options-row">
+                                <OptionButton label="Base" isSelected={selectedElevation === 'bot'} onClick={() => setSelectedElevation('bot')} />
+                                <OptionButton label="Mid" isSelected={selectedElevation === 'mid'} onClick={() => setSelectedElevation('mid')} />
+                                <OptionButton label="Peak" isSelected={selectedElevation === 'top'} onClick={() => setSelectedElevation('top')} />
+                            </div>
+                        </div>
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">Temperature display</span>
+                            <div className="settings-options-row">
+                                <OptionButton label="Max" isSelected={selectedTemperatureMetric === 'max'} onClick={() => setSelectedTemperatureMetric('max')} />
+                                <OptionButton label="Min" isSelected={selectedTemperatureMetric === 'min'} onClick={() => setSelectedTemperatureMetric('min')} />
+                                <OptionButton label="Avg" isSelected={selectedTemperatureMetric === 'avg'} onClick={() => setSelectedTemperatureMetric('avg')} />
+                                <OptionButton label="Median" isSelected={selectedTemperatureMetric === 'median'} onClick={() => setSelectedTemperatureMetric('median')} />
+                            </div>
+                        </div>
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">Snowfall estimate</span>
+                            <div className="settings-options-row">
+                                <OptionButton label="Model estimate" isSelected={snowfallEstimateMode === 'model'} onClick={() => setSnowfallEstimateMode('model')} />
+                                <OptionButton label="monkeysnow estimate" isSelected={snowfallEstimateMode === 'totalPrecip'} onClick={() => setSnowfallEstimateMode('totalPrecip')} />
+                            </div>
+                        </div>
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">Main page models</span>
+                            <div className="settings-options-row">
+                                <OptionButton label="Choose…" icon={icons.weatherModel} isSelected={false} onClick={openCardModels} />
+                                <span className="self-center text-sm text-theme-textSecondary">{cardModelsSummary}</span>
+                            </div>
+                        </div>
+                        <div className="settings-toggles">
                             <Toggle
-                                label="Fullscreen"
-                                isEnabled={isFullscreen}
-                                onToggle={(enabled) => enabled ? enterFullscreen() : exitFullscreen()}
-                                icon={icons.fullscreen}
+                                label="Show date"
+                                isEnabled={isShowDateEnabled}
+                                onToggle={setShowDateEnabled}
+                                icon={icons.date}
                             />
-                        )}
-                    </div>
-                </SettingSection>
+                        </div>
+                    </SettingSection>
 
-                {/* Weather Display */}
-                <SettingSection title="Weather Display" icon={icons.temperature}>
-                    <div className="settings-subsection">
-                        <span className="settings-subsection-label">Elevation</span>
-                        <div className="settings-options-row">
-                            <OptionButton label="Base" isSelected={selectedElevation === 'bot'} onClick={() => setSelectedElevation('bot')} />
-                            <OptionButton label="Mid" isSelected={selectedElevation === 'mid'} onClick={() => setSelectedElevation('mid')} />
-                            <OptionButton label="Peak" isSelected={selectedElevation === 'top'} onClick={() => setSelectedElevation('top')} />
+                    <SettingSection title="Sorting" icon={icons.sort}>
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">Sort by</span>
+                            <div className="settings-options-row">
+                                <OptionButton label="Temperature" isSelected={selectedSort === 'temperature'} onClick={() => setSelectedSort('temperature')} />
+                                <OptionButton label="Snowfall" isSelected={selectedSort === 'snowfall'} onClick={() => setSelectedSort('snowfall')} />
+                                <OptionButton label="Wind" isSelected={selectedSort === 'wind'} onClick={() => setSelectedSort('wind')} />
+                            </div>
                         </div>
-                    </div>
-                    <div className="settings-subsection">
-                        <span className="settings-subsection-label">Sort by</span>
-                        <div className="settings-options-row">
-                            <OptionButton label="Temperature" isSelected={selectedSort === 'temperature'} onClick={() => setSelectedSort('temperature')} />
-                            <OptionButton label="Snowfall" isSelected={selectedSort === 'snowfall'} onClick={() => setSelectedSort('snowfall')} />
-                            <OptionButton label="Wind" isSelected={selectedSort === 'wind'} onClick={() => setSelectedSort('wind')} />
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">Sort day</span>
+                            <div className="settings-options-grid">
+                                {sortDayData.specialOptions.map(option => (
+                                    <OptionButton
+                                        key={option.value}
+                                        label={option.name}
+                                        isSelected={selectedSortDay === option.value}
+                                        onClick={() => setSelectedSortDay(option.value as SortDay)}
+                                    />
+                                ))}
+                                {sortDayData.regularDays.map((label, index) => (
+                                    <OptionButton
+                                        key={index}
+                                        label={label}
+                                        isSelected={selectedSortDay === index}
+                                        onClick={() => setSelectedSortDay(index)}
+                                    />
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                    <div className="settings-subsection">
-                        <span className="settings-subsection-label">Sort day</span>
-                        <div className="settings-options-grid">
-                            {sortDayData.specialOptions.map(option => (
-                                <OptionButton
-                                    key={option.value}
-                                    label={option.name}
-                                    isSelected={selectedSortDay === option.value}
-                                    onClick={() => setSelectedSortDay(option.value as SortDay)}
-                                />
-                            ))}
-                            {sortDayData.regularDays.map((label, index) => (
-                                <OptionButton
-                                    key={index}
-                                    label={label}
-                                    isSelected={selectedSortDay === index}
-                                    onClick={() => setSelectedSortDay(index)}
-                                />
-                            ))}
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">Sort order</span>
+                            <div className="settings-options-row">
+                                <OptionButton label="Normal" isSelected={!isReversed} onClick={() => setIsReversed(false)} />
+                                <OptionButton label="Reverse" isSelected={isReversed} onClick={() => setIsReversed(true)} />
+                            </div>
                         </div>
-                    </div>
-                    <div className="settings-subsection">
-                        <span className="settings-subsection-label">Sort order</span>
-                        <div className="settings-options-row">
-                            <OptionButton label="Normal" isSelected={!isReversed} onClick={() => setIsReversed(false)} />
-                            <OptionButton label="Reverse" isSelected={isReversed} onClick={() => setIsReversed(true)} />
-                        </div>
-                    </div>
-                    <div className="settings-subsection">
-                        <span className="settings-subsection-label">View mode</span>
-                        <div className="settings-options-row">
-                            <OptionButton label="Default" isSelected={viewMode === 'default'} onClick={() => setViewMode('default')} />
-                            <OptionButton label="Full" isSelected={viewMode === 'full'} onClick={() => setViewMode('full')} />
-                            <OptionButton label="Compact" isSelected={viewMode === 'compact'} onClick={() => setViewMode('compact')} />
-                        </div>
-                    </div>
-                    <div className="settings-subsection">
-                        <span className="settings-subsection-label">Temperature display</span>
-                        <div className="settings-options-row">
-                            <OptionButton label="Max" isSelected={selectedTemperatureMetric === 'max'} onClick={() => setSelectedTemperatureMetric('max')} />
-                            <OptionButton label="Min" isSelected={selectedTemperatureMetric === 'min'} onClick={() => setSelectedTemperatureMetric('min')} />
-                            <OptionButton label="Avg" isSelected={selectedTemperatureMetric === 'avg'} onClick={() => setSelectedTemperatureMetric('avg')} />
-                            <OptionButton label="Median" isSelected={selectedTemperatureMetric === 'median'} onClick={() => setSelectedTemperatureMetric('median')} />
-                        </div>
-                    </div>
-                    <div className="settings-subsection">
-                        <span className="settings-subsection-label">Snowfall estimate</span>
-                        <div className="settings-options-row">
-                            <OptionButton label="Model estimate" isSelected={snowfallEstimateMode === 'model'} onClick={() => setSnowfallEstimateMode('model')} />
-                            <OptionButton label="monkeysnow estimate" isSelected={snowfallEstimateMode === 'totalPrecip'} onClick={() => setSnowfallEstimateMode('totalPrecip')} />
-                        </div>
-                    </div>
-                    <div className="settings-subsection">
-                        <span className="settings-subsection-label">Main page models</span>
-                        <div className="settings-options-row">
-                            <OptionButton label="Choose…" icon={icons.weatherModel} isSelected={false} onClick={openCardModels} />
-                            <span className="self-center text-sm text-theme-textSecondary">{cardModelsSummary}</span>
-                        </div>
-                    </div>
-                </SettingSection>
+                    </SettingSection>
+                </SettingGroup>
 
-                {/* Utility Bar */}
-                <SettingSection title="Utility Bar" icon={icons.controls}>
-                    <div className="settings-toggles">
-                        <Toggle
-                            label="Show utility bar"
-                            isEnabled={showUtilityBar}
-                            onToggle={setShowUtilityBar}
-                        />
-                    </div>
-                    <div className="settings-subsection">
-                        <span className="settings-subsection-label">Style</span>
-                        <div className="settings-options-row">
-                            <OptionButton label="Compact" isSelected={utilityBarStyle === 'compact'} onClick={() => setUtilityBarStyle('compact')} />
-                            <OptionButton label="Large" isSelected={utilityBarStyle === 'large'} onClick={() => setUtilityBarStyle('large')} />
+                <SettingGroup id="settings-detail-view">
+                    <SettingSection title="Charts" icon={icons.lineChart}>
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">Model styles</span>
+                            <div className="settings-options-row">
+                                <OptionButton label="Edit…" icon={icons.chart} isSelected={false} onClick={openModelStyles} />
+                                <span className="self-center text-sm text-theme-textSecondary">Colours, bold and opacity of each model's chart lines</span>
+                            </div>
                         </div>
-                    </div>
-                </SettingSection>
+                        <div className="settings-toggles">
+                            <Toggle
+                                label="Sync charts"
+                                isEnabled={chartZoomSyncEnabled}
+                                onToggle={setChartZoomSyncEnabled}
+                                icon={icons.link}
+                            />
+                        </div>
+                    </SettingSection>
 
-                {/* Advanced */}
-                <SettingSection title="Advanced" icon={icons.fps}>
-                    <div className="settings-toggles">
-                        <Toggle
-                            label="FPS counter"
-                            isEnabled={isFPSEnabled}
-                            onToggle={setFPSEnabled}
-                            icon={icons.fps}
+                    <SettingSection title="Map" icon={icons.mountain}>
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">3D map rotation</span>
+                            <div className="settings-options-row">
+                                <OptionButton label="Linear" isSelected={mapRotation === 'linear'} onClick={() => setMapRotation('linear')} />
+                                <OptionButton label="Orbital" isSelected={mapRotation === 'orbital'} onClick={() => setMapRotation('orbital')} />
+                            </div>
+                            <span className="text-sm text-theme-textSecondary">
+                                {mapRotation === 'linear'
+                                    ? 'Right-dragging sideways always turns the map the same way, wherever the pointer is'
+                                    : 'Right-dragging turns the map like spinning a globe, so opposite ways above and below its middle'}
+                            </span>
+                        </div>
+                    </SettingSection>
+                </SettingGroup>
+
+                <SettingGroup id="settings-appearance">
+                    <SettingSection title="Theme" icon={icons.theme}>
+                        <ThemePicker
+                            themes={availableThemes}
+                            currentThemeId={currentThemeId}
+                            setTheme={setTheme}
+                            applyTheme={applyTheme}
+                            resetThemePreview={resetThemePreview}
                         />
-                        <Toggle
-                            label="Sync charts"
-                            isEnabled={chartZoomSyncEnabled}
-                            onToggle={setChartZoomSyncEnabled}
-                            icon={icons.link}
-                        />
-                    </div>
-                    <div className="settings-subsection">
-                        <span className="settings-subsection-label">Resort display limit</span>
-                        <div className="settings-options-grid">
-                            {([
-                                { value: 'auto' as ResortDisplayLimit, label: 'Auto (100 on mobile)' },
-                                { value: 50 as ResortDisplayLimit, label: '50' },
-                                { value: 100 as ResortDisplayLimit, label: '100' },
-                                { value: 200 as ResortDisplayLimit, label: '200' },
-                                { value: 500 as ResortDisplayLimit, label: '500' },
-                                { value: 0 as ResortDisplayLimit, label: 'No limit' },
-                            ]).map(option => (
+                    </SettingSection>
+
+                    <SettingSection title="Font" icon={icons.font}>
+                        <div className="settings-options-grid" onMouseLeave={resetFontPreview}>
+                            {availableFonts.map(f => (
                                 <OptionButton
-                                    key={String(option.value)}
-                                    label={option.label}
-                                    isSelected={resortDisplayLimit === option.value}
-                                    onClick={() => setResortDisplayLimit(option.value)}
+                                    key={f.id}
+                                    label={f.name}
+                                    isSelected={currentFontId === f.id}
+                                    onClick={() => setFont(f.id)}
+                                    icon={f.isMonospace ? icons.monospace : icons.regular}
+                                    onHover={() => applyFont(f)}
+                                    onHoverEnd={resetFontPreview}
                                 />
                             ))}
                         </div>
-                    </div>
-                    <div className="settings-subsection">
-                        <span className="settings-subsection-label">3D map rotation</span>
-                        <div className="settings-options-row">
-                            <OptionButton label="Linear" isSelected={mapRotation === 'linear'} onClick={() => setMapRotation('linear')} />
-                            <OptionButton label="Orbital" isSelected={mapRotation === 'orbital'} onClick={() => setMapRotation('orbital')} />
+                        <div className="settings-toggles">
+                            <Toggle
+                                label="Bold text"
+                                isEnabled={isBoldTextEnabled}
+                                onToggle={setBoldTextEnabled}
+                                icon={icons.bold}
+                            />
+                            <Toggle
+                                label="Rainbow text"
+                                isEnabled={isRainbowEnabled}
+                                onToggle={setRainbowEnabled}
+                                icon={icons.rainbow}
+                            />
                         </div>
-                        <span className="text-sm text-theme-textSecondary">
-                            {mapRotation === 'linear'
-                                ? 'Right-dragging sideways always turns the map the same way, wherever the pointer is'
-                                : 'Right-dragging turns the map like spinning a globe, so opposite ways above and below its middle'}
-                        </span>
-                    </div>
-                    <div className="settings-subsection">
-                        <span className="settings-subsection-label">Model styles</span>
-                        <div className="settings-options-row">
-                            <OptionButton label="Edit…" icon={icons.chart} isSelected={false} onClick={openModelStyles} />
-                            <span className="self-center text-sm text-theme-textSecondary">Colours, bold and opacity of each model's chart lines</span>
-                        </div>
-                    </div>
-                </SettingSection>
+                    </SettingSection>
 
-                {/* Actions */}
-                <SettingSection title="Resorts" icon={icons.resort}>
-                    <button
-                        onClick={openResortSelector}
-                        className="settings-action-btn"
-                    >
-                        <Icon icon={icons.resort} />
-                        <span>Select resorts</span>
-                    </button>
-                </SettingSection>
+                    <SettingSection title="Interface" icon={icons.controls}>
+                        <div className="settings-toggles">
+                            <Toggle
+                                label="Show utility bar"
+                                isEnabled={showUtilityBar}
+                                onToggle={setShowUtilityBar}
+                            />
+                        </div>
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">Utility bar style</span>
+                            <div className="settings-options-row">
+                                <OptionButton label="Compact" isSelected={utilityBarStyle === 'compact'} onClick={() => setUtilityBarStyle('compact')} />
+                                <OptionButton label="Large" isSelected={utilityBarStyle === 'large'} onClick={() => setUtilityBarStyle('large')} />
+                            </div>
+                        </div>
+                        <div className="settings-toggles">
+                            <Toggle
+                                label="Show borders"
+                                isEnabled={!isHideBordersEnabled}
+                                onToggle={(enabled) => setHideBordersEnabled(!enabled)}
+                                icon={icons.borders}
+                            />
+                            {/* Not offered where the page can't go fullscreen (iPhone) */}
+                            {isFullscreenSupported && (
+                                <Toggle
+                                    label="Fullscreen"
+                                    isEnabled={isFullscreen}
+                                    onToggle={(enabled) => enabled ? enterFullscreen() : exitFullscreen()}
+                                    icon={icons.fullscreen}
+                                />
+                            )}
+                        </div>
+                    </SettingSection>
+                </SettingGroup>
+
+                <SettingGroup id="settings-advanced">
+                    <SettingSection title="Performance" icon={icons.fps}>
+                        <div className="settings-toggles">
+                            <Toggle
+                                label="FPS counter"
+                                isEnabled={isFPSEnabled}
+                                onToggle={setFPSEnabled}
+                                icon={icons.fps}
+                            />
+                        </div>
+                    </SettingSection>
+                </SettingGroup>
             </div>
         </div>
     );
