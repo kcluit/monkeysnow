@@ -508,7 +508,7 @@ function App(): JSX.Element {
             },
             {
                 id: 'chart-zoom-sync',
-                name: 'Sync chart zoom',
+                name: 'Sync charts',
                 icon: icons.link,
                 subCommands: [
                     {

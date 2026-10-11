@@ -466,7 +466,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                             icon={icons.fps}
                         />
                         <Toggle
-                            label="Sync chart zoom"
+                            label="Sync charts"
                             isEnabled={chartZoomSyncEnabled}
                             onToggle={setChartZoomSyncEnabled}
                             icon={icons.link}

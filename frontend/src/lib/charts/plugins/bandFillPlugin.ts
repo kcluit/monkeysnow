@@ -35,6 +35,8 @@ export function createBandFillPlugin(options: BandFillPluginOptions): uPlot.Plug
         const fillColor = colorWithOpacity(series.color, fillOpacity);
 
         ctx.fillStyle = fillColor;
+        // Faded, like a series, while another line is focused
+        ctx.globalAlpha *= u.series[seriesIdx].alpha ?? 1;
 
         const pathPoints: Array<{ x: number; yUpper: number; yLower: number }> = [];
 

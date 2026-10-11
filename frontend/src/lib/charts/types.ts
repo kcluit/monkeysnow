@@ -43,6 +43,8 @@ export interface ChartTheme {
 /** Configuration for a single data series */
 export interface SeriesConfig {
     id: string;
+    /** The line this series is focused and locked as, shared across charts; defaults to its id */
+    line?: string;
     name: string;
     color: string;
     type: ChartType;

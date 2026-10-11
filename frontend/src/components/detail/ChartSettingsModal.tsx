@@ -243,9 +243,9 @@ export function ChartSettingsModal({
                                 </div>
                             )}
 
-                            {/* Zoom Sync Option */}
+                            {/* Sync Option */}
                             <div className="chart-settings-section">
-                                <h3 className="chart-settings-section-title">Zoom Sync</h3>
+                                <h3 className="chart-settings-section-title">Sync</h3>
                                 <label className="chart-settings-toggle">
                                     <input
                                         type="checkbox"
@@ -253,10 +253,10 @@ export function ChartSettingsModal({
                                         onChange={(e) => setLocalZoomSyncExcluded(!e.target.checked)}
                                     />
                                     <span className="chart-settings-toggle-label">
-                                        Sync zoom with other charts
+                                        Sync zoom and locked line with other charts
                                     </span>
                                     <span className="chart-settings-toggle-desc">
-                                        When enabled, zooming this chart also zooms other charts
+                                        When enabled, zooming this chart or locking a line on it does the same on other charts
                                     </span>
                                 </label>
                             </div>

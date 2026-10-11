@@ -133,3 +133,11 @@ _Avoid_: ensemble, consensus
 **Model style**:
 How a visitor has chosen to draw the line of one **Forecast model** or **Aggregation**: its colour, whether it is bold, and its opacity. It is the same on every chart, for every **Resort** and location. A bold line is drawn thicker and above the others of its kind; a model whose opacity is Auto is faded only while **Aggregations** are drawn.
 _Avoid_: line style, model settings, model appearance
+
+**Focused line**:
+The line a visitor is pointing at, in a detail-view chart or its legend, drawn at full strength while every other line fades. A **Comparison model**'s hourly and **Accumulation** lines are focused together.
+_Avoid_: highlighted series, selected line
+
+**Locked line**:
+A **Focused line** that stays focused when the pointer moves away, set by double-clicking its legend entry. Pointing at another legend entry previews it; pointing in the chart does not.
+_Avoid_: pinned line, selected model
