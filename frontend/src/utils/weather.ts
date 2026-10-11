@@ -83,8 +83,8 @@ export function processResortData(
             ].filter((level): level is number => typeof level === 'number' && !isNaN(level));
             const highestFreezingLevel = freezingLevels.length > 0 ? Math.max(...freezingLevels) : null;
 
-            // Get main weather condition from first available period
-            const mainWeatherCode = dayData.AM?.weather_code ?? dayData.PM?.weather_code ?? dayData.NIGHT?.weather_code ?? 0;
+            // The day's weather (and its emoji) is its PM Period's, else Night's, else AM's
+            const mainWeatherCode = dayData.PM?.weather_code ?? dayData.NIGHT?.weather_code ?? dayData.AM?.weather_code ?? 0;
             const mainCondition = getWeatherDescription(mainWeatherCode);
 
             days.push({
@@ -208,7 +208,8 @@ function createPeriodFromData(data: PeriodData, label: string, temperatureMetric
         windKmh: data.wind_speed ?? 0,
         condition: getWeatherDescription(data.weather_code ?? 0),
         snowQuality: effectiveQuality,
-        snowToLiquidRatio: data.snow_to_liquid_ratio ?? 0
+        snowToLiquidRatio: data.snow_to_liquid_ratio ?? 0,
+        freezingLevel: formatFreezingLevel(data.freezing_level, unitSystem)
     };
 }
 
@@ -263,7 +264,7 @@ function getWeatherEmoji(condition: string): string {
 /**
  * Maps snow quality from API to display text and whether it is highlighted
  */
-function getSnowConditionFromQuality(quality: SnowQuality | null): SnowCondition {
+export function getSnowConditionFromQuality(quality: SnowQuality | null): SnowCondition {
     if (quality === null) {
         return { text: 'N/A', isHighlight: false, isSecondary: true };
     }

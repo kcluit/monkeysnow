@@ -140,6 +140,8 @@ export interface Period {
     condition: string;
     snowQuality: SnowQuality | null;
     snowToLiquidRatio: number;
+    /** The highest Freezing level in this Period, e.g. "1720 m" */
+    freezingLevel: string;
 }
 
 // Day forecast data
