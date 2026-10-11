@@ -9,7 +9,7 @@ import type { FeatureCollection, Geometry } from 'geojson';
 import type { ExpressionSpecification, GeoJSONSource, LayerSpecification, Map as MapLibreMap, SourceSpecification } from 'maplibre-gl';
 import type { SkiMapFeature } from '../../utils/skiMapData';
 import type { DifficultyConvention } from '../../utils/difficultyColours';
-import { OSM_ATTRIBUTION } from '../../utils/mapLayers';
+import { OPENSKIDATA_ATTRIBUTION, OSM_ATTRIBUTION } from '../../utils/mapLayers';
 import { EARTH_CIRCUMFERENCE, METRES_PER_DEGREE } from '../../utils/heightLines';
 import {
     DASHED_DOWNHILL,
@@ -47,7 +47,8 @@ const dashesInWidths = (dashArray: string, width: number) => dashArray.split(' '
 const EMPTY: FeatureCollection<Geometry, FeatureProperties> = { type: 'FeatureCollection', features: [] };
 
 export const SKI_MAP_SOURCES: Record<string, SourceSpecification> = {
-    [SOURCE]: { type: 'geojson', data: EMPTY, attribution: OSM_ATTRIBUTION },
+    // MapLibre drops the Standard Base map's credit as part of this one, so OpenStreetMap is credited once
+    [SOURCE]: { type: 'geojson', data: EMPTY, attribution: `${OSM_ATTRIBUTION} | ${OPENSKIDATA_ATTRIBUTION}` },
 };
 
 const isArea: ExpressionSpecification = ['==', ['get', 'area'], true];

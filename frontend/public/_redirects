@@ -1,3 +1,7 @@
+# A Ski map square with no Runs or Lifts has no file: answer 404, not the app's page (docs/adr/0010).
+# Rules only apply where no file exists, so squares that have one are served as they are.
+/skimap/*    /skimap/empty.json   404
+
 # Netlify SPA fallback - serve index.html for all routes
 # This allows React Router to handle client-side routing
 /*    /index.html   200
