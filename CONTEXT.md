@@ -97,12 +97,20 @@ One of the three parts a forecast day is split into on the **Main page**, in the
 _Avoid_: chunk, time slot, time of day
 
 **Snow quality**:
-What falls during an hour or a **Period**, estimated hour by hour from the air's temperature and humidity: Powder, Dry snow, Wet snow, Sleet/Mix or Rain, from best to worst. A Period's Snow quality is the worst of its hours with precipitation, and a day's is the worst of its Periods'; a Period with no precipitation has none.
+What falls during an hour, estimated from the air's temperature and humidity at the height being forecast: Powder, Dry snow, Wet snow, Sleet/Mix or Rain, from best to worst, leaning toward the worse one when it is close. A **Period**'s or a day's Snow quality is the one under which most of its precipitation fell, the worst of the tied on a tie; one with no precipitation has none.
 _Avoid_: snow condition, snow type, precip type
 
 **Snow quality colours**:
 The colour each **Snow quality** is drawn in, following the weather-radar convention: green Rain, pink Sleet/Mix, light blue Wet snow, blue Dry snow and violet Powder. They are the same on every theme, so a colour always means the same Snow quality.
 _Avoid_: precipitation colours, radar colours
+
+**Model estimate**:
+A card's snowfall and rain as the **Card model** itself splits them, which it does for its grid cell, so a **Resort**'s **Elevation bands** on one cell get the same split. One of the two choices under "Snowfall estimate".
+_Avoid_: model snowfall, raw snowfall
+
+**monkeysnow estimate**:
+A card's snowfall and rain as monkeysnow splits each hour's precipitation by its **Snow quality**, with the snow's depth from how fluffy that quality is, worked out for each **Elevation band** on its own. The other choice under "Snowfall estimate".
+_Avoid_: our estimate, estimated snowfall, total precipitation mode
 
 **Freezing level**:
 The height above which the air is below 0 °C. A **Period**'s is the highest it reaches in that Period, and a day's is the highest of its Periods'.
