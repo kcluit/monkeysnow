@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-MonkeySnow is a ski resort weather forecast application: a React frontend that fetches forecasts from Open-Meteo directly in the browser (there is no backend). It displays forecasts for multiple ski resorts with snow estimation using Kuchera ratios based on wet bulb temperature.
+MonkeySnow is a ski resort weather forecast application: a React frontend that fetches forecasts from Open-Meteo directly in the browser (there is no backend). It displays forecasts for multiple ski resorts with Snow quality and snow amounts estimated from the wet-bulb temperature at each elevation (`utils/snowQuality.ts`, docs/adr/0011).
 
 Domain terms (Selection, Selection cap, Fetch budget, Rate limit, Freshness window, ...) are defined in `CONTEXT.md`; architectural decisions live in `docs/adr/`.
 
@@ -18,6 +18,11 @@ npm run dev
 ### Build (regenerates `frontend/public/sitemap.xml` from `resorts.json`, then type-checks and builds)
 ```bash
 npm run build
+```
+
+### Test (Vitest; the only tests are the snow estimate's, `frontend/src/utils/snowQuality.test.ts`)
+```bash
+npm test
 ```
 
 ## Architecture
@@ -38,9 +43,10 @@ npm run build
 
 ### Fetching from Open-Meteo (see docs/adr/0001-fetch-forecasts-from-the-browser.md)
 - `utils/openMeteoBudget.ts` - every forecast request goes through `fetchWeatherApiWithinBudget()`: a per-tab Fetch budget of 550 calls per rolling minute, at most 2 requests in flight, Detailed view requests first, and a pause until the window resets when Open-Meteo returns a 429
-- `utils/resortForecast.ts` - fetches all three elevation bands for groups of up to 25 resorts sharing a Card model, and turns hourly data into AM/PM/NIGHT periods with the wet-bulb / Kuchera snow estimation; it also keeps each band's hours (`ElevationForecast.hours`) and the Freezing level's for Graph view
+- `utils/resortForecast.ts` - fetches all three elevation bands for groups of up to 25 resorts sharing a Card model, and turns hourly data into AM/PM/NIGHT periods with the Snow quality and monkeysnow estimate from `utils/snowQuality.ts`; it also keeps each band's hours (`ElevationForecast.hours`) and the Freezing level's for Graph view
+- `utils/snowQuality.ts` - the estimate itself, pure functions (docs/adr/0011): each hour's wet bulb (Stull, from the band's temperature and humidity) splits its total precipitation into snow and rain, Rain from +0.5 °C and Sleet/Mix from −0.5 °C, deliberately on the cold side; a snow-to-liquid ratio that is one line of the wet bulb (8 near freezing, 17 at −14 °C, 12 at −25 °C); and the snow labels by that ratio (Wet snow under 10, Dry snow 10 to 15, Powder 15 and up). A Period's or a day's label is the one under which most of its precipitation fell, the worst of the tied on a tie (`dominantQuality`). The model's own `snowfall` is only ever the Model estimate: Open-Meteo gives it per grid cell, the same for every band on the cell. Bump `SNOW_ESTIMATE_VERSION` when any of this changes, so cached forecasts count as stale
 - `utils/cardModels.ts` - picks each card's Card model: the visitor's Country model (localStorage, set in `components/CardModelsModal/`) where it covers the point, else the country's Recommended card model (see docs/adr/0006)
-- `hooks/useWeatherData.ts` - keeps the Selection's forecasts loaded: IndexedDB cache first, never-loaded resorts before stale ones, 3-hour Freshness window, re-checked every 5 minutes; in Graph view a forecast cached before hours were kept counts as never-loaded
+- `hooks/useWeatherData.ts` - keeps the Selection's forecasts loaded: IndexedDB cache first, never-loaded resorts before stale ones, 3-hour Freshness window, re-checked every 5 minutes; in Graph view a forecast cached before hours were kept counts as never-loaded, and one estimated under an earlier `SNOW_ESTIMATE_VERSION` counts as stale
 - `utils/openMeteoClient.ts` + `hooks/useDetailedWeatherData.ts` - the multi-model Detailed view
 - The Selection cap is `MAX_SELECTED_RESORTS` (300) in `hooks/useResortHierarchy.ts`
 
@@ -74,7 +80,7 @@ npm run build
 - Model styles (`utils/modelStyles.ts`): each Forecast model's and Aggregation's colour, bold and opacity, plus the Spread fills and hiding model lines, kept in localStorage. They are edited in the Model styles tab of every chart's gear modal (`components/detail/ChartSettingsModal.tsx`, a little wider on that tab on desktop), or in `ModelStylesModal` on its own from the Settings page and the command palette where no chart is showing; `openModelStyles()` picks which. The tab (`ModelStylesTab.tsx`) is one column of rows, each showing a sample of its line and opening its editor below it, one at a time (Esc closes the editor before the modal): Selected models first, the rest folded under "Other models", then the Selected Aggregations with the rest under "Other Aggregations", and the switches. A filter at the top searches names and Providers. Closing either modal, however it's closed, saves; Reset to default asks first
 
 ### Graph view
-- `components/graph/` - the view mode where each card is a Graph (`GraphCard.tsx`, drawn with uPlot by `GraphPlot.ts` from `graphData.ts`) of its Card model's hours: precipitation bars in Snow quality colours (`utils/snowQualityColours.ts`), snow or rain decided as the cards decide a Period's but with rain from the hour's total precipitation (Open-Meteo's `rain` leaves out showers), the temperature at the picked Elevation band, and the Freezing level, which has no axis, against dashed lines at the heights forecast; nights are shaded from `utils/nightTimes.ts`
+- `components/graph/` - the view mode where each card is a Graph (`GraphCard.tsx`, drawn with uPlot by `GraphPlot.ts` from `graphData.ts`) of its Card model's hours: precipitation bars in Snow quality colours (`utils/snowQualityColours.ts`) by each hour's own Snow quality, a Sleet/Mix hour drawn as all its water in mm, and under the Model estimate the model's snowfall else its total precipitation as rain (Open-Meteo's `rain` leaves out showers), the temperature at the picked Elevation band, and the Freezing level, which has no axis, against dashed lines at the heights forecast; nights are shaded from `utils/nightTimes.ts`
 - Every Graph shares one `GraphSync` per visit to the page: they open on 5 days from the current hour, zoom out to every hour any of them has, double-click back to those 5 days, and zoom, pan and are pointed at (a hairline on the others) together, by moment in time, each labelled in its own time zone (`graphTimeAxis.ts`)
 - Over a Graph the wheel zooms, never scrolling the page, even at a zoom limit; the page scrolls from headers, gaps and margins. `zoomPlugin`'s `wheel: 'smooth'` sizes each step to how far the wheel moved, so a trackpad zooms smoothly, and a sideways swipe or Shift+wheel pans. Locked charts doesn't apply. Only Graphs on or near the screen are drawn
 - The tooltip gives the hour's weather (the Card model's own words and emoji, as on the cards, which can disagree with the Snow quality), precipitation, temperature, wind speed and the compass point it blows from, and Freezing level; forecasts cached before wind and weather were kept leave those rows out until they're refreshed
@@ -85,7 +91,7 @@ npm run build
 - `fonts.ts` - Font configuration
 
 ### Weather Data Types
-- `PeriodData` - AM/PM/NIGHT period aggregates with snow estimation fields
+- `PeriodData` - AM/PM/NIGHT period aggregates with the monkeysnow estimate (`snowfall_estimate`, `rain_estimate`), `precipitation_by_quality` (mm under each Snow quality, which the day's label is summed from) and `snow_quality`
 - `DayData` - Contains AM/PM/NIGHT `PeriodData`
 - `ResortData` - bot/mid/top `ElevationForecast`s plus `fetchedAt`, and the hourly `freezingLevel` and `timeZone` a Graph needs
 - `HourlyForecast` - one band's hours (`ElevationForecast.hours`) as typed arrays from `start`, each hour's Snow quality an index into `SNOW_QUALITIES`; wind and weather code are optional, missing on forecasts cached before they were kept
