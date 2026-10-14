@@ -319,9 +319,12 @@ function freezingSeriesOf(response: ApiResponse | undefined, variableIndex: numb
 function hourlyForecastOf(response: ApiResponse): HourlyForecast | null {
     const hourly = response.hourly();
     if (!hourly) return null;
+    const windSpeed = hourly.variables(0)!.valuesArray()!;
+    const windDirection = hourly.variables(1)!.valuesArray()!;
     const temperature = hourly.variables(2)!.valuesArray()!;
     const humidity = hourly.variables(3)!.valuesArray()!;
     const precipitation = hourly.variables(4)!.valuesArray()!;
+    const weatherCode = hourly.variables(5)!.valuesArray()!;
     const snowfall = hourly.variables(8)!.valuesArray()!;
 
     let length = temperature.length;
@@ -335,6 +338,10 @@ function hourlyForecastOf(response: ApiResponse): HourlyForecast | null {
         snowEstimate: new Float32Array(length),
         precipitation: precipitation.slice(0, length),
         quality: new Int8Array(length).fill(-1),
+        windSpeed: windSpeed.slice(0, length),
+        windDirection: windDirection.slice(0, length),
+        // WMO codes run to 99, so 255 can stand for an hour without one
+        weatherCode: Uint8Array.from(weatherCode.subarray(0, length), (code) => (Number.isFinite(code) ? code : 255)),
     };
     for (let i = 0; i < length; i++) {
         if (!Number.isFinite(temperature[i])) {

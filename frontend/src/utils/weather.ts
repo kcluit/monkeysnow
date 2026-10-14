@@ -214,7 +214,7 @@ function createPeriodFromData(data: PeriodData, label: string, temperatureMetric
 }
 
 // WMO Weather Code to description mapping
-function getWeatherDescription(code: number): string {
+export function getWeatherDescription(code: number): string {
     const descriptions: Record<number, string> = {
         0: 'Clear sky',
         1: 'Mainly clear',
@@ -248,7 +248,7 @@ function getWeatherDescription(code: number): string {
     return descriptions[code] || 'Unknown';
 }
 
-function getWeatherEmoji(condition: string): string {
+export function getWeatherEmoji(condition: string): string {
     if (!condition) return '⛅';
     const lowerCondition = condition.toLowerCase();
 

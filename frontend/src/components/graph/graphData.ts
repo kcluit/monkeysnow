@@ -1,15 +1,27 @@
 /**
  * What one Graph draws, in the visitor's units: each hour's precipitation as a bar in
  * its Snow quality colour, the temperature at the picked Elevation band, and the
- * Freezing level against the heights being forecast.
+ * Freezing level against the heights being forecast; and for its tooltip, the wind and
+ * the Card model's weather.
  */
 
 import { SNOW_QUALITIES } from '../../utils/resortForecast';
+import { getWeatherDescription, getWeatherEmoji } from '../../utils/weather';
 import type { ElevationLevel, ResortData, SnowfallEstimateMode, SnowQuality, UnitSystem } from '../../types';
 
 const CM_TO_INCHES = 0.393701;
 const MM_TO_INCHES = 0.0393701;
 const M_TO_FT = 3.28084;
+const KMH_TO_MPH = 0.621371;
+
+/** The eight compass points a wind blows from */
+const COMPASS_POINTS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+
+export interface Weather {
+    /** e.g. "Partly cloudy", in the words the cards use */
+    text: string;
+    emoji: string;
+}
 
 /** A dashed line at one of the heights being forecast */
 export interface HeightLine {
@@ -33,6 +45,12 @@ export interface GraphData {
     temperature: (number | null)[];
     /** m or ft; all null where the forecast has none */
     freezingLevel: (number | null)[];
+    /** km/h or mph; these three are all null on forecasts cached before they were kept */
+    windSpeed: (number | null)[];
+    /** The compass point the wind blows from, e.g. "SW" */
+    windFrom: (string | null)[];
+    /** The Card model's own weather, which can disagree with monkeysnow's Snow quality */
+    weather: (Weather | null)[];
     heightLines: HeightLine[];
     lat: number;
     lon: number;
@@ -67,6 +85,9 @@ export function graphDataOf(
         isSnow: [],
         temperature: [],
         freezingLevel: [],
+        windSpeed: [],
+        windFrom: [],
+        weather: [],
         heightLines: heightLinesOf(data, elevation, units),
         lat: band.metadata.lat,
         lon: band.metadata.lon,
@@ -84,6 +105,14 @@ export function graphDataOf(
         const j = freezing ? Math.round((time - freezing.start) / freezing.interval) : -1;
         const level = freezing && j >= 0 && j < freezing.values.length ? freezing.values[j] : NaN;
         result.freezingLevel.push(Number.isFinite(level) ? (imperial ? level * M_TO_FT : level) : null);
+
+        const speed = hours.windSpeed?.[i] ?? NaN;
+        const direction = hours.windDirection?.[i] ?? NaN;
+        result.windSpeed.push(Number.isFinite(speed) ? (imperial ? speed * KMH_TO_MPH : speed) : null);
+        result.windFrom.push(Number.isFinite(direction) ? COMPASS_POINTS[Math.round(direction / 45) % 8] : null);
+        const code = hours.weatherCode?.[i] ?? 255;
+        const text = code === 255 ? null : getWeatherDescription(code);
+        result.weather.push(text ? { text, emoji: getWeatherEmoji(text) } : null);
 
         // Snow or rain, decided as the cards decide a Period's
         let quality: SnowQuality | null = hours.quality[i] >= 0 ? SNOW_QUALITIES[hours.quality[i]] : null;
