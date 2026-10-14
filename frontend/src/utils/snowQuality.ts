@@ -16,7 +16,7 @@ export const SNOW_QUALITIES: readonly SnowQuality[] = ['rain', 'sleet/mix', 'wet
  * Bumped whenever the estimate changes, so a forecast cached under an earlier one counts as
  * stale and is refetched, instead of showing labels and amounts these rules would not give.
  */
-export const SNOW_ESTIMATE_VERSION = 2;
+export const SNOW_ESTIMATE_VERSION = 3;
 
 /** Rain from this wet bulb (°C) up, where snow is less likely than 3 in 4 */
 export const RAIN_FROM = 0.5;
@@ -28,18 +28,41 @@ export const DRY_SNOW_FROM_RATIO = 10;
 /** Powder has a snow-to-liquid ratio of this or more */
 export const POWDER_FROM_RATIO = 15;
 
+/** Saturation vapour pressure over water, hPa, by Bolton's (1980) formula */
+function saturationVapourPressure(tempC: number): number {
+    return 6.112 * Math.exp((17.67 * tempC) / (tempC + 243.5));
+}
+
+/** The standard atmosphere's pressure at a height, hPa, for hours a model gives no surface pressure */
+export function standardPressureAt(elevationM: number): number {
+    return 1013.25 * Math.pow(1 - 2.25577e-5 * elevationM, 5.25588);
+}
+
+/** An hour's surface pressure, or the standard atmosphere's at the height being forecast where the model has none */
+export function surfacePressureOr(pressureHpa: number, elevationM: number): number {
+    return Number.isFinite(pressureHpa) && pressureHpa > 0 ? pressureHpa : standardPressureAt(elevationM);
+}
+
 /**
- * The wet-bulb temperature, °C, by Stull's (2011) approximation from the air's temperature
- * and relative humidity. It is fitted for sea-level pressure; in the near-saturated air of
- * a snowfall that costs under 0.2 °C at resort heights.
+ * The wet-bulb temperature, °C: how cold the air would get if water evaporated into it until it
+ * was saturated. Solved from the psychrometric equation over water at the hour's surface pressure,
+ * because the same air has a colder wet bulb the lower the pressure: at resort heights a few
+ * tenths of a degree in humid air and over a degree in dry air, which a sea-level fit misses.
  */
-export function wetBulbOf(tempC: number, humidity: number): number {
+export function wetBulbOf(tempC: number, humidity: number, pressureHpa: number): number {
     const rh = Math.max(0, Math.min(100, humidity));
-    return tempC * Math.atan(0.151977 * Math.sqrt(rh + 8.313659))
-        + Math.atan(tempC + rh)
-        - Math.atan(rh - 1.676331)
-        + 0.00391838 * Math.pow(rh, 1.5) * Math.atan(0.023101 * rh)
-        - 4.686035;
+    const vapourPressure = (rh / 100) * saturationVapourPressure(tempC);
+    // e = e_s(Tw) - A * P * (T - Tw), A being the psychrometric coefficient of a ventilated wet bulb
+    // over water. The right side rises with Tw, so bisect between the coldest it could be and the air
+    let low = tempC - 60;
+    let high = tempC;
+    for (let i = 0; i < 32; i++) {
+        const mid = (low + high) / 2;
+        const coefficient = 6.6e-4 * (1 + 0.00115 * mid);
+        if (saturationVapourPressure(mid) - coefficient * pressureHpa * (tempC - mid) > vapourPressure) high = mid;
+        else low = mid;
+    }
+    return (low + high) / 2;
 }
 
 /**
@@ -98,9 +121,9 @@ export interface HourlySnowEstimate {
     rainMm: number;
 }
 
-/** Splits an hour's total precipitation (mm of water) into snow and rain by the wet bulb. */
-export function estimateHour(tempC: number, humidity: number, precipitationMm: number): HourlySnowEstimate {
-    const wetBulb = wetBulbOf(tempC, humidity);
+/** Splits an hour's total precipitation (mm of water) into snow and rain by its wet bulb at the hour's surface pressure. */
+export function estimateHour(tempC: number, humidity: number, precipitationMm: number, pressureHpa: number): HourlySnowEstimate {
+    const wetBulb = wetBulbOf(tempC, humidity, pressureHpa);
     const fell = Number.isFinite(precipitationMm) && precipitationMm > 0 ? precipitationMm : 0;
     const snowWaterMm = fell * snowFractionOf(wetBulb);
     return {
