@@ -13,7 +13,7 @@ import { RESORT_LOCATIONS, continentOfCountry } from '../data/resortLocations';
 import { fetchWeatherApiWithinBudget, isNoDataError, type FetchPriority } from './openMeteoBudget';
 import { cardModelAt, markGap, recommendedCardModel } from './cardModels';
 import { getSavedLocation, isSavedLocationId } from './savedLocations';
-import type { DayData, ElevationForecast, PeriodData, ResortData, SnowQuality } from '../types';
+import type { DayData, ElevationForecast, HourlyForecast, HourlySeries, PeriodData, ResortData, SnowQuality } from '../types';
 import type { WeatherModel } from '../types/openMeteo';
 
 type ApiResponse = Awaited<ReturnType<typeof fetchWeatherApiWithinBudget>>[number];
@@ -151,6 +151,9 @@ function getSnowQuality(wetBulbC: number, snowFraction: number): SnowQuality {
     return 'dry_snow'; // -4 to -12 and < -18
 }
 
+/** Every Snow quality from worst to best; an HourlyForecast stores each hour's as its index here */
+export const SNOW_QUALITIES: readonly SnowQuality[] = ['rain', 'sleet/mix', 'wet_snow', 'dry_snow', 'powder'];
+
 function estimateHourlySnow(tempC: number, humidity: number, snowfallCm: number): HourlySnowEstimate {
     const wetBulb = calculateWetBulb(tempC, humidity);
     const snowFraction = calculateSnowFraction(wetBulb);
@@ -255,6 +258,11 @@ export function isOnCardModel(resortId: string, data: ResortData): boolean {
     return forecastModelOf(resortId, data) === planFor(resortId, forecastPointOf(resortId)).model;
 }
 
+/** Whether a forecast has the hours a Graph draws; those cached before hours were kept have only Periods. */
+export function hasHours(data: ResortData): boolean {
+    return Boolean(data.bot.hours && data.mid.hours && data.top.hours);
+}
+
 /**
  * Whether a forecast was fetched at the elevation this member of the Selection
  * has now. Only a Saved location's elevation can change.
@@ -302,6 +310,43 @@ function freezingSeriesOf(response: ApiResponse | undefined, variableIndex: numb
     const values = hourly?.variables(variableIndex)?.valuesArray();
     if (!hourly || !values) return null;
     return { values, timeStart: Number(hourly.time()), interval: hourly.interval() };
+}
+
+/**
+ * One location's hours as its Graph draws them, ending at the last hour inside the model's Range.
+ * The arrays are copies: the response's are views onto one buffer holding every location's hours.
+ */
+function hourlyForecastOf(response: ApiResponse): HourlyForecast | null {
+    const hourly = response.hourly();
+    if (!hourly) return null;
+    const temperature = hourly.variables(2)!.valuesArray()!;
+    const humidity = hourly.variables(3)!.valuesArray()!;
+    const precipitation = hourly.variables(4)!.valuesArray()!;
+    const snowfall = hourly.variables(8)!.valuesArray()!;
+
+    let length = temperature.length;
+    while (length > 0 && !Number.isFinite(temperature[length - 1])) length--;
+
+    const hours: HourlyForecast = {
+        start: Number(hourly.time()),
+        interval: hourly.interval(),
+        temperature: temperature.slice(0, length),
+        snowfall: snowfall.slice(0, length),
+        snowEstimate: new Float32Array(length),
+        precipitation: precipitation.slice(0, length),
+        quality: new Int8Array(length).fill(-1),
+    };
+    for (let i = 0; i < length; i++) {
+        if (!Number.isFinite(temperature[i])) {
+            hours.snowEstimate[i] = NaN;
+            continue;
+        }
+        const estimate = estimateHourlySnow(temperature[i], humidity[i], snowfall[i]);
+        hours.snowEstimate[i] = estimate.snowCm;
+        // As for a Period, only an hour with precipitation has a Snow quality
+        if (precipitation[i] > 0) hours.quality[i] = SNOW_QUALITIES.indexOf(estimate.quality);
+    }
+    return hours;
 }
 
 type Period = 'AM' | 'PM' | 'NIGHT';
@@ -614,12 +659,15 @@ async function fetchGroup(
                 console.warn(`Incomplete data for ${id}, skipping resort`);
                 return;
             }
-            bands.push({ metadata: { elevation, lat, lon }, forecast });
+            bands.push({ metadata: { elevation, lat, lon }, forecast, hours: hourlyForecastOf(responses[j]) ?? undefined });
         }
 
         // A Saved location's one forecast stands in for all three bands
         const [bot, mid = bot, top = bot] = bands;
-        result[id] = { bot, mid, top, fetchedAt, model };
+        const freezingLevel: HourlySeries | undefined = freezing
+            ? { start: freezing.timeStart, interval: freezing.interval, values: freezing.values.slice() }
+            : undefined;
+        result[id] = { bot, mid, top, fetchedAt, model, freezingLevel, timeZone: responses[0].timezone() ?? undefined };
     });
 
     return result;

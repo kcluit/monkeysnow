@@ -96,9 +96,36 @@ export interface ElevationMetadata {
     lon: number;
 }
 
+/** One value an hour, from `start` (epoch seconds) every `interval` seconds; NaN where the model has none */
+export interface HourlySeries {
+    start: number;
+    interval: number;
+    values: Float32Array;
+}
+
+/** One Elevation band's forecast hour by hour, as its Graph draws it; it ends where the Card model's Range does */
+export interface HourlyForecast {
+    /** Epoch seconds of the first hour */
+    start: number;
+    /** Seconds from one hour to the next */
+    interval: number;
+    /** °C at each hour */
+    temperature: Float32Array;
+    /** The Card model's own snowfall in the hour before each one, cm */
+    snowfall: Float32Array;
+    /** monkeysnow's estimate of that snowfall (Kuchera ratios), cm */
+    snowEstimate: Float32Array;
+    /** Everything that fell in the hour before each one, mm of water, including the showers Open-Meteo's rain leaves out */
+    precipitation: Float32Array;
+    /** Each hour's Snow quality, as its index in SNOW_QUALITIES, or -1 when nothing falls */
+    quality: Int8Array;
+}
+
 export interface ElevationForecast {
     metadata: ElevationMetadata;
     forecast: Record<string, DayData>; // date string -> day data
+    /** Missing on forecasts cached before hours were kept */
+    hours?: HourlyForecast;
 }
 
 export interface ResortData {
@@ -108,6 +135,10 @@ export interface ResortData {
     fetchedAt?: number; // epoch ms; missing on forecasts cached from the old backend
     /** The Card model it was fetched from; missing on forecasts cached before it was recorded */
     model?: WeatherModel;
+    /** The Freezing level hour by hour, one for every Elevation band; missing on forecasts cached before hours were kept */
+    freezingLevel?: HourlySeries;
+    /** The IANA time zone of the point, e.g. "America/Vancouver" */
+    timeZone?: string;
 }
 
 export interface AllWeatherData {

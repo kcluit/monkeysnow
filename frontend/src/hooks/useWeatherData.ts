@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { fetchResortForecasts, groupIntoRequests, isForecastCurrent, isOnCardModel, resortCallWeight } from '../utils/resortForecast';
+import { fetchResortForecasts, groupIntoRequests, hasHours, isForecastCurrent, isOnCardModel, resortCallWeight } from '../utils/resortForecast';
 import { isTransientError } from '../utils/openMeteoBudget';
 import { idbDelete, idbGet, idbSet } from '../utils/indexedDB';
 import { useSavedLocations } from './useSavedLocations';
@@ -30,6 +30,10 @@ interface FetchQueue {
 /** Fresh: fetched within the Freshness window, from the Card model the resort has now. */
 const isFresh = (id: string, entry: ResortData | undefined, now: number): boolean =>
   Boolean(entry?.fetchedAt && now - entry.fetchedAt < FRESHNESS_WINDOW_MS && isOnCardModel(id, entry));
+
+/** Whether a forecast can be shown: in Graph view, one cached before hours were kept can't. */
+const isLoaded = (entry: ResortData | undefined, needsHours: boolean): entry is ResortData =>
+  Boolean(entry && (!needsHours || hasHours(entry)));
 
 /** A forecast from the resort's Card model beats one from another model; otherwise the newer one wins. */
 function isBetter(id: string, a: ResortData, b: ResortData): boolean {
@@ -81,9 +85,10 @@ function currentOnly(forecasts: Record<string, ResortData>): Record<string, Reso
 /**
  * Keeps forecasts for the Selection loaded: cached forecasts show immediately,
  * missing ones are fetched first, stale ones are refreshed in the background,
- * and every request waits its turn in the Fetch budget.
+ * and every request waits its turn in the Fetch budget. With `needsHours` (Graph view),
+ * a forecast cached before hours were kept counts as missing, so it is fetched first.
  */
-export function useWeatherData(selectedResorts: string[]): UseWeatherDataReturn {
+export function useWeatherData(selectedResorts: string[], needsHours = false): UseWeatherDataReturn {
   const [allWeatherData, setAllWeatherData] = useState<AllWeatherData | null>(null);
   const [loading, setLoading] = useState(selectedResorts.length > 0);
   const [error, setError] = useState<Error | null>(null);
@@ -94,6 +99,8 @@ export function useWeatherData(selectedResorts: string[]): UseWeatherDataReturn 
   const queueRef = useRef<FetchQueue | null>(null);
   const selectionRef = useRef(selectedResorts);
   selectionRef.current = selectedResorts;
+  const needsHoursRef = useRef(needsHours);
+  needsHoursRef.current = needsHours;
   const loadingController = useRef<AbortController | null>(null);
   const syncRef = useRef<(selection: string[]) => Promise<void>>();
 
@@ -171,14 +178,15 @@ export function useWeatherData(selectedResorts: string[]): UseWeatherDataReturn 
 
     // Another tab may have fetched these already; take anything newer from IndexedDB first
     const now = Date.now();
-    const notFresh = selection.filter((id) => !isFresh(id, dataRef.current[id], now));
+    const needs = needsHoursRef.current;
+    const notFresh = selection.filter((id) => !isFresh(id, dataRef.current[id], now) || !isLoaded(dataRef.current[id], needs));
     const cached = currentOnly(await readCachedForecasts(notFresh));
     if (queue.controller.signal.aborted || run !== queue.syncRun) return;
 
     const newer: Record<string, ResortData> = {};
     for (const [id, entry] of Object.entries(cached)) {
       const current = dataRef.current[id];
-      if (!current || isBetter(id, entry, current)) newer[id] = entry;
+      if (!current || isBetter(id, entry, current) || (!isLoaded(current, needs) && isLoaded(entry, needs))) newer[id] = entry;
     }
     mergeForecasts(newer);
 
@@ -187,7 +195,7 @@ export function useWeatherData(selectedResorts: string[]): UseWeatherDataReturn 
     for (const id of selection) {
       if (queue.inFlight.has(id)) continue;
       const entry = dataRef.current[id];
-      if (!entry) missing.push(id);
+      if (!isLoaded(entry, needs)) missing.push(id);
       // Includes forecasts from a model the card no longer uses: they stay on show until replaced
       else if (!isFresh(id, entry, now)) stale.push(id);
     }
@@ -239,13 +247,13 @@ export function useWeatherData(selectedResorts: string[]): UseWeatherDataReturn 
       return;
     }
     void sync(selectedResorts);
-  }, [selectedResorts, savedLocations, countryModels, sync]);
+  }, [selectedResorts, savedLocations, countryModels, needsHours, sync]);
 
   // Selected resorts that have no forecast yet and are waiting on the Fetch budget
   const queuedIds = useMemo(() => {
     const selected = new Set(selectedResorts);
-    return outstanding.filter((id) => selected.has(id) && !allWeatherData?.data[id]);
-  }, [outstanding, selectedResorts, allWeatherData]);
+    return outstanding.filter((id) => selected.has(id) && !isLoaded(allWeatherData?.data[id], needsHours));
+  }, [outstanding, selectedResorts, allWeatherData, needsHours]);
 
   const queuedCalls = useMemo(
     () => queuedIds.reduce((sum, id) => sum + resortCallWeight(id), 0),
