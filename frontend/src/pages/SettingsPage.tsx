@@ -518,6 +518,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                                 <OptionButton label="Default" isSelected={viewMode === 'default'} onClick={() => setViewMode('default')} />
                                 <OptionButton label="Full" isSelected={viewMode === 'full'} onClick={() => setViewMode('full')} />
                                 <OptionButton label="Compact" isSelected={viewMode === 'compact'} onClick={() => setViewMode('compact')} />
+                                <OptionButton label="Graph" isSelected={viewMode === 'graph'} onClick={() => setViewMode('graph')} />
                             </div>
                         </div>
                         <div className="settings-subsection">

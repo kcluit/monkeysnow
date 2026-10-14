@@ -85,6 +85,17 @@ export const en: Translations = {
     'view.default': 'Default',
     'view.full': 'Full View',
     'view.compact': 'Compact',
+    'view.graph': 'Graph View',
+
+    // Graph view
+    'graph.loadingHours': 'Loading the hourly forecast…',
+    'graph.precipitationMetric': 'Snow in cm, rain in mm',
+    'graph.precipitationInches': 'Snow and rain in inches',
+    'graph.temperature': 'Temperature',
+    'graph.freezingLevel': 'Freezing level',
+    'graph.elevationBands': 'Elevation bands',
+    'graph.night': 'Night',
+    'graph.now': 'Now',
 
     // Temperature metrics
     'temperature.max': 'Maximum',

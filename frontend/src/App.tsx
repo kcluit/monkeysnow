@@ -13,6 +13,7 @@ import Konami from 'konami';
 const FullView = lazy(() => import('./components/cards/FullView').then(m => ({ default: m.FullView })));
 const DefaultCard = lazy(() => import('./components/cards/DefaultCard').then(m => ({ default: m.DefaultCard })));
 const CompactCard = lazy(() => import('./components/cards/CompactCard').then(m => ({ default: m.CompactCard })));
+const GraphView = lazy(() => import('./components/graph/GraphView').then(m => ({ default: m.GraphView })));
 
 // Lazy load DetailedResortView - imports uplot (~80KB) and chart configs
 const DetailedResortView = lazy(() => import('./components/detail/DetailedResortView').then(m => ({ default: m.DetailedResortView })));
@@ -273,8 +274,11 @@ function App(): JSX.Element {
         return () => controller.abort();
     }, [hasInitialized, landingPath, setSelectedResorts, setHasInitialized]);
 
-    // Weather data hook — keeps the selection's forecasts loaded within the Fetch budget
-    const { allWeatherData, loading: weatherLoading, error: weatherError, queuedCount, queuedCalls, createLoadingController, cancelLoading } = useWeatherData(selectedResorts);
+    const [viewMode, setViewMode] = useLocalStorage<ViewMode>('viewMode', 'default');
+
+    // Weather data hook — keeps the selection's forecasts loaded within the Fetch budget,
+    // with the hours that Graph view draws
+    const { allWeatherData, loading: weatherLoading, error: weatherError, queuedCount, queuedCalls, createLoadingController, cancelLoading } = useWeatherData(selectedResorts, viewMode === 'graph');
 
     // Block UI while the Starter resort is picked, and if there is NO cached data at all,
     // but not through a rate-limit pause (that can last until tomorrow; the home page
@@ -289,7 +293,6 @@ function App(): JSX.Element {
     const [utilityBarStyle, setUtilityBarStyle] = useLocalStorage<UtilityBarStyle>('utilityBarStyle', 'large');
 
     // Local component state
-    const [viewMode, setViewMode] = useLocalStorage<ViewMode>('viewMode', 'default');
     const [selectedTemperatureMetric, setSelectedTemperatureMetric] = useLocalStorage<TemperatureMetric>('temperatureMetric', defaultTemperatureMetric);
     const [snowfallEstimateMode, setSnowfallEstimateMode] = useLocalStorage<SnowfallEstimateMode>('snowfallEstimateMode', 'model');
     const [chartZoomSyncEnabled, setChartZoomSyncEnabled] = useLocalStorage<boolean>('chartZoomSync', true);
@@ -994,7 +997,16 @@ function App(): JSX.Element {
 
             <div className={viewMode === 'compact' ? "compact-grid" : "space-y-8"}>
                 <Suspense fallback={<div className="text-center py-4 text-theme-textSecondary">Loading...</div>}>
-                    {displayResorts.map((resort, index) => (
+                    {viewMode === 'graph' && allWeatherData ? (
+                        <GraphView
+                            resorts={displayResorts}
+                            allWeatherData={allWeatherData}
+                            elevation={selectedElevation}
+                            snowfallMode={snowfallEstimateMode}
+                            units={unitSystem}
+                            onResortClick={handleResortClick}
+                        />
+                    ) : displayResorts.map((resort, index) => (
                         <div key={`${resort.name}-${index}`}>
                             {viewMode === 'full' ? (
                                 <FullView resort={resort} temperatureMetric={selectedTemperatureMetric} showDate={isShowDateEnabled} unitSystem={unitSystem} onResortClick={handleResortClick} selectedElevation={selectedElevation} />

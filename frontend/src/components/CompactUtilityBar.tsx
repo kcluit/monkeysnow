@@ -42,7 +42,7 @@ export function CompactUtilityBar({
 
     // Cycle functions
     const cycleViewMode = (): void => {
-        const modes: ViewMode[] = ['default', 'full', 'compact'];
+        const modes: ViewMode[] = ['default', 'full', 'compact', 'graph'];
         const currentIndex = modes.indexOf(viewMode);
         const nextIndex = (currentIndex + 1) % modes.length;
         setViewMode(modes[nextIndex]);
@@ -53,6 +53,7 @@ export function CompactUtilityBar({
             case 'default': return 'Default';
             case 'full': return 'Full';
             case 'compact': return 'Compact';
+            case 'graph': return 'Graph';
         }
     };
 
