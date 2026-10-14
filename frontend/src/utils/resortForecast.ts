@@ -13,7 +13,7 @@ import { RESORT_LOCATIONS, continentOfCountry } from '../data/resortLocations';
 import { fetchWeatherApiWithinBudget, isNoDataError, type FetchPriority } from './openMeteoBudget';
 import { cardModelAt, markGap, recommendedCardModel } from './cardModels';
 import { getSavedLocation, isSavedLocationId } from './savedLocations';
-import { SNOW_ESTIMATE_VERSION, SNOW_QUALITIES, addPrecipitation, dominantQuality, estimateHour, noPrecipitationByQuality } from './snowQuality';
+import { SNOW_ESTIMATE_VERSION, SNOW_QUALITIES, addPrecipitation, dominantQuality, estimateHour, noPrecipitationByQuality, surfacePressureOr } from './snowQuality';
 import type { DayData, ElevationForecast, HourlyForecast, HourlySeries, PeriodData, ResortData } from '../types';
 import type { WeatherModel } from '../types/openMeteo';
 
@@ -232,7 +232,9 @@ function hourlyForecastOf(response: ApiResponse): HourlyForecast | null {
     const humidity = hourly.variables(3)!.valuesArray()!;
     const precipitation = hourly.variables(4)!.valuesArray()!;
     const weatherCode = hourly.variables(5)!.valuesArray()!;
+    const pressure = hourly.variables(6)!.valuesArray()!;
     const snowfall = hourly.variables(8)!.valuesArray()!;
+    const elevation = response.elevation();
 
     let length = temperature.length;
     while (length > 0 && !Number.isFinite(temperature[length - 1])) length--;
@@ -255,7 +257,7 @@ function hourlyForecastOf(response: ApiResponse): HourlyForecast | null {
             hours.snowEstimate[i] = NaN;
             continue;
         }
-        const estimate = estimateHour(temperature[i], humidity[i], precipitation[i]);
+        const estimate = estimateHour(temperature[i], humidity[i], precipitation[i], surfacePressureOr(pressure[i], elevation));
         hours.snowEstimate[i] = estimate.snowCm;
         // As for a Period, only an hour with precipitation has a Snow quality
         if (precipitation[i] > 0) hours.quality[i] = SNOW_QUALITIES.indexOf(estimate.quality);
@@ -350,6 +352,7 @@ function processLocation(mainResp: ApiResponse | undefined, freezing: FreezingSe
     const startTime = Number(hourly.time());
     const interval = hourly.interval();
     const length = (Number(hourly.timeEnd()) - startTime) / interval;
+    const elevation = mainResp.elevation();
     const localTime = localClockOf(mainResp, startTime, startTime + (length - 1) * interval);
 
     // Group Hourly Data
@@ -411,7 +414,7 @@ function processLocation(mainResp: ApiResponse | undefined, freezing: FreezingSe
             let rainEstimateMm = 0;
             const byQuality = noPrecipitationByQuality();
             for (const hourData of hData) {
-                const estimate = estimateHour(hourData.temperature, hourData.humidity, hourData.precipitation);
+                const estimate = estimateHour(hourData.temperature, hourData.humidity, hourData.precipitation, surfacePressureOr(hourData.surface_pressure, elevation));
                 snowEstimateCm += estimate.snowCm;
                 rainEstimateMm += estimate.rainMm;
                 addPrecipitation(byQuality, estimate.quality, hourData.precipitation);

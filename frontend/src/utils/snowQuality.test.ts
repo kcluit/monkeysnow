@@ -9,27 +9,49 @@ import {
     snowFractionOf,
     snowQualityOf,
     snowToLiquidRatioOf,
+    standardPressureAt,
     sumPrecipitationByQuality,
+    surfacePressureOr,
     wetBulbOf,
 } from './snowQuality';
 import type { SnowQuality } from '../types';
 
 describe('wetBulbOf', () => {
-    it('matches the worked example in Stull (2011): 20 °C at 50% gives 13.7 °C', () => {
-        expect(wetBulbOf(20, 50)).toBeCloseTo(13.7, 1);
+    it('is the air temperature in saturated air', () => {
+        for (const t of [-15, -5, 0, 5]) expect(wetBulbOf(t, 100, 800)).toBeCloseTo(t, 6);
     });
 
-    it('is within half a degree of the air temperature in saturated air', () => {
-        for (const t of [-15, -5, 0, 5]) expect(Math.abs(wetBulbOf(t, 100) - t)).toBeLessThan(0.5);
+    it('agrees with the psychrometric chart: 20 °C at 50% and sea level is about 13.85 °C', () => {
+        expect(Math.abs(wetBulbOf(20, 50, 1013.25) - 13.85)).toBeLessThan(0.1);
     });
 
     it('is colder in drier air', () => {
-        expect(wetBulbOf(1, 60)).toBeLessThan(wetBulbOf(1, 95));
+        expect(wetBulbOf(1, 60, 800)).toBeLessThan(wetBulbOf(1, 95, 800));
+    });
+
+    it('is colder at lower pressure for the same air, by more the drier it is', () => {
+        const humid = wetBulbOf(0, 95, 1013.25) - wetBulbOf(0, 95, 750);
+        const dry = wetBulbOf(0, 40, 1013.25) - wetBulbOf(0, 40, 750);
+        expect(humid).toBeGreaterThan(0);
+        expect(dry).toBeGreaterThan(humid);
     });
 
     it('clamps humidity to 0..100', () => {
-        expect(wetBulbOf(0, 140)).toBe(wetBulbOf(0, 100));
-        expect(wetBulbOf(0, -5)).toBe(wetBulbOf(0, 0));
+        expect(wetBulbOf(0, 140, 800)).toBe(wetBulbOf(0, 100, 800));
+        expect(wetBulbOf(0, -5, 800)).toBe(wetBulbOf(0, 0, 800));
+    });
+});
+
+describe('surface pressure', () => {
+    it('is the standard atmosphere\'s where the model gives none: 1013 at sea level, about 747 at 2500 m', () => {
+        expect(standardPressureAt(0)).toBeCloseTo(1013.25, 2);
+        expect(standardPressureAt(2500)).toBeCloseTo(747, 0);
+        expect(surfacePressureOr(NaN, 2500)).toBe(standardPressureAt(2500));
+        expect(surfacePressureOr(0, 2500)).toBe(standardPressureAt(2500));
+    });
+
+    it('is the model\'s where it gives one', () => {
+        expect(surfacePressureOr(812, 2500)).toBe(812);
     });
 });
 
@@ -126,14 +148,14 @@ describe('snowQualityOf', () => {
 
 describe('estimateHour', () => {
     it('makes rain of everything in warm air', () => {
-        const hour = estimateHour(6, 80, 2.5);
+        const hour = estimateHour(6, 80, 2.5, 800);
         expect(hour.quality).toBe('rain');
         expect(hour.rainMm).toBe(2.5);
         expect(hour.snowCm).toBe(0);
     });
 
     it('makes snow of everything in cold air, by the ratio at its wet bulb', () => {
-        const hour = estimateHour(-6, 85, 3);
+        const hour = estimateHour(-6, 85, 3, 800);
         expect(hour.quality).toBe('dry_snow');
         expect(hour.rainMm).toBe(0);
         expect(hour.snowCm).toBeCloseTo(3 * snowToLiquidRatioOf(hour.wetBulb) / 10, 10);
@@ -141,7 +163,7 @@ describe('estimateHour', () => {
 
     it('splits a Sleet/Mix hour so the snow water and the rain add up to what fell', () => {
         // Saturated air a little above freezing sits inside the Sleet/Mix band
-        const hour = estimateHour(0.3, 100, 2);
+        const hour = estimateHour(0.3, 100, 2, 800);
         expect(hour.quality).toBe('sleet/mix');
         const snowWaterMm = hour.snowCm * 10 / snowToLiquidRatioOf(hour.wetBulb);
         expect(snowWaterMm + hour.rainMm).toBeCloseTo(2, 10);
@@ -150,8 +172,8 @@ describe('estimateHour', () => {
     });
 
     it('treats a missing or negative amount as nothing falling', () => {
-        expect(estimateHour(-5, 90, NaN).snowCm).toBe(0);
-        expect(estimateHour(-5, 90, -1).rainMm).toBe(0);
+        expect(estimateHour(-5, 90, NaN, 800).snowCm).toBe(0);
+        expect(estimateHour(-5, 90, -1, 800).rainMm).toBe(0);
     });
 });
 
