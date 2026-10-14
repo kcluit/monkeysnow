@@ -10,6 +10,14 @@ Ski resort weather forecasts with snow-quality estimates, fetched from Open-Mete
 The page that shows the **Selection** as cards, one per **Resort** or **Saved location**, each forecast by its **Card model**.
 _Avoid_: home page, dashboard, overview
 
+**Graph view**:
+The way of showing the **Main page** in which each card is a **Graph** instead of a table.
+_Avoid_: chart view, graph mode
+
+**Graph**:
+One card in **Graph view**: the forecast of one **Resort** or **Saved location** from its **Card model**, hour by hour. It shows each hour's precipitation, snow or rain, in its **Snow quality colour**, the temperature, and the **Freezing level** against the heights being forecast. Every Graph on the page shows the same stretch of time.
+_Avoid_: **Chart** (that is the Detailed view's), card chart, timeline
+
 **Detailed view**:
 The page for one **Resort**, **Saved location** or **Custom location**, with its **Charts** of the **Comparison models** and its map.
 _Avoid_: detail view, resort page (it shows Saved and Custom locations too), forecast page, details page
@@ -89,8 +97,12 @@ One of the three parts a forecast day is split into on the **Main page**, in the
 _Avoid_: chunk, time slot, time of day
 
 **Snow quality**:
-What falls during a **Period**, estimated hour by hour from the air's temperature and humidity: Powder, Dry snow, Wet snow, Sleet/Mix or Rain, from best to worst. A Period's Snow quality is the worst of its hours with precipitation, and a day's is the worst of its Periods'; a Period with no precipitation has none.
+What falls during an hour or a **Period**, estimated hour by hour from the air's temperature and humidity: Powder, Dry snow, Wet snow, Sleet/Mix or Rain, from best to worst. A Period's Snow quality is the worst of its hours with precipitation, and a day's is the worst of its Periods'; a Period with no precipitation has none.
 _Avoid_: snow condition, snow type, precip type
+
+**Snow quality colours**:
+The colour each **Snow quality** is drawn in, following the weather-radar convention: green Rain, pink Sleet/Mix, light blue Wet snow, blue Dry snow and violet Powder. They are the same on every theme, so a colour always means the same Snow quality.
+_Avoid_: precipitation colours, radar colours
 
 **Freezing level**:
 The height above which the air is below 0 °C. A **Period**'s is the highest it reaches in that Period, and a day's is the highest of its Periods'.
@@ -172,7 +184,7 @@ _Avoid_: line style, model settings, model appearance
 
 **Chart**:
 One weather variable, such as snowfall or wind, drawn across the **Comparison models** in the **Detailed view**. A visitor picks which Charts show and in what order, one list for every **Resort** and location.
-_Avoid_: graph, plot, variable (for what a visitor picks)
+_Avoid_: graph (that is the **Main page**'s **Graph**), plot, variable (for what a visitor picks)
 
 **Locked charts**:
 **Charts** that can't be zoomed, by scrolling, pinching or a range slider. One choice for every **Resort** and location.
