@@ -84,6 +84,17 @@ export interface Translations {
     'view.default': string;
     'view.full': string;
     'view.compact': string;
+    'view.graph': string;
+
+    // Graph view
+    'graph.loadingHours': string;
+    'graph.precipitationMetric': string;
+    'graph.precipitationInches': string;
+    'graph.temperature': string;
+    'graph.freezingLevel': string;
+    'graph.elevationBands': string;
+    'graph.night': string;
+    'graph.now': string;
 
     // Temperature metrics
     'temperature.max': string;
@@ -254,6 +265,17 @@ export const TranslationsSchema = z.object({
     'view.default': z.string(),
     'view.full': z.string(),
     'view.compact': z.string(),
+    'view.graph': z.string(),
+
+    // Graph view
+    'graph.loadingHours': z.string(),
+    'graph.precipitationMetric': z.string(),
+    'graph.precipitationInches': z.string(),
+    'graph.temperature': z.string(),
+    'graph.freezingLevel': z.string(),
+    'graph.elevationBands': z.string(),
+    'graph.night': z.string(),
+    'graph.now': z.string(),
 
     // Temperature metrics
     'temperature.max': z.string(),

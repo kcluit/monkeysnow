@@ -56,7 +56,7 @@ export interface UseThemeReturn {
 export type ElevationLevel = 'bot' | 'mid' | 'top';
 export type SortOption = 'temperature' | 'snowfall' | 'wind';
 export type SortDay = number | 'next3days' | 'next7days';
-export type ViewMode = 'default' | 'full' | 'compact';
+export type ViewMode = 'default' | 'full' | 'compact' | 'graph';
 export type UtilityBarStyle = 'compact' | 'large';
 export type TemperatureMetric = 'max' | 'min' | 'avg' | 'median';
 export type SnowfallEstimateMode = 'model' | 'totalPrecip';

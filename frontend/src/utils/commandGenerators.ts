@@ -206,6 +206,12 @@ export function generateViewModeCommands(
       icon: viewMode === 'compact' ? icons.check : undefined,
       action: () => setViewMode('compact'),
     },
+    {
+      id: 'viewmode-graph',
+      name: 'Graph',
+      icon: viewMode === 'graph' ? icons.check : undefined,
+      action: () => setViewMode('graph'),
+    },
   ];
 }
 
