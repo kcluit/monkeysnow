@@ -178,7 +178,7 @@ export class GraphPlot implements SyncedGraph {
             },
             plugins: [
                 createZoomPlugin({
-                    wheel: 'ctrl',
+                    wheel: 'smooth',
                     limits: () => this.options.sync.bounds,
                     home: () => this.options.sync.home,
                     onZoom: (min, max) => this.options.sync.setWindow({ min, max }, this),

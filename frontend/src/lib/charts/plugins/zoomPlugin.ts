@@ -7,9 +7,9 @@
  * - Pan: Middle-click or right-click drag to pan
  * - Reset: Double-click to reset to initial view
  *
- * With `wheel: 'ctrl'` (a chart in a page of charts) the wheel scrolls the page instead:
- * Ctrl+wheel, which is also how a trackpad pinch arrives, zooms, and a sideways swipe
- * or Shift+wheel pans.
+ * By default each wheel event zooms by `factor`. With `wheel: 'smooth'` the zoom is sized
+ * to how far the wheel moved, so a trackpad's stream of small scrolls (or a pinch, which
+ * arrives as Ctrl+wheel) zooms smoothly, and a sideways swipe or Shift+wheel pans.
  *
  * Based on uPlot zoom-wheel.html and zoom-variations.html demos.
  */
@@ -30,8 +30,8 @@ export interface ZoomPluginOptions {
     limits?: () => XRange;
     /** Where a double-click returns to; the range it opened on by default */
     home?: () => XRange;
-    /** 'zoom' (default): the wheel zooms. 'ctrl': the wheel scrolls the page and Ctrl+wheel zooms */
-    wheel?: 'zoom' | 'ctrl';
+    /** 'steps' (default): every wheel event zooms by `factor`. 'smooth': zooms as far as the wheel moved, and sideways pans */
+    wheel?: 'steps' | 'smooth';
 }
 
 /** Pixels a wheel event moves, whether it counts in pixels, lines or pages */
@@ -42,7 +42,7 @@ function wheelPixels(e: WheelEvent, delta: number): number {
 }
 
 export function createZoomPlugin(options: ZoomPluginOptions = {}): uPlot.Plugin {
-    const { factor = 0.75, onZoom, limits, home, wheel = 'zoom' } = options;
+    const { factor = 0.75, onZoom, limits, home, wheel = 'steps' } = options;
 
     return {
         hooks: {
@@ -115,22 +115,20 @@ export function createZoomPlugin(options: ZoomPluginOptions = {}): uPlot.Plugin 
 
                 // Wheel zoom (centered on cursor)
                 const onWheel = (e: WheelEvent) => {
-                    if (wheel === 'ctrl' && !e.ctrlKey && !e.metaKey) {
-                        // A sideways swipe or Shift+wheel pans; any other wheel scrolls the page
-                        const sideways = e.shiftKey
-                            ? e.deltaX || e.deltaY
-                            : Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : 0;
-                        if (!sideways) return;
-                        e.preventDefault();
-                        syncRect();
-                        ensureInitialBounds();
-                        panBy(wheelPixels(e, sideways));
-                        return;
-                    }
-
                     e.preventDefault();
                     syncRect(); // Ensure fresh coordinates
                     ensureInitialBounds();
+
+                    if (wheel === 'smooth' && !e.ctrlKey && !e.metaKey) {
+                        // A sideways swipe or Shift+wheel pans
+                        const sideways = e.shiftKey
+                            ? e.deltaX || e.deltaY
+                            : Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : 0;
+                        if (sideways) {
+                            panBy(wheelPixels(e, sideways));
+                            return;
+                        }
+                    }
 
                     const xMin = u.scales.x.min!;
                     const xMax = u.scales.x.max!;
@@ -141,8 +139,8 @@ export function createZoomPlugin(options: ZoomPluginOptions = {}): uPlot.Plugin 
 
                     if (Number.isNaN(xVal)) return;
 
-                    const zoomMult = wheel === 'ctrl'
-                        // A pinch sends many small steps where a wheel sends one of about 100 px
+                    const zoomMult = wheel === 'smooth'
+                        // A trackpad or a pinch sends many small steps where a mouse wheel sends one of about 100 px
                         ? Math.pow(1 / factor, Math.max(-1, Math.min(1, wheelPixels(e, e.deltaY) / 100)))
                         : e.deltaY < 0 ? factor : 1 / factor;
                     const newRange = xRange * zoomMult;
