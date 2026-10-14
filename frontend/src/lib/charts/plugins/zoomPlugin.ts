@@ -7,20 +7,42 @@
  * - Pan: Middle-click or right-click drag to pan
  * - Reset: Double-click to reset to initial view
  *
+ * With `wheel: 'ctrl'` (a chart in a page of charts) the wheel scrolls the page instead:
+ * Ctrl+wheel, which is also how a trackpad pinch arrives, zooms, and a sideways swipe
+ * or Shift+wheel pans.
+ *
  * Based on uPlot zoom-wheel.html and zoom-variations.html demos.
  */
 
 import type uPlot from 'uplot';
+
+export interface XRange {
+    min: number;
+    max: number;
+}
 
 export interface ZoomPluginOptions {
     /** Zoom factor (0.9 = zoom in 10%, 1.1 = zoom out 10%) */
     factor?: number;
     /** Callback when zoom/pan changes */
     onZoom?: (min: number, max: number) => void;
+    /** How far it can zoom out and pan; the range it opened on by default */
+    limits?: () => XRange;
+    /** Where a double-click returns to; the range it opened on by default */
+    home?: () => XRange;
+    /** 'zoom' (default): the wheel zooms. 'ctrl': the wheel scrolls the page and Ctrl+wheel zooms */
+    wheel?: 'zoom' | 'ctrl';
+}
+
+/** Pixels a wheel event moves, whether it counts in pixels, lines or pages */
+function wheelPixels(e: WheelEvent, delta: number): number {
+    if (e.deltaMode === 1) return delta * 33;
+    if (e.deltaMode === 2) return delta * 800;
+    return delta;
 }
 
 export function createZoomPlugin(options: ZoomPluginOptions = {}): uPlot.Plugin {
-    const { factor = 0.75, onZoom } = options;
+    const { factor = 0.75, onZoom, limits, home, wheel = 'zoom' } = options;
 
     return {
         hooks: {
@@ -74,8 +96,38 @@ export function createZoomPlugin(options: ZoomPluginOptions = {}): uPlot.Plugin 
                     }
                 };
 
+                // How far it can zoom out and pan
+                const bounds = (): XRange => limits?.() ?? { min: (u.scales.x as any)._initialMin, max: (u.scales.x as any)._initialMax };
+
+                // Moves the view sideways by `px` pixels, within bounds
+                const panBy = (px: number) => {
+                    const xMin = u.scales.x.min!;
+                    const xMax = u.scales.x.max!;
+                    const xRange = xMax - xMin;
+                    const { min: initialMin, max: initialMax } = bounds();
+                    let nextMin = xMin + px * (xRange / rect.width);
+                    nextMin = Math.max(initialMin, Math.min(initialMax - xRange, nextMin));
+                    u.batch(() => {
+                        u.setScale('x', { min: nextMin, max: nextMin + xRange });
+                        onZoom?.(nextMin, nextMin + xRange);
+                    });
+                };
+
                 // Wheel zoom (centered on cursor)
                 const onWheel = (e: WheelEvent) => {
+                    if (wheel === 'ctrl' && !e.ctrlKey && !e.metaKey) {
+                        // A sideways swipe or Shift+wheel pans; any other wheel scrolls the page
+                        const sideways = e.shiftKey
+                            ? e.deltaX || e.deltaY
+                            : Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : 0;
+                        if (!sideways) return;
+                        e.preventDefault();
+                        syncRect();
+                        ensureInitialBounds();
+                        panBy(wheelPixels(e, sideways));
+                        return;
+                    }
+
                     e.preventDefault();
                     syncRect(); // Ensure fresh coordinates
                     ensureInitialBounds();
@@ -89,11 +141,13 @@ export function createZoomPlugin(options: ZoomPluginOptions = {}): uPlot.Plugin 
 
                     if (Number.isNaN(xVal)) return;
 
-                    const zoomMult = e.deltaY < 0 ? factor : 1 / factor;
+                    const zoomMult = wheel === 'ctrl'
+                        // A pinch sends many small steps where a wheel sends one of about 100 px
+                        ? Math.pow(1 / factor, Math.max(-1, Math.min(1, wheelPixels(e, e.deltaY) / 100)))
+                        : e.deltaY < 0 ? factor : 1 / factor;
                     const newRange = xRange * zoomMult;
 
-                    const initialMin = (u.scales.x as any)._initialMin;
-                    const initialMax = (u.scales.x as any)._initialMax;
+                    const { min: initialMin, max: initialMax } = bounds();
                     const maxRange = initialMax - initialMin;
 
                     let clampedRange = newRange;
@@ -198,8 +252,7 @@ export function createZoomPlugin(options: ZoomPluginOptions = {}): uPlot.Plugin 
                         let nextMin = panStartXMin + shift;
                         let nextMax = panStartXMax + shift;
 
-                        const initialMin = (u.scales.x as any)._initialMin;
-                        const initialMax = (u.scales.x as any)._initialMax;
+                        const { min: initialMin, max: initialMax } = bounds();
 
                         // Hard clamp to bounds
                         if (nextMin < initialMin) {
@@ -236,8 +289,7 @@ export function createZoomPlugin(options: ZoomPluginOptions = {}): uPlot.Plugin 
                                 const xVal2 = u.posToVal(Math.max(startRelative, endRelative), 'x');
 
                                 if (!Number.isNaN(xVal1) && !Number.isNaN(xVal2)) {
-                                    const initialMin = (u.scales.x as any)._initialMin;
-                                    const initialMax = (u.scales.x as any)._initialMax;
+                                    const { min: initialMin, max: initialMax } = bounds();
 
                                     // Clamp to initial bounds
                                     const nextMin = Math.max(xVal1, initialMin);
@@ -288,13 +340,12 @@ export function createZoomPlugin(options: ZoomPluginOptions = {}): uPlot.Plugin 
                     e.preventDefault();
                     e.stopPropagation();
 
-                    const initialMin = (u.scales.x as any)._initialMin;
-                    const initialMax = (u.scales.x as any)._initialMax;
+                    const target = home?.() ?? { min: (u.scales.x as any)._initialMin, max: (u.scales.x as any)._initialMax };
 
-                    if (initialMin !== undefined && initialMax !== undefined) {
+                    if (target.min !== undefined && target.max !== undefined) {
                         u.batch(() => {
-                            u.setScale('x', { min: initialMin, max: initialMax });
-                            onZoom?.(initialMin, initialMax);
+                            u.setScale('x', target);
+                            onZoom?.(target.min, target.max);
                         });
                     }
                 };

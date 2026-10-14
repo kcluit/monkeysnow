@@ -19,6 +19,8 @@ export interface TouchPluginOptions {
     canZoom?: boolean;
     /** Callback when zoom/pan changes */
     onZoom?: (min: number, max: number) => void;
+    /** How far it can zoom out and pan; the range it opened on by default */
+    limits?: () => { min: number; max: number };
 }
 
 interface TouchPoint {
@@ -44,7 +46,7 @@ function onDocumentTouchStart(e: TouchEvent): void {
 }
 
 export function createTouchPlugin(options: TouchPluginOptions = {}): uPlot.Plugin {
-    const { canZoom = true, onZoom } = options;
+    const { canZoom = true, onZoom, limits } = options;
 
     return {
         hooks: {
@@ -62,6 +64,11 @@ export function createTouchPlugin(options: TouchPluginOptions = {}): uPlot.Plugi
                         (u.scales.x as any)._initialMax = u.scales.x.max;
                     }
                 };
+
+                // How far it can zoom out and pan
+
+                const bounds = () => limits?.() ?? { min: (u.scales.x as any)._initialMin as number, max: (u.scales.x as any)._initialMax as number };
+
 
                 // Gesture state; 'scroll' is a vertical swipe that the browser is scrolling the page with
                 const activeTouches = new Map<number, TouchPoint>();
@@ -193,8 +200,7 @@ export function createTouchPlugin(options: TouchPluginOptions = {}): uPlot.Plugi
                             let nextMin = panStartXMin + shift;
                             let nextMax = panStartXMax + shift;
 
-                            const initialMin = (u.scales.x as any)._initialMin;
-                            const initialMax = (u.scales.x as any)._initialMax;
+                            const { min: initialMin, max: initialMax } = bounds();
 
                             if (nextMin < initialMin) {
                                 nextMin = initialMin;
@@ -226,8 +232,7 @@ export function createTouchPlugin(options: TouchPluginOptions = {}): uPlot.Plugi
                         const currentRange = pinchInitialXMax - pinchInitialXMin;
                         let newRange = currentRange * scale;
 
-                        const initialMin = (u.scales.x as any)._initialMin;
-                        const initialMax = (u.scales.x as any)._initialMax;
+                        const { min: initialMin, max: initialMax } = bounds();
                         const maxRange = initialMax - initialMin;
 
                         if (newRange > maxRange) newRange = maxRange;
