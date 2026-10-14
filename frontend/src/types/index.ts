@@ -119,6 +119,12 @@ export interface HourlyForecast {
     precipitation: Float32Array;
     /** Each hour's Snow quality, as its index in SNOW_QUALITIES, or -1 when nothing falls */
     quality: Int8Array;
+    /** km/h at 10 m above the ground; these three are missing on forecasts cached before they were kept */
+    windSpeed?: Float32Array;
+    /** Degrees the wind blows from, 0 = north */
+    windDirection?: Float32Array;
+    /** The Card model's WMO weather code */
+    weatherCode?: Uint8Array;
 }
 
 export interface ElevationForecast {

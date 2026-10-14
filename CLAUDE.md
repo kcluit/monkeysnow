@@ -76,7 +76,8 @@ npm run build
 ### Graph view
 - `components/graph/` - the view mode where each card is a Graph (`GraphCard.tsx`, drawn with uPlot by `GraphPlot.ts` from `graphData.ts`) of its Card model's hours: precipitation bars in Snow quality colours (`utils/snowQualityColours.ts`), snow or rain decided as the cards decide a Period's but with rain from the hour's total precipitation (Open-Meteo's `rain` leaves out showers), the temperature at the picked Elevation band, and the Freezing level, which has no axis, against dashed lines at the heights forecast; nights are shaded from `utils/nightTimes.ts`
 - Every Graph shares one `GraphSync` per visit to the page: they open on 5 days from the current hour, zoom out to every hour any of them has, double-click back to those 5 days, and zoom, pan and are pointed at (a hairline on the others) together, by moment in time, each labelled in its own time zone (`graphTimeAxis.ts`)
-- The wheel scrolls the page (`zoomPlugin`'s `wheel: 'ctrl'`): Ctrl+wheel, which is also a trackpad pinch, zooms, and a sideways swipe or Shift+wheel pans; Locked charts doesn't apply. Only Graphs on or near the screen are drawn
+- Over a Graph the wheel zooms, never scrolling the page, even at a zoom limit; the page scrolls from headers, gaps and margins. `zoomPlugin`'s `wheel: 'smooth'` sizes each step to how far the wheel moved, so a trackpad zooms smoothly, and a sideways swipe or Shift+wheel pans. Locked charts doesn't apply. Only Graphs on or near the screen are drawn
+- The tooltip gives the hour's weather (the Card model's own words and emoji, as on the cards, which can disagree with the Snow quality), precipitation, temperature, wind speed and the compass point it blows from, and Freezing level; forecasts cached before wind and weather were kept leave those rows out until they're refreshed
 
 ### Type System (`frontend/src/types/`)
 - `index.ts` - Core types: `AllWeatherData`, `ResortData`, `ProcessedResortData`, `DayForecast`, `Period`
@@ -87,5 +88,5 @@ npm run build
 - `PeriodData` - AM/PM/NIGHT period aggregates with snow estimation fields
 - `DayData` - Contains AM/PM/NIGHT `PeriodData`
 - `ResortData` - bot/mid/top `ElevationForecast`s plus `fetchedAt`, and the hourly `freezingLevel` and `timeZone` a Graph needs
-- `HourlyForecast` - one band's hours (`ElevationForecast.hours`) as Float32Arrays from `start`, each hour's Snow quality an index into `SNOW_QUALITIES`
+- `HourlyForecast` - one band's hours (`ElevationForecast.hours`) as typed arrays from `start`, each hour's Snow quality an index into `SNOW_QUALITIES`; wind and weather code are optional, missing on forecasts cached before they were kept
 - `ProcessedResortData` - Transformed for UI display with `DayForecast[]`

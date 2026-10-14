@@ -351,10 +351,15 @@ export class GraphPlot implements SyncedGraph {
         }
         const temperature = data.temperature[idx];
         const freezing = data.freezingLevel[idx];
+        const weather = data.weather[idx];
+        const windSpeed = data.windSpeed[idx];
+        const windFrom = data.windFrom[idx];
         const rows = [
             `<strong>${escapeHtml(axis.hourBefore(data.times[idx]))}</strong>`,
+            weather ? `${weather.emoji} ${escapeHtml(weather.text)}` : '',
             precipitation,
             temperature === null ? '' : `<span style="color:${TEMPERATURE_COLOUR}">●</span> Temperature ${Math.round(temperature)} °${imperial ? 'F' : 'C'}`,
+            windSpeed === null ? '' : `Wind ${Math.round(windSpeed)} ${imperial ? 'mph' : 'km/h'}${windFrom ? ` ${windFrom}` : ''}`,
             freezing === null ? '' : `Freezing level ${Math.round(freezing)} ${imperial ? 'ft' : 'm'}`,
         ];
         this.tooltip.innerHTML = rows.filter(Boolean).map((row) => `<div>${row}</div>`).join('');
