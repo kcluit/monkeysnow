@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { fetchResortForecasts, groupIntoRequests, hasHours, isForecastCurrent, isOnCardModel, resortCallWeight } from '../utils/resortForecast';
+import { fetchResortForecasts, groupIntoRequests, hasCurrentEstimate, hasHours, isForecastCurrent, isOnCardModel, resortCallWeight } from '../utils/resortForecast';
 import { isTransientError } from '../utils/openMeteoBudget';
 import { idbDelete, idbGet, idbSet } from '../utils/indexedDB';
 import { useSavedLocations } from './useSavedLocations';
@@ -27,9 +27,9 @@ interface FetchQueue {
   controller: AbortController;
 }
 
-/** Fresh: fetched within the Freshness window, from the Card model the resort has now. */
+/** Fresh: fetched within the Freshness window, from the Card model the resort has now, under the current snow estimate. */
 const isFresh = (id: string, entry: ResortData | undefined, now: number): boolean =>
-  Boolean(entry?.fetchedAt && now - entry.fetchedAt < FRESHNESS_WINDOW_MS && isOnCardModel(id, entry));
+  Boolean(entry?.fetchedAt && now - entry.fetchedAt < FRESHNESS_WINDOW_MS && isOnCardModel(id, entry) && hasCurrentEstimate(entry));
 
 /** Whether a forecast can be shown: in Graph view, one cached before hours were kept can't. */
 const isLoaded = (entry: ResortData | undefined, needsHours: boolean): entry is ResortData =>

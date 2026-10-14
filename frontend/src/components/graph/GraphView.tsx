@@ -2,7 +2,7 @@ import { useLayoutEffect, useMemo, useState } from 'react';
 import { useChartTheme } from '../../hooks/useChartTheme';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useLanguage } from '../../hooks/useLanguage';
-import { SNOW_QUALITIES } from '../../utils/resortForecast';
+import { SNOW_QUALITIES } from '../../utils/snowQuality';
 import { SNOW_QUALITY_COLOURS, SNOW_QUALITY_NAMES } from '../../utils/snowQualityColours';
 import { GraphCard } from './GraphCard';
 import { GraphSync } from './graphSync';

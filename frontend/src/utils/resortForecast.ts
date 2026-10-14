@@ -13,7 +13,8 @@ import { RESORT_LOCATIONS, continentOfCountry } from '../data/resortLocations';
 import { fetchWeatherApiWithinBudget, isNoDataError, type FetchPriority } from './openMeteoBudget';
 import { cardModelAt, markGap, recommendedCardModel } from './cardModels';
 import { getSavedLocation, isSavedLocationId } from './savedLocations';
-import type { DayData, ElevationForecast, HourlyForecast, HourlySeries, PeriodData, ResortData, SnowQuality } from '../types';
+import { SNOW_ESTIMATE_VERSION, SNOW_QUALITIES, addPrecipitation, dominantQuality, estimateHour, noPrecipitationByQuality } from './snowQuality';
+import type { DayData, ElevationForecast, HourlyForecast, HourlySeries, PeriodData, ResortData } from '../types';
 import type { WeatherModel } from '../types/openMeteo';
 
 type ApiResponse = Awaited<ReturnType<typeof fetchWeatherApiWithinBudget>>[number];
@@ -72,105 +73,6 @@ const getMode = (arr: number[]) => {
  */
 const fixed = (value: number, digits: number): number =>
     (Number.isFinite(value) ? parseFloat(value.toFixed(digits)) : null) as number;
-
-// --- Snow Estimation (Crystal Habit-Based with Kuchera Ratios) ---
-
-interface HourlySnowEstimate {
-    snowCm: number;
-    ratio: number;
-    snowFraction: number;
-    quality: SnowQuality;
-}
-
-/**
- * Calculates the Wet Bulb Temperature using the Stull (2011) approximation.
- */
-function calculateWetBulb(tempC: number, rh: number): number {
-    const safeRh = Math.max(0, Math.min(100, rh));
-    const term1 = tempC * Math.atan(0.151977 * Math.pow(safeRh + 8.313659, 0.5));
-    const term2 = Math.atan(tempC + safeRh);
-    const term3 = Math.atan(safeRh - 1.676331);
-    const term4 = 0.00391838 * Math.pow(safeRh, 1.5) * Math.atan(0.023101 * safeRh);
-    const term5 = 4.686035;
-    return term1 + term2 - term3 + term4 - term5;
-}
-
-/**
- * Calculates what percentage of precipitation actually contributes to accumulation.
- * - Warm (> 0.5C WB): 0% Snow (All rain)
- * - Transition (-2.0C to 0.5C WB): 10% - 100% Snow (Slush/Mix)
- * - Cold (< -2.0C WB): 100% Snow
- */
-function calculateSnowFraction(wetBulbC: number): number {
-    // Warm Zone: Pure Rain
-    if (wetBulbC >= 0.5) return 0.0;
-    // Slush Zone: Mostly rain, very little sticking
-    if (wetBulbC >= -0.5) return 0.1;
-    // Transition Zone (-2.0C to -0.5C): Linear interpolation 20% to 100%
-    if (wetBulbC > -2.0) {
-        const slope = (1.0 - 0.2) / (-2.0 - (-0.5));
-        const fraction = 0.2 + slope * (wetBulbC - (-0.5));
-        return Math.min(1.0, Math.max(0.0, fraction));
-    }
-    // Cold Zone: All Snow
-    return 1.0;
-}
-
-/**
- * Determines the Snow-to-Liquid Ratio (SLR) based on Wet Bulb Temperature.
- * Uses Kuchera method with crystal habit-based ratios:
- * - 0 to -4: Thin Plates (Wet) -> 3:1
- * - -4 to -10: Needles/Columns (Avg) -> 7:1
- * - -10 to -12: Transition -> 10:1
- * - -12 to -18: Dendrites (DGZ - Fluffy) -> 15:1
- * - < -18: Plates/Columns (Dense) -> 12:1
- */
-function getKucheraRatio(wetBulbC: number): number {
-    // Warm/Rain Zone
-    if (wetBulbC > 0) return 1;
-    // Thin Plates / Dendritic fragments (0 to -4)
-    if (wetBulbC > -4) return 4;
-    // Needles / Columns (-4 to -10)
-    if (wetBulbC > -10) return 10;
-    // Transition Zone (-10 to -12)
-    if (wetBulbC > -12) return 15;
-    // Dendritic Growth Zone / Stellar Dendrites (-12 to -18)
-    if (wetBulbC > -18) return 22;
-    // Cold / Plates & Columns (< -18)
-    return 12;
-}
-
-/**
- * Determines snow quality based on wet bulb temp and snow fraction.
- */
-function getSnowQuality(wetBulbC: number, snowFraction: number): SnowQuality {
-    if (snowFraction === 0) return 'rain';
-    if (snowFraction < 0.5) return 'sleet/mix';
-    if (wetBulbC > -4) return 'wet_snow';        // 0 to -4: Thin Plates/Wet
-    if (wetBulbC <= -12 && wetBulbC >= -18) return 'powder'; // -12 to -18: DGZ/Fluffy
-    return 'dry_snow'; // -4 to -12 and < -18
-}
-
-/** Every Snow quality from worst to best; an HourlyForecast stores each hour's as its index here */
-export const SNOW_QUALITIES: readonly SnowQuality[] = ['rain', 'sleet/mix', 'wet_snow', 'dry_snow', 'powder'];
-
-function estimateHourlySnow(tempC: number, humidity: number, snowfallCm: number): HourlySnowEstimate {
-    const wetBulb = calculateWetBulb(tempC, humidity);
-    const snowFraction = calculateSnowFraction(wetBulb);
-    const ratio = getKucheraRatio(wetBulb);
-
-    // Convert Open-Meteo snowfall (cm) to snowfall water equivalent (mm) using open-meteo's 0.7 factor
-    const sweMm = snowfallCm / 0.7;
-    const snowMm = sweMm * ratio;
-    const snowCm = snowMm / 10;
-
-    return {
-        snowCm,
-        ratio,
-        snowFraction,
-        quality: getSnowQuality(wetBulb, snowFraction)
-    };
-}
 
 // --- Model selection (Card models themselves are picked in cardModels.ts) ---
 
@@ -263,6 +165,11 @@ export function hasHours(data: ResortData): boolean {
     return Boolean(data.bot.hours && data.mid.hours && data.top.hours);
 }
 
+/** Whether a forecast was estimated under the current snow estimate; one cached under an earlier one is stale. */
+export function hasCurrentEstimate(data: ResortData): boolean {
+    return data.estimateVersion === SNOW_ESTIMATE_VERSION;
+}
+
 /**
  * Whether a forecast was fetched at the elevation this member of the Selection
  * has now. Only a Saved location's elevation can change.
@@ -348,7 +255,7 @@ function hourlyForecastOf(response: ApiResponse): HourlyForecast | null {
             hours.snowEstimate[i] = NaN;
             continue;
         }
-        const estimate = estimateHourlySnow(temperature[i], humidity[i], snowfall[i]);
+        const estimate = estimateHour(temperature[i], humidity[i], precipitation[i]);
         hours.snowEstimate[i] = estimate.snowCm;
         // As for a Period, only an hour with precipitation has a Snow quality
         if (precipitation[i] > 0) hours.quality[i] = SNOW_QUALITIES.indexOf(estimate.quality);
@@ -485,11 +392,6 @@ function processLocation(mainResp: ApiResponse | undefined, freezing: FreezingSe
         }
     }
 
-    // Ranking from worst to best: rain -> sleet/mix -> wet_snow -> dry_snow -> powder
-    const qualityRank: Record<SnowQuality, number> = {
-        'rain': 0, 'sleet/mix': 1, 'wet_snow': 2, 'dry_snow': 3, 'powder': 4
-    };
-
     const forecast: Record<string, DayData> = {};
 
     for (const [date, chunks] of Object.entries(dailyChunks)) {
@@ -503,33 +405,17 @@ function processLocation(mainResp: ApiResponse | undefined, freezing: FreezingSe
                 continue;
             }
 
-            // Calculate snow estimates from hourly data
-            let totalSnowEstimateCm = 0;
-            const ratios: number[] = [];
-            const qualities: SnowQuality[] = [];
-
+            // The monkeysnow estimate: each hour's precipitation split by this band's wet bulb,
+            // and what fell under each Snow quality, which decides the Period's
+            let snowEstimateCm = 0;
+            let rainEstimateMm = 0;
+            const byQuality = noPrecipitationByQuality();
             for (const hourData of hData) {
-                const estimate = estimateHourlySnow(hourData.temperature, hourData.humidity, hourData.snowfall);
-                totalSnowEstimateCm += estimate.snowCm;
-                if (estimate.ratio > 0) {
-                    ratios.push(estimate.ratio);
-                }
-                // Only track quality for hours with precipitation
-                if (hourData.precipitation > 0) {
-                    qualities.push(estimate.quality);
-                }
+                const estimate = estimateHour(hourData.temperature, hourData.humidity, hourData.precipitation);
+                snowEstimateCm += estimate.snowCm;
+                rainEstimateMm += estimate.rainMm;
+                addPrecipitation(byQuality, estimate.quality, hourData.precipitation);
             }
-
-            // Determine worst snow quality for the period (from hours with precip)
-            let worstQuality: SnowQuality | null = null;
-            for (const q of qualities) {
-                if (worstQuality === null || qualityRank[q] < qualityRank[worstQuality]) {
-                    worstQuality = q;
-                }
-            }
-
-            // Average ratio (only from hours with snow)
-            const avgRatio = ratios.length > 0 ? getAverage(ratios) : 0;
 
             const period: PeriodData = {
                 temperature_max: fixed(getMax(hData.map(d => d.temperature)), 2),
@@ -545,10 +431,10 @@ function processLocation(mainResp: ApiResponse | undefined, freezing: FreezingSe
                 weather_code: fixed(getMode(hData.map(d => d.weather_code)), 0),
                 surface_pressure: fixed(getAverage(hData.map(d => d.surface_pressure)), 2),
                 freezing_level: fData.length > 0 ? fixed(getMax(fData), 2) : null,
-                // Snow estimation fields
-                snowfall_estimate: fixed(totalSnowEstimateCm, 4),
-                snow_to_liquid_ratio: fixed(avgRatio, 2),
-                snow_quality: worstQuality as SnowQuality,
+                snowfall_estimate: fixed(snowEstimateCm, 4),
+                rain_estimate: fixed(rainEstimateMm, 4),
+                precipitation_by_quality: byQuality.map(mm => fixed(mm, 4)),
+                snow_quality: dominantQuality(byQuality),
             };
             day[chunkName] = period;
         }
@@ -674,7 +560,11 @@ async function fetchGroup(
         const freezingLevel: HourlySeries | undefined = freezing
             ? { start: freezing.timeStart, interval: freezing.interval, values: freezing.values.slice() }
             : undefined;
-        result[id] = { bot, mid, top, fetchedAt, model, freezingLevel, timeZone: responses[0].timezone() ?? undefined };
+        result[id] = {
+            bot, mid, top, fetchedAt, model, freezingLevel,
+            timeZone: responses[0].timezone() ?? undefined,
+            estimateVersion: SNOW_ESTIMATE_VERSION,
+        };
     });
 
     return result;

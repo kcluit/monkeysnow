@@ -81,45 +81,57 @@ export function AboutPage(): JSX.Element {
             {/* Snow Estimation Section */}
             <Section title="snow estimation" icon={faSnowflake}>
                 <p>
-                    monkeysnow uses the Kuchera snow-to-liquid ratio method to estimate snow accumulation
-                    from precipitation data. This algorithm considers wet bulb temperature to determine
-                    snow density and quality.
+                    monkeysnow estimates what falls from each hour's temperature and humidity at the height
+                    being forecast, through the wet-bulb temperature: how cold the air would get if its moisture
+                    evaporated into it, which tells rain from snow better than the air temperature alone.
+                    The estimate is cautious: when an hour is close, it leans toward the worse label.
                 </p>
                 <Subsection title="snow quality" icon={faListOl}>
                     <dl className="about-stats-list">
                         <dt>powder</dt>
                         <dd>
-                            - light, fluffy snow with high snow-to-liquid ratios (15:1 or higher).
-                            Occurs when wet bulb temperature is well below freezing.
+                            - light, fluffy snow, 15 cm or more for every centimetre of water.
+                            Wet bulb from about −11 °C down to about −21 °C.
                         </dd>
 
                         <dt>dry snow</dt>
                         <dd>
-                            - good quality snow with moderate density (10:1 to 15:1 ratio).
-                            Expected when temperatures are cold but not extreme.
+                            - good snow of ordinary density, 10 to 15 cm for every centimetre of water.
+                            Wet bulb from about −3.5 °C down to −11 °C, and again below −21 °C, where crystals go small.
                         </dd>
 
                         <dt>wet snow</dt>
                         <dd>
-                            - heavier, wetter snow with lower ratios (5:1 to 10:1).
-                            Common when temperatures are near freezing.
+                            - heavy snow, under 10 cm for every centimetre of water.
+                            Wet bulb from −0.5 °C down to about −3.5 °C.
                         </dd>
 
                         <dt>sleet/mix</dt>
                         <dd>
-                            - mixed precipitation when conditions hover around freezing.
-                            May include rain mixed with snow.
+                            - snow and rain together, counted partly as each.
+                            Wet bulb between −0.5 °C and +0.5 °C, where snow is still the likelier but not near-certain.
                         </dd>
 
                         <dt>rain</dt>
                         <dd>
-                            - liquid precipitation when wet bulb temperature is above freezing.
+                            - wet bulb of +0.5 °C and above.
                         </dd>
                     </dl>
                 </Subsection>
+                <p>
+                    The "monkeysnow estimate" on a card splits each hour's total precipitation into snow and rain
+                    this way, for each elevation on its own, and turns the snow's water into centimetres with a
+                    snow-to-liquid ratio that rises from 8 near freezing to 17 at −14 °C and falls again in the
+                    bitter cold. The "Model estimate" shows the weather model's own snowfall and rain instead,
+                    which it works out for its grid cell rather than for each elevation.
+                </p>
+                <p>
+                    A period's or a day's snow quality is the one under which most of its precipitation fell;
+                    on a tie, the worse one.
+                </p>
                 <p className="about-note">
                     Note: These estimates are approximations. Actual snow conditions depend on many factors
-                    including humidity, wind, elevation, and local terrain effects.
+                    including wind, elevation and local terrain effects, and on the weather model being right.
                 </p>
             </Section>
 

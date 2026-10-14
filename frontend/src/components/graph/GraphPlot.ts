@@ -12,7 +12,7 @@ import { createTouchPlugin, createZoomPlugin, type XRange } from '../../lib/char
 import { chartTextFill } from '../../lib/charts/theme';
 import { colorWithOpacity } from '../../lib/charts/utils/colorUtils';
 import type { ChartTheme } from '../../lib/charts';
-import { SNOW_QUALITIES } from '../../utils/resortForecast';
+import { SNOW_QUALITIES } from '../../utils/snowQuality';
 import { SNOW_QUALITY_COLOURS, SNOW_QUALITY_NAMES } from '../../utils/snowQualityColours';
 import { precipitationFloor, type GraphData } from './graphData';
 import type { GraphTimeAxis } from './graphTimeAxis';

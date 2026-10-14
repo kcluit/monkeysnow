@@ -22,6 +22,7 @@ import {
     formatFreezingLevel
 } from './unitConversion';
 import { forecastModelOf } from './resortForecast';
+import { addPrecipitation, dominantQuality, noPrecipitationByQuality, sumPrecipitationByQuality } from './snowQuality';
 import { getModelInfo } from '../data/modelHierarchy';
 
 export function processResortData(
@@ -72,8 +73,7 @@ export function processResortData(
             // Skip days with no meaningful forecast data (API returned zeros beyond model range)
             if (periods.length === 0 || periods.every(p => p.tempMax === 0 && p.tempMin === 0 && p.tempAvg === 0 && p.tempMedian === 0)) continue;
 
-            // Get snow condition from periods' snow quality (use first available with precipitation)
-            const snowCondition = getSnowConditionFromPeriods(periods);
+            const snowCondition = getSnowConditionFromQuality(dayQualityOf(dayData, periods, snowfallEstimateMode));
 
             // Get the highest freezing level from all periods
             const freezingLevels = [
@@ -159,36 +159,24 @@ function createPeriodFromData(data: PeriodData, label: string, temperatureMetric
         : temperatureMetric === 'min' ? 'floor' as const
             : 'round' as const;
 
+    // A Period with no precipitation has no Snow quality and shows zeros for both
     const snowQuality = data.snow_quality ?? null;
-    let snowValue: number;
-    let rainValue: number;
-
-    // Decide what to show based on estimate mode
-    if (snowQuality === null) {
-        // No precipitation - show zeros for both
-        snowValue = 0;
-        rainValue = 0;
-    } else if (snowfallEstimateMode === 'model') {
-        // Model mode: prioritize snowfall, only show rain if snowfall is 0
-        const modelSnow = data.snowfall_total ?? 0;
-        if (modelSnow > 0) {
-            snowValue = modelSnow;
-            rainValue = 0;
+    let snowValue = 0;
+    let rainValue = 0;
+    if (snowQuality !== null) {
+        if (snowfallEstimateMode === 'model') {
+            // The Model estimate: the model's own snowfall, else everything that fell as rain (its rain leaves out showers)
+            const modelSnow = data.snowfall_total ?? 0;
+            if (modelSnow > 0) snowValue = modelSnow;
+            else rainValue = data.precipitation_total ?? 0;
         } else {
-            snowValue = 0;
-            rainValue = data.rain_total ?? 0;
+            // The monkeysnow estimate: the Period's precipitation split by each hour's wet bulb, so a Sleet/Mix Period shows both
+            snowValue = data.snowfall_estimate ?? 0;
+            rainValue = data.rain_estimate ?? 0;
         }
-    } else if (snowQuality === 'rain') {
-        // totalPrecip mode + rain quality - show rain, zero snow
-        snowValue = 0;
-        rainValue = data.rain_total ?? 0;
-    } else {
-        // totalPrecip mode + snow quality - show snow, zero rain
-        rainValue = 0;
-        snowValue = data.snowfall_estimate ?? 0;
     }
 
-    // In model mode, if quality is 'rain' but model reports snowfall, show sleet/mix
+    // In Model mode, the model's snow in a Period monkeysnow reckons is Rain is a mix
     const effectiveQuality = (snowfallEstimateMode === 'model' && snowQuality === 'rain' && snowValue > 0)
         ? 'sleet/mix' as SnowQuality
         : snowQuality;
@@ -208,7 +196,6 @@ function createPeriodFromData(data: PeriodData, label: string, temperatureMetric
         windKmh: data.wind_speed ?? 0,
         condition: getWeatherDescription(data.weather_code ?? 0),
         snowQuality: effectiveQuality,
-        snowToLiquidRatio: data.snow_to_liquid_ratio ?? 0,
         freezingLevel: formatFreezingLevel(data.freezing_level, unitSystem)
     };
 }
@@ -284,46 +271,28 @@ export function getSnowConditionFromQuality(quality: SnowQuality | null): SnowCo
     }
 }
 
+/** A Period's precipitation by Snow quality; one cached before it was kept counts all of its precipitation under its label. */
+function precipitationByQualityOf(data: PeriodData): number[] {
+    if (data.precipitation_by_quality) return data.precipitation_by_quality;
+    const byQuality = noPrecipitationByQuality();
+    if (data.snow_quality) addPrecipitation(byQuality, data.snow_quality, data.precipitation_total ?? 0);
+    return byQuality;
+}
+
 /**
- * Gets the dominant snow condition from periods (prefers periods with precipitation)
+ * The day's Snow quality, by the same rule as a Period's over all of the day's hours: the one
+ * under which most of its precipitation fell, the worst of the tied on a tie. A day whose
+ * Periods all show nothing has none, and in Model mode a Rain day the model gives snow for
+ * is a mix, as a Period is.
  */
-function getSnowConditionFromPeriods(periods: Period[]): SnowCondition {
-    if (periods.length === 0) {
-        return { text: 'Mixed conditions', isHighlight: false };
-    }
-
-    // Find periods with snow and get the best quality (powder is best, rain is worst)
-    const qualityPriority: SnowQuality[] = ['powder', 'dry_snow', 'wet_snow', 'sleet/mix', 'rain'];
-
-    // Get all qualities from periods with precipitation
-    const periodsWithPrecip = periods.filter(p => parseFloat(p.snow) > 0 || parseFloat(p.rain) > 0);
-
-    if (periodsWithPrecip.length === 0) {
-        // No precipitation - return N/A
-        return { text: 'N/A', isHighlight: false, isSecondary: true };
-    }
-
-    // Filter out periods with null quality
-    const periodsWithQuality = periodsWithPrecip.filter(p => p.snowQuality !== null);
-
-    if (periodsWithQuality.length === 0) {
-        // All periods with precipitation have null quality - return N/A
-        return { text: 'N/A', isHighlight: false, isSecondary: true };
-    }
-
-    // Find the worst (lowest priority) quality among periods with precipitation
-    let worstQuality: SnowQuality = 'powder';
-    let worstPriorityIndex = -1;
-
-    for (const period of periodsWithQuality) {
-        const priorityIndex = qualityPriority.indexOf(period.snowQuality!);
-        if (priorityIndex !== -1 && priorityIndex > worstPriorityIndex) {
-            worstPriorityIndex = priorityIndex;
-            worstQuality = period.snowQuality!;
-        }
-    }
-
-    return getSnowConditionFromQuality(worstQuality);
+function dayQualityOf(dayData: DayData, periods: Period[], snowfallEstimateMode: SnowfallEstimateMode): SnowQuality | null {
+    if (!periods.some(p => parseFloat(p.snow) > 0 || parseFloat(p.rain) > 0)) return null;
+    const byQuality = sumPrecipitationByQuality(
+        [dayData.AM, dayData.PM, dayData.NIGHT].map(data => data ? precipitationByQualityOf(data) : undefined)
+    );
+    const quality = dominantQuality(byQuality);
+    if (snowfallEstimateMode === 'model' && quality === 'rain' && periods.some(p => p.snowCm > 0)) return 'sleet/mix';
+    return quality;
 }
 
 export function calculateSnowTotals(resort: ProcessedResortData | null): SnowTotals {
