@@ -5,7 +5,7 @@
  * the Card model's weather.
  */
 
-import { SNOW_QUALITIES } from '../../utils/resortForecast';
+import { SNOW_QUALITIES } from '../../utils/snowQuality';
 import { getWeatherDescription, getWeatherEmoji } from '../../utils/weather';
 import type { ElevationLevel, ResortData, SnowfallEstimateMode, SnowQuality, UnitSystem } from '../../types';
 
@@ -122,7 +122,8 @@ export function graphDataOf(
             if (snowfallMode === 'model') {
                 if (hours.snowfall[i] > 0) snowCm = hours.snowfall[i];
                 else rainMm = hours.precipitation[i];
-            } else if (quality === 'rain') {
+            } else if (quality === 'rain' || quality === 'sleet/mix') {
+                // A Sleet/Mix hour is drawn as all the water that fell, since one bar can't be part cm and part mm
                 rainMm = hours.precipitation[i];
             } else {
                 snowCm = hours.snowEstimate[i];

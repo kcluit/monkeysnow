@@ -78,10 +78,14 @@ export interface PeriodData {
     weather_code: number;
     surface_pressure: number;
     freezing_level: number | null;
-    // Snow estimation fields
+    /** The monkeysnow estimate's snow, cm (utils/snowQuality.ts) */
     snowfall_estimate: number;
-    snow_to_liquid_ratio: number;
-    snow_quality: SnowQuality;
+    /** The monkeysnow estimate's rain, mm; these two are missing on forecasts cached under an earlier SNOW_ESTIMATE_VERSION, which are refetched */
+    rain_estimate?: number;
+    /** mm of precipitation that fell under each Snow quality, in SNOW_QUALITIES order, which the day's label is summed from */
+    precipitation_by_quality?: number[];
+    /** The one under which most of the Period's precipitation fell, the worst of the tied on a tie; null when nothing fell */
+    snow_quality: SnowQuality | null;
 }
 
 export interface DayData {
@@ -113,7 +117,7 @@ export interface HourlyForecast {
     temperature: Float32Array;
     /** The Card model's own snowfall in the hour before each one, cm */
     snowfall: Float32Array;
-    /** monkeysnow's estimate of that snowfall (Kuchera ratios), cm */
+    /** The monkeysnow estimate's snow in the hour before each one, cm, from its precipitation and this band's wet bulb (utils/snowQuality.ts) */
     snowEstimate: Float32Array;
     /** Everything that fell in the hour before each one, mm of water, including the showers Open-Meteo's rain leaves out */
     precipitation: Float32Array;
@@ -145,6 +149,8 @@ export interface ResortData {
     freezingLevel?: HourlySeries;
     /** The IANA time zone of the point, e.g. "America/Vancouver" */
     timeZone?: string;
+    /** The SNOW_ESTIMATE_VERSION it was estimated under; missing or older counts as stale, so it is refetched */
+    estimateVersion?: number;
 }
 
 export interface AllWeatherData {
@@ -176,7 +182,6 @@ export interface Period {
     windKmh: number;
     condition: string;
     snowQuality: SnowQuality | null;
-    snowToLiquidRatio: number;
     /** The highest Freezing level in this Period, e.g. "1720 m" */
     freezingLevel: string;
 }
