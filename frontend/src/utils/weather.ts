@@ -110,7 +110,8 @@ export function processResortData(
             elevation: formatElevation(elevationData.metadata.elevation, unitSystem),
             days,
             fetchedAt: resortData.fetchedAt,
-            model: getModelInfo(model)?.label ?? model
+            model: getModelInfo(model)?.label ?? model,
+            isHistory: allData.historyLength !== undefined,
         };
     } catch (err) {
         console.error(`Error processing resort data for ${resortName}:`, err);
@@ -295,11 +296,17 @@ function dayQualityOf(dayData: DayData, periods: Period[], snowfallEstimateMode:
     return quality;
 }
 
-export function calculateSnowTotals(resort: ProcessedResortData | null): SnowTotals {
-    if (!resort || !resort.days) return { next3Days: 0, next7Days: 0 };
+/** A card's days nearest today first: the forecast's as they are, History's from today back */
+export function daysFromToday(resort: ProcessedResortData): DayForecast[] {
+    return resort.isHistory ? [...resort.days].reverse() : resort.days;
+}
 
-    const next3Days = resort.days.slice(0, 3);
-    const next7Days = resort.days.slice(0, 7);
+export function calculateSnowTotals(resort: ProcessedResortData | null): SnowTotals {
+    if (!resort || !resort.days) return { threeDays: 0, sevenDays: 0 };
+
+    const days = daysFromToday(resort);
+    const threeDays = days.slice(0, 3);
+    const sevenDays = days.slice(0, 7);
 
     // In cm, which formatSnow converts for display
     const calculate = (days: DayForecast[]): number => {
@@ -310,7 +317,7 @@ export function calculateSnowTotals(resort: ProcessedResortData | null): SnowTot
     };
 
     return {
-        next3Days: Math.round(calculate(next3Days)),
-        next7Days: Math.round(calculate(next7Days))
+        threeDays: Math.round(calculate(threeDays)),
+        sevenDays: Math.round(calculate(sevenDays))
     };
 }

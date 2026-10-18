@@ -3,6 +3,7 @@ import type { UtilityBarProps, SortDay, ElevationLevel, SortOption, ViewMode } f
 import { getSortDayText } from '../utils/sortDayHelpers';
 import { isAscendingOrder } from '../hooks/useResortFiltering';
 import { MobileSortModal } from './MobileSortModal';
+import { CompactHistorySwitch } from './HistorySwitch';
 
 interface ExtendedCompactUtilityBarProps extends UtilityBarProps {
     openResortModal: () => void;
@@ -18,6 +19,8 @@ export function CompactUtilityBar({
     setSelectedSortDay,
     viewMode,
     setViewMode,
+    isHistory,
+    setIsHistory,
     isReversed,
     setIsReversed,
     sortDayData,
@@ -110,6 +113,11 @@ export function CompactUtilityBar({
                 >
                     {getViewModeText()}
                 </button>
+
+                <span className="compact-bar-separator">|</span>
+
+                {/* History - On or off, in the accent while on */}
+                <CompactHistorySwitch isHistory={isHistory} setIsHistory={setIsHistory} />
 
                 {/* Desktop: Sort controls inline */}
                 <span className="compact-bar-separator hidden md:inline">|</span>

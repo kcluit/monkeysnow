@@ -60,7 +60,8 @@ import { generateControlCommands, generateDetailedViewCommands } from './utils/c
 import { icons } from './constants/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { setGlobalZoomSync } from './lib/charts/chartRegistry';
-import { getSortDayData } from './utils/sortDayHelpers';
+import { getSortDayData, historySortDayWithin } from './utils/sortDayHelpers';
+import { historyFetchDays, lastDaysOf } from './utils/resortForecast';
 import { getResortLocation } from './utils/openMeteoClient';
 import { resolveResortId } from './data/resortLocations';
 import { pickStarterResort } from './utils/starterResort';
@@ -80,8 +81,10 @@ import {
     defaultSort,
     defaultSortDay,
     defaultTemperatureMetric,
+    defaultHistoryLength,
 } from './utils/constants';
 import type {
+    AllWeatherData,
     ElevationLevel,
     SortOption,
     SortDay,
@@ -94,6 +97,9 @@ import type {
     ResortDisplayLimit,
 } from './types';
 
+/** What the forecast or History fetches while the other is on show */
+const NO_RESORTS: string[] = [];
+
 interface DetailRouteProps {
     unitSystem: 'metric' | 'imperial';
     showUtilityBar: boolean;
@@ -101,6 +107,11 @@ interface DetailRouteProps {
     mapRotation: MapRotation;
     mapTilt: MapTilt;
     onSaveLocation: (input: SavedLocationInput) => void;
+    /** History's switch and History length, one for the Main page and the Detailed view */
+    isHistory: boolean;
+    setIsHistory: (on: boolean) => void;
+    historyLength: number;
+    setHistoryLength: (days: number) => void;
 }
 
 // Resort Detail Page wrapper component
@@ -111,6 +122,10 @@ function ResortDetailRoute({
     mapRotation,
     mapTilt,
     onSaveLocation,
+    isHistory,
+    setIsHistory,
+    historyLength,
+    setHistoryLength,
     getDisplayName,
 }: DetailRouteProps & {
     getDisplayName: (id: string) => string;
@@ -164,6 +179,10 @@ function ResortDetailRoute({
                 mapTilt={mapTilt}
                 onBack={handleBack}
                 onSaveLocation={onSaveLocation}
+                isHistory={isHistory}
+                setIsHistory={setIsHistory}
+                historyLength={historyLength}
+                setHistoryLength={setHistoryLength}
             />
         </Suspense>
     );
@@ -178,6 +197,10 @@ function SavedLocationRoute({
     mapTilt,
     onSaveLocation,
     onDeleteSavedLocation,
+    isHistory,
+    setIsHistory,
+    historyLength,
+    setHistoryLength,
 }: DetailRouteProps & {
     onDeleteSavedLocation: (id: string) => void;
 }): JSX.Element | null {
@@ -230,6 +253,10 @@ function SavedLocationRoute({
                 onDeleteSavedLocation={onDeleteSavedLocation}
                 selectionWasFull={Boolean((state as { selectionWasFull?: boolean } | null)?.selectionWasFull)}
                 onDismissSelectionWasFull={() => navigate(pathname, { replace: true, state: null })}
+                isHistory={isHistory}
+                setIsHistory={setIsHistory}
+                historyLength={historyLength}
+                setHistoryLength={setHistoryLength}
             />
         </Suspense>
     );
@@ -276,18 +303,40 @@ function App(): JSX.Element {
 
     const [viewMode, setViewMode] = useLocalStorage<ViewMode>('viewMode', 'default');
 
-    // Weather data hook — keeps the selection's forecasts loaded within the Fetch budget,
-    // with the hours that Graph view draws
-    const { allWeatherData, loading: weatherLoading, error: weatherError, queuedCount, queuedCalls, createLoadingController, cancelLoading } = useWeatherData(selectedResorts, viewMode === 'graph');
+    // History is never remembered, so every visit opens on the forecast; the History length is
+    const [isHistory, setIsHistory] = useState(false);
+    const [historyLength, setHistoryLength] = useLocalStorage<number>('historyLength', defaultHistoryLength);
 
-    // Block UI while the Starter resort is picked, and if there is NO cached data at all,
+    // Weather data hooks — keep the selection's forecasts, or its History, loaded within the
+    // Fetch budget, with the hours that Graph view draws. Only the one on show fetches;
+    // the other keeps what it has for switching back
+    const forecast = useWeatherData(isHistory ? NO_RESORTS : selectedResorts, viewMode === 'graph');
+    const history = useWeatherData(isHistory ? selectedResorts : NO_RESORTS, viewMode === 'graph', historyFetchDays(historyLength));
+    const { loading: weatherLoading, error: weatherError, queuedCount, queuedCalls, createLoadingController, cancelLoading } = isHistory ? history : forecast;
+
+    // History cut to the History length, which can be shorter than the days it was fetched for
+    const historyWeatherData = history.allWeatherData;
+    const allWeatherData = useMemo((): AllWeatherData | null => {
+        if (!isHistory) return forecast.allWeatherData;
+        if (!historyWeatherData) return null;
+        const data = Object.fromEntries(
+            Object.entries(historyWeatherData.data).map(([id, resortData]) => [id, lastDaysOf(resortData, historyLength)])
+        );
+        return { ...historyWeatherData, data, historyLength };
+    }, [isHistory, forecast.allWeatherData, historyWeatherData, historyLength]);
+
+    // Block UI while the Starter resort is picked, and if there is NO cached forecast at all,
     // but not through a rate-limit pause (that can last until tomorrow; the home page
-    // explains it in its status row)
+    // explains it in its status row), nor on History, which keeps the utility bar to switch it off
     const fetchPause = useBudgetPause();
-    const loading = !hasInitialized || (!fetchPause && ((!allWeatherData && weatherLoading) || (!allWeatherData && hierarchyLoading)));
+    const loading = !hasInitialized || (!isHistory && !fetchPause && ((!allWeatherData && weatherLoading) || (!allWeatherData && hierarchyLoading)));
     const [selectedElevation, setSelectedElevation] = useLocalStorage<ElevationLevel>('selectedElevation', defaultElevation);
     const [selectedSort, setSelectedSort] = useLocalStorage<SortOption>('selectedSort', defaultSort);
-    const [selectedSortDay, setSelectedSortDay] = useLocalStorage<SortDay>('selectedSortDay', defaultSortDay);
+    const [forecastSortDay, setForecastSortDay] = useLocalStorage<SortDay>('selectedSortDay', defaultSortDay);
+    // History keeps its own sort day, since its days are other days
+    const [historySortDay, setHistorySortDay] = useLocalStorage<SortDay>('historySortDay', defaultSortDay);
+    const selectedSortDay = isHistory ? historySortDayWithin(historySortDay, historyLength) : forecastSortDay;
+    const setSelectedSortDay = isHistory ? setHistorySortDay : setForecastSortDay;
     const [isReversed, setIsReversed] = useLocalStorage<boolean>('reverseOrder', false);
     const [showUtilityBar, setShowUtilityBar] = useLocalStorage<boolean>('showUtilityBar', true);
     const [utilityBarStyle, setUtilityBarStyle] = useLocalStorage<UtilityBarStyle>('utilityBarStyle', 'large');
@@ -359,8 +408,8 @@ function App(): JSX.Element {
 
     // Sort day options for the utility bars, settings and command palette
     const sortDayData = useMemo(
-        () => getSortDayData(selectedResorts, allWeatherData, processResortData, selectedElevation, isShowDateEnabled),
-        [selectedResorts, allWeatherData, selectedElevation, isShowDateEnabled]
+        () => getSortDayData(selectedResorts, allWeatherData, processResortData, selectedElevation, isShowDateEnabled, isHistory ? historyLength : undefined),
+        [selectedResorts, allWeatherData, selectedElevation, isShowDateEnabled, isHistory, historyLength]
     );
 
     // Dependencies for command palette lazy generation
@@ -389,6 +438,7 @@ function App(): JSX.Element {
         sortDayData,
         isReversed, setIsReversed,
         viewMode, setViewMode,
+        isHistory, historyLength, setHistoryLength,
         selectedTemperatureMetric, setSelectedTemperatureMetric,
         snowfallEstimateMode, setSnowfallEstimateMode,
         openCardModels,
@@ -660,6 +710,10 @@ function App(): JSX.Element {
             setIsReversed,
             viewMode,
             setViewMode,
+            isHistory,
+            setIsHistory,
+            historyLength,
+            setHistoryLength,
             selectedTemperatureMetric,
             setSelectedTemperatureMetric,
             snowfallEstimateMode,
@@ -905,8 +959,8 @@ function App(): JSX.Element {
 
     const isTruncated = effectiveDisplayLimit > 0 && selectedResorts.length > effectiveDisplayLimit;
 
-    // Forecasts failed to load and nothing cached — error state
-    if (isHomePage && !allWeatherData && weatherError) {
+    // Forecasts failed to load and nothing cached — error state (History says so under its utility bar instead)
+    if (isHomePage && !isHistory && !allWeatherData && weatherError) {
         return (
             <div className="min-h-screen p-4 sm:p-6 md:p-8 flex items-center justify-center bg-theme-background transition-colors duration-300 overflow-x-hidden">
                 <div className="text-center">
@@ -946,6 +1000,8 @@ function App(): JSX.Element {
                         setSelectedSortDay={handleSortDayChange}
                         viewMode={viewMode}
                         setViewMode={setViewMode}
+                        isHistory={isHistory}
+                        setIsHistory={setIsHistory}
                         isReversed={isReversed}
                         setIsReversed={handleReverseChange}
                         searchTerm={searchTerm}
@@ -967,6 +1023,8 @@ function App(): JSX.Element {
                         setSelectedSortDay={handleSortDayChange}
                         viewMode={viewMode}
                         setViewMode={setViewMode}
+                        isHistory={isHistory}
+                        setIsHistory={setIsHistory}
                         isReversed={isReversed}
                         setIsReversed={handleReverseChange}
                         searchTerm={searchTerm}
@@ -999,6 +1057,8 @@ function App(): JSX.Element {
                 <Suspense fallback={<div className="text-center py-4 text-theme-textSecondary">Loading...</div>}>
                     {viewMode === 'graph' && allWeatherData ? (
                         <GraphView
+                            // Switching History opens the Graphs on their 5 days again
+                            key={isHistory ? 'history' : 'forecast'}
                             resorts={displayResorts}
                             allWeatherData={allWeatherData}
                             elevation={selectedElevation}
@@ -1021,6 +1081,10 @@ function App(): JSX.Element {
 
                 {/* Queued resorts (and rate-limit pauses) */}
                 <FetchStatus count={queuedCount} calls={queuedCalls} things="resorts" />
+
+                {isHistory && !allWeatherData && weatherError && (
+                    <div className="text-center py-3 text-sm text-theme-textSecondary">{t('error.loadingWeatherData')}</div>
+                )}
 
                 {isTruncated && (
                     <div className="text-center py-3 text-sm text-theme-textSecondary">
@@ -1103,6 +1167,10 @@ function App(): JSX.Element {
         setIsReversed: handleReverseChange,
         viewMode,
         setViewMode,
+        isHistory,
+        setIsHistory,
+        historyLength,
+        setHistoryLength,
         selectedTemperatureMetric,
         setSelectedTemperatureMetric,
         snowfallEstimateMode,
@@ -1193,6 +1261,10 @@ function App(): JSX.Element {
                             mapRotation={mapRotation}
                             mapTilt={mapTilt}
                             onSaveLocation={handleSaveLocation}
+                            isHistory={isHistory}
+                            setIsHistory={setIsHistory}
+                            historyLength={historyLength}
+                            setHistoryLength={setHistoryLength}
                             getDisplayName={getDisplayName}
                         />
                     </>
@@ -1212,6 +1284,10 @@ function App(): JSX.Element {
                             mapTilt={mapTilt}
                             onSaveLocation={handleSaveLocation}
                             onDeleteSavedLocation={handleDeleteSavedLocation}
+                            isHistory={isHistory}
+                            setIsHistory={setIsHistory}
+                            historyLength={historyLength}
+                            setHistoryLength={setHistoryLength}
                         />
                     </>
                 } />

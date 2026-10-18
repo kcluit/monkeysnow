@@ -3,6 +3,7 @@ import type { UtilityBarProps, SortDay } from '../types';
 import { getSortDayText } from '../utils/sortDayHelpers';
 import { isAscendingOrder } from '../hooks/useResortFiltering';
 import { MobileSortModal } from './MobileSortModal';
+import { HistorySwitch } from './HistorySwitch';
 
 interface ExtendedUtilityBarProps extends UtilityBarProps {
   openResortModal: () => void;
@@ -18,6 +19,8 @@ export function UtilityBar({
   setSelectedSortDay,
   viewMode,
   setViewMode,
+  isHistory,
+  setIsHistory,
   isReversed,
   setIsReversed,
   sortDayData,
@@ -142,6 +145,9 @@ export function UtilityBar({
               </div>
             )}
           </div>
+
+          {/* History - Desktop only */}
+          <HistorySwitch isHistory={isHistory} setIsHistory={setIsHistory} className="hidden md:block" />
         </div>
 
         {/* Desktop: Sort controls inline */}
@@ -336,6 +342,9 @@ export function UtilityBar({
             </div>
           )}
         </div>
+
+        {/* History - Mobile */}
+        <HistorySwitch isHistory={isHistory} setIsHistory={setIsHistory} />
 
         {/* Sort & Filter Button - Opens Modal */}
         <button

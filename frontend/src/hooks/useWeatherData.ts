@@ -27,9 +27,17 @@ interface FetchQueue {
   controller: AbortController;
 }
 
-/** Fresh: fetched within the Freshness window, from the Card model the resort has now, under the current snow estimate. */
-const isFresh = (id: string, entry: ResortData | undefined, now: number): boolean =>
-  Boolean(entry?.fetchedAt && now - entry.fetchedAt < FRESHNESS_WINDOW_MS && isOnCardModel(id, entry) && hasCurrentEstimate(entry));
+/**
+ * Fresh: fetched within the Freshness window, from the Card model the resort has now, under the
+ * current snow estimate, and for History, for at least the days History is fetched for now.
+ */
+const isFresh = (id: string, entry: ResortData | undefined, now: number, historyDays: number | undefined): boolean =>
+  Boolean(entry?.fetchedAt && now - entry.fetchedAt < FRESHNESS_WINDOW_MS && isOnCardModel(id, entry) && hasCurrentEstimate(entry)
+    && (entry.historyDays ?? 0) >= (historyDays ?? 0));
+
+/** Where a forecast is cached; History is cached apart from it */
+const cacheKey = (resortId: string, isHistory: boolean): string =>
+  `${isHistory ? 'history' : 'resort'}:${resortId}`;
 
 /** Whether a forecast can be shown: in Graph view, one cached before hours were kept can't. */
 const isLoaded = (entry: ResortData | undefined, needsHours: boolean): entry is ResortData =>
@@ -47,12 +55,12 @@ const sleep = (ms: number, signal: AbortSignal) =>
     signal.addEventListener('abort', () => { clearTimeout(timer); resolve(); }, { once: true });
   });
 
-async function readCachedForecasts(resortIds: string[]): Promise<Record<string, ResortData>> {
+async function readCachedForecasts(resortIds: string[], historyDays: number | undefined): Promise<Record<string, ResortData>> {
   const cached: Record<string, ResortData> = {};
   try {
     await Promise.all(
       resortIds.map(async (id) => {
-        const entry = await idbGet<ResortData>(`resort:${id}`);
+        const entry = await idbGet<ResortData>(cacheKey(id, Boolean(historyDays)));
         if (entry) cached[id] = entry;
       })
     );
@@ -62,17 +70,17 @@ async function readCachedForecasts(resortIds: string[]): Promise<Record<string, 
   return cached;
 }
 
-function writeCachedForecasts(forecasts: Record<string, ResortData>): void {
+function writeCachedForecasts(forecasts: Record<string, ResortData>, historyDays: number | undefined): void {
   Promise.all(
-    Object.entries(forecasts).map(([id, data]) => idbSet(`resort:${id}`, data))
+    Object.entries(forecasts).map(([id, data]) => idbSet(cacheKey(id, Boolean(historyDays)), data))
   ).catch(() => {
     // IndexedDB unavailable — silently ignore
   });
 }
 
-/** Forgets a deleted Saved location's cached forecast. */
+/** Forgets a deleted Saved location's cached forecast and History. */
 export function deleteCachedForecast(resortId: string): void {
-  idbDelete(`resort:${resortId}`).catch(() => {
+  Promise.all([idbDelete(cacheKey(resortId, false)), idbDelete(cacheKey(resortId, true))]).catch(() => {
     // IndexedDB unavailable — silently ignore
   });
 }
@@ -87,8 +95,11 @@ function currentOnly(forecasts: Record<string, ResortData>): Record<string, Reso
  * missing ones are fetched first, stale ones are refreshed in the background,
  * and every request waits its turn in the Fetch budget. With `needsHours` (Graph view),
  * a forecast cached before hours were kept counts as missing, so it is fetched first.
+ *
+ * With `historyDays`, it keeps History loaded instead, fetched for that many days and
+ * cached apart from the forecast; History fetched for fewer days counts as stale.
  */
-export function useWeatherData(selectedResorts: string[], needsHours = false): UseWeatherDataReturn {
+export function useWeatherData(selectedResorts: string[], needsHours = false, historyDays?: number): UseWeatherDataReturn {
   const [allWeatherData, setAllWeatherData] = useState<AllWeatherData | null>(null);
   const [loading, setLoading] = useState(selectedResorts.length > 0);
   const [error, setError] = useState<Error | null>(null);
@@ -101,6 +112,8 @@ export function useWeatherData(selectedResorts: string[], needsHours = false): U
   selectionRef.current = selectedResorts;
   const needsHoursRef = useRef(needsHours);
   needsHoursRef.current = needsHours;
+  const historyDaysRef = useRef(historyDays);
+  historyDaysRef.current = historyDays;
   const loadingController = useRef<AbortController | null>(null);
   const syncRef = useRef<(selection: string[]) => Promise<void>>();
 
@@ -132,13 +145,15 @@ export function useWeatherData(selectedResorts: string[], needsHours = false): U
 
         for (let attempt = 1; attempt <= MAX_ATTEMPTS && !signal.aborted; attempt++) {
           try {
-            const fetched = await fetchResortForecasts(group, 'main', signal);
+            const historyDays = historyDaysRef.current;
+            const fetched = await fetchResortForecasts(group, 'main', signal, historyDays);
             if (signal.aborted) return;
             const fresh = currentOnly(fetched);
             editedWhileFetching = Object.keys(fresh).length < Object.keys(fetched).length
-              || Object.entries(fresh).some(([id, data]) => !isOnCardModel(id, data));
+              || Object.entries(fresh).some(([id, data]) => !isOnCardModel(id, data))
+              || historyDays !== historyDaysRef.current;
             mergeForecasts(fresh);
-            writeCachedForecasts(fresh);
+            writeCachedForecasts(fresh, historyDays);
             setError(null);
             break;
           } catch (err) {
@@ -154,7 +169,7 @@ export function useWeatherData(selectedResorts: string[], needsHours = false): U
 
         group.forEach((id) => queue.inFlight.delete(id));
         publishOutstanding(queue);
-        // A Saved location's elevation or a Country model changed mid-fetch; fetch it again
+        // A Saved location's elevation, a Country model or the days History is fetched for changed mid-fetch; fetch it again
         if (editedWhileFetching) void syncRef.current?.(selectionRef.current);
       }
     } finally {
@@ -179,8 +194,9 @@ export function useWeatherData(selectedResorts: string[], needsHours = false): U
     // Another tab may have fetched these already; take anything newer from IndexedDB first
     const now = Date.now();
     const needs = needsHoursRef.current;
-    const notFresh = selection.filter((id) => !isFresh(id, dataRef.current[id], now) || !isLoaded(dataRef.current[id], needs));
-    const cached = currentOnly(await readCachedForecasts(notFresh));
+    const historyDays = historyDaysRef.current;
+    const notFresh = selection.filter((id) => !isFresh(id, dataRef.current[id], now, historyDays) || !isLoaded(dataRef.current[id], needs));
+    const cached = currentOnly(await readCachedForecasts(notFresh, historyDays));
     if (queue.controller.signal.aborted || run !== queue.syncRun) return;
 
     const newer: Record<string, ResortData> = {};
@@ -197,7 +213,7 @@ export function useWeatherData(selectedResorts: string[], needsHours = false): U
       const entry = dataRef.current[id];
       if (!isLoaded(entry, needs)) missing.push(id);
       // Includes forecasts from a model the card no longer uses: they stay on show until replaced
-      else if (!isFresh(id, entry, now)) stale.push(id);
+      else if (!isFresh(id, entry, now, historyDays)) stale.push(id);
     }
 
     // Never-loaded resorts first, so empty slots fill before cached cards refresh
@@ -237,7 +253,8 @@ export function useWeatherData(selectedResorts: string[], needsHours = false): U
     };
   }, [sync]);
 
-  // Re-queue whenever the selection changes, a Saved location is edited, or a Country model changes
+  // Re-queue whenever the selection changes, a Saved location is edited, a Country model changes,
+  // or History is fetched for more days
   const savedLocations = useSavedLocations();
   const countryModels = useCountryModels();
   const isFirstSelection = useRef(true);
@@ -247,7 +264,7 @@ export function useWeatherData(selectedResorts: string[], needsHours = false): U
       return;
     }
     void sync(selectedResorts);
-  }, [selectedResorts, savedLocations, countryModels, needsHours, sync]);
+  }, [selectedResorts, savedLocations, countryModels, needsHours, historyDays, sync]);
 
   // Selected resorts that have no forecast yet and are waiting on the Fetch budget
   const queuedIds = useMemo(() => {
@@ -256,8 +273,8 @@ export function useWeatherData(selectedResorts: string[], needsHours = false): U
   }, [outstanding, selectedResorts, allWeatherData, needsHours]);
 
   const queuedCalls = useMemo(
-    () => queuedIds.reduce((sum, id) => sum + resortCallWeight(id), 0),
-    [queuedIds]
+    () => queuedIds.reduce((sum, id) => sum + resortCallWeight(id, historyDays), 0),
+    [queuedIds, historyDays]
   );
 
   const createLoadingController = useCallback((): AbortController => {

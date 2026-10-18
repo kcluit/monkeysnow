@@ -1,7 +1,8 @@
-import { useRef, useState, useEffect, useCallback, MouseEvent } from 'react';
+import { useRef, useState, useEffect, useLayoutEffect, useCallback, MouseEvent } from 'react';
 import { webcamUrls } from '../../utils/constants';
 import { calculateSnowTotals } from '../../utils/weather';
 import { calculateDayStats, formatWeatherText, getTemperatureStyle, getSnowClass, getWindClass, showsAmount } from './cardUtils';
+import { HistoryBadge } from './HistoryBadge';
 import { formatSnow, formatRain, formatWind } from '../../utils/unitConversion';
 import type { CardProps } from '../../types';
 
@@ -31,6 +32,12 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
             observer.disconnect();
         };
     }, [updateScrollState]);
+
+    // History's latest days are on the right, so it opens scrolled to them
+    useLayoutEffect(() => {
+        const el = scrollContainerRef.current;
+        if (el) el.scrollLeft = resort.isHistory ? el.scrollWidth : 0;
+    }, [resort.isHistory, resort.days.length]);
 
     const webcamUrl = webcamUrls[resort.id];
     const totals = calculateSnowTotals(resort);
@@ -66,7 +73,10 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
         >
             <div className="mb-3 flex justify-between items-center">
                 <div>
-                    <h2 className="text-xl font-semibold text-theme-textPrimary tracking-tight">{resort.name}</h2>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <h2 className="text-xl font-semibold text-theme-textPrimary tracking-tight">{resort.name}</h2>
+                        {resort.isHistory && <HistoryBadge days={resort.days.length} />}
+                    </div>
                     <p className="text-xs text-theme-accent">
                         {resort.elevation}
                         <span className="text-theme-textSecondary"> · {resort.model}</span>
@@ -167,7 +177,7 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
                     <div className="bg-theme-cardBg px-3 py-1 rounded-lg">
                         <span className="text-sm font-medium">
                             <span className="text-theme-accent">Totals:</span>
-                            <span className="text-theme-textPrimary"> Next 3 Days: {formatSnow(totals.next3Days, unitSystem)} | Next 7 Days: {formatSnow(totals.next7Days, unitSystem)}</span>
+                            <span className="text-theme-textPrimary"> {resort.isHistory ? 'Past' : 'Next'} 3 Days: {formatSnow(totals.threeDays, unitSystem)} | {resort.isHistory ? 'Past' : 'Next'} 7 Days: {formatSnow(totals.sevenDays, unitSystem)}</span>
                         </span>
                     </div>
                 </div>

@@ -1,7 +1,8 @@
-import { useRef, useState, useEffect, useCallback, type ReactNode } from 'react';
+import { useRef, useState, useEffect, useLayoutEffect, useCallback, type ReactNode } from 'react';
 import { calculateSnowTotals, getSnowConditionFromQuality } from '../../utils/weather';
 import { formatSnow } from '../../utils/unitConversion';
 import { getTemperatureStyle, getWindClass, shortWeatherText, showsAmount } from './cardUtils';
+import { HistoryBadge } from './HistoryBadge';
 import { isSavedLocationId } from '../../utils/savedLocations';
 import type { CardProps, DayForecast, Period } from '../../types';
 
@@ -71,6 +72,12 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
             observer.disconnect();
         };
     }, [updateScrollState]);
+
+    // History's latest days are on the right, so it opens scrolled to them
+    useLayoutEffect(() => {
+        const el = scrollContainerRef.current;
+        if (el) el.scrollLeft = resort.isHistory ? el.scrollWidth : 0;
+    }, [resort.isHistory, resort.days.length]);
 
     // One day's three columns on a wide screen
     const scrollByDay = (direction: 1 | -1): void => {
@@ -151,8 +158,9 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
             onClick={() => onResortClick?.(resort.id)}
         >
             <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 mb-2">
-                <div className="flex flex-wrap items-baseline gap-x-2 min-w-0">
+                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 min-w-0">
                     <h2 className="text-lg sm:text-xl font-bold text-theme-textPrimary">{resort.name}</h2>
+                    {resort.isHistory && <HistoryBadge days={resort.days.length} />}
                     <span className="text-xs sm:text-sm text-theme-textSecondary">
                         <span className="text-theme-accent font-medium">{elevationLabel}{resort.elevation}</span>
                         {' · '}{resort.model}
@@ -163,7 +171,7 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
                 </div>
                 <div className="text-xs sm:text-sm font-medium">
                     <span className="text-theme-accent">Totals:</span>
-                    <span className="text-theme-textPrimary"> Next 3 Days: {formatSnow(totals.next3Days, unitSystem)} | Next 7 Days: {formatSnow(totals.next7Days, unitSystem)}</span>
+                    <span className="text-theme-textPrimary"> {resort.isHistory ? 'Past' : 'Next'} 3 Days: {formatSnow(totals.threeDays, unitSystem)} | {resort.isHistory ? 'Past' : 'Next'} 7 Days: {formatSnow(totals.sevenDays, unitSystem)}</span>
                 </div>
             </div>
 

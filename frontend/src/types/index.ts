@@ -55,7 +55,12 @@ export interface UseThemeReturn {
 // Elevation & sorting types
 export type ElevationLevel = 'bot' | 'mid' | 'top';
 export type SortOption = 'temperature' | 'snowfall' | 'wind';
-export type SortDay = number | 'next3days' | 'next7days';
+/**
+ * The day or days the cards are sorted by, counted from today: a day's index (0 is today),
+ * or the 3 or 7 days nearest today, which in History are the latest ones. 'allDays' is
+ * every day History shows, offered only in History.
+ */
+export type SortDay = number | 'next3days' | 'next7days' | 'allDays';
 export type ViewMode = 'default' | 'full' | 'compact' | 'graph';
 export type UtilityBarStyle = 'compact' | 'large';
 export type TemperatureMetric = 'max' | 'min' | 'avg' | 'median';
@@ -151,11 +156,15 @@ export interface ResortData {
     timeZone?: string;
     /** The SNOW_ESTIMATE_VERSION it was estimated under; missing or older counts as stale, so it is refetched */
     estimateVersion?: number;
+    /** Set on History: how many days it was fetched for, today so far the last of them, up to the hour it was fetched */
+    historyDays?: number;
 }
 
 export interface AllWeatherData {
     updatedAt: string;
     data: Record<string, ResortData>; // resort name -> resort data
+    /** Set when these are History, cut to the History length: how many days each shows */
+    historyLength?: number;
 }
 
 // Snow condition type
@@ -206,12 +215,14 @@ export interface ProcessedResortData {
     fetchedAt?: number; // epoch ms, from ResortData
     /** Label of the Card model it came from, e.g. "NOAA HRRR" */
     model: string;
+    /** Whether these are History's days, oldest first and today last, rather than the forecast's, today first */
+    isHistory?: boolean;
 }
 
-// Snow totals
+// Snow totals over the 3 and 7 days nearest today: the next ones, or in History the latest
 export interface SnowTotals {
-    next3Days: number;
-    next7Days: number;
+    threeDays: number;
+    sevenDays: number;
 }
 
 // Day stats for DefaultCard
@@ -234,7 +245,7 @@ export interface SortDayOption {
 
 export interface SortDayData {
     specialOptions: SortDayOption[];
-    /** The label of each day the Selection can be sorted by, today first */
+    /** The label of each day the Selection can be sorted by, today first (in History, going back) */
     regularDays: string[];
 }
 
@@ -250,6 +261,8 @@ export interface UtilityBarProps {
     setSelectedSortDay: (day: SortDay) => void;
     viewMode: ViewMode;
     setViewMode: (mode: ViewMode) => void;
+    isHistory: boolean;
+    setIsHistory: (on: boolean) => void;
     isReversed: boolean;
     setIsReversed: (value: boolean) => void;
     searchTerm: string;

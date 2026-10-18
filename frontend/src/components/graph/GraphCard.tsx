@@ -5,6 +5,7 @@ import { formatSnow } from '../../utils/unitConversion';
 import { nightsBetween } from '../../utils/nightTimes';
 import { useInViewport } from '../../hooks/useInViewport';
 import { useLanguage } from '../../hooks/useLanguage';
+import { HistoryBadge } from '../cards/HistoryBadge';
 import { graphDataOf } from './graphData';
 import { GraphTimeAxis } from './graphTimeAxis';
 import { GraphPlot } from './GraphPlot';
@@ -73,7 +74,10 @@ export function GraphCard({ resort, data, elevation, snowfallMode, units, theme,
                 onClick={() => onResortClick?.(resort.id)}
             >
                 <div className="min-w-0">
-                    <h2 className="text-xl font-semibold text-theme-textPrimary tracking-tight">{resort.name}</h2>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <h2 className="text-xl font-semibold text-theme-textPrimary tracking-tight">{resort.name}</h2>
+                        {resort.isHistory && <HistoryBadge days={resort.days.length} />}
+                    </div>
                     <p className="text-xs text-theme-accent">
                         {resort.elevation}
                         <span className="text-theme-textSecondary"> · {resort.model}</span>
@@ -82,7 +86,7 @@ export function GraphCard({ resort, data, elevation, snowfallMode, units, theme,
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                     <span className="text-sm font-medium">
                         <span className="text-theme-accent">Totals:</span>
-                        <span className="text-theme-textPrimary"> Next 3 Days: {formatSnow(totals.next3Days, units)} | Next 7 Days: {formatSnow(totals.next7Days, units)}</span>
+                        <span className="text-theme-textPrimary"> {resort.isHistory ? 'Past' : 'Next'} 3 Days: {formatSnow(totals.threeDays, units)} | {resort.isHistory ? 'Past' : 'Next'} 7 Days: {formatSnow(totals.sevenDays, units)}</span>
                     </span>
                     {webcamUrl && (
                         <a

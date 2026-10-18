@@ -3,7 +3,8 @@ import type { ElevationSelection } from '../../types/detailView';
 import { useVariableSelection } from '../../hooks/useVariableSelection';
 import { VariableSelectionModal } from '../VariableSelectionModal';
 import { formatElevation } from '../../utils/unitConversion';
-import { FORECAST_HORIZONS } from '../../utils/constants';
+import { FORECAST_HORIZONS, HISTORY_LENGTHS } from '../../utils/constants';
+import { CompactHistorySwitch } from '../HistorySwitch';
 import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
 
@@ -20,6 +21,10 @@ export function CompactDetailUtilityBar({
     setElevationSelection,
     forecastDays,
     setForecastDays,
+    isHistory,
+    setIsHistory,
+    historyLength,
+    setHistoryLength,
     isChartLocked,
     setIsChartLocked,
     fixedElevation,
@@ -54,11 +59,14 @@ export function CompactDetailUtilityBar({
         return formatElevation(elevationSelection, unitSystem);
     };
 
-    // Cycle forecast days: 1 → 3 → 7 → 14 → 16 → 1
-    const cycleForecastDays = (): void => {
-        const currentIndex = FORECAST_HORIZONS.indexOf(forecastDays);
-        const nextIndex = (currentIndex + 1) % FORECAST_HORIZONS.length;
-        setForecastDays(FORECAST_HORIZONS[nextIndex]);
+    // Cycle the days shown: the Forecast horizon 1 → 3 → 7 → 14 → 16 → 1, or while History is on
+    // the History length 3 → 7 → 14 → 30 → 3
+    const days = isHistory ? historyLength : forecastDays;
+    const cycleDays = (): void => {
+        const choices = isHistory ? HISTORY_LENGTHS : FORECAST_HORIZONS;
+        const next = choices[(choices.indexOf(days) + 1) % choices.length];
+        if (isHistory) setHistoryLength(next);
+        else setForecastDays(next);
     };
 
     // Model button text: Comparison models shown here / Selected models
@@ -124,12 +132,18 @@ export function CompactDetailUtilityBar({
 
                     <span className="compact-bar-separator hidden sm:inline">|</span>
 
-                    {/* Forecast Days - cycle */}
+                    {/* History - On or off, in the accent while on */}
+                    <CompactHistorySwitch isHistory={isHistory} setIsHistory={setIsHistory} />
+
+                    <span className="compact-bar-separator hidden sm:inline">|</span>
+
+                    {/* Days shown - cycle */}
                     <button
-                        onClick={cycleForecastDays}
+                        onClick={cycleDays}
+                        title={isHistory ? 'History length' : 'Forecast horizon'}
                         className="compact-bar-text text-theme-textSecondary hover:text-theme-accent transition-colors"
                     >
-                        {forecastDays}d
+                        {days}d
                     </button>
 
                     <span className="compact-bar-separator hidden sm:inline">|</span>

@@ -8,7 +8,7 @@ import type { Language } from '../types/i18n';
 import type { ElevationSelection } from '../types/detailView';
 import { icons } from '../constants/icons';
 import { formatElevation } from './unitConversion';
-import { FORECAST_HORIZONS } from './constants';
+import { FORECAST_HORIZONS, HISTORY_LENGTHS } from './constants';
 import {
   BASE_MAPS,
   OVERLAYS,
@@ -36,6 +36,11 @@ export interface ControlCommandParams {
   // View Mode
   viewMode: ViewMode;
   setViewMode: (m: ViewMode) => void;
+  // History
+  isHistory: boolean;
+  setIsHistory: (on: boolean) => void;
+  historyLength: number;
+  setHistoryLength: (days: number) => void;
   // Temperature Metric
   selectedTemperatureMetric: TemperatureMetric;
   setSelectedTemperatureMetric: (m: TemperatureMetric) => void;
@@ -211,6 +216,49 @@ export function generateViewModeCommands(
       name: 'Graph',
       icon: viewMode === 'graph' ? icons.check : undefined,
       action: () => setViewMode('graph'),
+    },
+  ];
+}
+
+/**
+ * Generate History's switch and History length submenus with checkmarks.
+ */
+export function generateHistoryCommands(
+  isHistory: boolean,
+  setIsHistory: (on: boolean) => void,
+  historyLength: number,
+  setHistoryLength: (days: number) => void
+): Command[] {
+  return [
+    {
+      id: 'history',
+      name: 'History',
+      icon: icons.history,
+      subCommands: [
+        {
+          id: 'history-on',
+          name: 'On',
+          icon: isHistory ? icons.check : undefined,
+          action: () => setIsHistory(true),
+        },
+        {
+          id: 'history-off',
+          name: 'Off',
+          icon: !isHistory ? icons.check : undefined,
+          action: () => setIsHistory(false),
+        },
+      ],
+    },
+    {
+      id: 'history-length',
+      name: 'History length',
+      icon: icons.calendar,
+      subCommands: HISTORY_LENGTHS.map((days) => ({
+        id: `history-length-${days}`,
+        name: `${days} days`,
+        icon: historyLength === days ? icons.check : undefined,
+        action: () => setHistoryLength(days),
+      })),
     },
   ];
 }
@@ -567,6 +615,12 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
         params.setViewMode
       ),
     },
+    ...generateHistoryCommands(
+      params.isHistory,
+      params.setIsHistory,
+      params.historyLength,
+      params.setHistoryLength
+    ),
     {
       id: 'temperature-metric',
       name: 'Temperature display',
