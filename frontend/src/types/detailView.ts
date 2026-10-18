@@ -95,6 +95,11 @@ export interface DetailUtilityBarProps {
     resolvedElevation: number;
     forecastDays: number;
     setForecastDays: (days: number) => void;
+    /** History's switch, and the History length, which takes the Forecast horizon's place while History is on */
+    isHistory: boolean;
+    setIsHistory: (on: boolean) => void;
+    historyLength: number;
+    setHistoryLength: (days: number) => void;
     location: {
         baseElevation: number;
         midElevation: number;

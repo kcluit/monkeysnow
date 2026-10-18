@@ -1,7 +1,7 @@
 /**
- * Beside a card's name on History, so its past days aren't taken for the forecast. It has the
- * History switch's accent fill, and counts the days the card shows: the History length, or
- * fewer while History fetched for a longer one is still on its way.
+ * Beside a card's name on History, and the Detailed view's heading, so the past days aren't taken
+ * for the forecast. It has the History switch's accent fill, and counts the days shown: the History
+ * length, or on a card fewer while History fetched for a longer one is still on its way.
  */
 export function HistoryBadge({ days }: { days: number }): JSX.Element {
     return (

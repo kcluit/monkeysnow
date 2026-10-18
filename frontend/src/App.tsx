@@ -107,6 +107,11 @@ interface DetailRouteProps {
     mapRotation: MapRotation;
     mapTilt: MapTilt;
     onSaveLocation: (input: SavedLocationInput) => void;
+    /** History's switch and History length, one for the Main page and the Detailed view */
+    isHistory: boolean;
+    setIsHistory: (on: boolean) => void;
+    historyLength: number;
+    setHistoryLength: (days: number) => void;
 }
 
 // Resort Detail Page wrapper component
@@ -117,6 +122,10 @@ function ResortDetailRoute({
     mapRotation,
     mapTilt,
     onSaveLocation,
+    isHistory,
+    setIsHistory,
+    historyLength,
+    setHistoryLength,
     getDisplayName,
 }: DetailRouteProps & {
     getDisplayName: (id: string) => string;
@@ -170,6 +179,10 @@ function ResortDetailRoute({
                 mapTilt={mapTilt}
                 onBack={handleBack}
                 onSaveLocation={onSaveLocation}
+                isHistory={isHistory}
+                setIsHistory={setIsHistory}
+                historyLength={historyLength}
+                setHistoryLength={setHistoryLength}
             />
         </Suspense>
     );
@@ -184,6 +197,10 @@ function SavedLocationRoute({
     mapTilt,
     onSaveLocation,
     onDeleteSavedLocation,
+    isHistory,
+    setIsHistory,
+    historyLength,
+    setHistoryLength,
 }: DetailRouteProps & {
     onDeleteSavedLocation: (id: string) => void;
 }): JSX.Element | null {
@@ -236,6 +253,10 @@ function SavedLocationRoute({
                 onDeleteSavedLocation={onDeleteSavedLocation}
                 selectionWasFull={Boolean((state as { selectionWasFull?: boolean } | null)?.selectionWasFull)}
                 onDismissSelectionWasFull={() => navigate(pathname, { replace: true, state: null })}
+                isHistory={isHistory}
+                setIsHistory={setIsHistory}
+                historyLength={historyLength}
+                setHistoryLength={setHistoryLength}
             />
         </Suspense>
     );
@@ -1240,6 +1261,10 @@ function App(): JSX.Element {
                             mapRotation={mapRotation}
                             mapTilt={mapTilt}
                             onSaveLocation={handleSaveLocation}
+                            isHistory={isHistory}
+                            setIsHistory={setIsHistory}
+                            historyLength={historyLength}
+                            setHistoryLength={setHistoryLength}
                             getDisplayName={getDisplayName}
                         />
                     </>
@@ -1259,6 +1284,10 @@ function App(): JSX.Element {
                             mapTilt={mapTilt}
                             onSaveLocation={handleSaveLocation}
                             onDeleteSavedLocation={handleDeleteSavedLocation}
+                            isHistory={isHistory}
+                            setIsHistory={setIsHistory}
+                            historyLength={historyLength}
+                            setHistoryLength={setHistoryLength}
                         />
                     </>
                 } />

@@ -9,7 +9,9 @@ import { historyFetchDays, lastDaysOf } from './resortForecast';
 import { historySortDayWithin } from './sortDayHelpers';
 import { callWeight } from './openMeteoBudget';
 import { calculateSnowTotals, daysFromToday } from './weather';
+import { lastDaysOfHistory } from './openMeteoClient';
 import type { DayData, DayForecast, ElevationForecast, HourlyForecast, ProcessedResortData, ResortData } from '../types';
+import type { HourlyDataPoint, WeatherModel } from '../types/openMeteo';
 
 const HOUR = 3600;
 const at = (iso: string): number => Date.parse(iso) / 1000;
@@ -69,6 +71,36 @@ describe('lastDaysOf', () => {
         const data = history(['2026-10-10', '2026-10-11'], at('2026-10-09T15:00Z'), 40, 'Asia/Tokyo');
         const cut = lastDaysOf(data, 14);
         expect(cut.mid).toBe(data.mid);
+    });
+});
+
+/** A Detailed view model's hours from `start` (epoch seconds), `hours` long */
+function modelHours(start: number, hours: number): HourlyDataPoint[] {
+    return Array.from({ length: hours }, (_, i) => {
+        const timestamp = (start + i * HOUR) * 1000;
+        return { time: new Date(timestamp), timestamp, temperature_2m: i };
+    });
+}
+
+describe('lastDaysOfHistory', () => {
+    it('cuts every model at the same local midnight across a daylight-saving switch', () => {
+        // Zurich leaves summer time on 25 October 2026: the 25th starts at 22:00 UTC the day before, the 26th at 23:00 UTC
+        const data = new Map<WeatherModel, HourlyDataPoint[]>([
+            ['ecmwf_ifs', modelHours(at('2026-10-23T22:00Z'), 70)],
+            // One hour short, which still starts from the same midnight
+            ['ncep_gfs_seamless', modelHours(at('2026-10-23T22:00Z'), 69)],
+        ]);
+        const twoDays = lastDaysOfHistory(data, 2, 'Europe/Zurich');
+        expect(twoDays.get('ecmwf_ifs')![0].timestamp).toBe(at('2026-10-24T22:00Z') * 1000);
+        expect(twoDays.get('ecmwf_ifs')!.length).toBe(46);
+        expect(twoDays.get('ncep_gfs_seamless')![0].temperature_2m).toBe(24);
+        expect(lastDaysOfHistory(data, 1, 'Europe/Zurich').get('ecmwf_ifs')![0].timestamp).toBe(at('2026-10-25T23:00Z') * 1000);
+    });
+
+    it('leaves History with no more days than the History length as it is', () => {
+        const data = new Map<WeatherModel, HourlyDataPoint[]>([['ecmwf_ifs', modelHours(at('2026-10-23T22:00Z'), 70)]]);
+        expect(lastDaysOfHistory(data, 3, 'Europe/Zurich')).toBe(data);
+        expect(lastDaysOfHistory(data, 7, 'Europe/Zurich')).toBe(data);
     });
 });
 

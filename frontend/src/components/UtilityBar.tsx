@@ -3,25 +3,10 @@ import type { UtilityBarProps, SortDay } from '../types';
 import { getSortDayText } from '../utils/sortDayHelpers';
 import { isAscendingOrder } from '../hooks/useResortFiltering';
 import { MobileSortModal } from './MobileSortModal';
+import { HistorySwitch } from './HistorySwitch';
 
 interface ExtendedUtilityBarProps extends UtilityBarProps {
   openResortModal: () => void;
-}
-
-/** History's switch: filled with the accent while the cards show the past days */
-function HistorySwitch({ isHistory, setIsHistory, className = '' }: Pick<UtilityBarProps, 'isHistory' | 'setIsHistory'> & { className?: string }): JSX.Element {
-  return (
-    <button
-      onClick={() => setIsHistory(!isHistory)}
-      aria-pressed={isHistory}
-      title={isHistory ? 'Back to the forecast' : 'Show the past days instead of the forecast'}
-      className={`${className} border rounded-lg px-3 py-2 text-sm font-medium shadow-sm transition-colors duration-200 ${isHistory
-        ? 'bg-theme-accent border-theme-accent text-theme-background hover:opacity-90'
-        : 'bg-theme-background border-theme-border text-theme-textPrimary hover:bg-theme-secondary'}`}
-    >
-      History
-    </button>
-  );
 }
 
 export function UtilityBar({

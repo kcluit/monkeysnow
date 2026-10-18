@@ -19,9 +19,12 @@ import { resolveComparisonModels } from '../../utils/comparisonModels';
 import { registerModelStylesOpener } from '../../utils/modelStyles';
 import { detailedViewModelsOpener } from '../../utils/openerRegistry';
 import { buildTimeAxis } from '../../utils/timeAxis';
+import { lastDaysOfHistory } from '../../utils/openMeteoClient';
+import { historyFetchDays } from '../../utils/resortForecast';
+import { HistoryBadge } from '../cards/HistoryBadge';
 import { clearHeldLines } from '../../lib/charts/chartRegistry';
 import type { DetailedResortViewProps, CustomLocation } from '../../types/detailView';
-import type { WeatherVariable } from '../../types/openMeteo';
+import type { WeatherModel, WeatherVariable } from '../../types/openMeteo';
 import type { ChartSettingsTab } from '../../types/chartSettings';
 import type { UnitSystem } from '../../types';
 import { formatElevation } from '../../utils/unitConversion';
@@ -44,7 +47,15 @@ interface DetailedResortViewPropsWithUnits extends DetailedResortViewProps {
     /** Set right after saving, when the Selection was already full */
     selectionWasFull?: boolean;
     onDismissSelectionWasFull?: () => void;
+    /** History's switch and History length, one for the Main page and the Detailed view */
+    isHistory: boolean;
+    setIsHistory: (on: boolean) => void;
+    historyLength: number;
+    setHistoryLength: (days: number) => void;
 }
+
+/** What the forecast or History fetches while the other is on show */
+const NO_MODELS: WeatherModel[] = [];
 
 /** Shown in place of the charts when there is nothing to draw, with a way to pick other models. */
 function NoChartsNotice({ message, actionLabel, onAction }: {
@@ -80,6 +91,10 @@ export function DetailedResortView({
     onDeleteSavedLocation,
     selectionWasFull = false,
     onDismissSelectionWasFull,
+    isHistory,
+    setIsHistory,
+    historyLength,
+    setHistoryLength,
 }: DetailedResortViewPropsWithUnits): JSX.Element {
     const { t } = useLanguage();
 
@@ -163,16 +178,30 @@ export function DetailedResortView({
         [selectedModels, effectiveCoords.lat, effectiveCoords.lon]
     );
 
-    // Fetch weather data using effective coordinates
-    const { data, unavailableModels, loadingModels, timezoneInfo, elevation: forecastElevation } = useDetailedWeatherData({
+    // Fetch the forecast, or History, at the effective coordinates. Only the one on show fetches;
+    // the other keeps what it has for switching back
+    const point = {
         latitude: effectiveCoords.lat,
         longitude: effectiveCoords.lon,
         // Left out for a Custom location with no Custom elevation: Open-Meteo forecasts it at its Ground elevation and reports that back
         elevation: customLocation ? customElevation ?? undefined : resolvedElevation,
-        models: coveringModels,
         variables: selectedVariables,
         forecastDays,
+    };
+    const forecast = useDetailedWeatherData({ ...point, models: isHistory ? NO_MODELS : coveringModels });
+    const history = useDetailedWeatherData({
+        ...point,
+        models: isHistory ? coveringModels : NO_MODELS,
+        historyDays: historyFetchDays(historyLength),
     });
+    const { data: shownData, unavailableModels, loadingModels, timezoneInfo } = isHistory ? history : forecast;
+    // History cut to the History length, which can be shorter than the days it was fetched for
+    const data = useMemo(
+        () => (isHistory ? lastDaysOfHistory(shownData, historyLength, timezoneInfo?.timezone) : shownData),
+        [isHistory, shownData, historyLength, timezoneInfo?.timezone]
+    );
+    // Both are for the same point and height, so either one's will do until the one on show has arrived
+    const forecastElevation = isHistory ? history.elevation ?? forecast.elevation : forecast.elevation ?? history.elevation;
     const reportedGroundElevation = customElevation === null ? forecastElevation : null;
     const groundElevation = customLocation ? reportedGroundElevation ?? rememberedGroundElevation : null;
     // The height a Custom location is forecast at, once known
@@ -303,6 +332,7 @@ export function DetailedResortView({
                     <h1 className="text-2xl font-bold text-theme-textPrimary">
                         {customLocation ? 'Custom Location' : resortName}
                     </h1>
+                    {isHistory && <HistoryBadge days={historyLength} />}
                     {customLocation && (
                         <>
                             <button
@@ -418,6 +448,10 @@ export function DetailedResortView({
                         resolvedElevation={resolvedElevation}
                         forecastDays={forecastDays}
                         setForecastDays={setForecastDays}
+                        isHistory={isHistory}
+                        setIsHistory={setIsHistory}
+                        historyLength={historyLength}
+                        setHistoryLength={setHistoryLength}
                         location={location}
                         isChartLocked={isChartLocked}
                         setIsChartLocked={setIsChartLocked}

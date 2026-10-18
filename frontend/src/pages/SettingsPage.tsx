@@ -490,6 +490,32 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                             resetThemePreview={resetThemePreview}
                         />
                     </SettingSection>
+
+                    {/* History is one switch and one History length for the Main page and the Detailed view */}
+                    <SettingSection title="History" icon={icons.history}>
+                        <div className="settings-toggles">
+                            <Toggle
+                                label="History"
+                                hint="the past days instead of the forecast, until you leave"
+                                isEnabled={isHistory}
+                                onToggle={setIsHistory}
+                                icon={icons.history}
+                            />
+                        </div>
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">History length</span>
+                            <div className="settings-options-row">
+                                {HISTORY_LENGTHS.map(days => (
+                                    <OptionButton
+                                        key={days}
+                                        label={`${days} days`}
+                                        isSelected={historyLength === days}
+                                        onClick={() => setHistoryLength(days)}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    </SettingSection>
                 </SettingGroup>
 
                 <SettingGroup id="settings-main-page">
@@ -565,31 +591,6 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                                 onToggle={setShowDateEnabled}
                                 icon={icons.date}
                             />
-                        </div>
-                    </SettingSection>
-
-                    <SettingSection title="History" icon={icons.history}>
-                        <div className="settings-toggles">
-                            <Toggle
-                                label="History"
-                                hint="the past days instead of the forecast, until you leave"
-                                isEnabled={isHistory}
-                                onToggle={setIsHistory}
-                                icon={icons.history}
-                            />
-                        </div>
-                        <div className="settings-subsection">
-                            <span className="settings-subsection-label">History length</span>
-                            <div className="settings-options-row">
-                                {HISTORY_LENGTHS.map(days => (
-                                    <OptionButton
-                                        key={days}
-                                        label={`${days} days`}
-                                        isSelected={historyLength === days}
-                                        onClick={() => setHistoryLength(days)}
-                                    />
-                                ))}
-                            </div>
                         </div>
                     </SettingSection>
 

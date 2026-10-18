@@ -6,7 +6,8 @@ import { CompactDetailUtilityBar } from './CompactDetailUtilityBar';
 import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
 import { elevationFromUnits, elevationInUnits, formatElevation, maxTypedElevation } from '../../utils/unitConversion';
-import { FORECAST_HORIZONS } from '../../utils/constants';
+import { FORECAST_HORIZONS, HISTORY_LENGTHS } from '../../utils/constants';
+import { HistorySwitch } from '../HistorySwitch';
 
 /** The Elevation menu's width in px (w-48) */
 const ELEVATION_MENU_WIDTH = 192;
@@ -33,6 +34,10 @@ function LargeDetailUtilityBar({
     resolvedElevation,
     forecastDays,
     setForecastDays,
+    isHistory,
+    setIsHistory,
+    historyLength,
+    setHistoryLength,
     location,
     isChartLocked,
     setIsChartLocked,
@@ -48,6 +53,11 @@ function LargeDetailUtilityBar({
     const [showForecastDropdown, setShowForecastDropdown] = useState(false);
     const [showCustomElevationInput, setShowCustomElevationInput] = useState(false);
     const [customElevationValue, setCustomElevationValue] = useState('');
+
+    // While History is on, the days are the History length's rather than the Forecast horizon's
+    const days = isHistory ? historyLength : forecastDays;
+    const setDays = isHistory ? setHistoryLength : setForecastDays;
+    const dayChoices = isHistory ? HISTORY_LENGTHS : FORECAST_HORIZONS;
 
     // Variable selection hook for modal
     const variableSelection = useVariableSelection({
@@ -281,42 +291,46 @@ function LargeDetailUtilityBar({
 
             <div className="h-6 w-px bg-theme-border" />
 
-            {/* Forecast Days Dropdown */}
-            <div className="relative" data-dropdown>
-                <button
-                    onClick={() => {
-                        setShowForecastDropdown(!showForecastDropdown);
-                        setShowElevationDropdown(false);
-                    }}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-background border border-theme-border hover:bg-theme-secondary transition-colors"
-                >
-                    <span className="text-sm text-theme-textSecondary">Forecast:</span>
-                    <span className="text-sm text-theme-textPrimary font-medium">
-                        {forecastDays} Days
-                    </span>
-                    <svg className="w-4 h-4 text-theme-textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                </button>
-                {showForecastDropdown && (
-                    <div className="absolute left-0 z-20 mt-1 w-32 bg-theme-background rounded-lg shadow-lg border border-theme-border p-1">
-                        {FORECAST_HORIZONS.map((days) => (
-                            <button
-                                key={days}
-                                onClick={() => {
-                                    setForecastDays(days);
-                                    setShowForecastDropdown(false);
-                                }}
-                                className={`w-full text-left px-3 py-2 rounded-md text-sm ${forecastDays === days
-                                        ? 'bg-theme-secondary text-theme-textPrimary'
-                                        : 'text-theme-textSecondary hover:bg-theme-secondary hover:text-theme-textPrimary'
-                                    }`}
-                            >
-                                {days} Days
-                            </button>
-                        ))}
-                    </div>
-                )}
+            {/* History, and the days shown: the Forecast horizon, or the History length while History is on.
+                Together, so they wrap onto a phone's next line as one */}
+            <div className="flex items-center gap-4">
+                <HistorySwitch isHistory={isHistory} setIsHistory={setIsHistory} />
+                <div className="relative" data-dropdown>
+                    <button
+                        onClick={() => {
+                            setShowForecastDropdown(!showForecastDropdown);
+                            setShowElevationDropdown(false);
+                        }}
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-background border border-theme-border hover:bg-theme-secondary transition-colors"
+                    >
+                        <span className="text-sm text-theme-textSecondary">{isHistory ? 'History:' : 'Forecast:'}</span>
+                        <span className="text-sm text-theme-textPrimary font-medium">
+                            {days} Days
+                        </span>
+                        <svg className="w-4 h-4 text-theme-textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    {showForecastDropdown && (
+                        <div className="absolute left-0 z-20 mt-1 w-32 bg-theme-background rounded-lg shadow-lg border border-theme-border p-1">
+                            {dayChoices.map((choice) => (
+                                <button
+                                    key={choice}
+                                    onClick={() => {
+                                        setDays(choice);
+                                        setShowForecastDropdown(false);
+                                    }}
+                                    className={`w-full text-left px-3 py-2 rounded-md text-sm ${days === choice
+                                            ? 'bg-theme-secondary text-theme-textPrimary'
+                                            : 'text-theme-textSecondary hover:bg-theme-secondary hover:text-theme-textPrimary'
+                                        }`}
+                                >
+                                    {choice} Days
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div className="h-6 w-px bg-theme-border" />

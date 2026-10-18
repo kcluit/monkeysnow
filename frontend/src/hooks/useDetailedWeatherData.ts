@@ -11,6 +11,8 @@ export interface UseDetailedWeatherDataProps {
     models: WeatherModel[];
     variables: WeatherVariable[];
     forecastDays: number;
+    /** Fetches History instead of the forecast: this many days up to the current hour */
+    historyDays?: number;
 }
 
 export interface UseDetailedWeatherDataReturn {
@@ -34,7 +36,7 @@ interface ModelRequest {
     controller: AbortController;
 }
 
-/** The forecasts for one point, elevation and length; changing any of them starts a new session. */
+/** The forecasts, or History, for one point, elevation and length; changing any of them starts a new session. */
 interface Session {
     key: string;
     /** Variables already in the data for each model */
@@ -74,10 +76,11 @@ function abortSession(session: Session): void {
 }
 
 /**
- * Keeps the detail view's forecasts loaded, one request per Forecast model.
- * Changing the point, elevation or forecast length starts over. Editing the models
+ * Keeps the detail view's forecasts, or its History, loaded, one request per Forecast model.
+ * Changing the point, elevation or length starts over. Editing the models
  * or variables fetches only what's missing, so charts already drawn stay on screen,
- * and removing or reordering them costs no requests.
+ * and removing or reordering them costs no requests. With no models it fetches nothing
+ * but keeps what it has.
  */
 export function useDetailedWeatherData({
     latitude,
@@ -86,8 +89,14 @@ export function useDetailedWeatherData({
     models,
     variables,
     forecastDays,
+    historyDays,
 }: UseDetailedWeatherDataProps): UseDetailedWeatherDataReturn {
-    const forecastKey = JSON.stringify([latitude, longitude, elevation ?? null, forecastDays]);
+    const forecastKey = JSON.stringify([
+        latitude,
+        longitude,
+        elevation ?? null,
+        historyDays === undefined ? { forecastDays } : { historyDays },
+    ]);
     // Sorted, so reordering models or variables changes nothing
     const modelsKey = [...models].sort().join(',');
     const variablesKey = [...variables].sort().join(',');
@@ -127,7 +136,8 @@ export function useDetailedWeatherData({
                         [...request.variables],
                         forecastDays,
                         'auto',
-                        signal
+                        signal,
+                        historyDays
                     );
                     if (signal.aborted) return;
 
@@ -207,10 +217,16 @@ export function useDetailedWeatherData({
         sessionRef.current = null;
     }, []);
 
+    // Models just asked for are loading from this render, before the effect has started their requests,
+    // so a switch to History never flashes an empty page, which would scroll it to the top
+    const waiting = variables.length > 0
+        ? models.filter((model) => !state.loading.has(model) && !state.data.has(model) && !state.unavailable.has(model))
+        : [];
+
     return {
         data: state.data,
         unavailableModels: state.unavailable,
-        loadingModels: state.loading,
+        loadingModels: waiting.length > 0 ? new Set([...state.loading, ...waiting]) : state.loading,
         timezoneInfo: state.timezoneInfo,
         // Until the effect starts the new Session, the state is the last one's, whose elevation was for another point or height
         elevation: state.key === forecastKey ? state.elevation : null,

@@ -1,6 +1,6 @@
 import type { WeatherModel, WeatherVariable, HourlyDataPoint, TimezoneInfo } from '../types/openMeteo';
 import { getOverlayVariablesFor, hasOverlays } from './chartConfigurations';
-import { fetchWeatherApiWithinBudget } from './openMeteoBudget';
+import { fetchWeatherApiWithinBudget, OPEN_METEO_FORECAST_URL, OPEN_METEO_HISTORICAL_FORECAST_URL } from './openMeteoBudget';
 import { RESORT_LOCATIONS, resolveResortId, type ResortLocation } from '../data/resortLocations';
 
 // DEV MODE: Enable mock data for performance testing
@@ -34,11 +34,14 @@ function isMockModeEnabled(): boolean {
 function generateMockData(
   models: WeatherModel[],
   variables: WeatherVariable[],
-  forecastDays: number
+  forecastDays: number,
+  historyDays?: number
 ): { data: Map<WeatherModel, HourlyDataPoint[]>; timezoneInfo: TimezoneInfo } {
-  const hoursCount = forecastDays * 24;
+  // History ends at the current hour
+  const hoursCount = historyDays ? (historyDays - 1) * 24 + 1 : forecastDays * 24;
   const startTime = new Date();
   startTime.setMinutes(0, 0, 0);
+  if (historyDays) startTime.setTime(startTime.getTime() - (historyDays - 1) * 24 * 60 * 60 * 1000);
 
   const mockData = new Map<WeatherModel, HourlyDataPoint[]>();
 
@@ -144,8 +147,12 @@ function expandVariablesWithOverlays(variables: WeatherVariable[]): WeatherVaria
   return Array.from(expanded);
 }
 
+const HOUR_MS = 3_600_000;
+
 // Fetch weather data from Open-Meteo for multiple models.
 // Without an elevation, Open-Meteo forecasts at its own ground elevation for the point.
+// With `historyDays`, it fetches History instead (docs/adr/0012): that many days up to the current hour,
+// from the Historical Forecast API.
 export async function fetchOpenMeteoData(
   latitude: number,
   longitude: number,
@@ -154,7 +161,8 @@ export async function fetchOpenMeteoData(
   variables: WeatherVariable[],
   forecastDays: number = 14,
   timezone: string = 'auto',
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  historyDays?: number
 ): Promise<FetchOpenMeteoDataResult> {
   // Expand variables to include overlay variables
   const expandedVariables = expandVariablesWithOverlays(variables);
@@ -165,8 +173,16 @@ export async function fetchOpenMeteoData(
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 100));
     if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
-    return { ...generateMockData(models, expandedVariables, forecastDays), elevation: elevation ?? 1650 };
+    return { ...generateMockData(models, expandedVariables, forecastDays, historyDays), elevation: elevation ?? 1650 };
   }
+
+  // History is the days before the point's own today and today itself, which Open-Meteo
+  // fills to midnight from the latest run, so it ends at the current hour
+  const days = historyDays
+    ? { past_days: historyDays - 1, forecast_days: 1 }
+    : { forecast_days: forecastDays };
+  const url = historyDays ? OPEN_METEO_HISTORICAL_FORECAST_URL : OPEN_METEO_FORECAST_URL;
+  const until = historyDays ? Math.floor(Date.now() / HOUR_MS) * HOUR_MS : Infinity;
 
   const params = {
     latitude,
@@ -175,13 +191,13 @@ export async function fetchOpenMeteoData(
     ...(elevation !== undefined ? { elevation } : {}),
     hourly: expandedVariables,
     models,
-    forecast_days: forecastDays,
+    ...days,
     timezone,
   };
 
   try {
     // Detail-view requests go ahead of the main page's queue in the Fetch budget
-    const responses = await fetchWeatherApiWithinBudget(params, 'detail', signal);
+    const responses = await fetchWeatherApiWithinBudget(params, 'detail', signal, url);
     const result = new Map<WeatherModel, HourlyDataPoint[]>();
 
     // Extract timezone info and elevation from first response
@@ -211,7 +227,10 @@ export async function fetchOpenMeteoData(
       const timeStart = Number(hourly.time());
       const timeEnd = Number(hourly.timeEnd());
       const interval = hourly.interval();
-      const numPoints = (timeEnd - timeStart) / interval;
+      const numPoints = Math.min(
+        (timeEnd - timeStart) / interval,
+        Math.max(0, Math.floor((until / 1000 - timeStart) / interval) + 1)
+      );
 
       const dataPoints: HourlyDataPoint[] = [];
 
@@ -249,6 +268,44 @@ export async function fetchOpenMeteoData(
     }
     throw error;
   }
+}
+
+/**
+ * History cut to its last `days` days in the point's own time zone, today so far the last of them,
+ * for a History length shorter than the days it was fetched for. Every model is cut at the same
+ * local midnight, so their hours stay aligned.
+ */
+export function lastDaysOfHistory(
+  data: ReadonlyMap<WeatherModel, HourlyDataPoint[]>,
+  days: number,
+  timeZone: string | undefined
+): ReadonlyMap<WeatherModel, HourlyDataPoint[]> {
+  let earliest = Infinity;
+  let latest = -Infinity;
+  for (const points of data.values()) {
+    if (points.length === 0) continue;
+    earliest = Math.min(earliest, points[0].timestamp);
+    latest = Math.max(latest, points[points.length - 1].timestamp);
+  }
+  if (earliest > latest) return data;
+
+  // Back an hour at a time from the latest, to the first hour of the earliest day kept
+  const dayOf = new Intl.DateTimeFormat('en-CA', { ...(timeZone ? { timeZone } : {}), year: 'numeric', month: '2-digit', day: '2-digit' });
+  let from = latest;
+  let day = dayOf.format(latest);
+  let daysSeen = 1;
+  for (let t = latest - HOUR_MS; t >= earliest; t -= HOUR_MS) {
+    const tDay = dayOf.format(t);
+    if (tDay !== day) {
+      if (daysSeen === days) break;
+      daysSeen++;
+      day = tDay;
+    }
+    from = t;
+  }
+  if (from <= earliest) return data;
+
+  return new Map([...data].map(([model, points]) => [model, points.filter((point) => point.timestamp >= from)]));
 }
 
 // Calculate median across selected models for a specific variable at each time point
