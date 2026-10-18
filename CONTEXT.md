@@ -15,7 +15,7 @@ The way of showing the **Main page** in which each card is a **Graph** instead o
 _Avoid_: chart view, graph mode
 
 **History**:
-A switch on the **Main page** that shows the **Selection**'s past days instead of the days ahead, in any way of showing it, **Graph view** included: the days of the **History length** in the local time of the point being forecast, up to the current hour, so its last day is today so far. It is never remembered: every visit opens on the forecast. The **Detailed view** always shows the forecast, even when opened from History. The past is what each **Card model** forecast in the first hours of its runs, not what was measured.
+A switch, one for both the **Main page** and the **Detailed view**, that shows past days instead of the days ahead: the **Selection**'s on the **Main page**, in any way of showing it, **Graph view** included, and every **Chart**'s in the **Detailed view**. They are the days of the **History length** in the local time of the point being forecast, up to the current hour, so the last day is today so far. It is never remembered: every visit opens on the forecast. The past is what each **Forecast model** forecast in the first hours of its runs (a card's **Card model**, a Chart's **Comparison models**), not what was measured.
 _Avoid_: historical view, past view (it is not a view of its own), archive, observations
 
 **Graph**:
@@ -163,7 +163,7 @@ How many days ahead a forecast is asked for: fourteen on the **Main page**, and 
 _Avoid_: forecast days, forecast length
 
 **History length**:
-How many days **History** shows: 3, 7, 14 or 30, fourteen unless the visitor picks another. Today so far is one of them, so fourteen is today and the thirteen days before it. It is the same on every card, whatever its **Card model**'s **Range**.
+How many days **History** shows: 3, 7, 14 or 30, fourteen unless the visitor picks another. Today so far is one of them, so fourteen is today and the thirteen days before it. It is one choice for every card and the **Detailed view**, whatever a model's **Range**, and it leaves the **Forecast horizon** alone.
 _Avoid_: lookback, past days, history horizon (a horizon is ahead)
 
 **Selected models**:
