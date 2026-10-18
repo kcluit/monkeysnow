@@ -10,7 +10,13 @@
  */
 
 import { RESORT_LOCATIONS, continentOfCountry } from '../data/resortLocations';
-import { fetchWeatherApiWithinBudget, isNoDataError, type FetchPriority } from './openMeteoBudget';
+import {
+    OPEN_METEO_FORECAST_URL,
+    OPEN_METEO_HISTORICAL_FORECAST_URL,
+    fetchWeatherApiWithinBudget,
+    isNoDataError,
+    type FetchPriority,
+} from './openMeteoBudget';
 import { cardModelAt, markGap, recommendedCardModel } from './cardModels';
 import { getSavedLocation, isSavedLocationId } from './savedLocations';
 import { SNOW_ESTIMATE_VERSION, SNOW_QUALITIES, addPrecipitation, dominantQuality, estimateHour, noPrecipitationByQuality, surfacePressureOr } from './snowQuality';
@@ -25,6 +31,15 @@ type ApiResponse = Awaited<ReturnType<typeof fetchWeatherApiWithinBudget>>[numbe
  * as one call, so this is as far as it goes without costing more of the Fetch budget.
  */
 const FORECAST_DAYS = 14;
+
+/**
+ * How many days History is fetched for: at least as many as the Forecast horizon, which
+ * Open-Meteo counts as one call, so the shorter History lengths cost no less and switching
+ * between them needs no fetch (docs/adr/0012).
+ */
+export function historyFetchDays(historyLength: number): number {
+    return Math.max(FORECAST_DAYS, historyLength);
+}
 
 /** Resorts per request; 25 resorts x 3 Elevation bands = at most 75 locations. */
 const RESORTS_PER_REQUEST = 25;
@@ -141,10 +156,14 @@ function planFor(resortId: string, point: ForecastPoint | null): RequestPlan {
     };
 }
 
-/** Open-Meteo calls one Resort or Saved location costs: one per elevation, plus one for a separate freezing level. */
-export function resortCallWeight(resortId: string): number {
+/**
+ * Open-Meteo calls one Resort or Saved location costs: one per elevation, plus one for a separate
+ * freezing level, each counting as more past 14 days of History.
+ */
+export function resortCallWeight(resortId: string, historyDays?: number): number {
     const point = forecastPointOf(resortId);
-    return (point?.elevations.length ?? 3) + (planFor(resortId, point).freezingModel ? 1 : 0);
+    const requests = (point?.elevations.length ?? 3) + (planFor(resortId, point).freezingModel ? 1 : 0);
+    return requests * Math.max(1, (historyDays ?? FORECAST_DAYS) / FORECAST_DAYS);
 }
 
 /**
@@ -177,6 +196,51 @@ export function hasCurrentEstimate(data: ResortData): boolean {
 export function isForecastCurrent(resortId: string, data: ResortData): boolean {
     if (!isSavedLocationId(resortId)) return true;
     return getSavedLocation(resortId)?.elevation === data.mid.metadata.elevation;
+}
+
+/** Epoch seconds of the local midnight a date ("2026-10-18") starts at in a time zone */
+function midnightOf(date: string, timeZone: string | undefined): number {
+    const wallClock = Date.parse(`${date}T00:00:00Z`) / 1000;
+    if (!timeZone) return wallClock;
+    // The offset at the wall clock read as UTC can be on the far side of a daylight-saving switch; the second guess can't
+    const guess = wallClock - (utcOffsetAt(timeZone, wallClock) ?? 0);
+    return wallClock - (utcOffsetAt(timeZone, guess) ?? 0);
+}
+
+/** The hours from `from` (epoch seconds) on, as views onto the same arrays */
+function hoursFrom(hours: HourlyForecast, from: number): HourlyForecast {
+    const skip = Math.max(0, Math.ceil((from - hours.start) / hours.interval));
+    if (skip === 0) return hours;
+    return {
+        ...hours,
+        start: hours.start + skip * hours.interval,
+        temperature: hours.temperature.subarray(skip),
+        snowfall: hours.snowfall.subarray(skip),
+        snowEstimate: hours.snowEstimate.subarray(skip),
+        precipitation: hours.precipitation.subarray(skip),
+        quality: hours.quality.subarray(skip),
+        windSpeed: hours.windSpeed?.subarray(skip),
+        windDirection: hours.windDirection?.subarray(skip),
+        weatherCode: hours.weatherCode?.subarray(skip),
+    };
+}
+
+/**
+ * History cut to its last `days` days, today so far the last of them, for a History length
+ * shorter than the days it was fetched for. Its hours start at the first day's local midnight.
+ */
+export function lastDaysOf(data: ResortData, days: number): ResortData {
+    const cut = (band: ElevationForecast): ElevationForecast => {
+        const dates = Object.keys(band.forecast).sort();
+        if (dates.length <= days) return band;
+        const kept = dates.slice(-days);
+        return {
+            ...band,
+            forecast: Object.fromEntries(kept.map(date => [date, band.forecast[date]])),
+            hours: band.hours && hoursFrom(band.hours, midnightOf(kept[0], data.timeZone)),
+        };
+    };
+    return { ...data, bot: cut(data.bot), mid: cut(data.mid), top: cut(data.top) };
 }
 
 /**
@@ -219,11 +283,16 @@ function freezingSeriesOf(response: ApiResponse | undefined, variableIndex: numb
     return { values, timeStart: Number(hourly.time()), interval: hourly.interval() };
 }
 
+/** How many of the hours from `start` come no later than `until` (epoch seconds) */
+const hoursUntil = (start: number, interval: number, until: number): number =>
+    Math.max(0, Math.floor((until - start) / interval) + 1);
+
 /**
- * One location's hours as its Graph draws them, ending at the last hour inside the model's Range.
- * The arrays are copies: the response's are views onto one buffer holding every location's hours.
+ * One location's hours as its Graph draws them, ending at the last hour inside the model's Range,
+ * or for History at `until`. The arrays are copies: the response's are views onto one buffer
+ * holding every location's hours.
  */
-function hourlyForecastOf(response: ApiResponse): HourlyForecast | null {
+function hourlyForecastOf(response: ApiResponse, until: number): HourlyForecast | null {
     const hourly = response.hourly();
     if (!hourly) return null;
     const windSpeed = hourly.variables(0)!.valuesArray()!;
@@ -236,12 +305,14 @@ function hourlyForecastOf(response: ApiResponse): HourlyForecast | null {
     const snowfall = hourly.variables(8)!.valuesArray()!;
     const elevation = response.elevation();
 
-    let length = temperature.length;
+    const start = Number(hourly.time());
+    const interval = hourly.interval();
+    let length = Math.min(temperature.length, hoursUntil(start, interval, until));
     while (length > 0 && !Number.isFinite(temperature[length - 1])) length--;
 
     const hours: HourlyForecast = {
-        start: Number(hourly.time()),
-        interval: hourly.interval(),
+        start,
+        interval,
         temperature: temperature.slice(0, length),
         snowfall: snowfall.slice(0, length),
         snowEstimate: new Float32Array(length),
@@ -329,8 +400,8 @@ function localClockOf(response: ApiResponse, firstHour: number, lastHour: number
     return (t) => new Date((t + (t < after ? startOffset : endOffset)) * 1000);
 }
 
-/** Processes a single location's hourly data into AM/PM/NIGHT periods per local date. */
-function processLocation(mainResp: ApiResponse | undefined, freezing: FreezingSeries | null): Record<string, DayData> | null {
+/** Processes a single location's hourly data into AM/PM/NIGHT periods per local date, up to `until` (epoch seconds). */
+function processLocation(mainResp: ApiResponse | undefined, freezing: FreezingSeries | null, until: number): Record<string, DayData> | null {
     const hourly = mainResp?.hourly();
     if (!mainResp || !hourly) {
         console.warn('Skipping location: missing response or hourly data');
@@ -351,7 +422,7 @@ function processLocation(mainResp: ApiResponse | undefined, freezing: FreezingSe
     const dailyChunks: Record<string, Record<Period, { hourly: HourData[]; freezingData: number[] }>> = {};
     const startTime = Number(hourly.time());
     const interval = hourly.interval();
-    const length = (Number(hourly.timeEnd()) - startTime) / interval;
+    const length = Math.min((Number(hourly.timeEnd()) - startTime) / interval, hoursUntil(startTime, interval, until));
     const elevation = mainResp.elevation();
     const localTime = localClockOf(mainResp, startTime, startTime + (length - 1) * interval);
 
@@ -386,7 +457,8 @@ function processLocation(mainResp: ApiResponse | undefined, freezing: FreezingSe
 
     // Group Freezing Data (Hourly)
     if (freezing) {
-        for (let i = 0; i < freezing.values.length; i++) {
+        const freezingLength = Math.min(freezing.values.length, hoursUntil(freezing.timeStart, freezing.interval, until));
+        for (let i = 0; i < freezingLength; i++) {
             const dateObj = localTime(freezing.timeStart + i * freezing.interval);
             const dateKey = dateObj.toISOString().split('T')[0];
             if (dailyChunks[dateKey] && Number.isFinite(freezing.values[i])) {
@@ -454,11 +526,15 @@ function processLocation(mainResp: ApiResponse | undefined, freezing: FreezingSe
  *
  * Where a Country model turns out to have no data, those resorts are fetched again
  * from their Recommended card model, and remembered so later fetches go straight there.
+ *
+ * With `historyDays`, it fetches History instead: that many days up to the current hour,
+ * today so far the last of them, from the Historical Forecast API (docs/adr/0012).
  */
 export async function fetchResortForecasts(
     resortIds: string[],
     priority: FetchPriority,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    historyDays?: number
 ): Promise<Record<string, ResortData>> {
     const resorts = resortIds.flatMap(id => {
         const point = forecastPointOf(id);
@@ -469,20 +545,20 @@ export async function fetchResortForecasts(
     const plan = planFor(resorts[0].id, resorts[0].point);
     let result: Record<string, ResortData>;
     try {
-        result = await fetchGroup(resorts, plan, priority, signal);
+        result = await fetchGroup(resorts, plan, priority, signal, historyDays);
     } catch (error) {
         // Open-Meteo refuses the whole request when the model has no data at any one point
         // in it, and Coverage boxes are drawn generously: halve the group until it's found
         if (!plan.isCountryModel || !isNoDataError(error)) throw error;
         if (resorts.length === 1) {
             markGap(plan.model, resorts[0].id);
-            return fetchResortForecasts([resorts[0].id], priority, signal);
+            return fetchResortForecasts([resorts[0].id], priority, signal, historyDays);
         }
         const ids = resorts.map(r => r.id);
         const half = Math.ceil(ids.length / 2);
         const [first, second] = await Promise.all([
-            fetchResortForecasts(ids.slice(0, half), priority, signal),
-            fetchResortForecasts(ids.slice(half), priority, signal),
+            fetchResortForecasts(ids.slice(0, half), priority, signal, historyDays),
+            fetchResortForecasts(ids.slice(half), priority, signal, historyDays),
         ]);
         return { ...first, ...second };
     }
@@ -493,7 +569,7 @@ export async function fetchResortForecasts(
         empty.forEach(id => markGap(plan.model, id));
         // Their Recommended card models may differ (a Country model can be chosen in several countries)
         for (const group of groupIntoRequests(empty)) {
-            Object.assign(result, await fetchResortForecasts(group, priority, signal));
+            Object.assign(result, await fetchResortForecasts(group, priority, signal, historyDays));
         }
     }
     return result;
@@ -503,10 +579,19 @@ async function fetchGroup(
     resorts: { id: string; point: ForecastPoint }[],
     { model, freezingModel }: RequestPlan,
     priority: FetchPriority,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    historyDays?: number
 ): Promise<Record<string, ResortData>> {
     const lats = resorts.map(r => r.point.lat);
     const lons = resorts.map(r => r.point.lon);
+
+    // History is the days before each point's own today and today itself, which Open-Meteo
+    // fills to midnight from the latest run, so it ends at the current hour
+    const days = historyDays
+        ? { past_days: historyDays - 1, forecast_days: 1 }
+        : { forecast_days: FORECAST_DAYS };
+    const url = historyDays ? OPEN_METEO_HISTORICAL_FORECAST_URL : OPEN_METEO_FORECAST_URL;
+    const until = historyDays ? Math.floor(Date.now() / 3_600_000) * 3600 : Infinity;
 
     const mainParams = {
         // One location per elevation: Bot, Mid and Top for a Resort, one for a Saved location
@@ -515,21 +600,21 @@ async function fetchGroup(
         elevation: resorts.flatMap(r => r.point.elevations),
         hourly: freezingModel ? MAIN_VARIABLES : [...MAIN_VARIABLES, 'freezing_level_height'],
         models: model,
-        forecast_days: FORECAST_DAYS,
+        ...days,
         timezone: 'auto',
     };
 
     const [mainResponses, freezingResponses] = await Promise.all([
-        fetchWeatherApiWithinBudget(mainParams, priority, signal),
+        fetchWeatherApiWithinBudget(mainParams, priority, signal, url),
         freezingModel
             ? fetchWeatherApiWithinBudget({
                 latitude: lats,
                 longitude: lons,
                 models: freezingModel,
                 hourly: ['freezing_level_height'],
-                forecast_days: FORECAST_DAYS,
+                ...days,
                 timezone: 'auto',
-            }, priority, signal)
+            }, priority, signal, url)
             : Promise.resolve(null),
     ]);
 
@@ -550,23 +635,28 @@ async function fetchGroup(
 
         const bands: ElevationForecast[] = [];
         for (const [j, elevation] of elevations.entries()) {
-            const forecast = processLocation(responses[j], freezing);
+            const forecast = processLocation(responses[j], freezing, until);
             if (!forecast) {
                 console.warn(`Incomplete data for ${id}, skipping resort`);
                 return;
             }
-            bands.push({ metadata: { elevation, lat, lon }, forecast, hours: hourlyForecastOf(responses[j]) ?? undefined });
+            bands.push({ metadata: { elevation, lat, lon }, forecast, hours: hourlyForecastOf(responses[j], until) ?? undefined });
         }
 
         // A Saved location's one forecast stands in for all three bands
         const [bot, mid = bot, top = bot] = bands;
         const freezingLevel: HourlySeries | undefined = freezing
-            ? { start: freezing.timeStart, interval: freezing.interval, values: freezing.values.slice() }
+            ? {
+                start: freezing.timeStart,
+                interval: freezing.interval,
+                values: freezing.values.slice(0, hoursUntil(freezing.timeStart, freezing.interval, until)),
+            }
             : undefined;
         result[id] = {
             bot, mid, top, fetchedAt, model, freezingLevel,
             timeZone: responses[0].timezone() ?? undefined,
             estimateVersion: SNOW_ESTIMATE_VERSION,
+            historyDays,
         };
     });
 

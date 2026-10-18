@@ -82,7 +82,7 @@ export function GraphCard({ resort, data, elevation, snowfallMode, units, theme,
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                     <span className="text-sm font-medium">
                         <span className="text-theme-accent">Totals:</span>
-                        <span className="text-theme-textPrimary"> Next 3 Days: {formatSnow(totals.next3Days, units)} | Next 7 Days: {formatSnow(totals.next7Days, units)}</span>
+                        <span className="text-theme-textPrimary"> {resort.isHistory ? 'Past' : 'Next'} 3 Days: {formatSnow(totals.threeDays, units)} | {resort.isHistory ? 'Past' : 'Next'} 7 Days: {formatSnow(totals.sevenDays, units)}</span>
                     </span>
                     {webcamUrl && (
                         <a

@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback, type ReactNode } from 'react';
+import { useRef, useState, useEffect, useLayoutEffect, useCallback, type ReactNode } from 'react';
 import { calculateSnowTotals, getSnowConditionFromQuality } from '../../utils/weather';
 import { formatSnow } from '../../utils/unitConversion';
 import { getTemperatureStyle, getWindClass, shortWeatherText, showsAmount } from './cardUtils';
@@ -71,6 +71,12 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
             observer.disconnect();
         };
     }, [updateScrollState]);
+
+    // History's latest days are on the right, so it opens scrolled to them
+    useLayoutEffect(() => {
+        const el = scrollContainerRef.current;
+        if (el) el.scrollLeft = resort.isHistory ? el.scrollWidth : 0;
+    }, [resort.isHistory, resort.days.length]);
 
     // One day's three columns on a wide screen
     const scrollByDay = (direction: 1 | -1): void => {
@@ -163,7 +169,7 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
                 </div>
                 <div className="text-xs sm:text-sm font-medium">
                     <span className="text-theme-accent">Totals:</span>
-                    <span className="text-theme-textPrimary"> Next 3 Days: {formatSnow(totals.next3Days, unitSystem)} | Next 7 Days: {formatSnow(totals.next7Days, unitSystem)}</span>
+                    <span className="text-theme-textPrimary"> {resort.isHistory ? 'Past' : 'Next'} 3 Days: {formatSnow(totals.threeDays, unitSystem)} | {resort.isHistory ? 'Past' : 'Next'} 7 Days: {formatSnow(totals.sevenDays, unitSystem)}</span>
                 </div>
             </div>
 

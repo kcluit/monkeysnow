@@ -48,6 +48,13 @@ export const defaultTemperatureMetric: TemperatureMetric = "max";
 export const FORECAST_HORIZONS: readonly number[] = [1, 3, 7, 14, 16];
 
 /**
+ * The History lengths a visitor can pick, in days, today so far one of them. Past 14 days each
+ * card costs more calls; 30 is about twice as many (docs/adr/0012).
+ */
+export const HISTORY_LENGTHS: readonly number[] = [3, 7, 14, 30];
+export const defaultHistoryLength = 14;
+
+/**
  * Fallback function to get display name from API ID.
  * Simply converts kebab-case to Title Case.
  *

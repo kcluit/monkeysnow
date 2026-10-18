@@ -19,7 +19,7 @@ import {
     withTerrainColouring,
     type MapLayers,
 } from '../utils/mapLayers';
-import { FORECAST_HORIZONS } from '../utils/constants';
+import { FORECAST_HORIZONS, HISTORY_LENGTHS } from '../utils/constants';
 import { elevationFromUnits, elevationInUnits, formatElevation, maxTypedElevation } from '../utils/unitConversion';
 import type {
     ElevationLevel,
@@ -98,6 +98,11 @@ export interface SettingsPageProps {
     setIsReversed: (r: boolean) => void;
     viewMode: ViewMode;
     setViewMode: (m: ViewMode) => void;
+    // History
+    isHistory: boolean;
+    setIsHistory: (on: boolean) => void;
+    historyLength: number;
+    setHistoryLength: (days: number) => void;
     selectedTemperatureMetric: TemperatureMetric;
     setSelectedTemperatureMetric: (m: TemperatureMetric) => void;
     snowfallEstimateMode: SnowfallEstimateMode;
@@ -411,6 +416,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
         selectedSortDay, setSelectedSortDay, sortDayData,
         isReversed, setIsReversed,
         viewMode, setViewMode,
+        isHistory, setIsHistory, historyLength, setHistoryLength,
         selectedTemperatureMetric, setSelectedTemperatureMetric,
         snowfallEstimateMode, setSnowfallEstimateMode,
         openCardModels,
@@ -559,6 +565,31 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                                 onToggle={setShowDateEnabled}
                                 icon={icons.date}
                             />
+                        </div>
+                    </SettingSection>
+
+                    <SettingSection title="History" icon={icons.history}>
+                        <div className="settings-toggles">
+                            <Toggle
+                                label="History"
+                                hint="the past days instead of the forecast, until you leave"
+                                isEnabled={isHistory}
+                                onToggle={setIsHistory}
+                                icon={icons.history}
+                            />
+                        </div>
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">History length</span>
+                            <div className="settings-options-row">
+                                {HISTORY_LENGTHS.map(days => (
+                                    <OptionButton
+                                        key={days}
+                                        label={`${days} days`}
+                                        isSelected={historyLength === days}
+                                        onClick={() => setHistoryLength(days)}
+                                    />
+                                ))}
+                            </div>
                         </div>
                     </SettingSection>
 

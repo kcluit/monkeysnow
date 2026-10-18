@@ -18,6 +18,8 @@ export function CompactUtilityBar({
     setSelectedSortDay,
     viewMode,
     setViewMode,
+    isHistory,
+    setIsHistory,
     isReversed,
     setIsReversed,
     sortDayData,
@@ -109,6 +111,21 @@ export function CompactUtilityBar({
                     className="compact-bar-text text-theme-textSecondary hover:text-theme-accent transition-colors"
                 >
                     {getViewModeText()}
+                </button>
+
+                <span className="compact-bar-separator">|</span>
+
+                {/* History - On or off, in the accent while on */}
+                <button
+                    onClick={() => setIsHistory(!isHistory)}
+                    aria-pressed={isHistory}
+                    title={isHistory ? 'Back to the forecast' : 'Show the past days instead of the forecast'}
+                    className={`compact-bar-text transition-colors ${isHistory
+                        ? 'text-theme-accent'
+                        : 'text-theme-textSecondary hover:text-theme-textPrimary hover:font-bold'
+                        }`}
+                >
+                    History
                 </button>
 
                 {/* Desktop: Sort controls inline */}

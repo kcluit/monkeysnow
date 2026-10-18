@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback, MouseEvent } from 'react';
+import { useRef, useState, useEffect, useLayoutEffect, useCallback, MouseEvent } from 'react';
 import { webcamUrls } from '../../utils/constants';
 import { calculateDayStats, formatWeatherText, getTemperatureStyle, getSnowClass, getWindClass, showsAmount } from './cardUtils';
 import { formatSnow, formatWind } from '../../utils/unitConversion';
@@ -30,6 +30,12 @@ export function CompactCard({ resort, temperatureMetric = 'max', showDate = fals
             observer.disconnect();
         };
     }, [updateScrollState]);
+
+    // History's latest days are on the right, so it opens scrolled to them
+    useLayoutEffect(() => {
+        const el = scrollContainerRef.current;
+        if (el) el.scrollLeft = resort.isHistory ? el.scrollWidth : 0;
+    }, [resort.isHistory, resort.days.length]);
 
     const webcamUrl = webcamUrls[resort.id];
 

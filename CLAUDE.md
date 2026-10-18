@@ -20,7 +20,7 @@ npm run dev
 npm run build
 ```
 
-### Test (Vitest; the only tests are the snow estimate's, `frontend/src/utils/snowQuality.test.ts`)
+### Test (Vitest: the snow estimate's, `frontend/src/utils/snowQuality.test.ts`, and History's sums, `history.test.ts`, which stubs `window` because `cardModels.ts` and `savedLocations.ts` listen for storage changes as they load)
 ```bash
 npm test
 ```
@@ -49,6 +49,12 @@ npm test
 - `hooks/useWeatherData.ts` - keeps the Selection's forecasts loaded: IndexedDB cache first, never-loaded resorts before stale ones, 3-hour Freshness window, re-checked every 5 minutes; in Graph view a forecast cached before hours were kept counts as never-loaded, and one estimated under an earlier `SNOW_ESTIMATE_VERSION` counts as stale
 - `utils/openMeteoClient.ts` + `hooks/useDetailedWeatherData.ts` - the multi-model Detailed view
 - The Selection cap is `MAX_SELECTED_RESORTS` (300) in `hooks/useResortHierarchy.ts`
+
+### History (see docs/adr/0012-history-is-the-card-models-own-early-hours.md)
+- The Main page's switch (`isHistory` in `App.tsx`, React state, so never remembered) shows each card's past days in every view mode; the Detailed view always shows the forecast. It is in both utility bars, the command palette and the Settings page's Main page group, with the History length (3, 7, 14 or 30 days, `HISTORY_LENGTHS`, localStorage `historyLength`)
+- `fetchResortForecasts(..., historyDays)` fetches it from the Historical Forecast API (`past_days` = days − 1 and `forecast_days` = 1, each point's own local days), cut at the hour it was fetched; `historyFetchDays()` asks for at least 14 days, which Open-Meteo counts as one call, so 3, 7 and 14 share a fetch and `lastDaysOf()` cuts it to the History length
+- `App.tsx` runs `useWeatherData` twice, for the forecast and for History (`historyDays`), giving the one not on show no resorts, so only the shown one fetches and switching back is instant; History is cached under `history:<id>` and counts as stale when fetched for fewer days than it needs
+- A processed History card (`ProcessedResortData.isHistory`) has its days oldest first, today so far last, and opens scrolled to the right; sorting and the totals count days from today (`daysFromToday()`), so `SortDay`'s 'next3days' is History's latest 3 days. History keeps its own sort day (`historySortDay`), adding 'allDays' (Past N days) above 7 days, and `historySortDayWithin()` falls back to the latest 3 days for a choice the History length doesn't offer
 
 ### First visit (see docs/adr/0002-locate-first-time-visitors-with-a-netlify-edge-function.md)
 - `utils/starterResort.ts` picks the Starter resort: the resort page landed on, else the nearest to the visitor, else random

@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { processResortData } from '../utils/weather';
+import { daysFromToday, processResortData } from '../utils/weather';
 import { RESORT_LOCATIONS } from '../data/resortLocations';
 import type {
   AllWeatherData,
@@ -113,45 +113,47 @@ export function useResortFiltering(
     };
 
     // PRE-COMPUTE all resort data ONCE to avoid O(N log N) calls to expensive processResortData
-    // This reduces complexity from O(N log N × D × P) to O(N × D × P)
-    const resortDataMap = new Map<string, ReturnType<typeof processResortData>>();
+    // This reduces complexity from O(N log N × D × P) to O(N × D × P).
+    // Each resort's days nearest today first, as the sort day counts them
+    const resortDaysMap = new Map<string, DayForecast[]>();
     for (const resort of resorts) {
-      resortDataMap.set(resort, processResortData(allWeatherData, resort, selectedElevation, temperatureMetric, snowfallEstimateMode, unitSystem));
+      const resortData = processResortData(allWeatherData, resort, selectedElevation, temperatureMetric, snowfallEstimateMode, unitSystem);
+      if (resortData) resortDaysMap.set(resort, daysFromToday(resortData));
     }
 
     // Resorts without a forecast for the sort day (still queued, failed, or a shorter model) go last:
     // a comparator calling them equal to every other resort would scramble the order of the rest
     const canCompare = (resort: string): boolean => {
-      const resortData = resortDataMap.get(resort);
-      return Boolean(resortData && (typeof selectedSortDay === 'string' || resortData.days[selectedSortDay]));
+      const days = resortDaysMap.get(resort);
+      return Boolean(days && (typeof selectedSortDay === 'string' || days[selectedSortDay]));
     };
     const withoutData = resorts.filter((resort) => !canCompare(resort));
 
     let sortedResorts = resorts.filter(canCompare).sort((a, b) => {
-      const resortDataA = resortDataMap.get(a);  // O(1) lookup
-      const resortDataB = resortDataMap.get(b);  // O(1) lookup
+      const daysA = resortDaysMap.get(a);  // O(1) lookup
+      const daysB = resortDaysMap.get(b);  // O(1) lookup
 
-      if (!resortDataA || !resortDataB) return 0;
+      if (!daysA || !daysB) return 0;
 
       // Handle multi-day aggregation sorting
       if (typeof selectedSortDay === 'string') {
-        const numDays = selectedSortDay === 'next3days' ? 3 : 7;
+        const numDays = selectedSortDay === 'next3days' ? 3 : selectedSortDay === 'next7days' ? 7 : Infinity;
 
         switch (sortBy) {
           case 'temperature':
-            return getAvgTempMultipleDays(resortDataA.days, numDays) - getAvgTempMultipleDays(resortDataB.days, numDays);
+            return getAvgTempMultipleDays(daysA, numDays) - getAvgTempMultipleDays(daysB, numDays);
           case 'snowfall':
-            return getTotalSnowMultipleDays(resortDataB.days, numDays) - getTotalSnowMultipleDays(resortDataA.days, numDays);
+            return getTotalSnowMultipleDays(daysB, numDays) - getTotalSnowMultipleDays(daysA, numDays);
           case 'wind':
-            return getSumWindMultipleDays(resortDataB.days, numDays) - getSumWindMultipleDays(resortDataA.days, numDays);
+            return getSumWindMultipleDays(daysB, numDays) - getSumWindMultipleDays(daysA, numDays);
           default:
             return 0;
         }
       }
 
       // Handle single day sorting (existing logic)
-      const dayA = resortDataA.days[selectedSortDay];
-      const dayB = resortDataB.days[selectedSortDay];
+      const dayA = daysA[selectedSortDay];
+      const dayB = daysB[selectedSortDay];
 
       if (!dayA || !dayB) return 0;
 

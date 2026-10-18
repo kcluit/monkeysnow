@@ -14,6 +14,9 @@ import { fetchWeatherApi } from 'openmeteo';
 
 export const OPEN_METEO_FORECAST_URL = 'https://api.open-meteo.com/v1/forecast';
 
+/** The same API on another host, keeping each model's past runs; History comes from it (docs/adr/0012) */
+export const OPEN_METEO_HISTORICAL_FORECAST_URL = 'https://historical-forecast-api.open-meteo.com/v1/forecast';
+
 /** Calls per rolling minute; leaves headroom under Open-Meteo's 600/min. */
 export const FETCH_BUDGET_PER_MINUTE = 550;
 
@@ -56,18 +59,19 @@ const pauseListeners = new Set<() => void>();
 
 /**
  * How many API calls Open-Meteo counts a request as: one per location per model,
- * scaled up past 10 variables or 14 days.
+ * scaled up past 10 variables or 14 days, past days counted with the days ahead.
  */
 export function callWeight(params: {
     latitude: number | number[];
     models?: string | string[];
     hourly?: string[];
     forecast_days?: number;
+    past_days?: number;
 }): number {
     const locations = Array.isArray(params.latitude) ? params.latitude.length : 1;
     const models = Array.isArray(params.models) ? Math.max(1, params.models.length) : 1;
     const variables = params.hourly?.length ?? 1;
-    const days = params.forecast_days ?? 7;
+    const days = (params.forecast_days ?? 7) + (params.past_days ?? 0);
     return locations * models * Math.max(1, variables / 10) * Math.max(1, days / 14);
 }
 
@@ -224,7 +228,8 @@ function isConcurrencyLimit(error: unknown): boolean {
 export async function fetchWeatherApiWithinBudget(
     params: Parameters<typeof callWeight>[0] & Record<string, unknown>,
     priority: FetchPriority,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    url = OPEN_METEO_FORECAST_URL
 ): ReturnType<typeof fetchWeatherApi> {
     const weight = callWeight(params);
 
@@ -234,7 +239,7 @@ export async function fetchWeatherApiWithinBudget(
         try {
             // retries = 1 turns off the SDK's own retries on 5xx, which would bypass the budget;
             // callers retry server errors themselves
-            return await fetchWeatherApi(OPEN_METEO_FORECAST_URL, params, 1, 0.2, 2, { signal });
+            return await fetchWeatherApi(url, params, 1, 0.2, 2, { signal });
         } catch (error) {
             if (signal?.aborted) throw error;
             if (isConcurrencyLimit(error)) {

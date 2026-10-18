@@ -20,7 +20,7 @@ export interface SyncedGraph {
 export class GraphSync {
     /** Every hour any Graph on the page has */
     bounds: XRange = { min: 0, max: 0 };
-    /** 5 days from the current hour, within the bounds */
+    /** 5 days from the current hour, within the bounds: for History, which ends at the current hour, the 5 days up to it */
     home: XRange = { min: 0, max: 0 };
     window: XRange = { min: 0, max: 0 };
     hairline: number | null = null;
