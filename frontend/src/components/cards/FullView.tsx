@@ -2,6 +2,7 @@ import { useRef, useState, useEffect, useLayoutEffect, useCallback, type ReactNo
 import { calculateSnowTotals, getSnowConditionFromQuality } from '../../utils/weather';
 import { formatSnow } from '../../utils/unitConversion';
 import { getTemperatureStyle, getWindClass, shortWeatherText, showsAmount } from './cardUtils';
+import { HistoryBadge } from './HistoryBadge';
 import { isSavedLocationId } from '../../utils/savedLocations';
 import type { CardProps, DayForecast, Period } from '../../types';
 
@@ -157,8 +158,9 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
             onClick={() => onResortClick?.(resort.id)}
         >
             <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 mb-2">
-                <div className="flex flex-wrap items-baseline gap-x-2 min-w-0">
+                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 min-w-0">
                     <h2 className="text-lg sm:text-xl font-bold text-theme-textPrimary">{resort.name}</h2>
+                    {resort.isHistory && <HistoryBadge days={resort.days.length} />}
                     <span className="text-xs sm:text-sm text-theme-textSecondary">
                         <span className="text-theme-accent font-medium">{elevationLabel}{resort.elevation}</span>
                         {' · '}{resort.model}

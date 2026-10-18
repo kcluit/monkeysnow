@@ -2,6 +2,7 @@ import { useRef, useState, useEffect, useLayoutEffect, useCallback, MouseEvent }
 import { webcamUrls } from '../../utils/constants';
 import { calculateSnowTotals } from '../../utils/weather';
 import { calculateDayStats, formatWeatherText, getTemperatureStyle, getSnowClass, getWindClass, showsAmount } from './cardUtils';
+import { HistoryBadge } from './HistoryBadge';
 import { formatSnow, formatRain, formatWind } from '../../utils/unitConversion';
 import type { CardProps } from '../../types';
 
@@ -72,7 +73,10 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
         >
             <div className="mb-3 flex justify-between items-center">
                 <div>
-                    <h2 className="text-xl font-semibold text-theme-textPrimary tracking-tight">{resort.name}</h2>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <h2 className="text-xl font-semibold text-theme-textPrimary tracking-tight">{resort.name}</h2>
+                        {resort.isHistory && <HistoryBadge days={resort.days.length} />}
+                    </div>
                     <p className="text-xs text-theme-accent">
                         {resort.elevation}
                         <span className="text-theme-textSecondary"> · {resort.model}</span>

@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, useLayoutEffect, useCallback, MouseEvent } from 'react';
 import { webcamUrls } from '../../utils/constants';
 import { calculateDayStats, formatWeatherText, getTemperatureStyle, getSnowClass, getWindClass, showsAmount } from './cardUtils';
+import { HistoryBadge } from './HistoryBadge';
 import { formatSnow, formatWind } from '../../utils/unitConversion';
 import type { CardProps } from '../../types';
 
@@ -70,8 +71,9 @@ export function CompactCard({ resort, temperatureMetric = 'max', showDate = fals
         >
             {/* Compact Header */}
             <div className="mb-2 flex justify-between items-center">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                     <h2 className="text-base font-semibold text-theme-textPrimary tracking-tight">{resort.name}</h2>
+                    {resort.isHistory && <HistoryBadge days={resort.days.length} />}
                     <span className="text-xs text-theme-accent">{resort.elevation}</span>
                 </div>
                 {webcamUrl && (
