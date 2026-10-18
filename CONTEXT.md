@@ -14,6 +14,10 @@ _Avoid_: home page, dashboard, overview
 The way of showing the **Main page** in which each card is a **Graph** instead of a table.
 _Avoid_: chart view, graph mode
 
+**History**:
+A switch on the **Main page** that shows the **Selection**'s past days instead of the days ahead, in any way of showing it, **Graph view** included: the days of the **History length** in the local time of the point being forecast, up to the current hour, so its last day is today so far. It is never remembered: every visit opens on the forecast. The **Detailed view** always shows the forecast, even when opened from History. The past is what each **Card model** forecast in the first hours of its runs, not what was measured.
+_Avoid_: historical view, past view (it is not a view of its own), archive, observations
+
 **Graph**:
 One card in **Graph view**: the forecast of one **Resort** or **Saved location** from its **Card model**, hour by hour. It shows each hour's precipitation, snow or rain, in its **Snow quality colour**, the temperature, and the **Freezing level** against the heights being forecast. Every Graph on the page shows the same stretch of time.
 _Avoid_: **Chart** (that is the Detailed view's), card chart, timeline
@@ -157,6 +161,10 @@ _Avoid_: model override, country setting
 **Forecast horizon**:
 How many days ahead a forecast is asked for: fourteen on the **Main page**, and whatever the visitor picks in the **Detailed view**. A card shows fewer days when its **Card model**'s **Range** ends sooner.
 _Avoid_: forecast days, forecast length
+
+**History length**:
+How many days **History** shows: 3, 7, 14 or 30, fourteen unless the visitor picks another. Today so far is one of them, so fourteen is today and the thirteen days before it. It is the same on every card, whatever its **Card model**'s **Range**.
+_Avoid_: lookback, past days, history horizon (a horizon is ahead)
 
 **Selected models**:
 The **Forecast models** a visitor has ticked for the **Detailed view**, one list for every **Resort**. Every visitor starts with the **Recommended models**. Visitors change them, with the **Selected Aggregations**, under "Detailed view models".
