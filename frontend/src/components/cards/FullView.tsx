@@ -145,7 +145,8 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
             cell: period => {
                 if (!period.snowQuality || (!showsSnow(period.snowCm, unitSystem) && !showsRain(period.rainMm, unitSystem))) return zero;
                 const quality = getSnowConditionFromQuality(period.snowQuality);
-                return <span className={`text-[11px] sm:text-xs font-semibold whitespace-nowrap ${quality.isHighlight ? 'special-color-text' : 'text-theme-accent'}`}>{quality.text}</span>;
+                // Wraps where it's longer than its column, as "Nieve húmeda" and "Neige humide" are
+                return <span className={`inline-block text-[11px] sm:text-xs leading-tight font-semibold ${quality.isHighlight ? 'special-color-text' : 'text-theme-accent'}`}>{quality.text}</span>;
             },
         },
     ];
