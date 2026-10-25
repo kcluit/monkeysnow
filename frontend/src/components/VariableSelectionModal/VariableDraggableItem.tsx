@@ -3,6 +3,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { WeatherVariable } from '../../types/openMeteo';
 import { VARIABLE_CONFIGS } from '../../utils/chartConfigurations';
+import { useLanguage } from '../../hooks/useLanguage';
 
 interface VariableDraggableItemProps {
   variable: WeatherVariable;
@@ -17,6 +18,7 @@ function VariableDraggableItemInner({
   onToggle,
   isDragDisabled = false,
 }: VariableDraggableItemProps): JSX.Element {
+  const { t } = useLanguage();
   const {
     attributes,
     listeners,
@@ -50,7 +52,7 @@ function VariableDraggableItemInner({
         className="variable-drag-handle"
         {...attributes}
         {...listeners}
-        aria-label="Drag to reorder"
+        aria-label={t('chart.dragToReorder')}
       >
         <svg
           width="16"
@@ -74,7 +76,7 @@ function VariableDraggableItemInner({
           checked={isSelected}
           onChange={onToggle}
           className="variable-checkbox"
-          aria-label={`Select ${config?.label || variable}`}
+          aria-label={t('chart.picker.select', { chart: config?.label || variable })}
         />
       </label>
 

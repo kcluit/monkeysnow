@@ -1,13 +1,30 @@
 import { useState, useEffect } from 'react';
 import type { UtilityBarProps, SortDay, ElevationLevel, SortOption, ViewMode } from '../types';
+import type { TranslationKey } from '../types/i18n';
 import { getSortDayText } from '../utils/sortDayHelpers';
 import { isAscendingOrder } from '../hooks/useResortFiltering';
+import { useLanguage } from '../hooks/useLanguage';
 import { MobileSortModal } from './MobileSortModal';
 import { CompactHistorySwitch } from './HistorySwitch';
 
 interface ExtendedCompactUtilityBarProps extends UtilityBarProps {
     openResortModal: () => void;
 }
+
+const BAND_NAMES: Record<ElevationLevel, TranslationKey> = { bot: 'band.base', mid: 'band.mid', top: 'band.top' };
+
+const VIEW_MODE_NAMES: Record<ViewMode, TranslationKey> = {
+    default: 'utilityBar.viewShort.default',
+    full: 'utilityBar.viewShort.full',
+    compact: 'utilityBar.viewShort.compact',
+    graph: 'utilityBar.viewShort.graph',
+};
+
+const SORT_NAMES: Record<SortOption, TranslationKey> = {
+    temperature: 'utilityBar.sortShort.temperature',
+    snowfall: 'utilityBar.sortShort.snowfall',
+    wind: 'utilityBar.sortBy.wind',
+};
 
 export function CompactUtilityBar({
     selectedResorts,
@@ -26,6 +43,7 @@ export function CompactUtilityBar({
     sortDayData,
     openResortModal
 }: ExtendedCompactUtilityBarProps): JSX.Element {
+    const { t } = useLanguage();
     const [showSortDayMenu, setShowSortDayMenu] = useState(false);
     const [showMobileSortModal, setShowMobileSortModal] = useState(false);
 
@@ -51,28 +69,11 @@ export function CompactUtilityBar({
         setViewMode(modes[nextIndex]);
     };
 
-    const getViewModeText = (): string => {
-        switch (viewMode) {
-            case 'default': return 'Default';
-            case 'full': return 'Full';
-            case 'compact': return 'Compact';
-            case 'graph': return 'Graph';
-        }
-    };
-
     const cycleSort = (): void => {
         const sorts: SortOption[] = ['temperature', 'snowfall', 'wind'];
         const currentIndex = sorts.indexOf(selectedSort);
         const nextIndex = (currentIndex + 1) % sorts.length;
         setSelectedSort(sorts[nextIndex]);
-    };
-
-    const getSortText = (): string => {
-        switch (selectedSort) {
-            case 'temperature': return 'Temp';
-            case 'snowfall': return 'Snow';
-            case 'wind': return 'Wind';
-        }
     };
 
     return (
@@ -83,7 +84,7 @@ export function CompactUtilityBar({
                     onClick={() => openResortModal()}
                     className="compact-bar-text basis-full sm:basis-auto text-theme-textSecondary hover:text-theme-textPrimary hover:font-bold transition-colors"
                 >
-                    Select Resorts ({selectedResorts.length})
+                    {t('utilityBar.selectResorts', { count: selectedResorts.length })}
                 </button>
 
                 <span className="compact-bar-separator hidden sm:inline">|</span>
@@ -99,7 +100,7 @@ export function CompactUtilityBar({
                                 : 'text-theme-textSecondary hover:text-theme-textPrimary hover:font-bold'
                                 }`}
                         >
-                            {level === 'bot' ? 'Base' : level === 'mid' ? 'Mid' : 'Top'}
+                            {t(BAND_NAMES[level])}
                         </button>
                     ))}
                 </div>
@@ -111,7 +112,7 @@ export function CompactUtilityBar({
                     onClick={cycleViewMode}
                     className="compact-bar-text text-theme-textSecondary hover:text-theme-accent transition-colors"
                 >
-                    {getViewModeText()}
+                    {t(VIEW_MODE_NAMES[viewMode])}
                 </button>
 
                 <span className="compact-bar-separator">|</span>
@@ -128,7 +129,7 @@ export function CompactUtilityBar({
                         onClick={cycleSort}
                         className="compact-bar-text text-theme-textSecondary hover:text-theme-accent transition-colors"
                     >
-                        {getSortText()}
+                        {t(SORT_NAMES[selectedSort])}
                     </button>
 
                     <span className="compact-bar-separator">|</span>
@@ -198,7 +199,7 @@ export function CompactUtilityBar({
                         onClick={() => setIsReversed(!isReversed)}
                         className="compact-bar-text text-theme-textSecondary hover:text-theme-accent transition-colors"
                     >
-                        {isAscendingOrder(selectedSort, isReversed) ? 'Ascending' : 'Descending'}
+                        {t(isAscendingOrder(selectedSort, isReversed) ? 'utilityBar.ascending' : 'utilityBar.descending')}
                     </button>
                 </div>
 
@@ -214,7 +215,7 @@ export function CompactUtilityBar({
                     <svg className="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" />
                     </svg>
-                    Sort
+                    {t('utilityBar.sortButton')}
                 </button>
             </div>
 

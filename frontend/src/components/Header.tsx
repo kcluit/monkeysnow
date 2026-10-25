@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Icon } from './Icon';
 import { icons } from '../constants/icons';
 import { LogoSnowflake } from './LogoSnowflake';
+import { useLanguage } from '../hooks/useLanguage';
 import type { Font } from '../types/fonts';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
@@ -30,6 +31,7 @@ function NavIconLink({ to, icon, isActive, title }: NavIconLinkProps): JSX.Eleme
 }
 
 export function Header({ font }: HeaderProps): JSX.Element {
+    const { t } = useLanguage();
     const location = useLocation();
     // Track font links to properly clean them up
     const fontLinksRef = useRef<HTMLLinkElement[]>([]);
@@ -86,19 +88,19 @@ export function Header({ font }: HeaderProps): JSX.Element {
                         to="/"
                         icon={icons.home}
                         isActive={location.pathname === '/' || location.pathname.startsWith('/resort/')}
-                        title="Home"
+                        title={t('header.home')}
                     />
                     <NavIconLink
                         to="/about"
                         icon={icons.info}
                         isActive={location.pathname === '/about'}
-                        title="About"
+                        title={t('header.about')}
                     />
                     <NavIconLink
                         to="/settings"
                         icon={icons.settings}
                         isActive={location.pathname === '/settings'}
-                        title="Settings"
+                        title={t('header.settings')}
                     />
                 </nav>
             </div>

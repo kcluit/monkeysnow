@@ -11,36 +11,52 @@ import {
     type RunKind,
     type SkiMapFeature,
 } from '../../utils/skiMapData';
-import { difficultyColour, type DifficultyConvention } from '../../utils/difficultyColours';
+import { difficultyColour, type DifficultyConvention, type DifficultyName } from '../../utils/difficultyColours';
+import { translate } from '../../locales';
 
 /** What the Ski map's row in the layers panel says about it. */
 export type SkiMapStatus = 'zoomIn' | 'loading' | 'ready' | 'unavailable';
 
+type OtherRunKind = 'nordic' | 'skitour' | 'snowPark' | 'sled';
+
 /** The Runs that aren't downhill, with their colour and dashes in pixels as the flat map draws them */
-export const OTHER_RUNS: Record<Exclude<RunKind, 'downhill'>, { colour: string; dashArray?: string; name: string }> = {
-    nordic: { colour: '#0d9488', dashArray: '8 5', name: 'nordic trail' },
-    skitour: { colour: '#c026d3', dashArray: '1 6', name: 'touring route' },
-    snow_park: { colour: '#db2777', name: 'terrain park' },
-    sled: { colour: '#a16207', dashArray: '4 4', name: 'sled run' },
+export const OTHER_RUNS: Record<Exclude<RunKind, 'downhill'>, { colour: string; dashArray?: string; kind: OtherRunKind }> = {
+    nordic: { colour: '#0d9488', dashArray: '8 5', kind: 'nordic' },
+    skitour: { colour: '#c026d3', dashArray: '1 6', kind: 'skitour' },
+    snow_park: { colour: '#db2777', kind: 'snowPark' },
+    sled: { colour: '#a16207', dashArray: '4 4', kind: 'sled' },
 };
 
 /** A downhill Run's dashes, for the off-piste and freeride routes European trail maps dash */
 export const DASHED_DOWNHILL = '6 5';
 
-const LIFT_NAMES: Record<string, string> = {
-    cable_car: 'cable car',
+type LiftKind = 'cableCar' | 'gondola' | 'mixedLift' | 'chairLift' | 'dragLift' | 'tBar' | 'jBar' | 'platter'
+    | 'ropeTow' | 'magicCarpet' | 'funicular' | 'railway' | 'lift';
+
+// By OpenStreetMap's aerialway tag
+const LIFT_KINDS: Record<string, LiftKind> = {
+    cable_car: 'cableCar',
     gondola: 'gondola',
-    mixed_lift: 'chair-gondola',
-    chair_lift: 'chairlift',
-    drag_lift: 'drag lift',
-    't-bar': 'T-bar',
-    'j-bar': 'J-bar',
-    platter: 'platter lift',
-    rope_tow: 'rope tow',
-    magic_carpet: 'magic carpet',
+    mixed_lift: 'mixedLift',
+    chair_lift: 'chairLift',
+    drag_lift: 'dragLift',
+    't-bar': 'tBar',
+    'j-bar': 'jBar',
+    platter: 'platter',
+    rope_tow: 'ropeTow',
+    magic_carpet: 'magicCarpet',
     funicular: 'funicular',
-    railway: 'mountain railway',
+    railway: 'railway',
 };
+
+/** Every kind of Run and Lift the Ski map names, each with its words in the locales: map.kind.<kind> and map.onKind.<kind> */
+type FeatureKind = DifficultyName | OtherRunKind | LiftKind;
+
+function featureKind(feature: SkiMapFeature, convention: DifficultyConvention): FeatureKind {
+    if (feature.kind === 'lift') return LIFT_KINDS[feature.liftType ?? ''] ?? 'lift';
+    if (feature.kind === 'downhill') return difficultyColour(feature.difficulty, convention).name;
+    return OTHER_RUNS[feature.kind].kind;
+}
 
 export const LIFT_COLOUR = '#1f2937';
 
@@ -54,11 +70,11 @@ export function runStyle(feature: SkiMapFeature, convention: DifficultyConventio
     return { colour: other.colour, dashArray: other.dashArray, downhill: false };
 }
 
+// The words below are looked up in the language showing each time they are asked for, never kept
+
 /** What kind of Run or Lift it is, as a skier would say, e.g. "blue run" or "chairlift". */
 export function kindName(feature: SkiMapFeature, convention: DifficultyConvention): string {
-    if (feature.kind === 'lift') return LIFT_NAMES[feature.liftType ?? ''] ?? 'lift';
-    if (feature.kind === 'downhill') return `${difficultyColour(feature.difficulty, convention).name} run`;
-    return OTHER_RUNS[feature.kind].name;
+    return translate(`map.kind.${featureKind(feature, convention)}`);
 }
 
 /** What hovering over a Run or Lift says, e.g. "Peak to Creek (blue run)" */
@@ -67,12 +83,10 @@ export function hoverName(feature: SkiMapFeature, convention: DifficultyConventi
     return feature.name ? `${feature.name} (${kind})` : kind;
 }
 
-const withArticle = (phrase: string) => (/^[aeiou]/i.test(phrase) ? `an ${phrase}` : `a ${phrase}`);
-
 /** e.g. "On Peak to Creek, blue run", or "On a chairlift" for one with no name. */
 export function describeCustomLocationOn(feature: SkiMapFeature, convention: DifficultyConvention): string {
-    const kind = kindName(feature, convention);
-    return feature.name ? `On ${feature.name}, ${kind}` : `On ${withArticle(kind)}`;
+    if (!feature.name) return translate(`map.onKind.${featureKind(feature, convention)}`);
+    return translate('map.onNamed', { name: feature.name, kind: kindName(feature, convention) });
 }
 
 interface ScreenPoint {

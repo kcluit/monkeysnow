@@ -4,20 +4,29 @@
  */
 
 import { daysFromToday } from './weather';
+import { translate } from '../locales';
 import type { SortDay, SortDayData, SortDayOption, ElevationLevel, AllWeatherData, ProcessedResortData, DayForecast } from '../types';
 
+/*
+ * App keeps the sort day options across a change of language, and the Settings page and the
+ * command palette read them too, so every name here is a getter, in the language shown when read.
+ */
+const option = (value: string, name: () => string): SortDayOption => ({ value, get name() { return name(); } });
+
 /** Default special options for sort day dropdown */
-export const SORT_DAY_SPECIAL_OPTIONS = [
-  { name: "Next 3 Days", value: "next3days" },
-  { name: "Next 7 Days", value: "next7days" }
-] as const;
+function forecastSpecialOptions(): SortDayOption[] {
+  return [
+    option("next3days", () => translate('sortDay.next3Days')),
+    option("next7days", () => translate('sortDay.next7Days')),
+  ];
+}
 
 /** History's: the latest 3 and 7 days, and every day it shows, each only where it differs from a shorter one */
 function historySpecialOptions(historyLength: number): SortDayOption[] {
   return [
-    { name: "Past 3 Days", value: "next3days" },
-    ...(historyLength >= 7 ? [{ name: "Past 7 Days", value: "next7days" }] : []),
-    ...(historyLength > 7 ? [{ name: `Past ${historyLength} Days`, value: "allDays" }] : []),
+    option("next3days", () => translate('sortDay.past3Days')),
+    ...(historyLength >= 7 ? [option("next7days", () => translate('sortDay.past7Days'))] : []),
+    ...(historyLength > 7 ? [option("allDays", () => translate('sortDay.pastDays', { count: historyLength }))] : []),
   ];
 }
 
@@ -55,7 +64,7 @@ export function getSortDayData(
   historyLength?: number
 ): SortDayData {
   const specialOptions: SortDayOption[] = historyLength === undefined
-    ? [...SORT_DAY_SPECIAL_OPTIONS]
+    ? forecastSpecialOptions()
     : historySpecialOptions(historyLength);
 
   if (selectedResorts.length === 0 || !allWeatherData) {
@@ -77,10 +86,14 @@ export function getSortDayData(
     return { specialOptions, regularDays: [] };
   }
   const resortData = processResortData(allWeatherData, longestResort, selectedElevation);
+  const days = resortData ? daysFromToday(resortData) : [];
 
   return {
     specialOptions,
-    regularDays: (resortData ? daysFromToday(resortData) : []).map((day, index) => dayLabel(day, index, showDate))
+    // A getter, as the names above are: each day's name and date are written as they're read
+    get regularDays() {
+      return days.map((day, index) => dayLabel(day, index, showDate));
+    }
   };
 }
 
@@ -93,7 +106,7 @@ export function getSortDayText(
 ): string {
   if (typeof selectedSortDay === 'string') {
     const specialOption = sortDayData.specialOptions.find(opt => opt.value === selectedSortDay);
-    return specialOption?.name || 'Today';
+    return specialOption?.name || translate('sortDay.today');
   }
-  return sortDayData.regularDays[selectedSortDay] || 'Today';
+  return sortDayData.regularDays[selectedSortDay] || translate('sortDay.today');
 }

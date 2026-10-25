@@ -11,6 +11,7 @@ import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
 import { useOverlay } from '../../hooks/useOverlay';
 import { useModelStyles } from '../../hooks/useModelStyles';
+import { useLanguage } from '../../hooks/useLanguage';
 import { shouldAutoFocusSearch } from '../../utils/autoFocus';
 import {
   buildModelHierarchyTree,
@@ -123,6 +124,7 @@ const ModelItem = memo(function ModelItem({
   unavailableReason: string | null;
   onToggle: () => void;
 }) {
+  const { t } = useLanguage();
   return (
     <label
       className={`resort-grid-item ${unavailableReason ? 'model-grid-item-unavailable' : ''}`}
@@ -138,8 +140,8 @@ const ModelItem = memo(function ModelItem({
       {node.resolution && (
         <span className="model-resolution-label">({node.resolution})</span>
       )}
-      {node.ai && <span className="model-tag">AI</span>}
-      {node.experimental && <span className="model-tag">Experimental</span>}
+      {node.ai && <span className="model-tag">{t('detail.models.ai')}</span>}
+      {node.experimental && <span className="model-tag">{t('detail.models.experimental')}</span>}
       {unavailableReason && (
         <span className="model-availability-note">{unavailableReason}</span>
       )}
@@ -206,6 +208,7 @@ const ProviderSection = memo(function ProviderSection({
   onDeselectAll: (node: ModelHierarchyNode) => void;
   getSelectionState: (node: ModelHierarchyNode) => 'all' | 'some' | 'none';
 }) {
+  const { t } = useLanguage();
   const isExpanded = expandedNodes.has(node.id);
   const selectionState = getSelectionState(node);
   const modelsUnder = getModelsUnderNode(node);
@@ -236,7 +239,7 @@ const ProviderSection = memo(function ProviderSection({
           className={`resort-grid-toggle ${isExpanded ? 'expanded' : ''}`}
           onClick={handleToggleExpand}
           aria-expanded={isExpanded}
-          aria-label={isExpanded ? 'Collapse' : 'Expand'}
+          aria-label={isExpanded ? t('detail.models.collapse') : t('detail.models.expand')}
         >
           <Icon icon={isExpanded ? icons.caretDown : icons.caretRight} />
         </button>
@@ -303,6 +306,7 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
 
   const inputRef = useRef<HTMLInputElement>(null);
   const modelStyles = useModelStyles();
+  const { t, tPlural, language } = useLanguage();
 
   // Closing keeps the picks made here, so the Model styles tab lists them
   const handleOpenModelStyles = useCallback(() => {
@@ -310,11 +314,11 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
     openModelStyles();
   }, [closeModal]);
 
-  // Build hierarchy tree once
-  const hierarchyTree = useMemo(() => buildModelHierarchyTree(), []);
+  // Build hierarchy tree once per language, which its names and descriptions are in
+  const hierarchyTree = useMemo(() => buildModelHierarchyTree(), [language]);
 
-  // Memoize all node IDs for performance
-  const allNodeIds = useMemo(() => getAllNodeIds(hierarchyTree), [hierarchyTree]);
+  // Memoize all node IDs for performance; they're the same in every language
+  const allNodeIds = useMemo(() => getAllNodeIds(buildModelHierarchyTree()), []);
 
   // Initialize expanded nodes with all node IDs (default expanded)
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(() => new Set(allNodeIds));
@@ -367,12 +371,16 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
 
   // Get total selection count: Selected models drawn at this point, of all Selected models; away from a point, just how many
   const getTotalCount = (): string => {
+    const selected = tPlural('detail.models.selected', selectedModels.length);
     const modelCount = modelAvailability
-      ? `${selectedModels.filter((id) => getUnavailableReason(id, modelAvailability) === null).length} shown of ${selectedModels.length} selected`
-      : `${selectedModels.length} selected`;
+      ? t('detail.models.shownOfSelected', {
+        shown: tPlural('detail.models.shown', selectedModels.filter((id) => getUnavailableReason(id, modelAvailability) === null).length),
+        selected,
+      })
+      : selected;
     const aggCount = selectedAggregations.length;
     if (aggCount > 0) {
-      return `${modelCount} + ${aggCount} aggregation${aggCount > 1 ? 's' : ''}`;
+      return `${modelCount} + ${tPlural('detail.models.aggregations', aggCount)}`;
     }
     return modelCount;
   };
@@ -389,7 +397,7 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
               className="command-input"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search models..."
+              placeholder={t('detail.models.search')}
               autoComplete="off"
               spellCheck={false}
             />
@@ -398,16 +406,16 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
             type="button"
             className="model-styles-link"
             onClick={handleOpenModelStyles}
-            title="Colours, bold and opacity of every model's line"
-            aria-label="Model styles"
+            title={t('detail.models.stylesTitle')}
+            aria-label={t('detail.modelStyles.title')}
           >
             <Icon icon={icons.palette} />
-            <span className="model-styles-link-label">Model styles</span>
+            <span className="model-styles-link-label">{t('detail.modelStyles.title')}</span>
           </button>
           <button
             className="resort-grid-close-btn"
             onClick={closeModal}
-            aria-label="Close"
+            aria-label={t('detail.close')}
           >
             <Icon icon={icons.close} />
           </button>
@@ -417,7 +425,7 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
         <div className="resort-grid-content">
           {filteredHierarchy.length === 0 ? (
             <div className="resort-grid-empty">
-              {searchTerm ? 'No models found' : 'No models available'}
+              {searchTerm ? t('detail.models.noneFound') : t('detail.models.noneAvailable')}
             </div>
           ) : (
             <div className="resort-grid-columns model-grid-columns">
@@ -445,11 +453,11 @@ export const ModelSelectionGridModal = memo(function ModelSelectionGridModal({
         {/* Footer */}
         <div className="command-palette-footer model-grid-footer">
           <div className="model-grid-footer-note">
-            Note: Your models apply to every resort. Dimmed ones aren't drawn here: they don't cover this point, sent no data, or repeat another model's numbers. Seamless blends a provider's models into one forecast. Model styles set how each one is drawn.
+            {t('detail.models.note')}
           </div>
           <div className="model-grid-footer-actions">
             <span className="command-hint">
-              <kbd>esc</kbd> close
+              <kbd>{t('key.esc')}</kbd> {t('detail.models.escClose')}
             </span>
             <span className="resort-selection-count">
               {getTotalCount()}

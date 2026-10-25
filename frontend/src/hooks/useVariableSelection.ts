@@ -3,6 +3,12 @@ import type { WeatherVariable } from '../types/openMeteo';
 import { ALL_VARIABLES, VARIABLE_CONFIGS } from '../utils/chartConfigurations';
 import { VARIABLE_CATEGORIES, type VariableCategory } from '../data/variableCategories';
 import { useLocalStorage } from './useLocalStorage';
+import { useLanguage } from './useLanguage';
+
+/** Lowercase, without accents and with plain spaces, so "temperature" finds "Température" and "0 °c" French's no-break space */
+function foldForSearch(text: string): string {
+  return text.toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').replace(/\s/g, ' ');
+}
 
 export interface UseVariableSelectionProps {
   selectedVariables: WeatherVariable[];
@@ -43,6 +49,7 @@ export function useVariableSelection({
   selectedVariables,
   setSelectedVariables,
 }: UseVariableSelectionProps): UseVariableSelectionReturn {
+  const { language } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -231,17 +238,18 @@ export function useVariableSelection({
     [localVariables]
   );
 
+  // Matches names in the language showing, so it searches again when that changes
   const filteredVariables = useMemo(() => {
     if (!searchTerm.trim()) {
       return orderedVariables;
     }
-    const query = searchTerm.toLowerCase();
+    const query = foldForSearch(searchTerm);
     return orderedVariables.filter((varId) => {
       const config = VARIABLE_CONFIGS.get(varId);
-      const label = config?.label?.toLowerCase() || '';
+      const label = foldForSearch(config?.label || '');
       return varId.toLowerCase().includes(query) || label.includes(query);
     });
-  }, [orderedVariables, searchTerm]);
+  }, [orderedVariables, searchTerm, language]);
 
   return {
     isOpen,

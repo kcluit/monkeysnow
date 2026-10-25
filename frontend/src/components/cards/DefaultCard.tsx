@@ -1,12 +1,13 @@
 import { useRef, useState, useEffect, useLayoutEffect, useCallback, MouseEvent } from 'react';
 import { webcamUrls } from '../../utils/constants';
-import { calculateSnowTotals } from '../../utils/weather';
-import { calculateDayStats, formatWeatherText, getTemperatureStyle, getSnowClass, getWindClass, showsAmount } from './cardUtils';
+import { calculateDayStats, formatWeatherText, getTemperatureStyle, getSnowClass, getWindClass, totalsText } from './cardUtils';
 import { HistoryBadge } from './HistoryBadge';
-import { formatSnow, formatRain, formatWind } from '../../utils/unitConversion';
+import { formatSnow, formatRain, formatWind, showsRain, showsSnow } from '../../utils/unitConversion';
+import { useLanguage } from '../../hooks/useLanguage';
 import type { CardProps } from '../../types';
 
 export function DefaultCard({ resort, temperatureMetric = 'max', showDate = false, unitSystem = 'metric', onResortClick }: CardProps): JSX.Element {
+    const { t } = useLanguage();
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [seymourClicks, setSeymourClicks] = useState(0);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -40,7 +41,6 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
     }, [resort.isHistory, resort.days.length]);
 
     const webcamUrl = webcamUrls[resort.id];
-    const totals = calculateSnowTotals(resort);
 
     const handleSeymourClick = (event: MouseEvent<HTMLAnchorElement>): void => {
         if (resort.id === "mt-seymour") {
@@ -94,7 +94,7 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" />
                         </svg>
-                        <span className="text-sm font-medium text-theme-accent">Webcams</span>
+                        <span className="text-sm font-medium text-theme-accent">{t('card.webcams')}</span>
                     </a>
                 )}
             </div>
@@ -120,8 +120,6 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
                         {resort.days.map((day, dayIndex) => {
                             const dayStats = calculateDayStats(day, temperatureMetric, unitSystem);
                             const weatherText = formatWeatherText(day.periods);
-                            const snowText = formatSnow(dayStats.snow, unitSystem);
-                            const rainText = formatRain(dayStats.rain, unitSystem);
                             return (
                                 <div key={dayIndex} className="w-[180px]">
                                     <div className="flex items-center gap-1 mb-1">
@@ -143,23 +141,23 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
                                                     </div>
                                                 );
                                             })()}
-                                            {showsAmount(snowText) ? (
+                                            {showsSnow(dayStats.snow, unitSystem) ? (
                                                 <div className={`text-sm font-bold ${getSnowClass(dayStats.snow)}`}>
-                                                    {snowText} snow
+                                                    {t('card.snowAmount', { amount: formatSnow(dayStats.snow, unitSystem) })}
                                                 </div>
-                                            ) : showsAmount(rainText) ? (
+                                            ) : showsRain(dayStats.rain, unitSystem) ? (
                                                 <div className="text-sm font-bold text-theme-textSecondary">
-                                                    {rainText} rain
+                                                    {t('card.rainAmount', { amount: formatRain(dayStats.rain, unitSystem) })}
                                                 </div>
                                             ) : null}
                                         </div>
                                         <div className="text-sm text-theme-textPrimary mt-1 font-medium truncate" title={weatherText}>{weatherText}</div>
                                         <div className={`text-xs font-medium ${getWindClass(dayStats.wind)} mt-1`}>
-                                            {formatWind(dayStats.wind, unitSystem)} wind
+                                            {t('card.windSpeed', { speed: formatWind(dayStats.wind, unitSystem) })}
                                         </div>
                                         <div className="mt-2 pt-2 border-t border-theme-border">
                                             <div className="text-xs text-theme-textPrimary font-medium">
-                                                Freezing: {day.freezingLevel}
+                                                {t('card.freezingLevel', { level: day.freezingLevel })}
                                             </div>
                                             <div className={`text-xs font-medium mt-0.5 truncate ${day.snowCondition.isHighlight ? 'title-color-text' : day.snowCondition.isSecondary ? 'text-theme-textSecondary' : 'text-theme-accent'}`} title={day.snowCondition.text}>
                                                 {day.snowCondition.text}
@@ -176,8 +174,8 @@ export function DefaultCard({ resort, temperatureMetric = 'max', showDate = fals
                 <div className="flex justify-center">
                     <div className="bg-theme-cardBg px-3 py-1 rounded-lg">
                         <span className="text-sm font-medium">
-                            <span className="text-theme-accent">Totals:</span>
-                            <span className="text-theme-textPrimary"> {resort.isHistory ? 'Past' : 'Next'} 3 Days: {formatSnow(totals.threeDays, unitSystem)} | {resort.isHistory ? 'Past' : 'Next'} 7 Days: {formatSnow(totals.sevenDays, unitSystem)}</span>
+                            <span className="text-theme-accent">{t('card.totals')}</span>
+                            <span className="text-theme-textPrimary"> {totalsText(resort, unitSystem)}</span>
                         </span>
                     </div>
                 </div>

@@ -1,10 +1,12 @@
 /**
  * Command generators for dynamic command palette integration.
- * Generates commands with checkmarks based on current state.
+ * Generates commands with checkmarks based on current state, named in the language
+ * showing as they are generated (App generates them again when it changes).
  */
 
 import type { Command, ElevationLevel, SortOption, SortDay, SortDayData, ViewMode, TemperatureMetric, SnowfallEstimateMode, SnowCaution, UtilityBarStyle, UnitSystem, ResortDisplayLimit } from '../types';
 import type { Language } from '../types/i18n';
+import { translate, translatePlural } from '../locales';
 import type { ElevationSelection } from '../types/detailView';
 import { icons } from '../constants/icons';
 import { formatElevation } from './unitConversion';
@@ -84,19 +86,19 @@ export function generateElevationCommands(
   return [
     {
       id: 'elevation-bot',
-      name: 'Base forecast',
+      name: translate('command.elevation.base'),
       icon: selectedElevation === 'bot' ? icons.check : undefined,
       action: () => setSelectedElevation('bot'),
     },
     {
       id: 'elevation-mid',
-      name: 'Mid forecast',
+      name: translate('command.elevation.mid'),
       icon: selectedElevation === 'mid' ? icons.check : undefined,
       action: () => setSelectedElevation('mid'),
     },
     {
       id: 'elevation-top',
-      name: 'Top forecast',
+      name: translate('command.elevation.top'),
       icon: selectedElevation === 'top' ? icons.check : undefined,
       action: () => setSelectedElevation('top'),
     },
@@ -113,19 +115,19 @@ export function generateSortCommands(
   return [
     {
       id: 'sort-temperature',
-      name: 'Sort by Temperature',
+      name: translate('command.sortBy.temperature'),
       icon: selectedSort === 'temperature' ? icons.check : undefined,
       action: () => setSelectedSort('temperature'),
     },
     {
       id: 'sort-snowfall',
-      name: 'Sort by Snowfall',
+      name: translate('command.sortBy.snowfall'),
       icon: selectedSort === 'snowfall' ? icons.check : undefined,
       action: () => setSelectedSort('snowfall'),
     },
     {
       id: 'sort-wind',
-      name: 'Sort by Wind',
+      name: translate('command.sortBy.wind'),
       icon: selectedSort === 'wind' ? icons.check : undefined,
       action: () => setSelectedSort('wind'),
     },
@@ -175,13 +177,13 @@ export function generateOrderCommands(
   return [
     {
       id: 'order-normal',
-      name: 'Normal order',
+      name: translate('command.sortOrder.normal'),
       icon: !isReversed ? icons.check : undefined,
       action: () => setIsReversed(false),
     },
     {
       id: 'order-reverse',
-      name: 'Reverse order',
+      name: translate('command.sortOrder.reverse'),
       icon: isReversed ? icons.check : undefined,
       action: () => setIsReversed(true),
     },
@@ -198,25 +200,25 @@ export function generateViewModeCommands(
   return [
     {
       id: 'viewmode-default',
-      name: 'Default',
+      name: translate('command.view.default'),
       icon: viewMode === 'default' ? icons.check : undefined,
       action: () => setViewMode('default'),
     },
     {
       id: 'viewmode-full',
-      name: 'Full',
+      name: translate('command.view.full'),
       icon: viewMode === 'full' ? icons.check : undefined,
       action: () => setViewMode('full'),
     },
     {
       id: 'viewmode-compact',
-      name: 'Compact',
+      name: translate('command.view.compact'),
       icon: viewMode === 'compact' ? icons.check : undefined,
       action: () => setViewMode('compact'),
     },
     {
       id: 'viewmode-graph',
-      name: 'Graph',
+      name: translate('command.view.graph'),
       icon: viewMode === 'graph' ? icons.check : undefined,
       action: () => setViewMode('graph'),
     },
@@ -235,18 +237,18 @@ export function generateHistoryCommands(
   return [
     {
       id: 'history',
-      name: 'History',
+      name: translate('command.history'),
       icon: icons.history,
       subCommands: [
         {
           id: 'history-on',
-          name: 'On',
+          name: translate('common.on'),
           icon: isHistory ? icons.check : undefined,
           action: () => setIsHistory(true),
         },
         {
           id: 'history-off',
-          name: 'Off',
+          name: translate('common.off'),
           icon: !isHistory ? icons.check : undefined,
           action: () => setIsHistory(false),
         },
@@ -254,11 +256,11 @@ export function generateHistoryCommands(
     },
     {
       id: 'history-length',
-      name: 'History length',
+      name: translate('command.historyLength'),
       icon: icons.calendar,
       subCommands: HISTORY_LENGTHS.map((days) => ({
         id: `history-length-${days}`,
-        name: `${days} days`,
+        name: translatePlural('command.days', days),
         icon: historyLength === days ? icons.check : undefined,
         action: () => setHistoryLength(days),
       })),
@@ -276,13 +278,13 @@ export function generateUtilityBarCommands(
   return [
     {
       id: 'utilitybar-show',
-      name: 'Show',
+      name: translate('common.show'),
       icon: showUtilityBar ? icons.check : undefined,
       action: () => setShowUtilityBar(true),
     },
     {
       id: 'utilitybar-hide',
-      name: 'Hide',
+      name: translate('common.hide'),
       icon: !showUtilityBar ? icons.check : undefined,
       action: () => setShowUtilityBar(false),
     },
@@ -299,13 +301,13 @@ export function generateUtilityBarStyleCommands(
   return [
     {
       id: 'utilitybar-style-compact',
-      name: 'Compact',
+      name: translate('command.utilityBarStyle.compact'),
       icon: utilityBarStyle === 'compact' ? icons.check : undefined,
       action: () => setUtilityBarStyle('compact'),
     },
     {
       id: 'utilitybar-style-large',
-      name: 'Large',
+      name: translate('command.utilityBarStyle.large'),
       icon: utilityBarStyle === 'large' ? icons.check : undefined,
       action: () => setUtilityBarStyle('large'),
     },
@@ -322,25 +324,25 @@ export function generateTemperatureMetricCommands(
   return [
     {
       id: 'tempmetric-max',
-      name: 'Max temperature',
+      name: translate('command.temperature.max'),
       icon: selectedMetric === 'max' ? icons.check : undefined,
       action: () => setSelectedMetric('max'),
     },
     {
       id: 'tempmetric-min',
-      name: 'Min temperature',
+      name: translate('command.temperature.min'),
       icon: selectedMetric === 'min' ? icons.check : undefined,
       action: () => setSelectedMetric('min'),
     },
     {
       id: 'tempmetric-avg',
-      name: 'Average temperature',
+      name: translate('command.temperature.avg'),
       icon: selectedMetric === 'avg' ? icons.check : undefined,
       action: () => setSelectedMetric('avg'),
     },
     {
       id: 'tempmetric-median',
-      name: 'Median temperature',
+      name: translate('command.temperature.median'),
       icon: selectedMetric === 'median' ? icons.check : undefined,
       action: () => setSelectedMetric('median'),
     },
@@ -357,13 +359,13 @@ export function generateSnowfallEstimateCommands(
   return [
     {
       id: 'snowfall-model',
-      name: 'Use Model Estimate',
+      name: translate('command.snowfall.useModel'),
       icon: selectedMode === 'model' ? icons.check : undefined,
       action: () => setSelectedMode('model'),
     },
     {
       id: 'snowfall-totalprecip',
-      name: 'monkeysnow estimate',
+      name: translate('snowfall.monkeysnow'),
       icon: selectedMode === 'totalPrecip' ? icons.check : undefined,
       action: () => setSelectedMode('totalPrecip'),
     },
@@ -380,19 +382,19 @@ export function generateSnowCautionCommands(
   return [
     {
       id: 'snow-caution-extra-cautious',
-      name: 'Extra cautious',
+      name: translate('snowCaution.extraCautious'),
       icon: selectedCaution === 'extraCautious' ? icons.check : undefined,
       action: () => setSelectedCaution('extraCautious'),
     },
     {
       id: 'snow-caution-cautious',
-      name: 'Cautious',
+      name: translate('snowCaution.cautious'),
       icon: selectedCaution === 'cautious' ? icons.check : undefined,
       action: () => setSelectedCaution('cautious'),
     },
     {
       id: 'snow-caution-realistic',
-      name: 'Realistic',
+      name: translate('snowCaution.realistic'),
       icon: selectedCaution === 'realistic' ? icons.check : undefined,
       action: () => setSelectedCaution('realistic'),
     },
@@ -409,13 +411,13 @@ export function generateUnitSystemCommands(
   return [
     {
       id: 'units-metric',
-      name: 'Metric (°C, cm, km/h)',
+      name: translate('command.units.metric'),
       icon: unitSystem === 'metric' ? icons.check : undefined,
       action: () => { setUnitSystem('metric'); window.location.reload(); },
     },
     {
       id: 'units-imperial',
-      name: 'Imperial (°F, in, mph)',
+      name: translate('command.units.imperial'),
       icon: unitSystem === 'imperial' ? icons.check : undefined,
       action: () => { setUnitSystem('imperial'); window.location.reload(); },
     },
@@ -430,12 +432,12 @@ export function generateResortDisplayLimitCommands(
   setLimit: (limit: ResortDisplayLimit) => void
 ): Command[] {
   const presets: { value: ResortDisplayLimit; name: string }[] = [
-    { value: 'auto', name: 'Auto (100 on mobile)' },
+    { value: 'auto', name: translate('command.resortDisplayLimit.auto') },
     { value: 50, name: '50' },
     { value: 100, name: '100' },
     { value: 200, name: '200' },
     { value: 500, name: '500' },
-    { value: 0, name: 'No limit' },
+    { value: 0, name: translate('command.resortDisplayLimit.none') },
   ];
 
   return presets.map(({ value, name }) => ({
@@ -448,7 +450,7 @@ export function generateResortDisplayLimitCommands(
 
 /**
  * Generate language submenu commands with checkmarks.
- * Shows both English name and native name for each language.
+ * Each language is named in itself, so a visitor finds theirs whatever the page is in.
  */
 export function generateLanguageCommands(
   currentLanguageId: string,
@@ -457,9 +459,8 @@ export function generateLanguageCommands(
 ): Command[] {
   return availableLanguages.map((lang) => ({
     id: `language-${lang.id}`,
-    name: lang.name === lang.nativeName
-      ? lang.name
-      : `${lang.name} (${lang.nativeName})`,
+    name: lang.nativeName,
+    keywords: [lang.name],
     icon: currentLanguageId === lang.id ? icons.check : undefined,
     action: () => setLanguage(lang.id),
   }));
@@ -470,8 +471,8 @@ export function generateLanguageCommands(
  */
 function generateOnOffCommands(id: string, isOn: boolean, setOn: (on: boolean) => void): Command[] {
   return [
-    { id: `${id}-on`, name: 'On', icon: isOn ? icons.check : undefined, action: () => setOn(true) },
-    { id: `${id}-off`, name: 'Off', icon: !isOn ? icons.check : undefined, action: () => setOn(false) },
+    { id: `${id}-on`, name: translate('common.on'), icon: isOn ? icons.check : undefined, action: () => setOn(true) },
+    { id: `${id}-off`, name: translate('common.off'), icon: !isOn ? icons.check : undefined, action: () => setOn(false) },
   ];
 }
 
@@ -496,9 +497,9 @@ export interface DetailedViewCommandParams {
 export function generateDetailedViewCommands(params: DetailedViewCommandParams): Command[] {
   const { elevationSelection, setElevationSelection, mapLayers, setMapLayers } = params;
   const elevationBands: { value: ElevationSelection; name: string }[] = [
-    { value: 'base', name: 'Base' },
-    { value: 'mid', name: 'Mid' },
-    { value: 'top', name: 'Top' },
+    { value: 'base', name: translate('band.base') },
+    { value: 'mid', name: translate('band.mid') },
+    { value: 'top', name: translate('band.top') },
   ];
   const elevationCommands: Command[] = elevationBands.map(({ value, name }) => ({
     id: `detail-elevation-${value}`,
@@ -510,7 +511,7 @@ export function generateDetailedViewCommands(params: DetailedViewCommandParams):
   if (typeof elevationSelection === 'number') {
     elevationCommands.push({
       id: 'detail-elevation-custom',
-      name: `Custom (${formatElevation(elevationSelection, params.unitSystem)})`,
+      name: translate('command.customElevation', { elevation: formatElevation(elevationSelection, params.unitSystem) }),
       icon: icons.check,
       action: () => setElevationSelection(elevationSelection),
     });
@@ -521,42 +522,42 @@ export function generateDetailedViewCommands(params: DetailedViewCommandParams):
   return [
     {
       id: 'detail-models',
-      name: 'Detailed view models',
+      name: translate('command.detailedViewModels'),
       icon: icons.weatherModel,
       action: params.openDetailedViewModels,
     },
     {
       id: 'detail-elevation',
-      name: 'Detailed view elevation',
+      name: translate('command.detailedViewElevation'),
       icon: icons.mountain,
       subCommands: elevationCommands,
     },
     {
       id: 'forecast-horizon',
-      name: 'Forecast horizon',
+      name: translate('command.forecastHorizon'),
       icon: icons.calendar,
       subCommands: FORECAST_HORIZONS.map((days) => ({
         id: `forecast-horizon-${days}`,
-        name: days === 1 ? '1 day' : `${days} days`,
+        name: translatePlural('command.days', days),
         icon: params.forecastHorizon === days ? icons.check : undefined,
         action: () => params.setForecastHorizon(days),
       })),
     },
     {
       id: 'select-charts',
-      name: 'Select charts',
+      name: translate('command.selectCharts'),
       icon: icons.lineChart,
       action: params.openChartsPicker,
     },
     {
       id: 'lock-charts',
-      name: 'Lock charts',
+      name: translate('command.lockCharts'),
       icon: icons.lock,
       subCommands: generateOnOffCommands('lock-charts', params.isChartLocked, params.setIsChartLocked),
     },
     {
       id: 'base-map',
-      name: 'Base map',
+      name: translate('command.baseMap'),
       icon: icons.baseMap,
       subCommands: BASE_MAPS.map((base) => ({
         id: `base-map-${base.id}`,
@@ -577,9 +578,9 @@ export function generateDetailedViewCommands(params: DetailedViewCommandParams):
     })),
     {
       id: 'terrain-colouring',
-      name: 'Colour terrain by',
+      name: translate('command.colourTerrainBy'),
       icon: icons.overlay,
-      subCommands: [{ id: null, label: 'None' }, ...TERRAIN_COLOURINGS].map((option) => ({
+      subCommands: [{ id: null, label: translate('command.colourTerrainBy.none') }, ...TERRAIN_COLOURINGS].map((option) => ({
         id: `terrain-colouring-${option.id ?? 'none'}`,
         name: option.label,
         icon: colouring === option.id ? icons.check : undefined,
@@ -597,13 +598,13 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
   return [
     {
       id: 'select-resorts',
-      name: 'Select resorts',
+      name: translate('command.selectResorts'),
       icon: icons.resort,
       action: params.openResortSelector,
     },
     {
       id: 'elevation',
-      name: 'Main page elevation',
+      name: translate('command.mainPageElevation'),
       icon: icons.mountain,
       subCommands: generateElevationCommands(
         params.selectedElevation,
@@ -612,7 +613,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     },
     {
       id: 'sort-by',
-      name: 'Sort by',
+      name: translate('command.sortBy'),
       icon: icons.chart,
       subCommands: generateSortCommands(
         params.selectedSort,
@@ -621,7 +622,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     },
     {
       id: 'sort-day',
-      name: 'Sort day',
+      name: translate('command.sortDay'),
       icon: icons.calendar,
       subCommands: generateSortDayCommands(
         params.selectedSortDay,
@@ -631,7 +632,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     },
     {
       id: 'sort-order',
-      name: 'Sort order',
+      name: translate('command.sortOrder'),
       icon: icons.sort,
       subCommands: generateOrderCommands(
         params.isReversed,
@@ -640,7 +641,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     },
     {
       id: 'view-mode',
-      name: 'Choose view',
+      name: translate('command.chooseView'),
       icon: icons.view,
       subCommands: generateViewModeCommands(
         params.viewMode,
@@ -655,7 +656,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     ),
     {
       id: 'temperature-metric',
-      name: 'Temperature display',
+      name: translate('command.temperatureDisplay'),
       icon: icons.temperature,
       subCommands: generateTemperatureMetricCommands(
         params.selectedTemperatureMetric,
@@ -664,7 +665,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     },
     {
       id: 'snowfall-estimate',
-      name: 'Snowfall estimate',
+      name: translate('term.snowfallEstimate'),
       icon: icons.snow,
       subCommands: generateSnowfallEstimateCommands(
         params.snowfallEstimateMode,
@@ -673,7 +674,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     },
     {
       id: 'snow-caution',
-      name: 'Snow caution',
+      name: translate('term.snowCaution'),
       icon: icons.caution,
       subCommands: generateSnowCautionCommands(
         params.snowCaution,
@@ -682,13 +683,13 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     },
     {
       id: 'card-models',
-      name: 'Main page models',
+      name: translate('command.mainPageModels'),
       icon: icons.weatherModel,
       action: params.openCardModels,
     },
     {
       id: 'utility-bar',
-      name: 'Utility bar',
+      name: translate('command.utilityBar'),
       icon: icons.controls,
       subCommands: generateUtilityBarCommands(
         params.showUtilityBar,
@@ -697,7 +698,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     },
     {
       id: 'utility-bar-style',
-      name: 'Utility bar style',
+      name: translate('command.utilityBarStyle'),
       icon: icons.ruler,
       subCommands: generateUtilityBarStyleCommands(
         params.utilityBarStyle,
@@ -706,7 +707,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     },
     {
       id: 'units',
-      name: 'Units',
+      name: translate('command.units'),
       icon: icons.units,
       subCommands: generateUnitSystemCommands(
         params.unitSystem,
@@ -715,7 +716,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     },
     {
       id: 'resort-display-limit',
-      name: 'Resort display limit',
+      name: translate('command.resortDisplayLimit'),
       icon: icons.resortLimit,
       subCommands: generateResortDisplayLimitCommands(
         params.resortDisplayLimit,
@@ -724,7 +725,9 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     },
     {
       id: 'language',
-      name: 'Language',
+      name: translate('language.title'),
+      // Found by its name in every language, for a visitor who can't read the one showing
+      keywords: params.availableLanguages.map((lang) => lang.translations['language.title']),
       icon: icons.language,
       subCommands: generateLanguageCommands(
         params.languageId,
@@ -734,7 +737,7 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
     },
     {
       id: 'model-styles',
-      name: 'Model styles',
+      name: translate('command.modelStyles'),
       icon: icons.chart,
       action: params.openModelStyles,
     },

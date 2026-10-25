@@ -1,7 +1,10 @@
 import { useTheme } from '../hooks/useTheme';
+import { useLanguage } from '../hooks/useLanguage';
 
 export function ThemeToggle(): JSX.Element {
   const { theme, setTheme, isDark } = useTheme();
+  const { t } = useLanguage();
+  const label = t(isDark ? 'app.themeToggle.light' : 'app.themeToggle.dark');
 
   const handleClick = (): void => {
     console.log('Theme toggle clicked, current theme:', theme.id);
@@ -16,8 +19,8 @@ export function ThemeToggle(): JSX.Element {
       style={{
         backgroundColor: 'var(--cardBg)'
       }}
-      aria-label={`Switch to ${isDark ? 'light' : 'dark'} theme`}
-      title={`Switch to ${isDark ? 'light' : 'dark'} theme`}
+      aria-label={label}
+      title={label}
     >
       {/* Toggle Circle */}
       <span

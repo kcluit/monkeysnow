@@ -5,6 +5,7 @@
  */
 
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { useLanguage } from '../../hooks/useLanguage';
 import { useSlopeBands } from '../../hooks/useSlopeBands';
 import {
     DEFAULT_SLOPE_BANDS,
@@ -89,6 +90,7 @@ function ColourInput({ value, label, onChange }: { value: string; label: string;
 }
 
 export function SlopeBandsEditor(): JSX.Element {
+    const { t } = useLanguage();
     const bands = useSlopeBands();
     const [confirmingReset, setConfirmingReset] = useState(false);
     const canAdd = newSlopeBand(bands) !== null;
@@ -96,20 +98,20 @@ export function SlopeBandsEditor(): JSX.Element {
 
     return (
         <div className="slope-bands">
-            <ul className="slope-bands-list" aria-label="Slope bands">
+            <ul className="slope-bands-list" aria-label={t('map.slopeBands.title')}>
                 {bands.map((band, i) => (
                     <li key={i} className="slope-bands-row">
-                        <AngleInput value={band.from} label={`Band ${i + 1} from, in degrees`} onChange={(from) => update(b => withBandFrom(b, i, from))} />
+                        <AngleInput value={band.from} label={t('map.slopeBands.from', { n: i + 1 })} onChange={(from) => update(b => withBandFrom(b, i, from))} />
                         <span aria-hidden="true">–</span>
-                        <AngleInput value={band.to} label={`Band ${i + 1} to, in degrees`} onChange={(to) => update(b => withBandTo(b, i, to))} />
+                        <AngleInput value={band.to} label={t('map.slopeBands.to', { n: i + 1 })} onChange={(to) => update(b => withBandTo(b, i, to))} />
                         <span aria-hidden="true">°</span>
-                        <ColourInput value={band.colour} label={`Band ${i + 1} colour`} onChange={(colour) => update(b => withBandColour(b, i, colour))} />
+                        <ColourInput value={band.colour} label={t('map.slopeBands.colour', { n: i + 1 })} onChange={(colour) => update(b => withBandColour(b, i, colour))} />
                         <button
                             type="button"
                             className="slope-bands-remove"
                             disabled={bands.length === 1}
-                            aria-label={`Remove ${slopeBandLabel(band)}`}
-                            title={bands.length === 1 ? 'The last band stays; pick None to turn Slope angle off' : `Remove ${slopeBandLabel(band)}`}
+                            aria-label={t('map.slopeBands.remove', { band: slopeBandLabel(band) })}
+                            title={bands.length === 1 ? t('map.slopeBands.lastStays') : t('map.slopeBands.remove', { band: slopeBandLabel(band) })}
                             onClick={() => update(b => withoutBand(b, i))}
                         >
                             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -121,8 +123,8 @@ export function SlopeBandsEditor(): JSX.Element {
             </ul>
             <div className="slope-bands-actions">
                 {confirmingReset ? (
-                    <div className="slope-bands-confirm" role="group" aria-label="Reset to default">
-                        <span>Reset the bands?</span>
+                    <div className="slope-bands-confirm" role="group" aria-label={t('map.slopeBands.reset')}>
+                        <span>{t('map.slopeBands.confirmReset')}</span>
                         <button
                             type="button"
                             className="slope-bands-btn"
@@ -131,9 +133,9 @@ export function SlopeBandsEditor(): JSX.Element {
                                 setConfirmingReset(false);
                             }}
                         >
-                            Yes
+                            {t('map.slopeBands.yes')}
                         </button>
-                        <button type="button" className="slope-bands-btn" onClick={() => setConfirmingReset(false)}>No</button>
+                        <button type="button" className="slope-bands-btn" onClick={() => setConfirmingReset(false)}>{t('map.slopeBands.no')}</button>
                     </div>
                 ) : (
                     <>
@@ -141,16 +143,16 @@ export function SlopeBandsEditor(): JSX.Element {
                             type="button"
                             className="slope-bands-btn"
                             disabled={!canAdd}
-                            title={canAdd ? undefined : 'No room left between 0 and 90°'}
+                            title={canAdd ? undefined : t('map.slopeBands.noRoom')}
                             onClick={() => update(b => {
                                 const added = newSlopeBand(b);
                                 return added ? withBand(b, added) : b;
                             })}
                         >
-                            Add band
+                            {t('map.slopeBands.add')}
                         </button>
                         <button type="button" className="slope-bands-btn" disabled={isDefault} onClick={() => setConfirmingReset(true)}>
-                            Reset to default
+                            {t('map.slopeBands.reset')}
                         </button>
                     </>
                 )}

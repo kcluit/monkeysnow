@@ -5,9 +5,10 @@ import { isFullscreenSupported } from '../hooks/useFullscreen';
 import { useCardModelsSummary } from '../components/CardModelsModal';
 import { useDetailedViewModelsSummary } from '../hooks/useSelectedModels';
 import { useShownCharts } from '../hooks/useDetailedViewSettings';
+import { useLanguage } from '../hooks/useLanguage';
 import type { Theme } from '../types/themes';
 import type { Font } from '../types/fonts';
-import type { Language } from '../types/i18n';
+import type { Language, TranslationKey } from '../types/i18n';
 import type { ElevationSelection } from '../types/detailView';
 import type { MapRotation, MapTilt } from '../utils/mapRotation';
 import {
@@ -153,24 +154,24 @@ function SettingSection({ title, icon, children }: SettingSectionProps): JSX.Ele
 }
 
 // What a right-drag does on the 3D map with each choice, shown under the choices
-const MAP_ROTATION_DESCRIPTIONS: Record<MapRotation, string> = {
-    linear: 'Right-dragging sideways turns your view that way, wherever the pointer is',
-    linearReversed: 'Right-dragging sideways turns your view the other way, so the far mountains follow the pointer, wherever it is',
-    orbital: 'Right-dragging turns the map like spinning a globe, so opposite ways above and below its middle',
+const MAP_ROTATION_DESCRIPTIONS: Record<MapRotation, TranslationKey> = {
+    linear: 'settings.mapRotation.linear',
+    linearReversed: 'settings.mapRotation.linearReversed',
+    orbital: 'settings.mapRotation.orbital',
 };
-const MAP_TILT_DESCRIPTIONS: Record<MapTilt, string> = {
-    dragUp: 'Right-dragging up tilts the view toward the horizon',
-    dragDown: 'Right-dragging down tilts the view toward the horizon',
+const MAP_TILT_DESCRIPTIONS: Record<MapTilt, TranslationKey> = {
+    dragUp: 'settings.mapTilt.dragUp',
+    dragDown: 'settings.mapTilt.dragDown',
 };
 
 // The page's groups, by where their settings take effect, in page order
 const SETTING_GROUPS = [
-    { id: 'settings-general', title: 'General' },
-    { id: 'settings-main-page', title: 'Main page' },
-    { id: 'settings-detailed-view', title: 'Detailed view' },
-    { id: 'settings-appearance', title: 'Appearance' },
-    { id: 'settings-advanced', title: 'Advanced' },
-] as const;
+    { id: 'settings-general', title: 'settings.group.general' },
+    { id: 'settings-main-page', title: 'settings.group.mainPage' },
+    { id: 'settings-detailed-view', title: 'settings.group.detailedView' },
+    { id: 'settings-appearance', title: 'settings.group.appearance' },
+    { id: 'settings-advanced', title: 'settings.group.advanced' },
+] as const satisfies readonly { id: string; title: TranslationKey }[];
 
 type SettingGroupId = typeof SETTING_GROUPS[number]['id'];
 
@@ -180,10 +181,11 @@ interface SettingGroupProps {
 }
 
 function SettingGroup({ id, children }: SettingGroupProps): JSX.Element {
+    const { t } = useLanguage();
     const title = SETTING_GROUPS.find(g => g.id === id)?.title;
     return (
         <div className="settings-group">
-            <h3 id={id} className="settings-group-title">{title}</h3>
+            <h3 id={id} className="settings-group-title">{title && t(title)}</h3>
             {children}
         </div>
     );
@@ -239,6 +241,7 @@ interface ThemePickerProps {
 
 // Searchable, scrolling list of themes, each button painted in its own colours
 function ThemePicker({ themes, currentThemeId, setTheme, applyTheme, resetThemePreview }: ThemePickerProps): JSX.Element {
+    const { t: translate } = useLanguage(); // t is each theme below
     const [query, setQuery] = useState('');
     const listRef = useRef<HTMLDivElement>(null);
     const needle = query.trim().toLowerCase();
@@ -263,8 +266,8 @@ function ThemePicker({ themes, currentThemeId, setTheme, applyTheme, resetThemeP
                 className="settings-search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search themes..."
-                aria-label="Search themes"
+                placeholder={translate('settings.searchThemes')}
+                aria-label={translate('settings.searchThemesLabel')}
                 autoComplete="off"
                 spellCheck={false}
             />
@@ -286,7 +289,7 @@ function ThemePicker({ themes, currentThemeId, setTheme, applyTheme, resetThemeP
                         {currentThemeId === t.id && <Icon icon={icons.check} className="settings-check-icon" />}
                     </button>
                 ))}
-                {shownThemes.length === 0 && <p className="settings-theme-empty">No themes match "{query.trim()}"</p>}
+                {shownThemes.length === 0 && <p className="settings-theme-empty">{translate('settings.noThemesMatch', { query: query.trim() })}</p>}
             </div>
         </>
     );
@@ -325,14 +328,15 @@ interface DetailElevationPickerProps {
     unitSystem: UnitSystem;
 }
 
-const ELEVATION_BANDS: { value: ElevationSelection; label: string }[] = [
-    { value: 'base', label: 'Base' },
-    { value: 'mid', label: 'Mid' },
-    { value: 'top', label: 'Top' },
+const ELEVATION_BANDS: { value: ElevationSelection; label: TranslationKey }[] = [
+    { value: 'base', label: 'band.base' },
+    { value: 'mid', label: 'band.mid' },
+    { value: 'top', label: 'band.top' },
 ];
 
 // The Detailed view's Elevation: an Elevation band, or a Custom elevation typed in the visitor's units
 function DetailElevationPicker({ selection, setSelection, unitSystem }: DetailElevationPickerProps): JSX.Element {
+    const { t } = useLanguage();
     const [isTyping, setIsTyping] = useState(false);
     const [typed, setTyped] = useState('');
     const customElevation = typeof selection === 'number' ? selection : null;
@@ -356,13 +360,15 @@ function DetailElevationPicker({ selection, setSelection, unitSystem }: DetailEl
                 {ELEVATION_BANDS.map(band => (
                     <OptionButton
                         key={String(band.value)}
-                        label={band.label}
+                        label={t(band.label)}
                         isSelected={selection === band.value}
                         onClick={() => { setSelection(band.value); setIsTyping(false); }}
                     />
                 ))}
                 <OptionButton
-                    label={customElevation === null ? 'Custom…' : `Custom: ${formatElevation(customElevation, unitSystem)}`}
+                    label={customElevation === null
+                        ? t('settings.customElevation')
+                        : t('settings.customElevationValue', { elevation: formatElevation(customElevation, unitSystem) })}
                     isSelected={customElevation !== null}
                     onClick={startTyping}
                 />
@@ -380,16 +386,16 @@ function DetailElevationPicker({ selection, setSelection, unitSystem }: DetailEl
                         }}
                         min="0"
                         max={maxTypedElevation(unitSystem)}
-                        placeholder="Elevation"
-                        aria-label={`Custom elevation in ${unitSystem === 'imperial' ? 'feet' : 'metres'}`}
+                        placeholder={t('settings.elevation')}
+                        aria-label={t(unitSystem === 'imperial' ? 'settings.customElevationInFeet' : 'settings.customElevationInMetres')}
                         autoFocus
                     />
                     <span className="self-center text-sm text-theme-textSecondary">{unit}</span>
-                    <OptionButton label="Apply" isSelected={false} onClick={apply} />
-                    <OptionButton label="Cancel" isSelected={false} onClick={() => setIsTyping(false)} />
+                    <OptionButton label={t('settings.apply')} isSelected={false} onClick={apply} />
+                    <OptionButton label={t('settings.cancel')} isSelected={false} onClick={() => setIsTyping(false)} />
                 </div>
             )}
-            <span className="text-sm text-theme-textSecondary">Saved locations are always forecast at their own height</span>
+            <span className="text-sm text-theme-textSecondary">{t('settings.savedLocationsOwnHeight')}</span>
         </>
     );
 }
@@ -432,6 +438,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
         openModelStyles,
         openResortSelector,
     } = props;
+    const { t, tPlural } = useLanguage();
     const cardModelsSummary = useCardModelsSummary();
     const detailedViewModelsSummary = useDetailedViewModelsSummary();
     const [shownCharts] = useShownCharts();
@@ -439,10 +446,10 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
 
     return (
         <div className="settings-page">
-            <h2 className="settings-title">Settings</h2>
-            <p className="settings-subtitle">Tip: You can also change all these settings quickly using the command palette (Esc or Tab or Ctrl+Shift+P)</p>
+            <h2 className="settings-title">{t('settings.title')}</h2>
+            <p className="settings-subtitle">{t('settings.tip')}</p>
 
-            <nav className="settings-jump" aria-label="Settings groups">
+            <nav className="settings-jump" aria-label={t('settings.groupsLabel')}>
                 {SETTING_GROUPS.map(g => (
                     <button
                         key={g.id}
@@ -450,34 +457,34 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                         className="settings-option-btn"
                         onClick={() => document.getElementById(g.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
                     >
-                        {g.title}
+                        {t(g.title)}
                     </button>
                 ))}
             </nav>
 
             <div className="settings-grid">
                 <SettingGroup id="settings-general">
-                    <SettingSection title="Units" icon={icons.units}>
+                    <SettingSection title={t('command.units')} icon={icons.units}>
                         <div className="settings-options-row">
                             <OptionButton
-                                label="Metric (°C, cm, km/h)"
+                                label={t('command.units.metric')}
                                 isSelected={unitSystem === 'metric'}
                                 onClick={() => { setUnitSystem('metric'); window.location.reload(); }}
                             />
                             <OptionButton
-                                label="Imperial (°F, in, mph)"
+                                label={t('command.units.imperial')}
                                 isSelected={unitSystem === 'imperial'}
                                 onClick={() => { setUnitSystem('imperial'); window.location.reload(); }}
                             />
                         </div>
                     </SettingSection>
 
-                    <SettingSection title="Language" icon={icons.language}>
+                    <SettingSection title={t('language.title')} icon={icons.language}>
                         <div className="settings-options-grid">
                             {availableLanguages.map(lang => (
                                 <OptionButton
                                     key={lang.id}
-                                    label={lang.name === lang.nativeName ? lang.name : `${lang.name} (${lang.nativeName})`}
+                                    label={lang.nativeName}
                                     isSelected={language.id === lang.id}
                                     onClick={() => setLanguage(lang.id)}
                                 />
@@ -485,7 +492,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                         </div>
                     </SettingSection>
 
-                    <SettingSection title="Theme" icon={icons.theme}>
+                    <SettingSection title={t('command.theme')} icon={icons.theme}>
                         <ThemePicker
                             themes={availableThemes}
                             currentThemeId={currentThemeId}
@@ -496,23 +503,23 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                     </SettingSection>
 
                     {/* History is one switch and one History length for the Main page and the Detailed view */}
-                    <SettingSection title="History" icon={icons.history}>
+                    <SettingSection title={t('command.history')} icon={icons.history}>
                         <div className="settings-toggles">
                             <Toggle
-                                label="History"
-                                hint="the past days instead of the forecast, until you leave"
+                                label={t('command.history')}
+                                hint={t('settings.historyHint')}
                                 isEnabled={isHistory}
                                 onToggle={setIsHistory}
                                 icon={icons.history}
                             />
                         </div>
                         <div className="settings-subsection">
-                            <span className="settings-subsection-label">History length</span>
+                            <span className="settings-subsection-label">{t('command.historyLength')}</span>
                             <div className="settings-options-row">
                                 {HISTORY_LENGTHS.map(days => (
                                     <OptionButton
                                         key={days}
-                                        label={`${days} days`}
+                                        label={tPlural('command.days', days)}
                                         isSelected={historyLength === days}
                                         onClick={() => setHistoryLength(days)}
                                     />
@@ -523,18 +530,18 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                 </SettingGroup>
 
                 <SettingGroup id="settings-main-page">
-                    <SettingSection title="Resorts" icon={icons.resort}>
-                        <ActionButton label="Select resorts" icon={icons.resort} onClick={openResortSelector} />
+                    <SettingSection title={t('settings.section.resorts')} icon={icons.resort}>
+                        <ActionButton label={t('command.selectResorts')} icon={icons.resort} onClick={openResortSelector} />
                         <div className="settings-subsection">
-                            <span className="settings-subsection-label">Resort display limit</span>
+                            <span className="settings-subsection-label">{t('command.resortDisplayLimit')}</span>
                             <div className="settings-options-grid">
                                 {([
-                                    { value: 'auto' as ResortDisplayLimit, label: 'Auto (100 on mobile)' },
+                                    { value: 'auto' as ResortDisplayLimit, label: t('command.resortDisplayLimit.auto') },
                                     { value: 50 as ResortDisplayLimit, label: '50' },
                                     { value: 100 as ResortDisplayLimit, label: '100' },
                                     { value: 200 as ResortDisplayLimit, label: '200' },
                                     { value: 500 as ResortDisplayLimit, label: '500' },
-                                    { value: 0 as ResortDisplayLimit, label: 'No limit' },
+                                    { value: 0 as ResortDisplayLimit, label: t('command.resortDisplayLimit.none') },
                                 ]).map(option => (
                                     <OptionButton
                                         key={String(option.value)}
@@ -547,58 +554,58 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                         </div>
                     </SettingSection>
 
-                    <SettingSection title="Cards" icon={icons.view}>
+                    <SettingSection title={t('settings.section.cards')} icon={icons.view}>
                         <div className="settings-subsection">
-                            <span className="settings-subsection-label">View mode</span>
+                            <span className="settings-subsection-label">{t('settings.viewMode')}</span>
                             <div className="settings-options-row">
-                                <OptionButton label="Default" isSelected={viewMode === 'default'} onClick={() => setViewMode('default')} />
-                                <OptionButton label="Full" isSelected={viewMode === 'full'} onClick={() => setViewMode('full')} />
-                                <OptionButton label="Compact" isSelected={viewMode === 'compact'} onClick={() => setViewMode('compact')} />
-                                <OptionButton label="Graph" isSelected={viewMode === 'graph'} onClick={() => setViewMode('graph')} />
+                                <OptionButton label={t('command.view.default')} isSelected={viewMode === 'default'} onClick={() => setViewMode('default')} />
+                                <OptionButton label={t('command.view.full')} isSelected={viewMode === 'full'} onClick={() => setViewMode('full')} />
+                                <OptionButton label={t('command.view.compact')} isSelected={viewMode === 'compact'} onClick={() => setViewMode('compact')} />
+                                <OptionButton label={t('command.view.graph')} isSelected={viewMode === 'graph'} onClick={() => setViewMode('graph')} />
                             </div>
                         </div>
                         <div className="settings-subsection">
-                            <span className="settings-subsection-label">Elevation</span>
+                            <span className="settings-subsection-label">{t('settings.elevation')}</span>
                             <div className="settings-options-row">
-                                <OptionButton label="Base" isSelected={selectedElevation === 'bot'} onClick={() => setSelectedElevation('bot')} />
-                                <OptionButton label="Mid" isSelected={selectedElevation === 'mid'} onClick={() => setSelectedElevation('mid')} />
-                                <OptionButton label="Top" isSelected={selectedElevation === 'top'} onClick={() => setSelectedElevation('top')} />
+                                <OptionButton label={t('band.base')} isSelected={selectedElevation === 'bot'} onClick={() => setSelectedElevation('bot')} />
+                                <OptionButton label={t('band.mid')} isSelected={selectedElevation === 'mid'} onClick={() => setSelectedElevation('mid')} />
+                                <OptionButton label={t('band.top')} isSelected={selectedElevation === 'top'} onClick={() => setSelectedElevation('top')} />
                             </div>
                         </div>
                         <div className="settings-subsection">
-                            <span className="settings-subsection-label">Temperature display</span>
+                            <span className="settings-subsection-label">{t('command.temperatureDisplay')}</span>
                             <div className="settings-options-row">
-                                <OptionButton label="Max" isSelected={selectedTemperatureMetric === 'max'} onClick={() => setSelectedTemperatureMetric('max')} />
-                                <OptionButton label="Min" isSelected={selectedTemperatureMetric === 'min'} onClick={() => setSelectedTemperatureMetric('min')} />
-                                <OptionButton label="Avg" isSelected={selectedTemperatureMetric === 'avg'} onClick={() => setSelectedTemperatureMetric('avg')} />
-                                <OptionButton label="Median" isSelected={selectedTemperatureMetric === 'median'} onClick={() => setSelectedTemperatureMetric('median')} />
+                                <OptionButton label={t('settings.temperature.max')} isSelected={selectedTemperatureMetric === 'max'} onClick={() => setSelectedTemperatureMetric('max')} />
+                                <OptionButton label={t('settings.temperature.min')} isSelected={selectedTemperatureMetric === 'min'} onClick={() => setSelectedTemperatureMetric('min')} />
+                                <OptionButton label={t('settings.temperature.avg')} isSelected={selectedTemperatureMetric === 'avg'} onClick={() => setSelectedTemperatureMetric('avg')} />
+                                <OptionButton label={t('settings.temperature.median')} isSelected={selectedTemperatureMetric === 'median'} onClick={() => setSelectedTemperatureMetric('median')} />
                             </div>
                         </div>
                         <div className="settings-subsection">
-                            <span className="settings-subsection-label">Snowfall estimate</span>
+                            <span className="settings-subsection-label">{t('term.snowfallEstimate')}</span>
                             <div className="settings-options-row">
-                                <OptionButton label="Model estimate" isSelected={snowfallEstimateMode === 'model'} onClick={() => setSnowfallEstimateMode('model')} />
-                                <OptionButton label="monkeysnow estimate" isSelected={snowfallEstimateMode === 'totalPrecip'} onClick={() => setSnowfallEstimateMode('totalPrecip')} />
+                                <OptionButton label={t('snowfall.model')} isSelected={snowfallEstimateMode === 'model'} onClick={() => setSnowfallEstimateMode('model')} />
+                                <OptionButton label={t('snowfall.monkeysnow')} isSelected={snowfallEstimateMode === 'totalPrecip'} onClick={() => setSnowfallEstimateMode('totalPrecip')} />
                             </div>
                         </div>
                         <div className="settings-subsection">
-                            <span className="settings-subsection-label">Snow caution</span>
+                            <span className="settings-subsection-label">{t('term.snowCaution')}</span>
                             <div className="settings-options-row">
-                                <OptionButton label="Extra cautious" isSelected={snowCaution === 'extraCautious'} onClick={() => setSnowCaution('extraCautious')} />
-                                <OptionButton label="Cautious" isSelected={snowCaution === 'cautious'} onClick={() => setSnowCaution('cautious')} />
-                                <OptionButton label="Realistic" isSelected={snowCaution === 'realistic'} onClick={() => setSnowCaution('realistic')} />
+                                <OptionButton label={t('snowCaution.extraCautious')} isSelected={snowCaution === 'extraCautious'} onClick={() => setSnowCaution('extraCautious')} />
+                                <OptionButton label={t('snowCaution.cautious')} isSelected={snowCaution === 'cautious'} onClick={() => setSnowCaution('cautious')} />
+                                <OptionButton label={t('snowCaution.realistic')} isSelected={snowCaution === 'realistic'} onClick={() => setSnowCaution('realistic')} />
                             </div>
                         </div>
                         <div className="settings-subsection">
-                            <span className="settings-subsection-label">Main page models</span>
+                            <span className="settings-subsection-label">{t('command.mainPageModels')}</span>
                             <div className="settings-options-row">
-                                <ActionButton label="Choose…" icon={icons.weatherModel} onClick={openCardModels} />
+                                <ActionButton label={t('settings.choose')} icon={icons.weatherModel} onClick={openCardModels} />
                                 <span className="self-center text-sm text-theme-textSecondary">{cardModelsSummary}</span>
                             </div>
                         </div>
                         <div className="settings-toggles">
                             <Toggle
-                                label="Show date"
+                                label={t('command.showDate')}
                                 isEnabled={isShowDateEnabled}
                                 onToggle={setShowDateEnabled}
                                 icon={icons.date}
@@ -606,17 +613,17 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                         </div>
                     </SettingSection>
 
-                    <SettingSection title="Sorting" icon={icons.sort}>
+                    <SettingSection title={t('settings.section.sorting')} icon={icons.sort}>
                         <div className="settings-subsection">
-                            <span className="settings-subsection-label">Sort by</span>
+                            <span className="settings-subsection-label">{t('command.sortBy')}</span>
                             <div className="settings-options-row">
-                                <OptionButton label="Temperature" isSelected={selectedSort === 'temperature'} onClick={() => setSelectedSort('temperature')} />
-                                <OptionButton label="Snowfall" isSelected={selectedSort === 'snowfall'} onClick={() => setSelectedSort('snowfall')} />
-                                <OptionButton label="Wind" isSelected={selectedSort === 'wind'} onClick={() => setSelectedSort('wind')} />
+                                <OptionButton label={t('settings.sortBy.temperature')} isSelected={selectedSort === 'temperature'} onClick={() => setSelectedSort('temperature')} />
+                                <OptionButton label={t('settings.sortBy.snowfall')} isSelected={selectedSort === 'snowfall'} onClick={() => setSelectedSort('snowfall')} />
+                                <OptionButton label={t('settings.sortBy.wind')} isSelected={selectedSort === 'wind'} onClick={() => setSelectedSort('wind')} />
                             </div>
                         </div>
                         <div className="settings-subsection">
-                            <span className="settings-subsection-label">Sort day</span>
+                            <span className="settings-subsection-label">{t('command.sortDay')}</span>
                             <div className="settings-options-grid">
                                 {sortDayData.specialOptions.map(option => (
                                     <OptionButton
@@ -637,35 +644,35 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                             </div>
                         </div>
                         <div className="settings-subsection">
-                            <span className="settings-subsection-label">Sort order</span>
+                            <span className="settings-subsection-label">{t('command.sortOrder')}</span>
                             <div className="settings-options-row">
-                                <OptionButton label="Normal" isSelected={!isReversed} onClick={() => setIsReversed(false)} />
-                                <OptionButton label="Reverse" isSelected={isReversed} onClick={() => setIsReversed(true)} />
+                                <OptionButton label={t('settings.sortOrder.normal')} isSelected={!isReversed} onClick={() => setIsReversed(false)} />
+                                <OptionButton label={t('settings.sortOrder.reverse')} isSelected={isReversed} onClick={() => setIsReversed(true)} />
                             </div>
                         </div>
                     </SettingSection>
                 </SettingGroup>
 
                 <SettingGroup id="settings-detailed-view">
-                    <SettingSection title="Forecast" icon={icons.weatherModel}>
+                    <SettingSection title={t('settings.section.forecast')} icon={icons.weatherModel}>
                         <div className="settings-subsection">
-                            <span className="settings-subsection-label">Detailed view models</span>
+                            <span className="settings-subsection-label">{t('command.detailedViewModels')}</span>
                             <div className="settings-options-row">
-                                <ActionButton label="Choose…" icon={icons.weatherModel} onClick={openDetailedViewModels} />
+                                <ActionButton label={t('settings.choose')} icon={icons.weatherModel} onClick={openDetailedViewModels} />
                                 <span className="self-center text-sm text-theme-textSecondary">{detailedViewModelsSummary}</span>
                             </div>
                         </div>
                         <div className="settings-subsection">
-                            <span className="settings-subsection-label">Elevation</span>
+                            <span className="settings-subsection-label">{t('settings.elevation')}</span>
                             <DetailElevationPicker selection={detailElevation} setSelection={setDetailElevation} unitSystem={unitSystem} />
                         </div>
                         <div className="settings-subsection">
-                            <span className="settings-subsection-label">Forecast horizon</span>
+                            <span className="settings-subsection-label">{t('command.forecastHorizon')}</span>
                             <div className="settings-options-row">
                                 {FORECAST_HORIZONS.map(days => (
                                     <OptionButton
                                         key={days}
-                                        label={days === 1 ? '1 day' : `${days} days`}
+                                        label={tPlural('command.days', days)}
                                         isSelected={forecastHorizon === days}
                                         onClick={() => setForecastHorizon(days)}
                                     />
@@ -674,33 +681,33 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                         </div>
                     </SettingSection>
 
-                    <SettingSection title="Charts" icon={icons.lineChart}>
+                    <SettingSection title={t('settings.section.charts')} icon={icons.lineChart}>
                         <div className="settings-subsection">
-                            <span className="settings-subsection-label">Charts shown</span>
+                            <span className="settings-subsection-label">{t('settings.chartsShown')}</span>
                             <div className="settings-options-row">
-                                <ActionButton label="Choose…" icon={icons.lineChart} onClick={openChartsPicker} />
+                                <ActionButton label={t('settings.choose')} icon={icons.lineChart} onClick={openChartsPicker} />
                                 <span className="self-center text-sm text-theme-textSecondary">
-                                    {shownCharts.length === 1 ? '1 chart' : `${shownCharts.length} charts`}
+                                    {tPlural('settings.charts', shownCharts.length)}
                                 </span>
                             </div>
                         </div>
                         <div className="settings-subsection">
-                            <span className="settings-subsection-label">Model styles</span>
+                            <span className="settings-subsection-label">{t('command.modelStyles')}</span>
                             <div className="settings-options-row">
-                                <ActionButton label="Edit…" icon={icons.chart} onClick={openModelStyles} />
-                                <span className="self-center text-sm text-theme-textSecondary">Colours, bold and opacity of each model's chart lines</span>
+                                <ActionButton label={t('settings.edit')} icon={icons.chart} onClick={openModelStyles} />
+                                <span className="self-center text-sm text-theme-textSecondary">{t('settings.modelStylesHint')}</span>
                             </div>
                         </div>
                         <div className="settings-toggles">
                             <Toggle
-                                label="Sync charts"
+                                label={t('command.syncCharts')}
                                 isEnabled={chartZoomSyncEnabled}
                                 onToggle={setChartZoomSyncEnabled}
                                 icon={icons.link}
                             />
                             <Toggle
-                                label="Lock charts"
-                                hint="no zooming or range slider"
+                                label={t('command.lockCharts')}
+                                hint={t('settings.lockChartsHint')}
                                 isEnabled={isChartLocked}
                                 onToggle={setIsChartLocked}
                                 icon={icons.lock}
@@ -708,9 +715,9 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                         </div>
                     </SettingSection>
 
-                    <SettingSection title="Map" icon={icons.mountain}>
+                    <SettingSection title={t('settings.section.map')} icon={icons.mountain}>
                         <div className="settings-subsection">
-                            <span className="settings-subsection-label">Base map</span>
+                            <span className="settings-subsection-label">{t('command.baseMap')}</span>
                             <div className="settings-options-row">
                                 {BASE_MAPS.map(base => (
                                     <OptionButton
@@ -723,14 +730,14 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                             </div>
                         </div>
                         <div className="settings-subsection">
-                            <span className="settings-subsection-label">Overlays</span>
+                            <span className="settings-subsection-label">{t('settings.overlays')}</span>
                             <div className="settings-toggles">
                                 {OVERLAYS.map(overlay => (
                                     <Toggle
                                         key={overlay.id}
                                         label={overlay.label}
                                         // The 3D map always shades its terrain
-                                        hint={overlay.id === 'hillshade' ? 'always on in 3D' : undefined}
+                                        hint={overlay.id === 'hillshade' ? t('settings.hillshadeHint') : undefined}
                                         isEnabled={mapLayers.overlays.includes(overlay.id)}
                                         onToggle={(on) => setMapLayers(withOverlay(mapLayers, overlay.id, on))}
                                     />
@@ -738,9 +745,9 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                             </div>
                         </div>
                         <div className="settings-subsection">
-                            <span className="settings-subsection-label">Colour terrain by</span>
+                            <span className="settings-subsection-label">{t('command.colourTerrainBy')}</span>
                             <div className="settings-options-row">
-                                {[{ id: null, label: 'None' }, ...TERRAIN_COLOURINGS].map(option => (
+                                {[{ id: null, label: t('command.colourTerrainBy.none') }, ...TERRAIN_COLOURINGS].map(option => (
                                     <OptionButton
                                         key={option.id ?? 'none'}
                                         label={option.label}
@@ -751,45 +758,45 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                             </div>
                         </div>
                         <div className="settings-subsection">
-                            <span className="settings-subsection-label">Slope bands</span>
+                            <span className="settings-subsection-label">{t('command.slopeBands')}</span>
                             <div className="settings-options-row">
-                                <ActionButton label="Edit…" icon={icons.slopeBands} onClick={openSlopeBands} />
-                                <span className="self-center text-sm text-theme-textSecondary">The ranges of steepness the Slope angle colouring paints, and their colours</span>
+                                <ActionButton label={t('settings.edit')} icon={icons.slopeBands} onClick={openSlopeBands} />
+                                <span className="self-center text-sm text-theme-textSecondary">{t('settings.slopeBandsHint')}</span>
                             </div>
                         </div>
                         <div className="settings-subsection">
-                            <span className="settings-subsection-label">3D map rotation</span>
+                            <span className="settings-subsection-label">{t('command.mapRotation')}</span>
                             <div className="settings-options-row">
-                                <OptionButton label="Linear" isSelected={mapRotation === 'linear'} onClick={() => setMapRotation('linear')} />
-                                <OptionButton label="Linear reversed" isSelected={mapRotation === 'linearReversed'} onClick={() => setMapRotation('linearReversed')} />
-                                <OptionButton label="Orbital" isSelected={mapRotation === 'orbital'} onClick={() => setMapRotation('orbital')} />
+                                <OptionButton label={t('command.mapRotation.linear')} isSelected={mapRotation === 'linear'} onClick={() => setMapRotation('linear')} />
+                                <OptionButton label={t('command.mapRotation.linearReversed')} isSelected={mapRotation === 'linearReversed'} onClick={() => setMapRotation('linearReversed')} />
+                                <OptionButton label={t('command.mapRotation.orbital')} isSelected={mapRotation === 'orbital'} onClick={() => setMapRotation('orbital')} />
                             </div>
-                            <span className="text-sm text-theme-textSecondary">{MAP_ROTATION_DESCRIPTIONS[mapRotation]}</span>
+                            <span className="text-sm text-theme-textSecondary">{t(MAP_ROTATION_DESCRIPTIONS[mapRotation])}</span>
                         </div>
                         <div className="settings-subsection">
-                            <span className="settings-subsection-label">3D map tilt</span>
+                            <span className="settings-subsection-label">{t('command.mapTilt')}</span>
                             <div className="settings-options-row">
-                                <OptionButton label="Drag up" isSelected={mapTilt === 'dragUp'} onClick={() => setMapTilt('dragUp')} />
-                                <OptionButton label="Drag down" isSelected={mapTilt === 'dragDown'} onClick={() => setMapTilt('dragDown')} />
+                                <OptionButton label={t('command.mapTilt.dragUp')} isSelected={mapTilt === 'dragUp'} onClick={() => setMapTilt('dragUp')} />
+                                <OptionButton label={t('command.mapTilt.dragDown')} isSelected={mapTilt === 'dragDown'} onClick={() => setMapTilt('dragDown')} />
                             </div>
-                            <span className="text-sm text-theme-textSecondary">{MAP_TILT_DESCRIPTIONS[mapTilt]}</span>
+                            <span className="text-sm text-theme-textSecondary">{t(MAP_TILT_DESCRIPTIONS[mapTilt])}</span>
                         </div>
                         <div className="settings-subsection">
                             <div className="settings-toggles">
                                 <Toggle
-                                    label="Cursor readout"
+                                    label={t('command.cursorReadout')}
                                     isEnabled={cursorReadoutShown}
                                     onToggle={setCursorReadoutShown}
                                     icon={icons.cursor}
                                 />
                             </div>
-                            <span className="text-sm text-theme-textSecondary">The height, Slope angle and Aspect of the terrain under the mouse, in a corner of either map; only where there is a mouse</span>
+                            <span className="text-sm text-theme-textSecondary">{t('settings.cursorReadoutHint')}</span>
                         </div>
                     </SettingSection>
                 </SettingGroup>
 
                 <SettingGroup id="settings-appearance">
-                    <SettingSection title="Font" icon={icons.font}>
+                    <SettingSection title={t('command.font')} icon={icons.font}>
                         <div className="settings-options-grid" onMouseLeave={resetFontPreview}>
                             {availableFonts.map(f => (
                                 <OptionButton
@@ -805,13 +812,13 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                         </div>
                         <div className="settings-toggles">
                             <Toggle
-                                label="Bold text"
+                                label={t('command.boldText')}
                                 isEnabled={isBoldTextEnabled}
                                 onToggle={setBoldTextEnabled}
                                 icon={icons.bold}
                             />
                             <Toggle
-                                label="Rainbow text"
+                                label={t('command.rainbowText')}
                                 isEnabled={isRainbowEnabled}
                                 onToggle={setRainbowEnabled}
                                 icon={icons.rainbow}
@@ -819,24 +826,24 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                         </div>
                     </SettingSection>
 
-                    <SettingSection title="Interface" icon={icons.controls}>
+                    <SettingSection title={t('settings.section.interface')} icon={icons.controls}>
                         <div className="settings-toggles">
                             <Toggle
-                                label="Show utility bar"
+                                label={t('settings.showUtilityBar')}
                                 isEnabled={showUtilityBar}
                                 onToggle={setShowUtilityBar}
                             />
                         </div>
                         <div className="settings-subsection">
-                            <span className="settings-subsection-label">Utility bar style</span>
+                            <span className="settings-subsection-label">{t('command.utilityBarStyle')}</span>
                             <div className="settings-options-row">
-                                <OptionButton label="Compact" isSelected={utilityBarStyle === 'compact'} onClick={() => setUtilityBarStyle('compact')} />
-                                <OptionButton label="Large" isSelected={utilityBarStyle === 'large'} onClick={() => setUtilityBarStyle('large')} />
+                                <OptionButton label={t('command.utilityBarStyle.compact')} isSelected={utilityBarStyle === 'compact'} onClick={() => setUtilityBarStyle('compact')} />
+                                <OptionButton label={t('command.utilityBarStyle.large')} isSelected={utilityBarStyle === 'large'} onClick={() => setUtilityBarStyle('large')} />
                             </div>
                         </div>
                         <div className="settings-toggles">
                             <Toggle
-                                label="Show borders"
+                                label={t('command.showBorders')}
                                 isEnabled={!isHideBordersEnabled}
                                 onToggle={(enabled) => setHideBordersEnabled(!enabled)}
                                 icon={icons.borders}
@@ -844,7 +851,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                             {/* Not offered where the page can't go fullscreen (iPhone) */}
                             {isFullscreenSupported && (
                                 <Toggle
-                                    label="Fullscreen"
+                                    label={t('command.fullscreen')}
                                     isEnabled={isFullscreen}
                                     onToggle={(enabled) => enabled ? enterFullscreen() : exitFullscreen()}
                                     icon={icons.fullscreen}
@@ -855,10 +862,10 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                 </SettingGroup>
 
                 <SettingGroup id="settings-advanced">
-                    <SettingSection title="Performance" icon={icons.fps}>
+                    <SettingSection title={t('settings.section.performance')} icon={icons.fps}>
                         <div className="settings-toggles">
                             <Toggle
-                                label="FPS counter"
+                                label={t('command.fpsCounter')}
                                 isEnabled={isFPSEnabled}
                                 onToggle={setFPSEnabled}
                                 icon={icons.fps}

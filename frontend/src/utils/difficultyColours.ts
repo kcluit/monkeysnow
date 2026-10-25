@@ -9,10 +9,12 @@
 
 import { continentOfCountry } from '../data/resortLocations';
 
+/** Which colour a Run is, which the Ski map names as a skier would say it, e.g. "blue run" or "double black run" */
+export type DifficultyName = 'green' | 'blue' | 'red' | 'black' | 'doubleBlack' | 'freeride' | 'ungraded';
+
 export interface DifficultyColour {
     colour: string;
-    /** As a skier would say it, e.g. "blue" or "double black" */
-    name: string;
+    name: DifficultyName;
     /** Off-piste and freeride routes are dashed, as on European trail maps */
     dashed?: boolean;
 }
@@ -23,7 +25,7 @@ const GREEN: DifficultyColour = { colour: '#16a34a', name: 'green' };
 const BLUE: DifficultyColour = { colour: '#2563eb', name: 'blue' };
 const RED: DifficultyColour = { colour: '#dc2626', name: 'red' };
 const BLACK: DifficultyColour = { colour: '#111111', name: 'black' };
-const DOUBLE_BLACK: DifficultyColour = { colour: '#111111', name: 'double black' };
+const DOUBLE_BLACK: DifficultyColour = { colour: '#111111', name: 'doubleBlack' };
 const FREERIDE: DifficultyColour = { colour: '#f59e0b', name: 'freeride', dashed: true };
 const UNGRADED: DifficultyColour = { colour: '#6b7280', name: 'ungraded' };
 

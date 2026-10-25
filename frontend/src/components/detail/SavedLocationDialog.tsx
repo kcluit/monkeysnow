@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useOverlay } from '../../hooks/useOverlay';
+import { useLanguage } from '../../hooks/useLanguage';
 import {
     MAX_SAVED_ELEVATION,
     MAX_SAVED_NAME_LENGTH,
@@ -37,6 +38,7 @@ export function SavedLocationDialog({
     onSubmit,
     onCancel,
 }: SavedLocationDialogProps): JSX.Element {
+    const { t } = useLanguage();
     const isImperial = unitSystem === 'imperial';
     const toDisplay = (metres: number) => String(isImperial ? Math.round(metres * M_TO_FT) : metres);
 
@@ -81,7 +83,7 @@ export function SavedLocationDialog({
 
                 <div className="chart-settings-content space-y-3">
                     <label className="block">
-                        <span className="block mb-1 text-xs text-theme-textSecondary">Name</span>
+                        <span className="block mb-1 text-xs text-theme-textSecondary">{t('detail.savedLocation.name')}</span>
                         <input
                             type="text"
                             value={name}
@@ -92,13 +94,13 @@ export function SavedLocationDialog({
                         />
                     </label>
                     <label className="block">
-                        <span className="block mb-1 text-xs text-theme-textSecondary">Elevation</span>
+                        <span className="block mb-1 text-xs text-theme-textSecondary">{t('detail.elevation')}</span>
                         <div className="flex items-center gap-2">
                             <input
                                 type="number"
                                 value={elevationText}
                                 onChange={(e) => setElevationText(e.target.value)}
-                                placeholder={isLoadingElevation ? 'Looking up...' : 'Elevation'}
+                                placeholder={isLoadingElevation ? t('detail.savedLocation.lookingUp') : t('detail.elevation')}
                                 min={isImperial ? Math.ceil(MIN_SAVED_ELEVATION * M_TO_FT) : MIN_SAVED_ELEVATION}
                                 max={isImperial ? Math.floor(MAX_SAVED_ELEVATION * M_TO_FT) : MAX_SAVED_ELEVATION}
                                 className={inputClass}
@@ -107,7 +109,11 @@ export function SavedLocationDialog({
                         </div>
                         {elevationText.trim() !== '' && !elevationValid && (
                             <span className="block mt-1 text-xs text-red-500">
-                                Between {toDisplay(MIN_SAVED_ELEVATION)} and {toDisplay(MAX_SAVED_ELEVATION)} {unit}
+                                {t('detail.savedLocation.between', {
+                                    min: toDisplay(MIN_SAVED_ELEVATION),
+                                    max: toDisplay(MAX_SAVED_ELEVATION),
+                                    unit,
+                                })}
                             </span>
                         )}
                     </label>
@@ -115,7 +121,7 @@ export function SavedLocationDialog({
 
                 <div className="chart-settings-footer">
                     <button type="button" className="chart-settings-btn cancel" onClick={onCancel}>
-                        Cancel
+                        {t('detail.cancel')}
                     </button>
                     <button type="submit" className="chart-settings-btn apply disabled:opacity-50 disabled:cursor-not-allowed" disabled={!canSubmit}>
                         {submitLabel}

@@ -4,6 +4,7 @@ import type {
     ProcessedResortData,
     DayForecast,
     Period,
+    PeriodTime,
     SnowCondition,
     SnowTotals,
     PeriodData,
@@ -15,17 +16,21 @@ import type {
     PeriodEstimate,
     UnitSystem
 } from '../types';
+import type { TranslationKey } from '../types/i18n';
 import {
     formatTempWithRounding,
     formatSnow,
     formatRain,
     formatWind,
     formatElevation,
-    formatFreezingLevel
+    formatFreezingLevel,
+    showsRain,
+    showsSnow
 } from './unitConversion';
 import { forecastModelOf } from './resortForecast';
 import { DEFAULT_SNOW_CAUTION, addPrecipitation, dominantQuality, noPrecipitationByQuality, sumPrecipitationByQuality } from './snowQuality';
 import { getModelInfo } from '../data/modelHierarchy';
+import { formatLocale, translate } from '../locales';
 
 /** The Snowfall estimate a visitor starts with: the monkeysnow estimate */
 export const DEFAULT_SNOWFALL_ESTIMATE_MODE: SnowfallEstimateMode = 'totalPrecip';
@@ -58,7 +63,6 @@ export function processResortData(
         }
 
         const days: DayForecast[] = [];
-        const daysInWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
         // Get sorted date keys from the forecast
         const dateKeys = Object.keys(elevationData.forecast).sort();
@@ -67,19 +71,13 @@ export function processResortData(
             const dayData = elevationData.forecast[dateKey];
             if (!dayData) continue;
 
-            const date = new Date(dateKey);
-            // Use getUTCDay() to match the forecast date key (which is parsed as UTC)
-            const dayName = daysInWeek[date.getUTCDay()];
-            // Format date as "Jan 25" for optional display
-            const dateDisplay = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
-
             // Create periods from AM/PM/NIGHT data
             const periods = createPeriodsFromDayData(dayData, temperatureMetric, snowfallEstimateMode, unitSystem, snowCaution);
 
             // Skip days with no meaningful forecast data (API returned zeros beyond model range)
             if (periods.length === 0 || periods.every(p => p.tempMax === 0 && p.tempMin === 0 && p.tempAvg === 0 && p.tempMedian === 0)) continue;
 
-            const snowCondition = getSnowConditionFromQuality(dayQualityOf(dayData, periods, snowfallEstimateMode, snowCaution));
+            const snowCondition = getSnowConditionFromQuality(dayQualityOf(dayData, periods, snowfallEstimateMode, unitSystem, snowCaution));
 
             // Get the highest freezing level from all periods
             const freezingLevels = [
@@ -91,13 +89,15 @@ export function processResortData(
 
             // The day's weather (and its emoji) is its PM Period's, else Night's, else AM's
             const mainWeatherCode = dayData.PM?.weather_code ?? dayData.NIGHT?.weather_code ?? dayData.AM?.weather_code ?? 0;
-            const mainCondition = getWeatherDescription(mainWeatherCode);
 
+            // Words and dates are getters, in the language shown when they're read (see types/index.ts)
             days.push({
-                name: dayName,
-                date: dateDisplay,
-                weather: mainCondition,
-                weatherEmoji: getWeatherEmoji(mainCondition),
+                dateKey,
+                get name() { return weekdayName(dateKey); },
+                get date() { return shortDate(dateKey); },
+                weatherCode: mainWeatherCode,
+                get weather() { return getWeatherDescription(mainWeatherCode); },
+                weatherEmoji: getWeatherEmoji(mainWeatherCode),
                 periods,
                 freezingLevel: formatFreezingLevel(highestFreezingLevel, unitSystem),
                 snowCondition
@@ -116,7 +116,7 @@ export function processResortData(
             elevation: formatElevation(elevationData.metadata.elevation, unitSystem),
             days,
             fetchedAt: resortData.fetchedAt,
-            model: getModelInfo(model)?.label ?? model,
+            get model() { return getModelInfo(model)?.label ?? model; },
             isHistory: allData.historyLength !== undefined,
         };
     } catch (err) {
@@ -128,16 +128,16 @@ export function processResortData(
 function createPeriodsFromDayData(dayData: DayData, temperatureMetric: TemperatureMetric, snowfallEstimateMode: SnowfallEstimateMode, unitSystem: UnitSystem, snowCaution: SnowCaution): Period[] {
     const periods: Period[] = [];
 
-    const periodOrder: Array<{ key: keyof DayData; label: string }> = [
-        { key: 'AM', label: 'AM' },
-        { key: 'PM', label: 'PM' },
-        { key: 'NIGHT', label: 'Night' }
+    const periodOrder: Array<{ key: keyof DayData; time: PeriodTime }> = [
+        { key: 'AM', time: 'AM' },
+        { key: 'PM', time: 'PM' },
+        { key: 'NIGHT', time: 'Night' }
     ];
 
-    for (const { key, label } of periodOrder) {
+    for (const { key, time } of periodOrder) {
         const periodData = dayData[key];
         if (periodData) {
-            periods.push(createPeriodFromData(periodData, label, temperatureMetric, snowfallEstimateMode, unitSystem, snowCaution));
+            periods.push(createPeriodFromData(periodData, time, temperatureMetric, snowfallEstimateMode, unitSystem, snowCaution));
         }
     }
 
@@ -159,7 +159,7 @@ function getTemperatureByMetric(data: PeriodData, metric: TemperatureMetric): nu
     }
 }
 
-function createPeriodFromData(data: PeriodData, label: string, temperatureMetric: TemperatureMetric, snowfallEstimateMode: SnowfallEstimateMode, unitSystem: UnitSystem, snowCaution: SnowCaution): Period {
+function createPeriodFromData(data: PeriodData, time: PeriodTime, temperatureMetric: TemperatureMetric, snowfallEstimateMode: SnowfallEstimateMode, unitSystem: UnitSystem, snowCaution: SnowCaution): Period {
     const displayTemp = getTemperatureByMetric(data, temperatureMetric);
     // Determine rounding mode based on metric
     const roundingMode = temperatureMetric === 'max' ? 'ceil' as const
@@ -189,94 +189,120 @@ function createPeriodFromData(data: PeriodData, label: string, temperatureMetric
         ? 'sleet/mix' as SnowQuality
         : snowQuality;
 
+    const weatherCode = data.weather_code ?? 0;
     return {
-        time: label,
+        time,
         temp: formatTempWithRounding(displayTemp, unitSystem, roundingMode),
         tempMax: data.temperature_max ?? 0,
         tempMin: data.temperature_min ?? 0,
         tempAvg: data.temperature_avg ?? 0,
         tempMedian: data.temperature_median ?? 0,
-        snow: formatSnow(snowValue, unitSystem),
-        rain: formatRain(rainValue, unitSystem),
+        get snow() { return formatSnow(snowValue, unitSystem); },
+        get rain() { return formatRain(rainValue, unitSystem); },
         wind: formatWind(data.wind_speed ?? 0, unitSystem),
         snowCm: snowValue,
         rainMm: rainValue,
         windKmh: data.wind_speed ?? 0,
-        condition: getWeatherDescription(data.weather_code ?? 0),
+        weatherCode,
+        get condition() { return getWeatherDescription(weatherCode); },
         snowQuality: effectiveQuality,
         freezingLevel: formatFreezingLevel(data.freezing_level, unitSystem)
     };
 }
 
-// WMO Weather Code to description mapping
+/** Each WMO weather code's words, and its emoji by the kind of weather: snow, rain or drizzle, clear, cloud, fog or thunder */
+const WEATHER: Record<number, { key: TranslationKey; emoji: string }> = {
+    0: { key: 'weather.clearSky', emoji: '☀️' },
+    1: { key: 'weather.mainlyClear', emoji: '☀️' },
+    2: { key: 'weather.partlyCloudy', emoji: '☁️' },
+    3: { key: 'weather.overcast', emoji: '☁️' },
+    45: { key: 'weather.foggy', emoji: '🌫️' },
+    48: { key: 'weather.rimeFog', emoji: '🌫️' },
+    51: { key: 'weather.lightDrizzle', emoji: '🌧️' },
+    53: { key: 'weather.moderateDrizzle', emoji: '🌧️' },
+    55: { key: 'weather.denseDrizzle', emoji: '🌧️' },
+    56: { key: 'weather.lightFreezingDrizzle', emoji: '🌧️' },
+    57: { key: 'weather.denseFreezingDrizzle', emoji: '🌧️' },
+    61: { key: 'weather.slightRain', emoji: '🌧️' },
+    63: { key: 'weather.moderateRain', emoji: '🌧️' },
+    65: { key: 'weather.heavyRain', emoji: '🌧️' },
+    66: { key: 'weather.lightFreezingRain', emoji: '🌧️' },
+    67: { key: 'weather.heavyFreezingRain', emoji: '🌧️' },
+    71: { key: 'weather.slightSnow', emoji: '❄️' },
+    73: { key: 'weather.moderateSnow', emoji: '❄️' },
+    75: { key: 'weather.heavySnow', emoji: '❄️' },
+    77: { key: 'weather.snowGrains', emoji: '❄️' },
+    80: { key: 'weather.slightRainShowers', emoji: '🌧️' },
+    81: { key: 'weather.moderateRainShowers', emoji: '🌧️' },
+    82: { key: 'weather.violentRainShowers', emoji: '🌧️' },
+    85: { key: 'weather.slightSnowShowers', emoji: '❄️' },
+    86: { key: 'weather.heavySnowShowers', emoji: '❄️' },
+    95: { key: 'weather.thunderstorm', emoji: '⛈️' },
+    96: { key: 'weather.thunderstormSlightHail', emoji: '⛈️' },
+    99: { key: 'weather.thunderstormHeavyHail', emoji: '⛈️' },
+};
+
+/** A WMO weather code in words, in the language shown */
 export function getWeatherDescription(code: number): string {
-    const descriptions: Record<number, string> = {
-        0: 'Clear sky',
-        1: 'Mainly clear',
-        2: 'Partly cloudy',
-        3: 'Overcast',
-        45: 'Foggy',
-        48: 'Depositing rime fog',
-        51: 'Light drizzle',
-        53: 'Moderate drizzle',
-        55: 'Dense drizzle',
-        56: 'Light freezing drizzle',
-        57: 'Dense freezing drizzle',
-        61: 'Slight rain',
-        63: 'Moderate rain',
-        65: 'Heavy rain',
-        66: 'Light freezing rain',
-        67: 'Heavy freezing rain',
-        71: 'Slight snow',
-        73: 'Moderate snow',
-        75: 'Heavy snow',
-        77: 'Snow grains',
-        80: 'Slight rain showers',
-        81: 'Moderate rain showers',
-        82: 'Violent rain showers',
-        85: 'Slight snow showers',
-        86: 'Heavy snow showers',
-        95: 'Thunderstorm',
-        96: 'Thunderstorm with slight hail',
-        99: 'Thunderstorm with heavy hail'
-    };
-    return descriptions[code] || 'Unknown';
+    return translate(WEATHER[code]?.key ?? 'weather.unknown');
 }
 
-export function getWeatherEmoji(condition: string): string {
-    if (!condition) return '⛅';
-    const lowerCondition = condition.toLowerCase();
-
-    if (lowerCondition.includes('snow')) return '❄️';
-    if (lowerCondition.includes('rain') || lowerCondition.includes('drizzle')) return '🌧️';
-    if (lowerCondition.includes('clear')) return '☀️';
-    if (lowerCondition.includes('cloud') || lowerCondition.includes('overcast')) return '☁️';
-    if (lowerCondition.includes('fog')) return '🌫️';
-    if (lowerCondition.includes('thunder')) return '⛈️';
-    return '⛅';
+/** A WMO weather code's emoji */
+export function getWeatherEmoji(code: number): string {
+    return WEATHER[code]?.emoji ?? '⛅';
 }
+
+// A day's Snow quality as the Default view's cards head it
+const SNOW_CONDITIONS: Record<SnowQuality, { key: TranslationKey; isHighlight: boolean }> = {
+    powder: { key: 'card.snowCondition.powder', isHighlight: true },
+    dry_snow: { key: 'card.snowCondition.drySnow', isHighlight: true },
+    wet_snow: { key: 'card.snowCondition.wetSnow', isHighlight: false },
+    'sleet/mix': { key: 'snowQuality.sleetMix', isHighlight: false },
+    rain: { key: 'snowQuality.rain', isHighlight: false },
+};
 
 /**
  * Maps snow quality from API to display text and whether it is highlighted
  */
 export function getSnowConditionFromQuality(quality: SnowQuality | null): SnowCondition {
     if (quality === null) {
-        return { text: 'N/A', isHighlight: false, isSecondary: true };
+        return { get text() { return translate('card.snowCondition.none'); }, isHighlight: false, isSecondary: true };
     }
-    switch (quality) {
-        case 'powder':
-            return { text: 'Powder!', isHighlight: true };
-        case 'dry_snow':
-            return { text: 'Dry Snow', isHighlight: true };
-        case 'wet_snow':
-            return { text: 'Wet Snow', isHighlight: false };
-        case 'sleet/mix':
-            return { text: 'Sleet/Mix', isHighlight: false };
-        case 'rain':
-            return { text: 'Rain', isHighlight: false };
-        default:
-            return { text: 'Mixed conditions', isHighlight: false };
+    const { key, isHighlight }: { key: TranslationKey; isHighlight: boolean } =
+        SNOW_CONDITIONS[quality] ?? { key: 'card.snowCondition.mixed', isHighlight: false };
+    return { get text() { return translate(key); }, isHighlight };
+}
+
+interface DayFormats {
+    weekday: Intl.DateTimeFormat;
+    date: Intl.DateTimeFormat;
+}
+
+const dayFormats = new Map<string, DayFormats>();
+
+// A forecast day's date key is read as UTC midnight, so it is written in UTC to stay that date
+function dayFormatsFor(locale: string): DayFormats {
+    let formats = dayFormats.get(locale);
+    if (!formats) {
+        formats = {
+            weekday: new Intl.DateTimeFormat(locale, { weekday: 'long', timeZone: 'UTC' }),
+            date: new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric', timeZone: 'UTC' }),
+        };
+        dayFormats.set(locale, formats);
     }
+    return formats;
+}
+
+/** "Saturday" for "2026-10-24", capitalised as a card's heading, since French writes "samedi" */
+function weekdayName(dateKey: string): string {
+    const locale = formatLocale();
+    const name = dayFormatsFor(locale).weekday.format(new Date(dateKey));
+    return name.charAt(0).toLocaleUpperCase(locale) + name.slice(1);
+}
+
+/** "Oct 24", or "24 oct." in French */
+function shortDate(dateKey: string): string {
+    return dayFormatsFor(formatLocale()).date.format(new Date(dateKey));
 }
 
 /**
@@ -304,8 +330,8 @@ function periodEstimateOf(data: PeriodData, snowCaution: SnowCaution): PeriodEst
  * Periods all show nothing has none, and in Model mode a Rain day the model gives snow for
  * is a mix, as a Period is.
  */
-function dayQualityOf(dayData: DayData, periods: Period[], snowfallEstimateMode: SnowfallEstimateMode, snowCaution: SnowCaution): SnowQuality | null {
-    if (!periods.some(p => parseFloat(p.snow) > 0 || parseFloat(p.rain) > 0)) return null;
+function dayQualityOf(dayData: DayData, periods: Period[], snowfallEstimateMode: SnowfallEstimateMode, unitSystem: UnitSystem, snowCaution: SnowCaution): SnowQuality | null {
+    if (!periods.some(p => showsSnow(p.snowCm, unitSystem) || showsRain(p.rainMm, unitSystem))) return null;
     const byQuality = sumPrecipitationByQuality(
         [dayData.AM, dayData.PM, dayData.NIGHT].map(data => data ? periodEstimateOf(data, snowCaution).precipitation_by_quality : undefined)
     );

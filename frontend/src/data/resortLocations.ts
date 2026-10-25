@@ -4,10 +4,13 @@
  * resorts/resorts.json is generated from OpenSkiData by scripts/import-resorts.mjs
  * (see resorts/README.md). This module indexes it for lookups, resolves earlier
  * slugs and pre-OpenSkiData IDs to current ones, and reshapes it into the
- * Continent -> Country -> Region hierarchy the resort picker renders.
+ * Continent -> Country -> Region hierarchy the resort picker renders. Its names are
+ * resorts.json's English ones; continentName() and countryName() (locales) show them.
  */
 
 import resortData from './resorts/resorts.json';
+import { translate } from '../locales';
+import type { TranslationKey } from '../types/i18n';
 
 export interface ResortLocation {
     displayName: string;
@@ -32,6 +35,8 @@ export interface ResortInfo {
 export interface ProvinceData {
     id: string;
     name: string;
+    /** The Resorts OpenSkiData gives no Region in a country split into Regions, named "Other" */
+    isOther?: boolean;
     resorts: ResortInfo[];
 }
 
@@ -72,6 +77,21 @@ const rawCountries = resortData.countries as unknown as Record<string, RawCountr
 const rawResorts = resortData.resorts as unknown as Record<string, RawResort>;
 
 const CONTINENT_ORDER = ['North America', 'Europe', 'Asia', 'Oceania', 'South America', 'Africa'];
+
+const CONTINENT_NAMES: Record<string, TranslationKey> = {
+    'North America': 'continent.northAmerica',
+    'Europe': 'continent.europe',
+    'Asia': 'continent.asia',
+    'Oceania': 'continent.oceania',
+    'South America': 'continent.southAmerica',
+    'Africa': 'continent.africa',
+};
+
+/** A continent's name in the language shown, from resorts.json's English one */
+export function continentName(continent: string): string {
+    const key = CONTINENT_NAMES[continent];
+    return key ? translate(key) : continent;
+}
 
 /** Attribution OpenSkiData's licence (ODbL) requires wherever Resort data is shown. */
 export const RESORT_DATA_ATTRIBUTION: string = resortData.attribution;
@@ -126,12 +146,13 @@ function buildHierarchy(): ContinentData[] {
         }
 
         // Small countries get one implicit group named after the country
+        const isOther = country.regions && !r.region;
         const provinceName = country.regions ? r.region ?? 'Other' : country.name;
         const provinceKey = `${r.country}|${provinceName}`;
         let province = provinces.get(provinceKey);
         if (!province) {
             const provinceId = country.regions ? `${countryNode.id}-${toSlugId(provinceName)}` : countryNode.id;
-            province = { id: provinceId, name: provinceName, resorts: [] };
+            province = { id: provinceId, name: provinceName, ...(isOther ? { isOther } : {}), resorts: [] };
             provinces.set(provinceKey, province);
             countryNode.provinces.push(province);
         }

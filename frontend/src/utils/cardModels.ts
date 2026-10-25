@@ -211,7 +211,8 @@ export function countryModelOptions(country: string): CountryModelProvider[] {
         const points = resortPointsOf(country);
         providers = modelProviders
             .map((provider) => ({
-                name: provider.name,
+                // Read from the Provider each time, in the language shown, since this is kept for every visit
+                get name() { return provider.name; },
                 options: provider.models
                     .filter((info) => canFillCards(info.id))
                     .map((info) => ({

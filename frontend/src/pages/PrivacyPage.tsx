@@ -6,6 +6,7 @@ import {
     faGlobe,
 } from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface SectionProps {
     title: string;
@@ -28,8 +29,13 @@ function Section({ title, icon, children }: SectionProps): JSX.Element {
 }
 
 export function PrivacyPage(): JSX.Element {
+    const { t, language } = useLanguage();
+    // The policy stays in English, the binding version; another language only says so, above it
     return (
-        <div className="about-page">
+        <div className="about-page" lang="en">
+            {language.id !== 'en' && (
+                <p className="about-note" lang={language.id} style={{ marginTop: 0 }}>{t('legal.privacyEnglishOnly')}</p>
+            )}
             <Section title="privacy policy" icon={faShieldAlt}>
                 <p>
                     Your privacy is important to us. This policy explains what information monkeysnow

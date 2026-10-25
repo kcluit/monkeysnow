@@ -1,7 +1,8 @@
 /**
- * A Graph's time axis, labelled in the point's own time zone: the day ("Sat 17") at
- * each local midnight and clock hours in between, as many as fit. It is built once per
- * Graph because formatting in a time zone is slow unless the formatters are reused.
+ * A Graph's time axis, labelled in the point's own time zone and in the language shown:
+ * the day ("Sat 17", "sam. 17") at each local midnight and clock hours in between, as
+ * many as fit. It is built once per Graph and language because formatting in a time
+ * zone is slow unless the formatters are reused.
  */
 
 const HOUR = 3600;
@@ -20,26 +21,27 @@ interface Formatters {
 
 const formatterCache = new Map<string, Formatters>();
 
-function createFormatters(timeZone: string | undefined): Formatters {
+function createFormatters(timeZone: string | undefined, locale: string): Formatters {
     const zone = timeZone ? { timeZone } : {};
     return {
+        // Read as a number, so always in English digits on a 24-hour clock
         hour: new Intl.DateTimeFormat('en-US', { ...zone, hour: 'numeric', hourCycle: 'h23' }),
-        hourLabel: new Intl.DateTimeFormat('en-US', { ...zone, hour: 'numeric' }),
-        weekday: new Intl.DateTimeFormat('en-US', { ...zone, weekday: 'short' }),
-        dayOfMonth: new Intl.DateTimeFormat('en-US', { ...zone, day: 'numeric' }),
-        tooltipDay: new Intl.DateTimeFormat('en-US', { ...zone, weekday: 'short', month: 'short', day: 'numeric' }),
+        hourLabel: new Intl.DateTimeFormat(locale, { ...zone, hour: 'numeric' }),
+        weekday: new Intl.DateTimeFormat(locale, { ...zone, weekday: 'short' }),
+        dayOfMonth: new Intl.DateTimeFormat(locale, { ...zone, day: 'numeric' }),
+        tooltipDay: new Intl.DateTimeFormat(locale, { ...zone, weekday: 'short', month: 'short', day: 'numeric' }),
     };
 }
 
-function formattersFor(timeZone: string | undefined): Formatters {
-    const key = timeZone ?? '';
+function formattersFor(timeZone: string | undefined, locale: string): Formatters {
+    const key = `${locale}|${timeZone ?? ''}`;
     let formatters = formatterCache.get(key);
     if (!formatters) {
         try {
-            formatters = createFormatters(timeZone);
+            formatters = createFormatters(timeZone, locale);
         } catch {
             // A time zone this browser doesn't know: label in the browser's own
-            formatters = createFormatters(undefined);
+            formatters = createFormatters(undefined, locale);
         }
         formatterCache.set(key, formatters);
     }
@@ -57,10 +59,10 @@ export class GraphTimeAxis {
 
     /**
      * Hours on the forecast's own clock (`alignedTo` is one of them) from `from` to `to`,
-     * so the axis covers what every Graph on the page shows.
+     * so the axis covers what every Graph on the page shows, labelled in `locale`'s way.
      */
-    constructor(from: number, to: number, alignedTo: number, timeZone: string | undefined) {
-        this.formatters = formattersFor(timeZone);
+    constructor(from: number, to: number, alignedTo: number, timeZone: string | undefined, locale: string) {
+        this.formatters = formattersFor(timeZone, locale);
         const f = this.formatters;
         const first = alignedTo - Math.ceil((alignedTo - from) / HOUR) * HOUR;
         for (let t = first; t <= to; t += HOUR) {
@@ -106,7 +108,7 @@ export class GraphTimeAxis {
         return this.labels[this.indexOf(t)] ?? '';
     }
 
-    /** "Sat, Oct 17, 4 – 5 PM": the hour before `t`, which its precipitation fell in */
+    /** "Sat, Oct 17, 4 – 5 PM" ("sam. 17 oct., 16 – 17 h"): the hour before `t`, which its precipitation fell in */
     hourBefore(t: number): string {
         const f = this.formatters;
         const end = new Date(t * 1000);

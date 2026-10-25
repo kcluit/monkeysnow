@@ -1,4 +1,5 @@
 import { useLocalStorage } from './useLocalStorage';
+import { useLanguage } from './useLanguage';
 import { RECOMMENDED_MODELS, aggregationOptions, getModelInfo } from '../data/modelHierarchy';
 import type { AggregationType, WeatherModel } from '../types/openMeteo';
 
@@ -20,14 +21,15 @@ export function useSelectedAggregations(): [AggregationType[], Setter<Aggregatio
 
 /** e.g. "ECMWF IFS HRES, NOAA GFS Seamless + Median", or "6 models + 3 Aggregations" when there are more, for the Settings page */
 export function useDetailedViewModelsSummary(): string {
+    const { t } = useLanguage();
     const [selectedModels] = useSelectedModels();
     const [selectedAggregations] = useSelectedAggregations();
-    const models = selectedModels.length === 0 ? 'No models'
+    const models = selectedModels.length === 0 ? t('detail.summary.noModels')
         : selectedModels.length <= 3 ? selectedModels.map((model) => getModelInfo(model)?.label ?? model).join(', ')
-        : `${selectedModels.length} models`;
+        : t('detail.summary.models', { count: selectedModels.length });
     if (selectedAggregations.length === 0) return models;
     const aggregations = selectedAggregations.length <= 2
         ? selectedAggregations.map((id) => aggregationOptions.find((option) => option.id === id)?.name ?? id).join(', ')
-        : `${selectedAggregations.length} Aggregations`;
+        : t('detail.summary.aggregations', { count: selectedAggregations.length });
     return `${models} + ${aggregations}`;
 }

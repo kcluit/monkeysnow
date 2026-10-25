@@ -6,6 +6,7 @@
 import type { WeatherModel, HourlyDataPoint } from '../types/openMeteo';
 import { coversPoint, getModelInfo, hasGlobalCoverage, inCatalogueOrder } from '../data/modelHierarchy';
 import type { ModelAvailabilityContext } from '../types/detailView';
+import { translate } from '../locales';
 
 export type DroppedModel =
     | { reason: 'no-data' }
@@ -103,14 +104,16 @@ export function resolveComparisonModels(
 }
 
 /**
- * Why a Selected model isn't drawn at the point being forecast, or null when it is (or
- * would be, once loaded).
+ * Why a Selected model isn't drawn at the point being forecast, in the current language,
+ * or null when it is (or would be, once loaded).
  */
 export function getUnavailableReason(model: WeatherModel, availability: ModelAvailabilityContext): string | null {
     const { point, droppedModels } = availability;
-    if (!coversPoint(model, point.lat, point.lon)) return 'Outside its coverage';
+    if (!coversPoint(model, point.lat, point.lon)) return translate('detail.unavailable.outsideCoverage');
     const dropped = droppedModels.get(model);
-    if (dropped?.reason === 'no-data') return 'No data here';
-    if (dropped?.reason === 'clone') return `Same as ${getModelInfo(dropped.of)?.label ?? dropped.of} here`;
+    if (dropped?.reason === 'no-data') return translate('detail.unavailable.noData');
+    if (dropped?.reason === 'clone') {
+        return translate('detail.unavailable.clone', { model: getModelInfo(dropped.of)?.label ?? dropped.of });
+    }
     return null;
 }

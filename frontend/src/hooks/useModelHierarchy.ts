@@ -15,6 +15,7 @@ import {
   flattenModels,
   type ModelHierarchyNode,
 } from '../data/modelHierarchy';
+import { useLanguage } from './useLanguage';
 
 export interface UseModelHierarchyProps {
   selectedModels: WeatherModel[];
@@ -65,8 +66,9 @@ export function useModelHierarchy({
   selectedAggregations,
   onAggregationsChange,
 }: UseModelHierarchyProps): UseModelHierarchyReturn {
-  // Build hierarchy tree once
-  const hierarchyTree = useMemo(() => buildModelHierarchyTree(), []);
+  // Build hierarchy tree once per language, which its names and descriptions are in
+  const { language } = useLanguage();
+  const hierarchyTree = useMemo(() => buildModelHierarchyTree(), [language]);
 
   // Modal state
   const [isOpen, setIsOpen] = useState(false);

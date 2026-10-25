@@ -5,6 +5,7 @@
  */
 
 import type { SnowQuality } from '../types';
+import { translate } from '../locales';
 
 export const SNOW_QUALITY_COLOURS: Record<SnowQuality, string> = {
     rain: '#22a447',
@@ -14,11 +15,14 @@ export const SNOW_QUALITY_COLOURS: Record<SnowQuality, string> = {
     powder: '#8a4fe0',
 };
 
-/** Each Snow quality's name as the page shows it */
+/**
+ * Each Snow quality's name as the page shows it. Getters, so each is looked up in the
+ * language shown when it's read, never once as this module loads.
+ */
 export const SNOW_QUALITY_NAMES: Record<SnowQuality, string> = {
-    rain: 'Rain',
-    'sleet/mix': 'Sleet/Mix',
-    wet_snow: 'Wet snow',
-    dry_snow: 'Dry snow',
-    powder: 'Powder',
+    get rain() { return translate('snowQuality.rain'); },
+    get 'sleet/mix'() { return translate('snowQuality.sleetMix'); },
+    get wet_snow() { return translate('snowQuality.wetSnow'); },
+    get dry_snow() { return translate('snowQuality.drySnow'); },
+    get powder() { return translate('snowQuality.powder'); },
 };

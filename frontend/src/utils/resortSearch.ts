@@ -2,8 +2,40 @@
  * Search in the resort picker, forgiving about how a name is typed: accents,
  * punctuation and word order don't matter, and Mt., St. and Ste. find Mount,
  * Saint, Sankt and Sainte (and the other way round). Mont and Monte are left
- * alone: they are other languages' words, not abbreviations of Mount.
+ * alone: they are other languages' words, not abbreviations of Mount. A country
+ * is found by its name in every language monkeysnow has, whichever is showing.
  */
+
+import { languages } from '../locales';
+
+const regionNames = new Map<string, Intl.DisplayNames | null>();
+
+function regionNamesIn(locale: string): Intl.DisplayNames | null {
+    let names = regionNames.get(locale);
+    if (names === undefined) {
+        try {
+            names = new Intl.DisplayNames([locale], { type: 'region', fallback: 'none' });
+        } catch {
+            names = null;
+        }
+        regionNames.set(locale, names);
+    }
+    return names;
+}
+
+/**
+ * A country's names in every language monkeysnow has, for search to find it by any of
+ * them: English's is resorts.json's, as countryName() shows it, and the rest the browser's.
+ */
+export function countryNamesInEveryLanguage(code: string, englishName: string): string[] {
+    const names = new Set([englishName]);
+    for (const language of languages) {
+        if (language.id === 'en') continue;
+        const name = regionNamesIn(language.locale)?.of(code.toUpperCase());
+        if (name) names.add(name);
+    }
+    return [...names];
+}
 
 // Letters that aren't a plain letter plus an accent, so removing accents leaves them as they are
 const SPECIAL_LETTERS: Record<string, string> = {

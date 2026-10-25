@@ -1,3 +1,4 @@
+import { Fragment, type ReactNode } from 'react';
 import { Icon } from '../components/Icon';
 import {
     faInfoCircle,
@@ -15,6 +16,7 @@ import {
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { Link } from 'react-router-dom';
 import { useGitHubContributors } from '../hooks/useGitHubContributors';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface SectionProps {
     title: string;
@@ -56,123 +58,92 @@ function Subsection({ title, icon, children }: SubsectionProps): JSX.Element {
     );
 }
 
+/** A translated sentence with links or keys in place of its {placeholders}, wherever its language puts them */
+function withParts(sentence: string, parts: Record<string, ReactNode>): ReactNode[] {
+    // Splitting on a captured group leaves the placeholders' names at the odd indexes
+    return sentence.split(/\{(\w+)\}/).map((piece, i) => (i % 2 === 0 ? piece : <Fragment key={i}>{parts[piece]}</Fragment>));
+}
+
+function ExternalLink({ href, children }: { href: string; children: ReactNode }): JSX.Element {
+    return (
+        <a href={href} target="_blank" rel="noopener noreferrer" className="about-link">
+            {children}
+        </a>
+    );
+}
+
 export function AboutPage(): JSX.Element {
+    const { t } = useLanguage();
     const { contributors, loading, error } = useGitHubContributors();
+    const openMeteo = <ExternalLink href="https://open-meteo.com/">Open-Meteo</ExternalLink>;
 
     return (
         <div className="about-page">
 
 
             {/* About Section */}
-            <Section title="about" icon={faInfoCircle}>
-                <p>
-                    monkeysnow is a minimalistic and customizable ski resort/snow forecast app.
-                    It displays weather data from multiple weather models for ski resorts around the world,
-                    with snow accumulation estimates based on wet bulb temperature and precipitation.
-                </p>
-                <p>
-                    The app features multiple view modes, customizable themes, and multi-model comparison charts.
-                </p>
-                <p>
-                    Track conditions at your favorite resorts and compare forecasts across weather models.
-                </p>
+            <Section title={t('about.title.about')} icon={faInfoCircle}>
+                <p>{t('about.intro')}</p>
+                <p>{t('about.features')}</p>
+                <p>{t('about.track')}</p>
             </Section>
 
             {/* Snow Estimation Section */}
-            <Section title="snow estimation" icon={faSnowflake}>
-                <p>
-                    monkeysnow estimates what falls from each hour's temperature and humidity at the height
-                    being forecast, through the wet-bulb temperature: how cold the air would get if its moisture
-                    evaporated into it, which tells rain from snow better than the air temperature alone.
-                    How far it leans toward the worse label when an hour is close is your snow caution,
-                    set on the settings page: cautious unless you pick another.
-                </p>
-                <Subsection title="snow quality, when cautious" icon={faListOl}>
+            <Section title={t('about.title.snowEstimation')} icon={faSnowflake}>
+                <p>{t('about.snow.intro')}</p>
+                <Subsection title={t('about.title.qualityWhenCautious')} icon={faListOl}>
                     <dl className="about-stats-list">
-                        <dt>powder</dt>
-                        <dd>
-                            - light, fluffy snow, 15 cm or more for every centimetre of water.
-                            Wet bulb from about −11 °C down to about −21 °C.
-                        </dd>
+                        <dt>{t('about.quality.powder')}</dt>
+                        <dd>- {t('about.quality.powderText')}</dd>
 
-                        <dt>dry snow</dt>
-                        <dd>
-                            - good snow of ordinary density, 10 to 15 cm for every centimetre of water.
-                            Wet bulb from about −3.5 °C down to −11 °C, and again below −21 °C, where crystals go small.
-                        </dd>
+                        <dt>{t('about.quality.drySnow')}</dt>
+                        <dd>- {t('about.quality.drySnowText')}</dd>
 
-                        <dt>wet snow</dt>
-                        <dd>
-                            - heavy snow, under 10 cm for every centimetre of water.
-                            Wet bulb from −0.5 °C down to about −3.5 °C.
-                        </dd>
+                        <dt>{t('about.quality.wetSnow')}</dt>
+                        <dd>- {t('about.quality.wetSnowText')}</dd>
 
-                        <dt>sleet/mix</dt>
-                        <dd>
-                            - snow and rain together, counted partly as each.
-                            Wet bulb between −0.5 °C and +0.5 °C, where snow is still the likelier but not near-certain.
-                        </dd>
+                        <dt>{t('about.quality.sleetMix')}</dt>
+                        <dd>- {t('about.quality.sleetMixText')}</dd>
 
-                        <dt>rain</dt>
-                        <dd>
-                            - wet bulb of +0.5 °C and above.
-                        </dd>
+                        <dt>{t('about.quality.rain')}</dt>
+                        <dd>- {t('about.quality.rainText')}</dd>
                     </dl>
                 </Subsection>
-                <Subsection title="snow caution" icon={faShieldAlt}>
+                <Subsection title={t('about.title.snowCaution')} icon={faShieldAlt}>
                     <dl className="about-stats-list">
-                        <dt>extra cautious</dt>
-                        <dd>
-                            - rain from a wet bulb of −0.3 °C and sleet/mix from −1.5 °C, so rain wherever there's
-                            even a 1 in 10 chance of it. Its snow is denser too, as LaChapelle measured it at Alta,
-                            so down to a wet bulb of about −6 °C the same water makes 10 to 15% less of it.
-                        </dd>
+                        <dt>{t('about.caution.extraCautious')}</dt>
+                        <dd>- {t('about.caution.extraCautiousText')}</dd>
 
-                        <dt>cautious</dt>
-                        <dd>
-                            - the labels above: rain from +0.5 °C, where snow is still about 2 in 3 likely.
-                        </dd>
+                        <dt>{t('about.caution.cautious')}</dt>
+                        <dd>- {t('about.caution.cautiousText')}</dd>
 
-                        <dt>realistic</dt>
-                        <dd>
-                            - rain from +1.35 °C and sleet/mix from +0.25 °C, so half snow at +0.8 °C,
-                            where the rain–snow studies put it in the mountains.
-                        </dd>
+                        <dt>{t('about.caution.realistic')}</dt>
+                        <dd>- {t('about.caution.realisticText')}</dd>
                     </dl>
                 </Subsection>
-                <p>
-                    The "monkeysnow estimate" on a card, shown unless you pick the "Model estimate", splits each
-                    hour's total precipitation into snow and rain this way, for each elevation on its own, and turns
-                    the snow's water into centimetres with a snow-to-liquid ratio that rises from 8 near freezing to
-                    17 at −14 °C and falls again in the bitter cold. The "Model estimate" shows the weather model's
-                    own snowfall and rain instead, which it works out for its grid cell rather than for each elevation.
-                </p>
-                <p>
-                    A period's or a day's snow quality is the one under which most of its precipitation fell;
-                    on a tie, the worse one.
-                </p>
-                <p className="about-note">
-                    Note: These estimates are approximations. Actual snow conditions depend on many factors
-                    including wind, elevation and local terrain effects, and on the weather model being right.
-                </p>
+                <p>{t('about.snow.estimates')}</p>
+                <p>{t('about.snow.tie')}</p>
+                <p className="about-note">{t('about.snow.note')}</p>
             </Section>
 
             {/* Keybinds Section */}
-            <Section title="keybinds" icon={faKeyboard}>
+            <Section title={t('about.title.keybinds')} icon={faKeyboard}>
                 <p>
-                    You can use <kbd>Esc</kbd> or <kbd>Tab</kbd> or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> to
-                    open the command palette. From there you can access all settings and controls without touching your mouse.
+                    {withParts(t('about.keys.palette'), {
+                        esc: <kbd>{t('about.key.esc')}</kbd>,
+                        tab: <kbd>{t('about.key.tab')}</kbd>,
+                        ctrl: <kbd>{t('about.key.ctrl')}</kbd>,
+                        shift: <kbd>{t('about.key.shift')}</kbd>,
+                        p: <kbd>P</kbd>,
+                    })}
                 </p>
-                <p>
-                    The command palette supports fuzzy search - just start typing to filter commands.
-                    Use arrow keys to navigate and <kbd>Enter</kbd> to select.
-                </p>
+                <p>{withParts(t('about.keys.search'), { enter: <kbd>{t('about.key.enter')}</kbd> })}</p>
             </Section>
 
             {/* Contributors Section */}
-            <Section title="contributors" icon={faCodeBranch}>
-                {loading && <p>loading contributors...</p>}
-                {error && <p>failed to load contributors.</p>}
+            <Section title={t('about.title.contributors')} icon={faCodeBranch}>
+                {loading && <p>{t('about.contributors.loading')}</p>}
+                {error && <p>{t('about.contributors.failed')}</p>}
                 {!loading && !error && contributors.length > 0 && (
                     <div className="about-contributors-grid">
                         {contributors.map((username) => (
@@ -191,156 +162,70 @@ export function AboutPage(): JSX.Element {
             </Section>
 
             {/* Data Sources Section */}
-            <Section title="data sources" icon={faDatabase}>
-                <p>
-                    Weather data is provided by{' '}
-                    <a
-                        href="https://open-meteo.com/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="about-link"
-                    >
-                        Open-Meteo
-                    </a>
-                    , an open-source weather API that aggregates data from multiple national weather services
-                    and weather models worldwide.
-                </p>
-                <p>
-                    Available weather models include ECMWF, GFS, ICON, and regional models.
-                    Each model has different strengths - compare them to get a better picture of
-                    expected conditions.
-                </p>
-                <p>
-                    Forecasts are updated automatically every few hours to provide the latest predictions.
-                </p>
+            <Section title={t('about.title.dataSources')} icon={faDatabase}>
+                <p>{withParts(t('about.data.openMeteo'), { openMeteo })}</p>
+                <p>{t('about.data.models')}</p>
+                <p>{t('about.data.updates')}</p>
             </Section>
 
             {/* Credits Section */}
-            <Section title="credits" icon={faCodeBranch}>
+            <Section title={t('about.title.credits')} icon={faCodeBranch}>
                 <p>
-                    Inspired by{' '}
-                    <a
-                        href="https://monkeytype.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="about-link"
-                    >
-                        Monkeytype
-                    </a>
-                    {' '}- the minimalistic typing test.
+                    {withParts(t('about.credits.inspired'), {
+                        monkeytype: <ExternalLink href="https://monkeytype.com">Monkeytype</ExternalLink>,
+                    })}
+                </p>
+                <p>{withParts(t('about.credits.weather'), { openMeteo })}</p>
+                <p>
+                    {withParts(t('about.credits.skiData'), {
+                        openSkiData: <ExternalLink href="https://openskidata.org/">OpenSkiData</ExternalLink>,
+                        osmContributors: (
+                            <ExternalLink href="https://www.openstreetmap.org/copyright">{t('about.credits.osmContributors')}</ExternalLink>
+                        ),
+                        resortList: (
+                            <ExternalLink href="https://github.com/kcluit/monkeysnow/tree/main/frontend/src/data/resorts">
+                                {t('about.credits.resortList')}
+                            </ExternalLink>
+                        ),
+                        skiMapData: (
+                            <ExternalLink href="https://github.com/kcluit/monkeysnow/tree/main/frontend/public/skimap">
+                                {t('about.credits.skiMapData')}
+                            </ExternalLink>
+                        ),
+                        odbl: <ExternalLink href="https://opendatacommons.org/licenses/odbl/">ODbL</ExternalLink>,
+                    })}
                 </p>
                 <p>
-                    Weather data by{' '}
-                    <a
-                        href="https://open-meteo.com/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="about-link"
-                    >
-                        Open-Meteo
-                    </a>
+                    {withParts(t('about.credits.photos'), {
+                        sources: [
+                            ['EOxCloudless', 'https://cloudless.eox.at/'],
+                            ['swisstopo', 'https://www.swisstopo.admin.ch/'],
+                            ['IGN', 'https://geoservices.ign.fr/'],
+                            ['basemap.at', 'https://basemap.at/'],
+                            ['USGS', 'https://www.usgs.gov/programs/national-geospatial-program/national-map'],
+                            ['GSI Japan', 'https://maps.gsi.go.jp/development/ichiran.html'],
+                        ].map(([name, href], i, all) => (
+                            <span key={name}>
+                                {i > 0 && (i === all.length - 1 ? ` ${t('about.credits.and')} ` : ', ')}
+                                <ExternalLink href={href}>{name}</ExternalLink>
+                            </span>
+                        )),
+                        mapzen: (
+                            <ExternalLink href="https://github.com/tilezen/joerd/blob/master/docs/attribution.md">Mapzen Terrain Tiles</ExternalLink>
+                        ),
+                        mapterhorn: <ExternalLink href="https://mapterhorn.com/attribution">Mapterhorn</ExternalLink>,
+                    })}
                 </p>
                 <p>
-                    Ski resort, run and lift data from{' '}
-                    <a
-                        href="https://openskidata.org/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="about-link"
-                    >
-                        OpenSkiData
-                    </a>
-                    {' '}/ OpenSkiMap.org, ©{' '}
-                    <a
-                        href="https://www.openstreetmap.org/copyright"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="about-link"
-                    >
-                        OpenStreetMap contributors
-                    </a>
-                    {' '}(ODbL), Skimap.org, Who's On First, © Mapterhorn. Our{' '}
-                    <a
-                        href="https://github.com/kcluit/monkeysnow/tree/main/frontend/src/data/resorts"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="about-link"
-                    >
-                        resort list
-                    </a>
-                    {' '}and{' '}
-                    <a
-                        href="https://github.com/kcluit/monkeysnow/tree/main/frontend/public/skimap"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="about-link"
-                    >
-                        ski map data
-                    </a>
-                    {' '}are available under the{' '}
-                    <a
-                        href="https://opendatacommons.org/licenses/odbl/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="about-link"
-                    >
-                        ODbL
-                    </a>
-                    .
-                </p>
-                <p>
-                    Map satellite photos from{' '}
-                    {[
-                        ['EOxCloudless', 'https://cloudless.eox.at/'],
-                        ['swisstopo', 'https://www.swisstopo.admin.ch/'],
-                        ['IGN', 'https://geoservices.ign.fr/'],
-                        ['basemap.at', 'https://basemap.at/'],
-                        ['USGS', 'https://www.usgs.gov/programs/national-geospatial-program/national-map'],
-                        ['GSI Japan', 'https://maps.gsi.go.jp/development/ichiran.html'],
-                    ].map(([name, href], i, all) => (
-                        <span key={name}>
-                            {i > 0 && (i === all.length - 1 ? ' and ' : ', ')}
-                            <a href={href} target="_blank" rel="noopener noreferrer" className="about-link">{name}</a>
-                        </span>
-                    ))}
-                    ; terrain from{' '}
-                    <a
-                        href="https://github.com/tilezen/joerd/blob/master/docs/attribution.md"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="about-link"
-                    >
-                        Mapzen Terrain Tiles
-                    </a>
-                    {' '}and, on the 3D map,{' '}
-                    <a
-                        href="https://mapterhorn.com/attribution"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="about-link"
-                    >
-                        Mapterhorn
-                    </a>
-                    .
-                </p>
-                <p>
-                    Icons by{' '}
-                    <a
-                        href="https://fontawesome.com/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="about-link"
-                    >
-                        Font Awesome
-                    </a>
+                    {withParts(t('about.credits.icons'), {
+                        fontAwesome: <ExternalLink href="https://fontawesome.com/">Font Awesome</ExternalLink>,
+                    })}
                 </p>
             </Section>
 
             {/* Contact Section */}
-            <Section title="contact" icon={faEnvelope}>
-                <p>
-                    Found a bug? Have a feature request? Want to contribute?
-                </p>
+            <Section title={t('about.title.contact')} icon={faEnvelope}>
+                <p>{t('about.contact.prompt')}</p>
                 <div className="about-contact-links">
                     <a
                         href="https://github.com/kcluit/monkeysnow"
@@ -353,11 +238,11 @@ export function AboutPage(): JSX.Element {
                     </a>
                     <Link to="/terms" className="about-contact-btn">
                         <Icon icon={faFileContract} />
-                        <span>Terms</span>
+                        <span>{t('about.contact.terms')}</span>
                     </Link>
                     <Link to="/privacy" className="about-contact-btn">
                         <Icon icon={faShieldAlt} />
-                        <span>Privacy</span>
+                        <span>{t('about.contact.privacy')}</span>
                     </Link>
                     <a
                         href="https://ko-fi.com/kcluit"
@@ -366,7 +251,7 @@ export function AboutPage(): JSX.Element {
                         className="about-contact-btn"
                     >
                         <Icon icon={faHeart} />
-                        <span>Donate</span>
+                        <span>{t('about.contact.donate')}</span>
                     </a>
                 </div>
             </Section>
@@ -375,9 +260,9 @@ export function AboutPage(): JSX.Element {
             <section className="about-hero">
 
                 <p className="about-hero-subtext">
-                    Made in Burnaby with love.<br />
+                    {t('about.madeIn')}<br />
 
-                    Launched on 30th Jan 2026.
+                    {t('about.launched')}
                 </p>
             </section>
         </div>

@@ -3,6 +3,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { WeatherVariable } from '../../types/openMeteo';
 import type { VariableConfig } from '../../types/detailView';
+import { useLanguage } from '../../hooks/useLanguage';
 
 interface VariableCardDraggableProps {
   variable: WeatherVariable;
@@ -17,6 +18,8 @@ function VariableCardDraggableInner({
   isSelected,
   onToggle,
 }: VariableCardDraggableProps): JSX.Element {
+  // Also redraws this memoized card in a new language, as its config's label is read here
+  const { t } = useLanguage();
   const {
     attributes,
     listeners,
@@ -47,7 +50,7 @@ function VariableCardDraggableInner({
             {...attributes}
             {...listeners}
             onClick={(e) => e.preventDefault()}
-            aria-label={`Drag to reorder ${config?.label || variable}`}
+            aria-label={t('chart.picker.dragChart', { chart: config?.label || variable })}
           >
             <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
               <circle cx="5" cy="4" r="1.5" />

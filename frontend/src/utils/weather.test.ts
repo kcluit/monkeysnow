@@ -7,6 +7,7 @@ vi.hoisted(() => {
 
 import { processResortData } from './weather';
 import { SNOW_CAUTIONS } from './snowQuality';
+import { setLanguage } from '../locales';
 import type { AllWeatherData, DayData, ElevationForecast, PeriodData, PeriodEstimate, SnowCaution, SnowfallEstimateMode } from '../types';
 
 /** A Period that 4 mm fell in, the model making 3 cm of snow of it */
@@ -73,5 +74,23 @@ describe('a card under each Snow caution', () => {
     it('counts all of an older forecast\'s precipitation under its label where it has no tally by Snow quality', () => {
         const older = period({ snowfall_estimate: 3, snow_quality: 'dry_snow' });
         expect(amPeriodOf(older, 'totalPrecip', 'cautious').snowCondition.text).toBe('Dry Snow');
+    });
+});
+
+describe('a card when the language changes', () => {
+    it('reads its words, dates and decimals in the language shown, without being processed again', () => {
+        // setLanguage() warns that it can't save the pick, as Node has no localStorage
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+        const day = amPeriodOf(period({ estimates: ESTIMATES }), 'totalPrecip', 'cautious');
+        const am = day.periods[0];
+        expect([day.name, day.date, am.snow, am.condition, day.snowCondition.text]).toEqual(['Saturday', 'Oct 24', '1.6 cm', 'Moderate snow', 'Sleet/Mix']);
+        expect(day.weatherEmoji).toBe('❄️');
+        try {
+            setLanguage('fr');
+            expect([day.name, day.date, am.snow, am.condition, day.snowCondition.text]).toEqual(['Samedi', '24 oct.', '1,6 cm', 'Neige modérée', 'Pluie et neige']);
+        } finally {
+            setLanguage('en');
+            warn.mockRestore();
+        }
     });
 });

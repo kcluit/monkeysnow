@@ -9,6 +9,7 @@
 import uPlot from 'uplot';
 import type { ChartConfig } from '../types';
 import { chartTextFill } from '../theme';
+import { translate } from '../../../locales';
 
 export interface ElevationLinesPluginOptions {
     /** Latest chart configuration; lines come from its elevationLines (already in display units) */
@@ -32,13 +33,13 @@ export function createElevationLinesPlugin(options: ElevationLinesPluginOptions)
         const left = u.bbox.left;
         const width = u.bbox.width;
 
-        // Define elevations array with labels; a Saved location has one elevation, not three bands
+        // Define elevations array with labels, in the language showing; a Saved location has one elevation, not three bands
         const elevationEntries = elevations.base === elevations.mid && elevations.mid === elevations.top
-            ? [{ value: elevations.mid, label: 'Elevation' }]
+            ? [{ value: elevations.mid, label: translate('chart.elevationLines.elevation') }]
             : [
-                { value: elevations.base, label: 'Base' },
-                { value: elevations.mid, label: 'Mid' },
-                { value: elevations.top, label: 'Top' },
+                { value: elevations.base, label: translate('band.base') },
+                { value: elevations.mid, label: translate('band.mid') },
+                { value: elevations.top, label: translate('band.top') },
             ];
 
         // Set up styles for lines and labels; the canvas is in device pixels, so CSS sizes scale by pxRatio
@@ -71,7 +72,7 @@ export function createElevationLinesPlugin(options: ElevationLinesPluginOptions)
             ctx.stroke();
 
             // Draw label at right edge
-            const labelText = `${entry.label}: ${Math.round(entry.value)}${unit}`;
+            const labelText = translate('chart.elevationLines.label', { band: entry.label, value: Math.round(entry.value), unit });
 
             // Position label slightly inside the right edge with padding
             const labelX = left + width - 5 * pxRatio;

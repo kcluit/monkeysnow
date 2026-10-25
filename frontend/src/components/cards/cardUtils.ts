@@ -1,49 +1,91 @@
-import type { DayForecast, Period, DayStats, TemperatureMetric, UnitSystem } from '../../types';
-import { formatTempWithRounding } from '../../utils/unitConversion';
+import type { DayForecast, Period, PeriodTime, DayStats, ProcessedResortData, TemperatureMetric, UnitSystem } from '../../types';
+import type { TranslationKey } from '../../types/i18n';
+import { translate } from '../../locales';
+import { formatSnow, formatTempWithRounding } from '../../utils/unitConversion';
+import { calculateSnowTotals, getWeatherDescription } from '../../utils/weather';
+
+const PERIOD_NAMES: Record<PeriodTime, TranslationKey> = { AM: 'period.am', PM: 'period.pm', Night: 'period.night' };
+
+/** A Period's name in the language shown: "AM", or "Matin" */
+export function periodName(time: PeriodTime): string {
+    return translate(PERIOD_NAMES[time]);
+}
 
 /**
- * Formats weather text from periods (combines AM/PM conditions intelligently)
+ * A day's weather in words, one for each of its AM and PM Periods when they differ,
+ * else its PM's, else its first Period's
  */
-export function formatWeatherText(periods: Period[]): string {
-    if (!periods || periods.length === 0) return 'No data';
+export function dayWeatherTexts(periods: Period[]): string[] {
+    if (!periods || periods.length === 0) return [translate('card.noData')];
 
     const amPeriod = periods.find(p => p.time === 'AM');
     const pmPeriod = periods.find(p => p.time === 'PM');
 
     if (amPeriod && pmPeriod) {
-        if (amPeriod.condition === pmPeriod.condition) {
-            return amPeriod.condition;
+        if (amPeriod.weatherCode === pmPeriod.weatherCode) {
+            return [amPeriod.condition];
         }
-        return `${amPeriod.condition} / ${pmPeriod.condition}`;
+        return [amPeriod.condition, pmPeriod.condition];
     } else if (pmPeriod) {
-        return pmPeriod.condition;
-    } else if (periods.length === 1) {
-        return periods[0].condition;
+        return [pmPeriod.condition];
     }
 
-    return periods[0].condition;
+    return [periods[0].condition];
 }
 
 /**
- * Shortens a weather description to fit a narrow column by dropping intensity words
+ * Formats weather text from periods (combines AM/PM conditions intelligently)
+ */
+export function formatWeatherText(periods: Period[]): string {
+    return dayWeatherTexts(periods).join(' / ');
+}
+
+// Each WMO weather code's words without intensity; codes left out are short enough already
+const SHORT_WEATHER: Record<number, TranslationKey> = {
+    0: 'weather.short.clear',
+    1: 'weather.short.mostlyClear',
+    2: 'weather.short.partlyCloudy',
+    45: 'weather.short.fog',
+    48: 'weather.short.rimeFog',
+    51: 'weather.short.drizzle',
+    53: 'weather.short.drizzle',
+    55: 'weather.short.drizzle',
+    56: 'weather.short.freezingDrizzle',
+    57: 'weather.short.freezingDrizzle',
+    61: 'weather.short.rain',
+    63: 'weather.short.rain',
+    65: 'weather.short.rain',
+    66: 'weather.short.freezingRain',
+    67: 'weather.short.freezingRain',
+    71: 'weather.short.snow',
+    73: 'weather.short.snow',
+    75: 'weather.short.snow',
+    80: 'weather.short.showers',
+    81: 'weather.short.showers',
+    82: 'weather.short.showers',
+    85: 'weather.short.snowShowers',
+    86: 'weather.short.snowShowers',
+    95: 'weather.short.storm',
+    96: 'weather.short.stormHail',
+    99: 'weather.short.stormHail',
+};
+
+/**
+ * A WMO weather code's words, short enough for a narrow column by dropping intensity
  * ("Light drizzle" and "Dense drizzle" are both "Drizzle"): the snow and rain amounts show intensity.
  */
-export function shortWeatherText(condition: string): string {
-    const c = condition.toLowerCase();
-    if (c.includes('thunderstorm')) return c.includes('hail') ? 'Storm + hail' : 'Storm';
-    if (c.includes('snow showers')) return 'Snow showers';
-    if (c.includes('rain showers')) return 'Showers';
-    if (c.includes('snow grains')) return 'Snow grains';
-    if (c.includes('freezing drizzle')) return 'Freezing drizzle';
-    if (c.includes('freezing rain')) return 'Freezing rain';
-    if (c.includes('drizzle')) return 'Drizzle';
-    if (c.includes('rain')) return 'Rain';
-    if (c.includes('snow')) return 'Snow';
-    if (c.includes('rime')) return 'Rime fog';
-    if (c.includes('fog')) return 'Fog';
-    if (c === 'mainly clear') return 'Mostly clear';
-    if (c.includes('clear')) return 'Clear';
-    return condition;
+export function shortWeatherText(weatherCode: number): string {
+    const key = SHORT_WEATHER[weatherCode];
+    return key ? translate(key) : getWeatherDescription(weatherCode);
+}
+
+/** "Next 3 Days: 12.0 cm | Next 7 Days: 31.0 cm", or History's latest days */
+export function totalsText(resort: ProcessedResortData, unitSystem: UnitSystem): string {
+    const totals = calculateSnowTotals(resort);
+    const [threeDays, sevenDays]: TranslationKey[] = resort.isHistory
+        ? ['card.past3Days', 'card.past7Days']
+        : ['card.next3Days', 'card.next7Days'];
+    return `${translate(threeDays, { amount: formatSnow(totals.threeDays, unitSystem) })} | ${translate(sevenDays, { amount: formatSnow(totals.sevenDays, unitSystem) })}`;
 }
 
 /**
@@ -102,11 +144,6 @@ export function calculateDayStats(day: DayForecast, temperatureMetric: Temperatu
         rain: periods.reduce((sum, period) => sum + period.rainMm, 0),
         wind
     };
-}
-
-/** Whether a formatted amount such as "0.0 in" shows anything */
-export function showsAmount(formatted: string): boolean {
-    return parseFloat(formatted) > 0;
 }
 
 /**

@@ -6,29 +6,34 @@
  * (docs/adr/0007-map-layers-from-keyless-openly-licensed-sources.md, docs/adr/0009).
  */
 
+import { translate } from '../locales';
+
 export type BaseMapId = 'standard' | 'satellite';
 export type TerrainColouringId = 'slopeAngle' | 'gradient' | 'aspect' | 'heightTint';
 export type OverlayId = 'skiMap' | 'contours' | 'hillshade' | 'flats' | TerrainColouringId;
 
+// Each label is a getter, so it is read in the language showing at the time, here and on the Settings page and in the command palette
 export const BASE_MAPS: readonly { id: BaseMapId; label: string }[] = [
-    { id: 'standard', label: 'Standard' },
-    { id: 'satellite', label: 'Satellite' },
+    { id: 'standard', get label() { return translate('map.baseMap.standard'); } },
+    { id: 'satellite', get label() { return translate('map.baseMap.satellite'); } },
 ];
 
 /** Overlays that combine with anything, each ticked on its own */
+// Labels are getters, read in the language showing at the time, like BASE_MAPS's
 export const OVERLAYS: readonly { id: Exclude<OverlayId, TerrainColouringId>; label: string }[] = [
-    { id: 'skiMap', label: 'Ski map' },
-    { id: 'contours', label: 'Contours' },
-    { id: 'hillshade', label: 'Hillshade' },
-    { id: 'flats', label: 'Flats' },
+    { id: 'skiMap', get label() { return translate('map.overlay.skiMap'); } },
+    { id: 'contours', get label() { return translate('map.overlay.contours'); } },
+    { id: 'hillshade', get label() { return translate('map.overlay.hillshade'); } },
+    { id: 'flats', get label() { return translate('map.overlay.flats'); } },
 ];
 
 /** Overlays that colour all the ground, so only one is on at a time: two over each other can't be read */
+// Labels are getters, read in the language showing at the time, like BASE_MAPS's
 export const TERRAIN_COLOURINGS: readonly { id: TerrainColouringId; label: string }[] = [
-    { id: 'slopeAngle', label: 'Slope angle' },
-    { id: 'gradient', label: 'Gradient' },
-    { id: 'aspect', label: 'Aspect' },
-    { id: 'heightTint', label: 'Height tint' },
+    { id: 'slopeAngle', get label() { return translate('map.colouring.slopeAngle'); } },
+    { id: 'gradient', get label() { return translate('map.colouring.gradient'); } },
+    { id: 'aspect', get label() { return translate('map.colouring.aspect'); } },
+    { id: 'heightTint', get label() { return translate('map.colouring.heightTint'); } },
 ];
 
 export interface MapLayers {

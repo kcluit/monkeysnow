@@ -25,11 +25,13 @@ import {
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { CSS } from '@dnd-kit/utilities';
 import { WeatherChart, type WeatherChartComponentProps } from './WeatherChart';
+import { useLanguage } from '../../hooks/useLanguage';
 import type { DetailChartGridProps } from '../../types/detailView';
 import type { WeatherVariable } from '../../types/openMeteo';
 
 /** One chart in the column, moved by dragging the grip in its header */
 function SortableWeatherChart(props: Omit<WeatherChartComponentProps, 'dragHandle'>): JSX.Element {
+    const { t } = useLanguage();
     const {
         attributes,
         listeners,
@@ -53,10 +55,10 @@ function SortableWeatherChart(props: Omit<WeatherChartComponentProps, 'dragHandl
                         ref={setActivatorNodeRef}
                         type="button"
                         className="weather-chart-drag-handle"
-                        title="Drag to reorder"
+                        title={t('chart.dragToReorder')}
                         {...attributes}
                         {...listeners}
-                        aria-label="Drag to reorder"
+                        aria-label={t('chart.dragToReorder')}
                     >
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                             <circle cx="5" cy="4" r="1.5" />

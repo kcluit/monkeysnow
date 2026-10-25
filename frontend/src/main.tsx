@@ -7,6 +7,7 @@ import { resolveResortId } from './data/resortLocations'
 import { getSavedLocation, isSavedLocationId } from './utils/savedLocations'
 import { idbClear } from './utils/indexedDB'
 import { turnOnContoursOnce } from './utils/mapLayers'
+import { initLanguage } from './locales'
 import './style.css'
 
 // Main app wrapper
@@ -69,6 +70,7 @@ const migrateResortIds = () => {
 resetStoredData();
 migrateResortIds();
 turnOnContoursOnce();
+initLanguage();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>

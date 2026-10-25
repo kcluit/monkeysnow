@@ -11,6 +11,7 @@ import type { ChartConfig } from './types';
 import { createZoomPlugin, createTouchPlugin, createBandFillPlugin, createBoxWhiskerPlugin, createHeatmapPlugin, createWindArrowPlugin, createZeroAxisPlugin, createElevationLinesPlugin, createTooltipPlugin, createLegendPlugin, createSeriesFocusPlugin } from './plugins';
 import { colorWithOpacity } from './utils/colorUtils';
 import { chartTextFill } from './theme';
+import { formatDecimal } from '../../locales';
 import {
     subscribeToZoomChanges,
     broadcastZoomChange,
@@ -24,7 +25,8 @@ import {
  * Generate a structural key for comparison.
  * Only changes to structural properties should trigger a chart rebuild. Anything else
  * is applied to the existing chart, whose axes and plugins read the latest config
- * whenever they draw.
+ * whenever they draw. Words aren't structural: a change of language keeps the zoom,
+ * the legend renaming its entries when the new config's data is set.
  */
 function getStructuralKey(config: ChartConfig): string {
     return JSON.stringify({
@@ -185,12 +187,13 @@ function getDecimalPlaces(range: number): number {
 }
 
 /**
- * Format a y-axis value with appropriate decimal places based on the scale range.
+ * Format a y-axis value with appropriate decimal places based on the scale range,
+ * written the language's way (1.5 or 1,5).
  */
 function formatYAxisValue(value: number, scaleMin: number, scaleMax: number): string {
     const range = scaleMax - scaleMin;
     const decimals = getDecimalPlaces(range);
-    return decimals === 0 ? Math.round(value).toString() : value.toFixed(decimals);
+    return decimals === 0 ? Math.round(value).toString() : formatDecimal(value, decimals);
 }
 
 /** Tick spacing in hours; up to a day they divide 24, so ticks land on the same clock hours each day. */

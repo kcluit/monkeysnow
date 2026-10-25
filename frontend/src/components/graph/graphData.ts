@@ -2,11 +2,10 @@
  * What one Graph draws, in the visitor's units: each hour's precipitation as a bar in
  * its Snow quality colour, the temperature at the picked Elevation band, and the
  * Freezing level against the heights being forecast; and for its tooltip, the wind and
- * the Card model's weather.
+ * the Card model's weather. It holds no words, so a change of language only redraws it.
  */
 
 import { SNOW_QUALITIES, splitHour } from '../../utils/snowQuality';
-import { getWeatherDescription, getWeatherEmoji } from '../../utils/weather';
 import type { ElevationLevel, HourlyForecast, ResortData, SnowCaution, SnowfallEstimateMode, SnowQuality, UnitSystem } from '../../types';
 
 const CM_TO_INCHES = 0.393701;
@@ -15,17 +14,13 @@ const M_TO_FT = 3.28084;
 const KMH_TO_MPH = 0.621371;
 
 /** The eight compass points a wind blows from */
-const COMPASS_POINTS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-
-export interface Weather {
-    /** e.g. "Partly cloudy", in the words the cards use */
-    text: string;
-    emoji: string;
-}
+export const COMPASS_POINTS = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as const;
+export type CompassPoint = typeof COMPASS_POINTS[number];
 
 /** A dashed line at one of the heights being forecast */
 export interface HeightLine {
-    label: string;
+    /** The Elevation band it is, or null for a Saved location's one elevation */
+    band: ElevationLevel | null;
     /** In m or ft */
     height: number;
     /** The picked Elevation band's, drawn bold */
@@ -47,10 +42,10 @@ export interface GraphData {
     freezingLevel: (number | null)[];
     /** km/h or mph; these three are all null on forecasts cached before they were kept */
     windSpeed: (number | null)[];
-    /** The compass point the wind blows from, e.g. "SW" */
-    windFrom: (string | null)[];
-    /** The Card model's own weather, which can disagree with monkeysnow's Snow quality */
-    weather: (Weather | null)[];
+    /** The compass point the wind blows from, e.g. 'sw' */
+    windFrom: (CompassPoint | null)[];
+    /** The Card model's own weather, its WMO weather code, which can disagree with monkeysnow's Snow quality */
+    weather: (number | null)[];
     heightLines: HeightLine[];
     lat: number;
     lon: number;
@@ -61,8 +56,6 @@ export interface GraphData {
 export function precipitationFloor(units: UnitSystem): number {
     return units === 'imperial' ? 0.8 : 2;
 }
-
-const BAND_NAMES: Record<ElevationLevel, string> = { bot: 'Base', mid: 'Mid', top: 'Top' };
 
 /**
  * An hour's Snow quality, null when nothing falls, and the monkeysnow estimate's snow under a Snow
@@ -127,8 +120,7 @@ export function graphDataOf(
         result.windSpeed.push(Number.isFinite(speed) ? (imperial ? speed * KMH_TO_MPH : speed) : null);
         result.windFrom.push(Number.isFinite(direction) ? COMPASS_POINTS[Math.round(direction / 45) % 8] : null);
         const code = hours.weatherCode?.[i] ?? 255;
-        const text = code === 255 ? null : getWeatherDescription(code);
-        result.weather.push(text ? { text, emoji: getWeatherEmoji(text) } : null);
+        result.weather.push(code === 255 ? null : code);
 
         // Snow or rain, decided as the cards decide a Period's
         const estimate = hourEstimateOf(hours, i, snowCaution);
@@ -162,14 +154,13 @@ export function graphDataOf(
 
 function heightLinesOf(data: ResortData, elevation: ElevationLevel, units: UnitSystem): HeightLine[] {
     const toUnits = (m: number) => Math.round(units === 'imperial' ? m * M_TO_FT : m);
-    const unit = units === 'imperial' ? 'ft' : 'm';
     // A Saved location has one elevation, standing in for all three bands
     if (data.bot.metadata.elevation === data.top.metadata.elevation) {
-        const height = toUnits(data.mid.metadata.elevation);
-        return [{ label: `${height} ${unit}`, height, picked: true }];
+        return [{ band: null, height: toUnits(data.mid.metadata.elevation), picked: true }];
     }
-    return (['bot', 'mid', 'top'] as const).map((level) => {
-        const height = toUnits(data[level].metadata.elevation);
-        return { label: `${BAND_NAMES[level]} ${height} ${unit}`, height, picked: level === elevation };
-    });
+    return (['bot', 'mid', 'top'] as const).map((level) => ({
+        band: level,
+        height: toUnits(data[level].metadata.elevation),
+        picked: level === elevation,
+    }));
 }
