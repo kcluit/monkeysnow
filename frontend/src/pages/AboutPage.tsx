@@ -206,7 +206,7 @@ export function AboutPage(): JSX.Element {
                             ['GSI Japan', 'https://maps.gsi.go.jp/development/ichiran.html'],
                         ].map(([name, href], i, all) => (
                             <span key={name}>
-                                {i > 0 && (i === all.length - 1 ? ` ${t('about.credits.and')} ` : ', ')}
+                                {i > 0 && (i === all.length - 1 ? ` ${t('about.credits.and')} ` : t('about.credits.comma'))}
                                 <ExternalLink href={href}>{name}</ExternalLink>
                             </span>
                         )),

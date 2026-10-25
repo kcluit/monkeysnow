@@ -2,6 +2,7 @@ import { en } from './en';
 import { fr } from './fr';
 import { es } from './es';
 import { ru } from './ru';
+import { zh, regions as zhRegions } from './zh';
 import type {
     Language,
     PluralKey,
@@ -48,6 +49,19 @@ const russianLanguage: Language = {
     translations: ru,
 };
 
+// Every Chinese browser gets it, zh-TW and zh-HK included, until a Traditional Chinese
+// (zh-Hant) is added: its id stays 'zh', so a saved pick always means Simplified
+const chineseLanguage: Language = {
+    id: 'zh',
+    name: 'Chinese (Simplified)',
+    nativeName: '简体中文',
+    locale: 'zh-CN',
+    htmlLang: 'zh-Hans',
+    script: 'han',
+    translations: zh,
+    regionNames: zhRegions,
+};
+
 /**
  * All available languages. See CONTRIBUTING.md for adding one.
  */
@@ -56,6 +70,7 @@ export const languages: Language[] = [
     frenchLanguage,
     spanishLanguage,
     russianLanguage,
+    chineseLanguage,
 ];
 
 /**
@@ -81,6 +96,9 @@ export function interpolate(template: string, values: TranslationValues): string
 // no-break one, so a line never starts with the mark. Spanish sets one only between a
 // number and ° or %, Russian before a dash and °. Done here rather than in the strings,
 // so they stay readable with ordinary spaces.
+// Chinese sets a space between a character and a Latin letter or number. zh's strings
+// have them already; this puts them beside what fills a placeholder, such as a Resort's
+// name or a count.
 const NO_BREAK_SPACE = '\u{00A0}';
 const typesetters: Record<string, (text: string) => string> = {
     fr: text => text
@@ -88,6 +106,9 @@ const typesetters: Record<string, (text: string) => string> = {
         .replace(/« /g, `«${NO_BREAK_SPACE}`),
     es: text => text.replace(/ ([°%])/g, `${NO_BREAK_SPACE}$1`),
     ru: text => text.replace(/ ([—°])/g, `${NO_BREAK_SPACE}$1`),
+    zh: text => text
+        .replace(/(\p{Script=Han})([A-Za-z0-9])/gu, '$1 $2')
+        .replace(/([A-Za-z0-9%])(\p{Script=Han})/gu, '$1 $2'),
 };
 
 /** Where a visitor's pick is kept. Only a pick is: until there is one, the browser's language decides. */
@@ -130,7 +151,7 @@ export function getLanguage(): Language {
 
 function show(language: Language): void {
     current = language;
-    if (typeof document !== 'undefined') document.documentElement.lang = language.id;
+    if (typeof document !== 'undefined') document.documentElement.lang = language.htmlLang ?? language.id;
     listeners.forEach(listener => listener());
 }
 
@@ -312,4 +333,12 @@ export function countryName(code: string, englishName: string): string {
         regionNames.set(locale, names);
     }
     return names?.of(code.toUpperCase()) ?? englishName;
+}
+
+/**
+ * A Region's name in the current language, where the language names that country's
+ * Regions (Chinese does China's and Japan's); otherwise resorts.json's, as OpenSkiData has it.
+ */
+export function regionName(countryCode: string, name: string): string {
+    return getLanguage().regionNames?.[countryCode]?.[name] ?? name;
 }

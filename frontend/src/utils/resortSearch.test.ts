@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { countryNamesInEveryLanguage, matchesSearchWords, normalizeForSearch, toSearchWords } from './resortSearch';
+import { countryNamesInEveryLanguage, matchesSearchWords, normalizeForSearch, regionNamesInEveryLanguage, toSearchWords } from './resortSearch';
 
 describe('the resort picker\'s search', () => {
     // As the picker builds it: a Resort's name, then its country's names in every language
@@ -28,5 +28,21 @@ describe('the resort picker\'s search', () => {
 
     it('finds ё by е, as Russians often type it', () => {
         expect(matchesSearchWords(normalizeForSearch('Озёрный'), toSearchWords('озерный'))).toBe(true);
+    });
+
+    it('finds a country, and a Region a language names, by its Chinese name', () => {
+        const niseko = normalizeForSearch([
+            'Niseko United',
+            ...countryNamesInEveryLanguage('JP', 'Japan'),
+            ...regionNamesInEveryLanguage('JP', 'Hokkaido Prefecture'),
+        ].join(' '));
+        expect(matchesSearchWords(niseko, toSearchWords('日本'))).toBe(true);
+        expect(matchesSearchWords(niseko, toSearchWords('北海道'))).toBe(true);
+        expect(matchesSearchWords(niseko, toSearchWords('Hokkaido niseko'))).toBe(true);
+        expect(matchesSearchWords(niseko, toSearchWords('长野县'))).toBe(false);
+    });
+
+    it('leaves a Region no language names with its own name only', () => {
+        expect(regionNamesInEveryLanguage('AT', 'Tyrol')).toEqual(['Tyrol']);
     });
 });

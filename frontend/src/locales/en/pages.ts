@@ -63,8 +63,9 @@ export const pages = {
     'about.credits.osmContributors': 'OpenStreetMap contributors',
     'about.credits.resortList': 'resort list',
     'about.credits.skiMapData': 'ski map data',
-    // {sources} is a list of the satellite photos' sources, the last two joined by 'about.credits.and'
+    // {sources} is a list of the satellite photos' sources, the last two joined by 'about.credits.and' and the rest by 'about.credits.comma'
     'about.credits.photos': 'Map satellite photos from {sources}; terrain from {mapzen} and, on the 3D map, {mapterhorn}.',
+    'about.credits.comma': ', ',
     'about.credits.and': 'and',
     'about.credits.icons': 'Icons by {fontAwesome}',
 

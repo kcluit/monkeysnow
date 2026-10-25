@@ -59,6 +59,7 @@ export const pages: Translated<typeof en> = {
     'about.credits.resortList': 'liste des stations',
     'about.credits.skiMapData': 'données du plan des pistes',
     'about.credits.photos': 'Photos satellite de la carte : {sources} ; relief : {mapzen} et, sur la carte 3D, {mapterhorn}.',
+    'about.credits.comma': ', ',
     'about.credits.and': 'et',
     'about.credits.icons': 'Icônes de {fontAwesome}',
 

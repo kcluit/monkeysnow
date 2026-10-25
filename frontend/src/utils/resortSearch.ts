@@ -3,7 +3,8 @@
  * punctuation and word order don't matter, and Mt., St. and Ste. find Mount,
  * Saint, Sankt and Sainte (and the other way round). Mont and Monte are left
  * alone: they are other languages' words, not abbreviations of Mount. A country
- * is found by its name in every language monkeysnow has, whichever is showing.
+ * is found by its name in every language monkeysnow has, whichever is showing,
+ * and so is a Region a language names (北海道 finds Hokkaido Prefecture).
  */
 
 import { languages } from '../locales';
@@ -33,6 +34,16 @@ export function countryNamesInEveryLanguage(code: string, englishName: string): 
         if (language.id === 'en') continue;
         const name = regionNamesIn(language.locale)?.of(code.toUpperCase());
         if (name) names.add(name);
+    }
+    return [...names];
+}
+
+/** A Region's names in every language that names it, for search to find it by any of them */
+export function regionNamesInEveryLanguage(countryCode: string, name: string): string[] {
+    const names = new Set([name]);
+    for (const language of languages) {
+        const named = language.regionNames?.[countryCode]?.[name];
+        if (named) names.add(named);
     }
     return [...names];
 }

@@ -1,11 +1,11 @@
 import { useCallback, useMemo } from 'react';
 import { RESORT_HIERARCHY, continentName } from '../data/resortLocations';
 import type { ContinentData, ResortInfo } from '../data/resortLocations';
-import { countryName } from '../locales';
+import { countryName, regionName } from '../locales';
 import { useLanguage } from './useLanguage';
 import { useSavedLocations } from './useSavedLocations';
 import type { SavedLocation } from '../utils/savedLocations';
-import { countryNamesInEveryLanguage } from '../utils/resortSearch';
+import { countryNamesInEveryLanguage, regionNamesInEveryLanguage } from '../utils/resortSearch';
 import type { Translate } from '../types/i18n';
 
 export type { ContinentData, CountryData, ProvinceData, ResortInfo } from '../data/resortLocations';
@@ -23,8 +23,8 @@ export interface HierarchyNode {
   children?: HierarchyNode[];
   resortId?: string;
   /**
-   * A resort's other names, often in the local script, or a country's name in every language;
-   * matched by search but not shown.
+   * A resort's other names, often in the local script, or a country's or Region's name in
+   * every language; matched by search but not shown.
    */
   aka?: string[];
 }
@@ -41,10 +41,12 @@ function toResortNode(resort: ResortInfo): HierarchyNode {
 
 /**
  * Converts hierarchy data to a flat HierarchyNode tree for UI rendering, in the language
- * shown: continents and countries are named in it, and countries sorted in its order.
+ * shown: continents, countries and the Regions it names are named in it, and countries
+ * and Regions sorted in its order.
  */
 function buildHierarchyTree(hierarchy: ContinentData[], t: Translate, locale: string): HierarchyNode[] {
   const collator = new Intl.Collator(locale);
+  const byName = (a: HierarchyNode, b: HierarchyNode) => collator.compare(a.name, b.name);
   return hierarchy.map((continent): HierarchyNode => ({
     id: continent.id,
     name: continentName(continent.name),
@@ -56,15 +58,20 @@ function buildHierarchyTree(hierarchy: ContinentData[], t: Translate, locale: st
         type: 'country',
         aka: countryNamesInEveryLanguage(country.code, country.name),
         children: country.hasRegions
-          ? country.provinces.map((province): HierarchyNode => ({
-              id: province.id,
-              name: province.isOther ? t('picker.otherRegion') : province.name,
-              type: 'province',
-              children: province.resorts.map(toResortNode),
-            }))
+          ? country.provinces
+              .map((province): HierarchyNode => province.isOther
+                ? { id: province.id, name: t('picker.otherRegion'), type: 'province', children: province.resorts.map(toResortNode) }
+                : {
+                    id: province.id,
+                    name: regionName(country.code, province.name),
+                    type: 'province',
+                    aka: regionNamesInEveryLanguage(country.code, province.name),
+                    children: province.resorts.map(toResortNode),
+                  })
+              .sort(byName)
           : country.provinces.flatMap((province) => province.resorts.map(toResortNode)),
       }))
-      .sort((a, b) => collator.compare(a.name, b.name)),
+      .sort(byName),
   }));
 }
 

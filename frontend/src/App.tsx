@@ -29,6 +29,7 @@ import { useLocalStorage } from './hooks/useLocalStorage';
 import { useResortFiltering } from './hooks/useResortFiltering';
 import { useTheme } from './hooks/useTheme';
 import { useFont } from './hooks/useFont';
+import { lacksLettersFor } from './types/fonts';
 import { useFullscreen, isFullscreenSupported } from './hooks/useFullscreen';
 import { useFPSCounter } from './hooks/useFPSCounter';
 import { useCommandPalette } from './hooks/useCommandPalette';
@@ -493,7 +494,7 @@ function App(): JSX.Element {
                 icon: icons.font,
                 subCommands: availableFonts.map((f) => ({
                     id: `font-${f.id}`,
-                    name: f.scripts.includes(language.script) ? f.name : `${f.name} · ${t('font.missingLetters')}`,
+                    name: lacksLettersFor(f, language.script) ? `${f.name} · ${t('font.missingLetters')}` : f.name,
                     icon: f.isMonospace ? icons.monospace : icons.regular,
                     action: () => setFont(f.id),
                 })),

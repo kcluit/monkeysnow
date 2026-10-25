@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fonts, getFontById, getDefaultFont } from '../types/fonts';
+import { fonts, getFontById, getDefaultFont, fontFamilyWithChinese } from '../types/fonts';
 import type { Font } from '../types/fonts';
 
 export interface UseFontReturn {
@@ -17,7 +17,7 @@ export function useFont(): UseFontReturn {
   // Apply font CSS variable to document
   const applyFont = useCallback((fontToApply: Font) => {
     const root = document.documentElement;
-    root.style.setProperty('--fontFamily', fontToApply.family);
+    root.style.setProperty('--fontFamily', fontFamilyWithChinese(fontToApply));
   }, []);
 
   // Initialize font on mount

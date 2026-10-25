@@ -59,6 +59,7 @@ export const pages: Translated<typeof en, 'few' | 'many'> = {
     'about.credits.resortList': 'список курортов',
     'about.credits.skiMapData': 'данные схемы трасс',
     'about.credits.photos': 'Спутниковые снимки для карты: {sources}; рельеф: {mapzen}, а на 3D-карте — {mapterhorn}.',
+    'about.credits.comma': ', ',
     'about.credits.and': 'и',
     'about.credits.icons': 'Иконки: {fontAwesome}',
 

@@ -8,6 +8,7 @@ import { useShownCharts } from '../hooks/useDetailedViewSettings';
 import { useLanguage } from '../hooks/useLanguage';
 import type { Theme } from '../types/themes';
 import type { Font } from '../types/fonts';
+import { lacksLettersFor } from '../types/fonts';
 import type { Language, TranslationKey } from '../types/i18n';
 import type { ElevationSelection } from '../types/detailView';
 import type { MapRotation, MapTilt } from '../utils/mapRotation';
@@ -817,7 +818,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                                     icon={f.isMonospace ? icons.monospace : icons.regular}
                                     onHover={() => applyFont(f)}
                                     onHoverEnd={resetFontPreview}
-                                    note={f.scripts.includes(language.script) ? undefined : t('font.missingLetters')}
+                                    note={lacksLettersFor(f, language.script) ? t('font.missingLetters') : undefined}
                                 />
                             ))}
                         </div>

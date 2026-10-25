@@ -29,8 +29,8 @@ export type Translated<T, Extra extends ExtraPluralForm = never> = { [K in keyof
     [K in keyof T as K extends `${infer Base}.other` ? `${Base}.${Extra}` : never]: string
 };
 
-/** The alphabets monkeysnow's languages are written in, which a font may or may not have letters for */
-export type Script = 'latin' | 'cyrillic';
+/** The scripts monkeysnow's languages are written in, which a font may or may not have letters for */
+export type Script = 'latin' | 'cyrillic' | 'han';
 
 /** Values for a string's `{placeholders}` */
 export type TranslationValues = Record<string, string | number>;
@@ -53,10 +53,20 @@ export interface Language {
     nativeName: string;
     /** BCP 47 tag that dates, times and numbers are formatted in (e.g., 'en-US', 'fr') */
     locale: string;
+    /**
+     * The page's lang attribute, where it isn't the id: 'zh-Hans', so that a browser
+     * with no Chinese font named draws the Simplified Chinese forms, not Japanese ones
+     */
+    htmlLang?: string;
     /** The alphabet it is written in, which the font pickers check each font for */
     script: Script;
     /** All translated strings */
     translations: Translations;
+    /**
+     * Regions named in this language, by country code and then by resorts.json's name;
+     * every other Region keeps resorts.json's name
+     */
+    regionNames?: Record<string, Record<string, string>>;
 }
 
 /**

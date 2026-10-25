@@ -93,6 +93,8 @@ describe('a card when the language changes', () => {
             // Russian writes its units in Cyrillic too
             setLanguage('ru');
             expect([day.name, day.date, am.snow, am.condition, day.snowCondition.text]).toEqual(['Суббота', '24 окт.', '1,6 см', 'Умеренный снег', 'Снег с дождём']);
+            setLanguage('zh');
+            expect([day.name, day.date, am.snow, am.condition, day.snowCondition.text]).toEqual(['星期六', '10月24日', '1.6 cm', '中雪', '雨夹雪']);
         } finally {
             setLanguage('en');
             warn.mockRestore();

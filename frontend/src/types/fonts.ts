@@ -8,7 +8,7 @@ export const FontSchema = z.object({
   googleFontsUrl: z.string().optional(), // Google Fonts URL (if applicable)
   isMonospace: z.boolean(),
   // The alphabets it has letters for; a language written in another draws them in the fallback font
-  scripts: z.array(z.enum(['latin', 'cyrillic'])),
+  scripts: z.array(z.enum(['latin', 'cyrillic', 'han'])),
 });
 
 export type Font = z.infer<typeof FontSchema>;
@@ -211,6 +211,29 @@ export const fonts: Font[] = [
     scripts: ['latin'],
   },
 ];
+
+// None of the fonts above has Chinese characters. Named before a stack's generic family,
+// these draw them in a sans-serif face on every platform (Mac and iPhone, older Macs,
+// Windows, Android and Linux), where the generic monospace would give Windows' serif
+// NSimSun. A serif stack keeps its generic, whose Chinese face is a serif one too.
+const CHINESE_SANS_SERIF = "'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC'";
+
+/** The CSS font-family to apply for a font: its own, with a Chinese face before its generic family */
+export function fontFamilyWithChinese(font: Font): string {
+  const families = font.family.split(',').map(family => family.trim());
+  const generic = families[families.length - 1];
+  if (generic === 'serif') return font.family;
+  return [...families.slice(0, -1), CHINESE_SANS_SERIF, generic].join(', ');
+}
+
+/**
+ * Whether the font pickers mark a font as having no letters for a language's script: only
+ * where another font has them, so picking it would change the language's text. No font
+ * here has Chinese characters, so in Chinese none is marked.
+ */
+export function lacksLettersFor(font: Font, script: Font['scripts'][number]): boolean {
+  return !font.scripts.includes(script) && fonts.some(other => other.scripts.includes(script));
+}
 
 export function getFontById(id: string): Font | undefined {
   return fonts.find(font => font.id === id);
