@@ -1,5 +1,7 @@
 # Snow quality and the monkeysnow estimate come from each Elevation band's wet bulb, not the model's snowfall
 
+The cut-offs below are now one of three, the visitor's Snow caution: see ADR 0013.
+
 Open-Meteo adjusts the temperature it returns to the elevation asked for (not the humidity), but its `snowfall` and `rain` are the grid cell's own, the same for every elevation on that cell. Zermatt from ECMWF IFS on 14 October 2026, seven days, at three requested heights:
 
 | Requested height | Precipitation | Model snowfall | Model rain | Mean temperature |

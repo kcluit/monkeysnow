@@ -101,8 +101,12 @@ One of the three parts a forecast day is split into on the **Main page**, in the
 _Avoid_: chunk, time slot, time of day
 
 **Snow quality**:
-What falls during an hour, estimated from the air's temperature and humidity at the height being forecast: Powder, Dry snow, Wet snow, Sleet/Mix or Rain, from best to worst, leaning toward the worse one when it is close. A **Period**'s or a day's Snow quality is the one under which most of its precipitation fell, the worst of the tied on a tie; one with no precipitation has none.
+What falls during an hour, estimated from the air's temperature and humidity at the height being forecast: Powder, Dry snow, Wet snow, Sleet/Mix or Rain, from best to worst, leaning toward the worse one when it is close as far as the visitor's **Snow caution** says. A **Period**'s or a day's Snow quality is the one under which most of its precipitation fell, the worst of the tied on a tie; one with no precipitation has none.
 _Avoid_: snow condition, snow type, precip type
+
+**Snow caution**:
+How readily **Snow quality** calls an hour snow, and how much snow the **monkeysnow estimate** makes of it: Extra cautious, Cautious or Realistic. Realistic follows the published rain–snow studies; the other two call Rain sooner, and Extra cautious makes denser snow too. One choice for every card, whichever is picked under "Snowfall estimate".
+_Avoid_: snow mode, estimate mode, bias, optimism, Default (as a choice's name)
 
 **Snow quality colours**:
 The colour each **Snow quality** is drawn in, following the weather-radar convention: green Rain, pink Sleet/Mix, light blue Wet snow, blue Dry snow and violet Powder. They are the same on every theme, so a colour always means the same Snow quality.
