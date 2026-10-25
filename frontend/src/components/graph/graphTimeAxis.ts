@@ -5,6 +5,8 @@
  * zone is slow unless the formatters are reused.
  */
 
+import { hourFormat, type DateFormat } from '../../locales';
+
 const HOUR = 3600;
 /** The closest two labels may sit, in CSS pixels */
 const MIN_LABEL_SPACING = 46;
@@ -13,7 +15,7 @@ const DAY_STEPS = [1, 2, 3, 7];
 
 interface Formatters {
     hour: Intl.DateTimeFormat;
-    hourLabel: Intl.DateTimeFormat;
+    hourLabel: DateFormat;
     weekday: Intl.DateTimeFormat;
     dayOfMonth: Intl.DateTimeFormat;
     tooltipDay: Intl.DateTimeFormat;
@@ -26,7 +28,7 @@ function createFormatters(timeZone: string | undefined, locale: string): Formatt
     return {
         // Read as a number, so always in English digits on a 24-hour clock
         hour: new Intl.DateTimeFormat('en-US', { ...zone, hour: 'numeric', hourCycle: 'h23' }),
-        hourLabel: new Intl.DateTimeFormat(locale, { ...zone, hour: 'numeric' }),
+        hourLabel: hourFormat(locale, { ...zone, hour: 'numeric' }),
         weekday: new Intl.DateTimeFormat(locale, { ...zone, weekday: 'short' }),
         dayOfMonth: new Intl.DateTimeFormat(locale, { ...zone, day: 'numeric' }),
         tooltipDay: new Intl.DateTimeFormat(locale, { ...zone, weekday: 'short', month: 'short', day: 'numeric' }),
@@ -108,12 +110,13 @@ export class GraphTimeAxis {
         return this.labels[this.indexOf(t)] ?? '';
     }
 
-    /** "Sat, Oct 17, 4 – 5 PM" ("sam. 17 oct., 16 – 17 h"): the hour before `t`, which its precipitation fell in */
+    /** "Sat, Oct 17, 4 – 5 PM" ("sam. 17 oct., 16 – 17 h", "sáb, 17 oct, 16 – 17 h"): the hour before `t`, which its precipitation fell in */
     hourBefore(t: number): string {
         const f = this.formatters;
         const end = new Date(t * 1000);
         const start = new Date((t - HOUR) * 1000);
-        const [startHour, startPeriod] = f.hourLabel.format(start).split(' ');
+        // Spanish's "h" follows a no-break space (hourFormat())
+        const [startHour, startPeriod] = f.hourLabel.format(start).split(/ |\u{00A0}/u);
         const endLabel = f.hourLabel.format(end);
         const sameHalf = endLabel.endsWith(startPeriod ?? '');
         return `${f.tooltipDay.format(start)}, ${sameHalf ? startHour : f.hourLabel.format(start)} – ${endLabel}`;

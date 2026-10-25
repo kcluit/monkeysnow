@@ -6,12 +6,12 @@
  * language, so a change of language relabels it without building it again.
  */
 
-import { formatLocale } from '../locales';
+import { formatLocale, hourFormat, type DateFormat } from '../locales';
 
 export interface TimeAxis {
     /** Epoch milliseconds of each hour */
     timestamps: number[];
-    /** "Wed, Oct 7" at local midnight, "5 PM" at other hours ("mer. 7 oct.", "17 h" in French) */
+    /** "Wed, Oct 7" at local midnight, "5 PM" at other hours ("mer. 7 oct.", "17 h" in French, "17 h" in Spanish) */
     labels: string[];
     /** "Wed, Oct 7, 5 PM" */
     tooltipLabels: string[];
@@ -37,9 +37,9 @@ interface StructureFormatters {
 
 /** The labels' formatters, in one language */
 interface LabelFormatters {
-    hourLabel: Intl.DateTimeFormat;
+    hourLabel: DateFormat;
     dayLabel: Intl.DateTimeFormat;
-    tooltip: Intl.DateTimeFormat;
+    tooltip: DateFormat;
     day: Intl.DateTimeFormat;
 }
 
@@ -66,9 +66,9 @@ function createStructureFormatters(timeZone: string | undefined): StructureForma
 function createLabelFormatters(locale: string, timeZone: string | undefined): LabelFormatters {
     const zone = timeZone ? { timeZone } : {};
     return {
-        hourLabel: new Intl.DateTimeFormat(locale, { ...zone, hour: 'numeric' }),
+        hourLabel: hourFormat(locale, { ...zone, hour: 'numeric' }),
         dayLabel: new Intl.DateTimeFormat(locale, { ...zone, weekday: 'short', month: 'short', day: 'numeric' }),
-        tooltip: new Intl.DateTimeFormat(locale, { ...zone, weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric' }),
+        tooltip: hourFormat(locale, { ...zone, weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric' }),
         day: new Intl.DateTimeFormat(locale, dayOptions(timeZone)),
     };
 }

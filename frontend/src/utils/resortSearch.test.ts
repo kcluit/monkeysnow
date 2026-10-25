@@ -8,11 +8,14 @@ describe('the resort picker\'s search', () => {
     it('finds a country by its name in any language monkeysnow has, whichever is showing', () => {
         expect(matchesSearchWords(verbier, toSearchWords('Switzerland'))).toBe(true);
         expect(matchesSearchWords(verbier, toSearchWords('suisse verbier'))).toBe(true);
+        expect(matchesSearchWords(verbier, toSearchWords('Suiza'))).toBe(true);
         expect(matchesSearchWords(verbier, toSearchWords('Österreich'))).toBe(false);
     });
 
-    it('matches a French name without its accents', () => {
+    it('matches a French or Spanish name without its accents', () => {
         const unitedStates = normalizeForSearch(countryNamesInEveryLanguage('US', 'United States').join(' '));
         expect(matchesSearchWords(unitedStates, toSearchWords('etats-unis'))).toBe(true);
+        const spain = normalizeForSearch(countryNamesInEveryLanguage('ES', 'Spain').join(' '));
+        expect(matchesSearchWords(spain, toSearchWords('espana'))).toBe(true);
     });
 });

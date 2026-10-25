@@ -1,5 +1,6 @@
 import { en } from './en';
 import { fr } from './fr';
+import { es } from './es';
 import type {
     Language,
     PluralKey,
@@ -25,12 +26,22 @@ const frenchLanguage: Language = {
     translations: fr,
 };
 
+const spanishLanguage: Language = {
+    id: 'es',
+    name: 'Spanish',
+    nativeName: 'Español',
+    // Spain's conventions (1,5 and a 24-hour clock), which Chile and Argentina share
+    locale: 'es',
+    translations: es,
+};
+
 /**
  * All available languages. See CONTRIBUTING.md for adding one.
  */
 export const languages: Language[] = [
     englishLanguage,
     frenchLanguage,
+    spanishLanguage,
 ];
 
 /**
@@ -53,13 +64,15 @@ export function interpolate(template: string, values: TranslationValues): string
 }
 
 // French sets a space before : ; ! ? and », after «, and between a number and °: a
-// no-break one, so a line never starts with the mark. Done here rather than in fr's
-// strings, so they stay readable with ordinary spaces.
+// no-break one, so a line never starts with the mark. Spanish sets one only between a
+// number and ° or %. Done here rather than in the strings, so they stay readable with
+// ordinary spaces.
 const NO_BREAK_SPACE = '\u{00A0}';
 const typesetters: Record<string, (text: string) => string> = {
     fr: text => text
         .replace(/ ([:;!?»°])/g, `${NO_BREAK_SPACE}$1`)
         .replace(/« /g, `«${NO_BREAK_SPACE}`),
+    es: text => text.replace(/ ([°%])/g, `${NO_BREAK_SPACE}$1`),
 };
 
 /** Where a visitor's pick is kept. Only a pick is: until there is one, the browser's language decides. */
@@ -189,6 +202,31 @@ export const translatePlural: TranslatePlural = (key: PluralKey, count, values) 
 /** The BCP 47 tag that dates and times are formatted in: 'en-US' for English, so it reads as it always has */
 export function formatLocale(): string {
     return getLanguage().locale;
+}
+
+/** A formatter's one method, which hourFormat() keeps */
+export type DateFormat = Pick<Intl.DateTimeFormat, 'format'>;
+
+// Intl writes a French hour "14 h" by itself, but a Spanish one as a bare "14", which
+// reads like a stray number after a date: Spanish gets the hour symbol ("14 h", as the
+// RAE writes it) added, after a no-break space so the two never part.
+const hourSymbols: Record<string, string> = {
+    es: `${NO_BREAK_SPACE}h`,
+};
+
+/**
+ * An Intl.DateTimeFormat with `options` that show an hour, alone or ending a date, writing
+ * the hour the locale's language does: "5 PM", "17 h" in French, and "17 h" in Spanish too.
+ */
+export function hourFormat(locale: string, options: Intl.DateTimeFormatOptions): DateFormat {
+    const formatter = new Intl.DateTimeFormat(locale, options);
+    const symbol = hourSymbols[locale];
+    if (!symbol) return formatter;
+    return {
+        format: (date) => formatter.formatToParts(date)
+            .map(part => (part.type === 'hour' ? part.value + symbol : part.value))
+            .join(''),
+    };
 }
 
 const decimalMarks = new Map<string, string>();

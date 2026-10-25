@@ -88,6 +88,8 @@ describe('a card when the language changes', () => {
         try {
             setLanguage('fr');
             expect([day.name, day.date, am.snow, am.condition, day.snowCondition.text]).toEqual(['Samedi', '24 oct.', '1,6 cm', 'Neige modérée', 'Pluie et neige']);
+            setLanguage('es');
+            expect([day.name, day.date, am.snow, am.condition, day.snowCondition.text]).toEqual(['Sábado', '24 oct', '1,6 cm', 'Nevada moderada', 'Aguanieve']);
         } finally {
             setLanguage('en');
             warn.mockRestore();
