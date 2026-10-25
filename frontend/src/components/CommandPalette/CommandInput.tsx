@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { shouldAutoFocusSearch } from '../../utils/autoFocus';
+import { useLanguage } from '../../hooks/useLanguage';
 
 interface CommandInputProps {
   value: string;
   onChange: (value: string) => void;
+  /** "Search..." in the language showing, if not given */
   placeholder?: string;
   canGoBack: boolean;
   onBack: () => void;
@@ -12,10 +14,11 @@ interface CommandInputProps {
 export function CommandInput({
   value,
   onChange,
-  placeholder = 'Search...',
+  placeholder,
   canGoBack,
   onBack,
 }: CommandInputProps): JSX.Element {
+  const { t } = useLanguage();
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Auto-focus on mount, unless that would open a phone's keyboard
@@ -32,7 +35,7 @@ export function CommandInput({
           type="button"
           className="command-back-btn"
           onClick={onBack}
-          aria-label="Go back"
+          aria-label={t('command.goBack')}
         >
           &lt;
         </button>
@@ -43,7 +46,7 @@ export function CommandInput({
         className="command-input"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t('command.search')}
         autoComplete="off"
         spellCheck={false}
       />

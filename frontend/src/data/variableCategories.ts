@@ -1,4 +1,5 @@
 import type { WeatherVariable } from '../types/openMeteo';
+import { translate } from '../locales';
 
 export interface VariableCategory {
   id: string;
@@ -6,25 +7,26 @@ export interface VariableCategory {
   variables: WeatherVariable[];
 }
 
+// Names are getters, looked up in the language showing each time they're read
 export const VARIABLE_CATEGORIES: VariableCategory[] = [
   {
     id: 'temperature',
-    name: 'Temperature',
+    get name() { return translate('chart.category.temperature'); },
     variables: ['temperature_2m', 'apparent_temperature', 'dew_point_2m', 'wet_bulb_temperature_2m'],
   },
   {
     id: 'precipitation',
-    name: 'Precipitation',
+    get name() { return translate('chart.category.precipitation'); },
     variables: ['precipitation', 'precipitation_probability', 'rain', 'showers', 'snowfall', 'snow_depth'],
   },
   {
     id: 'snow',
-    name: 'Snow',
+    get name() { return translate('chart.category.snow'); },
     variables: ['snowfall_height', 'snowfall_water_equivalent', 'snow_depth_water_equivalent', 'snow_density'],
   },
   {
     id: 'hazards',
-    name: 'Precip Type & Hazards',
+    get name() { return translate('chart.category.hazards'); },
     variables: [
       'precipitation_type',
       'hail',
@@ -38,17 +40,17 @@ export const VARIABLE_CATEGORIES: VariableCategory[] = [
   },
   {
     id: 'wind',
-    name: 'Wind',
+    get name() { return translate('chart.category.wind'); },
     variables: ['wind_speed_10m', 'wind_gusts_10m', 'wind_direction_10m'],
   },
   {
     id: 'atmosphere',
-    name: 'Atmosphere',
+    get name() { return translate('chart.category.atmosphere'); },
     variables: ['relative_humidity_2m', 'surface_pressure', 'pressure_msl', 'vapour_pressure_deficit', 'boundary_layer_height'],
   },
   {
     id: 'clouds',
-    name: 'Clouds & Visibility',
+    get name() { return translate('chart.category.clouds'); },
     variables: [
       'cloud_cover',
       'cloud_cover_low',
@@ -64,27 +66,27 @@ export const VARIABLE_CATEGORIES: VariableCategory[] = [
   },
   {
     id: 'radiation',
-    name: 'Solar & Radiation',
+    get name() { return translate('chart.category.radiation'); },
     variables: ['shortwave_radiation', 'direct_radiation', 'diffuse_radiation', 'direct_normal_irradiance', 'global_tilted_irradiance', 'terrestrial_radiation'],
   },
   {
     id: 'uv',
-    name: 'UV & Sunshine',
+    get name() { return translate('chart.category.uv'); },
     variables: ['uv_index', 'uv_index_clear_sky', 'sunshine_duration', 'is_day'],
   },
   {
     id: 'soil',
-    name: 'Soil',
+    get name() { return translate('chart.category.soil'); },
     variables: ['soil_temperature_0cm', 'soil_moisture_0_to_1cm', 'evapotranspiration', 'et0_fao_evapotranspiration'],
   },
   {
     id: 'stability',
-    name: 'Convective / Stability',
+    get name() { return translate('chart.category.stability'); },
     variables: ['cape', 'lifted_index', 'convective_inhibition', 'freezing_level_height', 'weather_code', 'k_index', 'updraft'],
   },
   {
     id: 'upperAir',
-    name: 'Upper Air & Surface',
+    get name() { return translate('chart.category.upperAir'); },
     variables: ['temperature_80m', 'total_column_integrated_water_vapour', 'surface_temperature', 'skin_temperature'],
   },
 ];

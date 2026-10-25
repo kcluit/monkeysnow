@@ -8,6 +8,7 @@
  */
 
 import { RESORT_LOCATIONS, nearestResortId } from '../data/resortLocations';
+import { translate } from '../locales';
 
 export interface SavedLocation {
     /** Its ID in the Selection, e.g. "saved:k3j9x2qa" */
@@ -97,10 +98,10 @@ export function subscribeSavedLocations(listener: () => void): () => void {
     return () => listeners.delete(listener);
 }
 
-/** The name the Save dialog suggests: "Near" the nearest Resort. */
+/** The name the Save dialog suggests, in the language shown: "Near" the nearest Resort. */
 export function suggestedName(lat: number, lon: number): string {
     const nearest = RESORT_LOCATIONS.get(nearestResortId(lat, lon));
-    return nearest ? `Near ${nearest.displayName}` : 'My location';
+    return nearest ? translate('savedLocation.near', { resort: nearest.displayName }) : translate('savedLocation.mine');
 }
 
 function newId(): string {

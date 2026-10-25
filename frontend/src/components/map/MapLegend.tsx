@@ -1,3 +1,5 @@
+import { useLanguage } from '../../hooks/useLanguage';
+import { withUnit } from '../../locales';
 import { TERRAIN_COLOURINGS, type TerrainColouringId } from '../../utils/mapLayers';
 import { slopeBandLabel, type SlopeBand } from '../../utils/slopeBands';
 import {
@@ -32,6 +34,7 @@ function ScaleBar({ stops, ticks }: { stops: readonly ColourStop[]; ticks: { val
 
 /** The eight Aspects as a compass rose, north up */
 function AspectRose(): JSX.Element {
+    const { t } = useLanguage();
     const radius = 22;
     const wedge = (index: number) => {
         const from = ((index * 45 - 22.5) * Math.PI) / 180;
@@ -40,12 +43,13 @@ function AspectRose(): JSX.Element {
         return `M 0 0 L ${point(from)} A ${radius} ${radius} 0 0 1 ${point(to)} Z`;
     };
     return (
-        <svg className="resort-map-legend-rose" viewBox="-34 -34 68 68" role="img" aria-label="Aspect: the compass direction a slope faces">
+        <svg className="resort-map-legend-rose" viewBox="-34 -34 68 68" role="img" aria-label={t('map.legend.aspectRose')}>
             {ASPECT_SECTORS.map((sector, i) => (
                 <path key={sector.name} d={wedge(i)} fill={rgb(sector.colour)} stroke="rgba(128, 128, 128, 0.6)" strokeWidth={0.5} />
             ))}
-            {[['N', 0, -29], ['E', 29, 0], ['S', 0, 29], ['W', -29, 0]].map(([letter, x, y]) => (
-                <text key={letter} x={x} y={y} textAnchor="middle" dominantBaseline="central">{letter}</text>
+            {/* N, E, S and W, the sectors at 0, 90, 180 and 270 degrees */}
+            {([[0, 0, -29], [2, 29, 0], [4, 0, 29], [6, -29, 0]] as const).map(([sector, x, y]) => (
+                <text key={sector} x={x} y={y} textAnchor="middle" dominantBaseline="central">{t(ASPECT_SECTORS[sector].label)}</text>
             ))}
         </svg>
     );
@@ -53,9 +57,9 @@ function AspectRose(): JSX.Element {
 
 function heightTicks(unitSystem: UnitSystem): { value: number; label: string }[] {
     if (unitSystem === 'imperial') {
-        return [0, 10000, 20000].map(feet => ({ value: feet * FEET_TO_METRES, label: feet === 0 ? '0' : `${feet}ft` }));
+        return [0, 10000, 20000].map(feet => ({ value: feet * FEET_TO_METRES, label: feet === 0 ? '0' : withUnit(feet, 'ft', true) }));
     }
-    return [0, 2000, 4000, 6000, 8000].map(metres => ({ value: metres, label: metres === 0 ? '0' : `${metres}m` }));
+    return [0, 2000, 4000, 6000, 8000].map(metres => ({ value: metres, label: metres === 0 ? '0' : withUnit(metres, 'm', true) }));
 }
 
 interface MapLegendProps {
@@ -66,9 +70,10 @@ interface MapLegendProps {
 
 /** What the Terrain colouring's colours mean, along the bottom of either map while it is on. */
 export function MapLegend({ colouring, slopeBands, unitSystem }: MapLegendProps): JSX.Element {
+    const { t } = useLanguage();
     const label = TERRAIN_COLOURINGS.find(c => c.id === colouring)?.label;
     return (
-        <div className="resort-map-legend" aria-label={`${label} legend`}>
+        <div className="resort-map-legend" aria-label={t('map.legend.label', { name: String(label) })}>
             <div className="resort-map-legend-title">{label}</div>
             {colouring === 'slopeAngle' && (
                 <>
@@ -80,7 +85,7 @@ export function MapLegend({ colouring, slopeBands, unitSystem }: MapLegendProps)
                             </span>
                         ))}
                     </div>
-                    <div className="resort-map-legend-note">Approximate</div>
+                    <div className="resort-map-legend-note">{t('map.legend.approximate')}</div>
                 </>
             )}
             {colouring === 'gradient' && (

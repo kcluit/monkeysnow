@@ -4,6 +4,11 @@ import type { Command, UseCommandPaletteReturn } from '../types';
 
 type PendingNav = { commandId: string } | null;
 
+/** Lowercase without accents, and French's no-break spaces as spaces, so "unites" finds "Unités" */
+function foldForSearch(text: string): string {
+  return text.normalize('NFD').replace(/\p{M}/gu, '').replace(/\s/g, ' ').toLowerCase();
+}
+
 /** Whether a key press is going into a text field rather than to the page. */
 function isTypingInField(target: EventTarget | null): boolean {
   return target instanceof HTMLElement &&
@@ -66,11 +71,12 @@ export function useCommandPalette(
       return currentCommands;
     }
 
-    const query = searchQuery.toLowerCase();
+    const query = foldForSearch(searchQuery);
     return currentCommands.filter(
       (cmd) =>
-        cmd.name.toLowerCase().includes(query) ||
-        cmd.id.toLowerCase().includes(query)
+        foldForSearch(cmd.name).includes(query) ||
+        cmd.id.toLowerCase().includes(query) ||
+        cmd.keywords?.some((word) => foldForSearch(word).includes(query))
     );
   }, [currentCommands, searchQuery]);
 

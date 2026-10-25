@@ -1,13 +1,14 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
-import { RESORT_HIERARCHY, RESORT_LOCATIONS } from '../../data/resortLocations';
+import { RESORT_HIERARCHY, RESORT_LOCATIONS, continentName } from '../../data/resortLocations';
 import { getModelInfo } from '../../data/modelHierarchy';
 import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
 import { useCountryModels } from '../../hooks/useCountryModels';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useOverlay } from '../../hooks/useOverlay';
-import { interpolate } from '../../locales';
+import { countryName, interpolate } from '../../locales';
 import { shouldAutoFocusSearch } from '../../utils/autoFocus';
+import { countryNamesInEveryLanguage, normalizeForSearch } from '../../utils/resortSearch';
 import { getSavedLocation } from '../../utils/savedLocations';
 import {
     countryModelOptions,
@@ -22,32 +23,44 @@ import type { WeatherModel } from '../../types/openMeteo';
 
 interface Country {
     code: string;
+    /** In the language shown */
     name: string;
+    /** Its names in every language, as search compares them, so "Suisse" and "Switzerland" both find it */
+    searchText: string;
     resorts: number;
 }
 
-// Countries by continent, in the Resort picker's order
-const CONTINENTS = RESORT_HIERARCHY.map((continent) => ({
-    name: continent.name,
-    countries: continent.countries.map((country): Country => ({
-        code: country.code,
-        name: country.name,
-        resorts: country.provinces.reduce((sum, province) => sum + province.resorts.length, 0),
-    })),
-}));
+interface Continent {
+    id: string;
+    name: string;
+    countries: Country[];
+}
 
-const ALL_COUNTRIES = CONTINENTS
-    .flatMap((continent) => continent.countries)
-    .sort((a, b) => a.name.localeCompare(b.name));
+// Countries by continent, in the Resort picker's order, named and sorted in the language shown
+function continentsIn(locale: string): Continent[] {
+    const collator = new Intl.Collator(locale);
+    return RESORT_HIERARCHY.map((continent) => ({
+        id: continent.id,
+        name: continentName(continent.name),
+        countries: continent.countries
+            .map((country): Country => ({
+                code: country.code,
+                name: countryName(country.code, country.name),
+                searchText: normalizeForSearch(countryNamesInEveryLanguage(country.code, country.name).join(' ')),
+                resorts: country.provinces.reduce((sum, province) => sum + province.resorts.length, 0),
+            }))
+            .sort((a, b) => collator.compare(a.name, b.name)),
+    }));
+}
 
 const labelOf = (model: WeatherModel): string => getModelInfo(model)?.label ?? model;
 
 /** "All countries on Auto", or how many countries have a Country model. */
 export function useCardModelsSummary(): string {
-    const { t } = useLanguage();
+    const { t, tPlural } = useLanguage();
     const changed = Object.keys(useCountryModels()).length;
     if (changed === 0) return t('cardModels.allAuto');
-    return changed === 1 ? t('cardModels.changedOne') : interpolate(t('cardModels.changedMany'), { count: changed });
+    return tPlural('cardModels.changed', changed);
 }
 
 interface ModelOptionsProps {
@@ -144,9 +157,10 @@ export interface CardModelsModalProps {
  * Recommended card model (docs/adr/0006).
  */
 export const CardModelsModal = memo(function CardModelsModal({ isOpen, onClose, selectedResorts }: CardModelsModalProps): JSX.Element | null {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const countryModels = useCountryModels();
     const summary = useCardModelsSummary();
+    const continents = useMemo(() => continentsIn(language.locale), [language]);
     const [search, setSearch] = useState('');
     // One list open at a time: "everywhere", or "<group>:<country code>"
     const [expanded, setExpanded] = useState<string | null>(null);
@@ -163,21 +177,27 @@ export const CardModelsModal = memo(function CardModelsModal({ isOpen, onClose, 
     // Lock page scroll while open, and close on Esc
     useOverlay(isOpen, onClose);
 
-    // The countries of the Selection's Resorts and Saved locations
+    // The countries of the Selection's Resorts and Saved locations, in the language's alphabetical order
     const selectionCountries = useMemo(() => {
         const codes = new Set(selectedResorts.map((id) => RESORT_LOCATIONS.get(id)?.country ?? getSavedLocation(id)?.country));
-        return ALL_COUNTRIES.filter((country) => codes.has(country.code));
-    }, [selectedResorts]);
+        const collator = new Intl.Collator(language.locale);
+        return continents
+            .flatMap((continent) => continent.countries)
+            .filter((country) => codes.has(country.code))
+            .sort((a, b) => collator.compare(a.name, b.name));
+    }, [selectedResorts, continents, language]);
 
     if (!isOpen) return null;
 
     const query = search.trim().toLowerCase();
+    // Whatever language it's typed in, without minding accents or punctuation
+    const searchWords = normalizeForSearch(query).trim();
     const matches = (country: Country) =>
-        !query || country.name.toLowerCase().includes(query) || country.code.toLowerCase() === query;
+        !query || country.searchText.includes(searchWords) || country.code.toLowerCase() === query;
     const groups = [
         { key: 'selection', name: t('cardModels.yourSelection'), countries: selectionCountries.filter(matches) },
-        ...CONTINENTS.map((continent) => ({
-            key: continent.name,
+        ...continents.map((continent) => ({
+            key: continent.id,
             name: continent.name,
             countries: continent.countries.filter(matches),
         })),
@@ -201,7 +221,7 @@ export const CardModelsModal = memo(function CardModelsModal({ isOpen, onClose, 
                             spellCheck={false}
                         />
                     </div>
-                    <button className="resort-grid-close-btn" onClick={onClose} aria-label="Close">
+                    <button className="resort-grid-close-btn" onClick={onClose} aria-label={t('picker.close')}>
                         <Icon icon={icons.close} />
                     </button>
                 </div>
@@ -253,7 +273,7 @@ export const CardModelsModal = memo(function CardModelsModal({ isOpen, onClose, 
 
                 <div className="command-palette-footer">
                     <span className="command-hint">
-                        <kbd>esc</kbd> close
+                        <kbd>{t('key.esc')}</kbd> {t('picker.closeHint')}
                     </span>
                     {Object.keys(countryModels).length > 0 && (
                         <button className="resort-grid-clear-btn" onClick={resetCountryModels}>

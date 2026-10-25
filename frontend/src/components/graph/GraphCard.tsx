@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { webcamUrls } from '../../utils/constants';
-import { calculateSnowTotals } from '../../utils/weather';
-import { formatSnow } from '../../utils/unitConversion';
 import { nightsBetween } from '../../utils/nightTimes';
 import { useInViewport } from '../../hooks/useInViewport';
 import { useLanguage } from '../../hooks/useLanguage';
 import { HistoryBadge } from '../cards/HistoryBadge';
+import { totalsText } from '../cards/cardUtils';
 import { graphDataOf } from './graphData';
 import { GraphTimeAxis } from './graphTimeAxis';
 import { GraphPlot } from './GraphPlot';
@@ -38,10 +37,9 @@ interface GraphCardProps {
  * canvases at once would use too much memory.
  */
 export function GraphCard({ resort, data, elevation, snowfallMode, snowCaution, units, theme, sync, bounds, plotHeight, onResortClick }: GraphCardProps): JSX.Element {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [cardRef, isNearScreen] = useInViewport<HTMLDivElement>({ rootMargin: '600px 0px' });
     const plotRef = useRef<HTMLDivElement>(null);
-    const totals = calculateSnowTotals(resort);
     const webcamUrl = webcamUrls[resort.id];
 
     const graphData = useMemo(
@@ -50,9 +48,9 @@ export function GraphCard({ resort, data, elevation, snowfallMode, snowCaution, 
     );
     const axis = useMemo(
         () => graphData && graphData.times.length > 0
-            ? new GraphTimeAxis(bounds.min, bounds.max, graphData.times[0], graphData.timeZone)
+            ? new GraphTimeAxis(bounds.min, bounds.max, graphData.times[0], graphData.timeZone, language.locale)
             : null,
-        [graphData, bounds]
+        [graphData, bounds, language.locale]
     );
     const nights = useMemo(
         () => graphData ? nightsBetween(bounds.min, bounds.max, graphData.lat, graphData.lon) : [],
@@ -62,14 +60,15 @@ export function GraphCard({ resort, data, elevation, snowfallMode, snowCaution, 
     useEffect(() => {
         const container = plotRef.current;
         if (!isNearScreen || !graphData || !axis || !container) return;
-        const plot = new GraphPlot(container, { data: graphData, axis, nights, theme, units, width: container.clientWidth, plotHeight, sync });
+        // Built again in a new language, since its labels and tooltip are drawn with t
+        const plot = new GraphPlot(container, { data: graphData, axis, nights, theme, units, width: container.clientWidth, plotHeight, sync, t });
         const observer = new ResizeObserver(() => plot.setWidth(container.clientWidth));
         observer.observe(container);
         return () => {
             observer.disconnect();
             plot.destroy();
         };
-    }, [isNearScreen, graphData, axis, nights, theme, units, plotHeight, sync]);
+    }, [isNearScreen, graphData, axis, nights, theme, units, plotHeight, sync, t]);
 
     return (
         <div ref={cardRef} className="resort-card rounded-2xl p-3 sm:p-4 shadow-lg mb-6 backdrop-blur-md">
@@ -89,8 +88,8 @@ export function GraphCard({ resort, data, elevation, snowfallMode, snowCaution, 
                 </div>
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                     <span className="text-sm font-medium">
-                        <span className="text-theme-accent">Totals:</span>
-                        <span className="text-theme-textPrimary"> {resort.isHistory ? 'Past' : 'Next'} 3 Days: {formatSnow(totals.threeDays, units)} | {resort.isHistory ? 'Past' : 'Next'} 7 Days: {formatSnow(totals.sevenDays, units)}</span>
+                        <span className="text-theme-accent">{t('card.totals')}</span>
+                        <span className="text-theme-textPrimary"> {totalsText(resort, units)}</span>
                     </span>
                     {webcamUrl && (
                         <a
@@ -104,7 +103,7 @@ export function GraphCard({ resort, data, elevation, snowfallMode, snowCaution, 
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" />
                             </svg>
-                            <span className="text-sm font-medium text-theme-accent">Webcams</span>
+                            <span className="text-sm font-medium text-theme-accent">{t('card.webcams')}</span>
                         </a>
                     )}
                 </div>

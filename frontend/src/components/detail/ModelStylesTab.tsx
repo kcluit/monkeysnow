@@ -7,10 +7,19 @@
  */
 
 import { Fragment, useState, type ReactNode } from 'react';
-import { aggregationOptions, getModelInfo, inCatalogueOrder, isKnownModel, modelProviders } from '../../data/modelHierarchy';
+import {
+    aggregationOptions,
+    getModelInfo,
+    inCatalogueOrder,
+    isKnownModel,
+    modelProviders,
+    type ProviderData,
+} from '../../data/modelHierarchy';
 import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
 import { useOverlay } from '../../hooks/useOverlay';
+import { useLanguage } from '../../hooks/useLanguage';
+import { translate } from '../../locales';
 import {
     COLOR_PRESETS,
     DEFAULT_MODEL_STYLES,
@@ -41,8 +50,9 @@ interface ModelStylesTabProps {
 const ALL_SELECTED_MODELS = 'all';
 
 // Each Forecast model's Provider, so the filter finds a model by its Provider's name too
-const PROVIDER_NAMES = new Map(
-    modelProviders.flatMap((provider) => provider.models.map((model): [WeatherModel, string] => [model.id, provider.name]))
+// (read as it filters: some names are in the current language)
+const PROVIDERS = new Map(
+    modelProviders.flatMap((provider) => provider.models.map((model): [WeatherModel, ProviderData] => [model.id, provider]))
 );
 
 /** One line's style with anything left at its default removed, or null when nothing is left. */
@@ -66,28 +76,30 @@ function withStyle<K extends string>(
     return next;
 }
 
-const percent = (opacity: number): string => `${Math.round(opacity * 100)}%`;
+/** e.g. "35%", or "35 %" in French; read while drawing, by a component that redraws on a new language */
+const percent = (opacity: number): string => translate('detail.percent', { value: Math.round(opacity * 100) });
 
 /**
  * Reset to default, for the footer of a modal showing this tab. Closing the modal saves,
  * so nothing could undo a reset: it asks first.
  */
 export function ResetModelStyles({ onChange }: { onChange: (styles: ModelStyles) => void }): JSX.Element {
+    const { t } = useLanguage();
     const [confirming, setConfirming] = useState(false);
 
     if (!confirming) {
         return (
             <div className="chart-settings-footer-start">
                 <button type="button" className="chart-settings-btn cancel" onClick={() => setConfirming(true)}>
-                    Reset to default
+                    {t('detail.modelStyles.reset')}
                 </button>
             </div>
         );
     }
 
     return (
-        <div className="chart-settings-footer-start" role="group" aria-label="Reset to default">
-            <span className="chart-settings-footer-question">Reset every Model style?</span>
+        <div className="chart-settings-footer-start" role="group" aria-label={t('detail.modelStyles.reset')}>
+            <span className="chart-settings-footer-question">{t('detail.modelStyles.confirmReset')}</span>
             <button
                 type="button"
                 className="chart-settings-btn apply"
@@ -96,10 +108,10 @@ export function ResetModelStyles({ onChange }: { onChange: (styles: ModelStyles)
                     setConfirming(false);
                 }}
             >
-                Yes
+                {t('detail.yes')}
             </button>
             <button type="button" className="chart-settings-btn cancel" onClick={() => setConfirming(false)}>
-                No
+                {t('detail.no')}
             </button>
         </div>
     );
@@ -112,6 +124,7 @@ function ColorChoices({ color, original, onPick }: {
     /** Called with undefined for the original colour */
     onPick: (color: string | undefined) => void;
 }): JSX.Element {
+    const { t } = useLanguage();
     const isCustom = color !== original && !COLOR_PRESETS.includes(color);
     return (
         <div className="model-style-colors">
@@ -119,8 +132,8 @@ function ColorChoices({ color, original, onPick }: {
                 type="button"
                 className={`model-color-swatch model-color-original${color === original ? ' selected' : ''}`}
                 style={{ backgroundColor: original }}
-                title="Original colour"
-                aria-label="Original colour"
+                title={t('detail.modelStyles.originalColour')}
+                aria-label={t('detail.modelStyles.originalColour')}
                 onClick={() => onPick(undefined)}
             />
             {COLOR_PRESETS.filter((preset) => preset !== original).map((preset) => (
@@ -136,12 +149,12 @@ function ColorChoices({ color, original, onPick }: {
             <label
                 className={`model-color-swatch model-color-custom${isCustom ? ' selected' : ''}`}
                 style={isCustom ? { background: color } : undefined}
-                title="Custom colour…"
+                title={t('detail.modelStyles.customColourEllipsis')}
             >
                 <input
                     type="color"
                     value={color}
-                    aria-label="Custom colour"
+                    aria-label={t('detail.modelStyles.customColour')}
                     onChange={(e) => onPick(e.target.value.toLowerCase())}
                 />
             </label>
@@ -156,9 +169,10 @@ function OpacityChips({ opacity, allowAuto, onPick }: {
     allowAuto: boolean;
     onPick: (opacity: number | undefined) => void;
 }): JSX.Element {
+    const { t } = useLanguage();
     const choices: (number | undefined)[] = allowAuto ? [undefined, ...OPACITY_CHOICES] : [...OPACITY_CHOICES];
     return (
-        <div className="model-style-chips" role="radiogroup" aria-label="Opacity">
+        <div className="model-style-chips" role="radiogroup" aria-label={t('detail.modelStyles.opacity')}>
             {choices.map((choice) => (
                 <button
                     key={choice ?? 'auto'}
@@ -168,7 +182,7 @@ function OpacityChips({ opacity, allowAuto, onPick }: {
                     className={`model-style-chip${opacity === choice ? ' selected' : ''}`}
                     onClick={() => onPick(choice)}
                 >
-                    {choice === undefined ? 'Auto' : percent(choice)}
+                    {choice === undefined ? t('detail.modelStyles.auto') : percent(choice)}
                 </button>
             ))}
         </div>
@@ -185,11 +199,12 @@ function SwitchKnob({ on }: { on: boolean | 'mixed' }): JSX.Element {
 }
 
 function BoldSwitch({ bold, onChange }: { bold: boolean | 'mixed'; onChange: (bold: boolean) => void }): JSX.Element {
+    const { t } = useLanguage();
     return (
         <button
             type="button"
             className="model-style-bold-switch"
-            aria-label="Bold"
+            aria-label={t('detail.modelStyles.bold')}
             aria-pressed={bold}
             onClick={() => onChange(bold !== true)}
         >
@@ -222,11 +237,12 @@ function LineRow({ name, note, color, original, style, allowAuto, isOpen, onTogg
     onToggle: () => void;
     onChange: (style: LineStyle) => void;
 }): JSX.Element {
+    const { t } = useLanguage();
     const current = style ?? {};
     // For an Aggregation, 100% is its default and stored as nothing
     const opacity = current.opacity ?? (allowAuto ? undefined : 1);
     // Auto's fade depends on the chart, so a model's sample is drawn solid and says which it is
-    const tag = opacity === undefined ? 'Auto' : allowAuto || opacity !== 1 ? percent(opacity) : null;
+    const tag = opacity === undefined ? t('detail.modelStyles.auto') : allowAuto || opacity !== 1 ? percent(opacity) : null;
 
     return (
         <div className={`model-style-row${note ? ' unavailable' : ''}${isOpen ? ' open' : ''}`}>
@@ -243,30 +259,30 @@ function LineRow({ name, note, color, original, style, allowAuto, isOpen, onTogg
                     />
                 </span>
                 <span className="model-style-tag">{tag}</span>
-                <span className={`model-style-changed${style ? ' on' : ''}`} title={style ? 'Changed' : undefined} />
+                <span className={`model-style-changed${style ? ' on' : ''}`} title={style ? t('detail.modelStyles.changed') : undefined} />
             </button>
             {isOpen && (
                 <div className="model-style-editor">
-                    <EditorField label="Colour">
+                    <EditorField label={t('detail.modelStyles.colour')}>
                         <ColorChoices
                             color={color}
                             original={original}
                             onPick={(picked) => onChange({ ...current, color: picked === original ? undefined : picked })}
                         />
                     </EditorField>
-                    <EditorField label="Opacity">
+                    <EditorField label={t('detail.modelStyles.opacity')}>
                         <OpacityChips
                             opacity={opacity}
                             allowAuto={allowAuto}
                             onPick={(next) => onChange({ ...current, opacity: !allowAuto && next === 1 ? undefined : next })}
                         />
                     </EditorField>
-                    <EditorField label="Bold">
+                    <EditorField label={t('detail.modelStyles.bold')}>
                         <BoldSwitch bold={!!current.bold} onChange={(bold) => onChange({ ...current, bold })} />
                     </EditorField>
                     <button type="button" className="model-style-reset" disabled={!style} onClick={() => onChange({})}>
                         <Icon icon={icons.reset} />
-                        Reset line
+                        {t('detail.modelStyles.resetLine')}
                     </button>
                 </div>
             )}
@@ -284,6 +300,7 @@ function FoldTitle({ label, count, changed, isOpen, disabled, onToggle }: {
     disabled: boolean;
     onToggle: () => void;
 }): JSX.Element {
+    const { tPlural } = useLanguage();
     return (
         <button
             type="button"
@@ -294,7 +311,7 @@ function FoldTitle({ label, count, changed, isOpen, disabled, onToggle }: {
         >
             <Icon icon={isOpen ? icons.caretDown : icons.caretRight} />
             {label} ({count})
-            {changed > 0 && <span className="model-styles-fold-changed">· {changed} changed</span>}
+            {changed > 0 && <span className="model-styles-fold-changed">{tPlural('detail.modelStyles.changedCount', changed)}</span>}
         </button>
     );
 }
@@ -333,6 +350,7 @@ export function ModelStylesTab({
     selectedAggregations,
     modelAvailability,
 }: ModelStylesTabProps): JSX.Element {
+    const { t } = useLanguage();
     const [openLine, setOpenLine] = useState<string | null>(null);
     const [showOtherModels, setShowOtherModels] = useState(false);
     const [showOtherAggregations, setShowOtherAggregations] = useState(false);
@@ -355,7 +373,7 @@ export function ModelStylesTab({
     const isFiltering = words.length > 0;
     const matches = (text: string) => !isFiltering || matchesSearchWords(normalizeForSearch(text), words);
     const modelMatches = (model: WeatherModel) =>
-        matches(`${getModelInfo(model)?.label ?? model} ${PROVIDER_NAMES.get(model) ?? ''}`);
+        matches(`${getModelInfo(model)?.label ?? model} ${PROVIDERS.get(model)?.name ?? ''}`);
 
     const models = inCatalogueOrder(selectedModels.filter(isKnownModel));
     const shownModels = models.filter(modelMatches);
@@ -434,25 +452,25 @@ export function ModelStylesTab({
 
     return (
         <>
-            <p className="model-styles-intro">These apply to every chart, for every resort.</p>
+            <p className="model-styles-intro">{t('detail.modelStyles.intro')}</p>
 
             <div className="model-styles-filter">
                 <input
                     type="search"
                     className="model-styles-filter-input"
                     value={filter}
-                    placeholder="Filter lines…"
-                    aria-label="Filter lines"
+                    placeholder={t('detail.modelStyles.filter')}
+                    aria-label={t('detail.modelStyles.filterLabel')}
                     onChange={(e) => changeFilter(e.target.value)}
                 />
             </div>
 
-            {nothingMatches && <p className="model-styles-intro">No lines match.</p>}
+            {nothingMatches && <p className="model-styles-intro">{t('detail.modelStyles.noMatch')}</p>}
 
             {(!isFiltering || shownModels.length > 0) && (
                 <div className="chart-settings-section">
                     <div className="model-styles-heading">
-                        <h3 className="chart-settings-section-title">Selected models</h3>
+                        <h3 className="chart-settings-section-title">{t('detail.modelStyles.selectedModels')}</h3>
                         {!isFiltering && models.length > 1 && (
                             <button
                                 type="button"
@@ -460,26 +478,26 @@ export function ModelStylesTab({
                                 aria-expanded={openLine === ALL_SELECTED_MODELS}
                                 onClick={() => toggleLine(ALL_SELECTED_MODELS)}
                             >
-                                Set all…
+                                {t('detail.modelStyles.setAll')}
                             </button>
                         )}
                     </div>
                     {openLine === ALL_SELECTED_MODELS && (
                         <div className="model-style-editor model-style-all-editor">
-                            <EditorField label="Opacity">
+                            <EditorField label={t('detail.modelStyles.opacity')}>
                                 <OpacityChips
                                     opacity={sharedOpacity}
                                     allowAuto
                                     onPick={(opacity) => setOnAllModels({ opacity })}
                                 />
                             </EditorField>
-                            <EditorField label="Bold">
+                            <EditorField label={t('detail.modelStyles.bold')}>
                                 <BoldSwitch bold={allBold} onChange={(bold) => setOnAllModels({ bold })} />
                             </EditorField>
                         </div>
                     )}
                     {models.length === 0 ? (
-                        <p className="model-styles-intro">No models selected yet.</p>
+                        <p className="model-styles-intro">{t('detail.modelStyles.noModels')}</p>
                     ) : (
                         <div className="model-style-list">
                             {shownModels.map((model) =>
@@ -494,7 +512,7 @@ export function ModelStylesTab({
                 <div className="chart-settings-section">
                     <h3 className="chart-settings-section-title">
                         <FoldTitle
-                            label="Other models"
+                            label={t('detail.modelStyles.otherModels')}
                             count={otherModels.length}
                             changed={otherModels.filter((model) => styles.models[model]).length}
                             isOpen={isOtherModelsOpen}
@@ -517,9 +535,9 @@ export function ModelStylesTab({
 
             {(!isFiltering || shownAggregations.length + shownOtherAggregations.length > 0) && (
                 <div className="chart-settings-section">
-                    <h3 className="chart-settings-section-title">Aggregations</h3>
+                    <h3 className="chart-settings-section-title">{t('detail.aggregations')}</h3>
                     {!isFiltering && aggregations.length === 0 && (
-                        <p className="model-styles-intro">None selected. Select them in the model picker.</p>
+                        <p className="model-styles-intro">{t('detail.modelStyles.noAggregations')}</p>
                     )}
                     {shownAggregations.length > 0 && (
                         <div className="model-style-list">
@@ -530,7 +548,7 @@ export function ModelStylesTab({
                         <>
                             <h4 className="model-style-provider">
                                 <FoldTitle
-                                    label="Other Aggregations"
+                                    label={t('detail.modelStyles.otherAggregations')}
                                     count={otherAggregations.length}
                                     changed={otherAggregations.filter(({ id }) => styles.aggregations[id]).length}
                                     isOpen={isOtherAggregationsOpen}
@@ -548,23 +566,23 @@ export function ModelStylesTab({
                     {!isFiltering && (
                         <div className="model-style-switches">
                             <Toggle
-                                label="Min–max spread"
-                                title="Shades between the Min and Max lines"
-                                needs={hasPair('min', 'max') ? null : 'Needs Min and Max selected'}
+                                label={t('detail.modelStyles.minMaxFill')}
+                                title={t('detail.modelStyles.minMaxFillTitle')}
+                                needs={hasPair('min', 'max') ? null : t('detail.modelStyles.minMaxFillNeeds')}
                                 checked={styles.showMinMaxFill}
                                 onChange={(showMinMaxFill) => onChange({ ...styles, showMinMaxFill })}
                             />
                             <Toggle
-                                label="25th–75th spread"
-                                title="Shades between the 25th and 75th percentile lines"
-                                needs={hasPair('p25', 'p75') ? null : 'Needs 25th and 75th Percentile selected'}
+                                label={t('detail.modelStyles.percentileFill')}
+                                title={t('detail.modelStyles.percentileFillTitle')}
+                                needs={hasPair('p25', 'p75') ? null : t('detail.modelStyles.percentileFillNeeds')}
                                 checked={styles.showPercentileFill}
                                 onChange={(showPercentileFill) => onChange({ ...styles, showPercentileFill })}
                             />
                             <Toggle
-                                label="Hide model lines"
-                                title="While Aggregations are drawn, show only them"
-                                needs={selectedAggregations.length > 0 ? null : 'Needs an Aggregation selected'}
+                                label={t('detail.modelStyles.hideModelLines')}
+                                title={t('detail.modelStyles.hideModelLinesTitle')}
+                                needs={selectedAggregations.length > 0 ? null : t('detail.modelStyles.hideModelLinesNeeds')}
                                 checked={styles.hideModelLines}
                                 onChange={(hideModelLines) => onChange({ ...styles, hideModelLines })}
                             />

@@ -1,13 +1,30 @@
 import { useState, useEffect } from 'react';
-import type { UtilityBarProps, SortDay } from '../types';
+import type { UtilityBarProps, SortDay, ElevationLevel, SortOption, ViewMode } from '../types';
+import type { TranslationKey } from '../types/i18n';
 import { getSortDayText } from '../utils/sortDayHelpers';
 import { isAscendingOrder } from '../hooks/useResortFiltering';
+import { useLanguage } from '../hooks/useLanguage';
 import { MobileSortModal } from './MobileSortModal';
 import { HistorySwitch } from './HistorySwitch';
 
 interface ExtendedUtilityBarProps extends UtilityBarProps {
   openResortModal: () => void;
 }
+
+const BAND_NAMES: Record<ElevationLevel, TranslationKey> = { bot: 'band.base', mid: 'band.mid', top: 'band.top' };
+
+const VIEW_MODE_NAMES: Record<ViewMode, TranslationKey> = {
+  default: 'utilityBar.view.default',
+  full: 'utilityBar.view.full',
+  compact: 'utilityBar.view.compact',
+  graph: 'utilityBar.view.graph',
+};
+
+const SORT_NAMES: Record<SortOption, TranslationKey> = {
+  temperature: 'utilityBar.sortBy.temperature',
+  snowfall: 'utilityBar.sortBy.snowfall',
+  wind: 'utilityBar.sortBy.wind',
+};
 
 export function UtilityBar({
   selectedResorts,
@@ -26,6 +43,7 @@ export function UtilityBar({
   sortDayData,
   openResortModal
 }: ExtendedUtilityBarProps): JSX.Element {
+  const { t } = useLanguage();
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showSortDayMenu, setShowSortDayMenu] = useState(false);
   const [showViewModeMenu, setShowViewModeMenu] = useState(false);
@@ -63,13 +81,13 @@ export function UtilityBar({
             className="w-full md:w-64 bg-theme-background border border-theme-border rounded-lg px-4 py-2 text-left shadow-sm hover:bg-theme-secondary transition-colors duration-200"
           >
             <span className="block truncate text-theme-textPrimary">
-              Select Resorts ({selectedResorts.length})
+              {t('utilityBar.selectResorts', { count: selectedResorts.length })}
             </span>
           </button>
 
           {/* Elevation Selection - Inline buttons */}
           <div className="flex md:inline-flex w-full md:w-auto items-center gap-1 bg-theme-background border border-theme-border rounded-lg px-3 py-2 shadow-sm">
-            <span className="text-sm text-theme-textPrimary mr-1.5">Elevation:</span>
+            <span className="text-sm text-theme-textPrimary mr-1.5">{t('utilityBar.elevation')}</span>
             {(['bot', 'mid', 'top'] as const).map((level) => (
               <button
                 key={level}
@@ -80,7 +98,7 @@ export function UtilityBar({
                     : 'text-theme-textSecondary hover:text-theme-textPrimary'
                 }`}
               >
-                {level === 'bot' ? 'Base' : level === 'mid' ? 'Mid' : 'Top'}
+                {t(BAND_NAMES[level])}
               </button>
             ))}
           </div>
@@ -93,17 +111,17 @@ export function UtilityBar({
                 setShowSortMenu(false);
                 setShowSortDayMenu(false);
               }}
-              className="w-full md:w-36 bg-theme-background border border-theme-border rounded-lg px-3 py-2 text-left flex items-center justify-between shadow-sm hover:bg-theme-secondary transition-colors duration-200"
+              className="w-full md:w-auto md:min-w-36 gap-2 bg-theme-background border border-theme-border rounded-lg px-3 py-2 text-left flex items-center justify-between shadow-sm hover:bg-theme-secondary transition-colors duration-200"
             >
               <span className="block truncate text-sm font-medium text-theme-accent">
-                {viewMode === 'default' ? 'Default View' : viewMode === 'full' ? 'Full View' : viewMode === 'compact' ? 'Compact' : 'Graph View'}
+                {t(VIEW_MODE_NAMES[viewMode])}
               </span>
               <svg className="h-4 w-4 text-theme-textSecondary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
             </button>
             {showViewModeMenu && (
-              <div className="absolute right-0 z-10 mt-1 w-36 bg-theme-background rounded-lg shadow-lg border border-theme-border">
+              <div className="absolute right-0 z-10 mt-1 w-max min-w-36 bg-theme-background rounded-lg shadow-lg border border-theme-border">
                 <div className="p-2 space-y-1">
                   <button
                     onClick={() => {
@@ -112,7 +130,7 @@ export function UtilityBar({
                     }}
                     className={`w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors duration-200 ${viewMode === 'default' ? 'bg-theme-secondary text-theme-accent font-medium' : 'hover:bg-theme-secondary text-theme-textPrimary'}`}
                   >
-                    Default View
+                    {t(VIEW_MODE_NAMES.default)}
                   </button>
                   <button
                     onClick={() => {
@@ -121,7 +139,7 @@ export function UtilityBar({
                     }}
                     className={`w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors duration-200 ${viewMode === 'full' ? 'bg-theme-secondary text-theme-accent font-medium' : 'hover:bg-theme-secondary text-theme-textPrimary'}`}
                   >
-                    Full View
+                    {t(VIEW_MODE_NAMES.full)}
                   </button>
                   <button
                     onClick={() => {
@@ -130,7 +148,7 @@ export function UtilityBar({
                     }}
                     className={`w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors duration-200 ${viewMode === 'compact' ? 'bg-theme-secondary text-theme-accent font-medium' : 'hover:bg-theme-secondary text-theme-textPrimary'}`}
                   >
-                    Compact
+                    {t(VIEW_MODE_NAMES.compact)}
                   </button>
                   <button
                     onClick={() => {
@@ -139,7 +157,7 @@ export function UtilityBar({
                     }}
                     className={`w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors duration-200 ${viewMode === 'graph' ? 'bg-theme-secondary text-theme-accent font-medium' : 'hover:bg-theme-secondary text-theme-textPrimary'}`}
                   >
-                    Graph View
+                    {t(VIEW_MODE_NAMES.graph)}
                   </button>
                 </div>
               </div>
@@ -154,7 +172,7 @@ export function UtilityBar({
         <div className="hidden md:inline-flex items-center gap-3 bg-theme-background border border-theme-border rounded-lg px-4 py-2 shadow-sm">
           {/* Sort Dropdown */}
           <div className="relative inline-flex items-center" data-dropdown>
-            <span className="text-sm text-theme-textSecondary mr-1.5">Sort:</span>
+            <span className="text-sm text-theme-textSecondary mr-1.5">{t('utilityBar.sort')}</span>
             <button
               onClick={() => {
                 setShowSortMenu(!showSortMenu);
@@ -163,10 +181,7 @@ export function UtilityBar({
               }}
               className="inline-flex items-center gap-1 text-sm text-theme-textPrimary hover:text-theme-accent transition-colors duration-200"
             >
-              <span className="capitalize">
-                {selectedSort === 'temperature' ? 'Temperature' :
-                 selectedSort === 'snowfall' ? 'Snowfall' : 'Wind'}
-              </span>
+              <span>{t(SORT_NAMES[selectedSort])}</span>
               <svg className="h-3.5 w-3.5 text-theme-textPrimary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
@@ -181,7 +196,7 @@ export function UtilityBar({
                     }}
                     className={`w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors duration-200 ${selectedSort === 'temperature' ? 'text-theme-accent font-medium' : 'hover:bg-theme-secondary text-theme-textPrimary'}`}
                   >
-                    Temperature
+                    {t(SORT_NAMES.temperature)}
                   </button>
                   <button
                     onClick={() => {
@@ -190,7 +205,7 @@ export function UtilityBar({
                     }}
                     className={`w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors duration-200 ${selectedSort === 'snowfall' ? 'text-theme-accent font-medium' : 'hover:bg-theme-secondary text-theme-textPrimary'}`}
                   >
-                    Snowfall
+                    {t(SORT_NAMES.snowfall)}
                   </button>
                   <button
                     onClick={() => {
@@ -199,7 +214,7 @@ export function UtilityBar({
                     }}
                     className={`w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors duration-200 ${selectedSort === 'wind' ? 'text-theme-accent font-medium' : 'hover:bg-theme-secondary text-theme-textPrimary'}`}
                   >
-                    Wind
+                    {t(SORT_NAMES.wind)}
                   </button>
                 </div>
               </div>
@@ -210,7 +225,7 @@ export function UtilityBar({
 
           {/* Sort Day Dropdown */}
           <div className="relative inline-flex items-center" data-dropdown>
-            <span className="text-sm text-theme-textSecondary mr-1.5">Within:</span>
+            <span className="text-sm text-theme-textSecondary mr-1.5">{t('utilityBar.within')}</span>
             <button
               onClick={() => {
                 setShowSortDayMenu(!showSortDayMenu);
@@ -262,7 +277,7 @@ export function UtilityBar({
                       </button>
                     )) :
                     !sortDayData.specialOptions.length && (
-                      <div className="text-sm text-theme-textSecondary px-3 py-1.5">Loading...</div>
+                      <div className="text-sm text-theme-textSecondary px-3 py-1.5">{t('common.loading')}</div>
                     )
                   }
                 </div>
@@ -277,7 +292,7 @@ export function UtilityBar({
             onClick={() => setIsReversed(!isReversed)}
             className="text-sm font-medium text-theme-textPrimary hover:text-theme-accent transition-colors duration-200"
           >
-            {isAscendingOrder(selectedSort, isReversed) ? '↑ Ascending' : '↓ Descending'}
+            {isAscendingOrder(selectedSort, isReversed) ? `↑ ${t('utilityBar.ascending')}` : `↓ ${t('utilityBar.descending')}`}
           </button>
         </div>
       </div>
@@ -293,7 +308,7 @@ export function UtilityBar({
             className="bg-theme-background border border-theme-border rounded-lg px-3 py-2 text-left flex items-center justify-between gap-2 shadow-sm hover:bg-theme-secondary transition-colors duration-200"
           >
             <span className="block truncate text-sm font-medium text-theme-accent">
-              {viewMode === 'default' ? 'Default View' : viewMode === 'full' ? 'Full View' : viewMode === 'compact' ? 'Compact' : 'Graph View'}
+              {t(VIEW_MODE_NAMES[viewMode])}
             </span>
             <svg className="h-4 w-4 text-theme-textSecondary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -309,7 +324,7 @@ export function UtilityBar({
                   }}
                   className={`w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors duration-200 ${viewMode === 'default' ? 'bg-theme-secondary text-theme-accent font-medium' : 'hover:bg-theme-secondary text-theme-textPrimary'}`}
                 >
-                  Default View
+                  {t(VIEW_MODE_NAMES.default)}
                 </button>
                 <button
                   onClick={() => {
@@ -318,7 +333,7 @@ export function UtilityBar({
                   }}
                   className={`w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors duration-200 ${viewMode === 'full' ? 'bg-theme-secondary text-theme-accent font-medium' : 'hover:bg-theme-secondary text-theme-textPrimary'}`}
                 >
-                  Full View
+                  {t(VIEW_MODE_NAMES.full)}
                 </button>
                 <button
                   onClick={() => {
@@ -327,7 +342,7 @@ export function UtilityBar({
                   }}
                   className={`w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors duration-200 ${viewMode === 'compact' ? 'bg-theme-secondary text-theme-accent font-medium' : 'hover:bg-theme-secondary text-theme-textPrimary'}`}
                 >
-                  Compact
+                  {t(VIEW_MODE_NAMES.compact)}
                 </button>
                 <button
                   onClick={() => {
@@ -336,7 +351,7 @@ export function UtilityBar({
                   }}
                   className={`w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors duration-200 ${viewMode === 'graph' ? 'bg-theme-secondary text-theme-accent font-medium' : 'hover:bg-theme-secondary text-theme-textPrimary'}`}
                 >
-                  Graph View
+                  {t(VIEW_MODE_NAMES.graph)}
                 </button>
               </div>
             </div>
@@ -357,7 +372,7 @@ export function UtilityBar({
           <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
             <path d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" />
           </svg>
-          Sort & Filter
+          {t('utilityBar.sortAndFilter')}
         </button>
       </div>
 

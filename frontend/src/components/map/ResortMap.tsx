@@ -1,5 +1,5 @@
 import { Component, Suspense, lazy, useState, useCallback, useEffect, useMemo, useRef, type ReactNode } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, ZoomControl, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useFullscreenView } from '../../hooks/useFullscreenView';
@@ -16,7 +16,8 @@ import type { MapView } from './ResortMap3D';
 import { SatelliteBaseMap } from './SatelliteBaseMap';
 import { TerrainOverlay } from './TerrainOverlay';
 import { SkiMapOverlay } from './SkiMapOverlay';
-import type { SkiMapStatus } from './skiMapFeatures';
+import { describeCustomLocationOn, type SkiMapStatus } from './skiMapFeatures';
+import type { SkiMapFeature } from '../../utils/skiMapData';
 import { MapLayersPanel } from './MapLayersPanel';
 import { MapLegend } from './MapLegend';
 import { CursorReadout } from './CursorReadout';
@@ -135,6 +136,14 @@ function MapResizeHandler(): null {
     return null;
 }
 
+// Leaflet names a popup's close button in English only, so it is renamed as each popup opens
+function PopupCloseLabel({ label }: { label: string }): null {
+    useMapEvents({
+        popupopen: (e) => e.popup.getElement()?.querySelector('.leaflet-popup-close-button')?.setAttribute('aria-label', label),
+    });
+    return null;
+}
+
 // Inner component to handle map click events
 function MapClickHandler({ onClick }: { onClick: (lat: number, lon: number) => void }): null {
     const pendingClick = useRef<number | undefined>(undefined);
@@ -178,7 +187,7 @@ export function ResortMap({
     rotation,
     tilt,
 }: ResortMapProps): JSX.Element {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const hasCustomLocation = customLocation !== null && customLocation !== undefined;
     const [isExpanded, setIsExpanded] = useState(false);
     // While fullscreen: Back and Esc close the map, and the page behind it can't scroll
@@ -200,19 +209,21 @@ export function ResortMap({
 
     const [zoom, setZoom] = useState(INITIAL_ZOOM);
     const [skiMapStatus, setSkiMapStatus] = useState<SkiMapStatus>('loading');
-    // e.g. "On Peak to Creek, blue run" when the Custom location is on a Run or Lift of the Ski map
-    const [customLocationOn, setCustomLocationOn] = useState<string | null>(null);
+    // The Run or Lift of the Ski map the Custom location is on, if any
+    const [customLocationOnFeature, setCustomLocationOnFeature] = useState<SkiMapFeature | null>(null);
+    // e.g. "On Peak to Creek, blue run", in the language showing
+    const customLocationOn = customLocationOnFeature && describeCustomLocationOn(customLocationOnFeature, convention);
 
     const hints: Partial<Record<OverlayId, string>> = {
-        skiMap: zoom < SKI_MAP_MIN_ZOOM ? 'Zoom in to see runs'
-            : skiMapStatus === 'unavailable' ? 'Unavailable, retrying'
-            : skiMapStatus === 'loading' ? 'Loading...'
+        skiMap: zoom < SKI_MAP_MIN_ZOOM ? t('map.hint.zoomInRuns')
+            : skiMapStatus === 'unavailable' ? t('map.hint.skiMapUnavailable')
+            : skiMapStatus === 'loading' ? t('common.loading')
             : undefined,
-        contours: zoom < CONTOURS_MIN_ZOOM ? 'Zoom in to see contours' : undefined,
+        contours: zoom < CONTOURS_MIN_ZOOM ? t('map.hint.zoomInContours') : undefined,
     };
     // Steepness needs terrain about 30 m or finer (docs/adr/0009)
     for (const steepness of ['slopeAngle', 'gradient', 'aspect', 'flats'] as const) {
-        if (zoom < STEEPNESS_MIN_ZOOM) hints[steepness] = 'Zoom in to see slopes';
+        if (zoom < STEEPNESS_MIN_ZOOM) hints[steepness] = t('map.hint.zoomInSlopes');
     }
 
     // The layers panel closes on a click or tap anywhere outside it, or on Esc
@@ -278,9 +289,9 @@ export function ResortMap({
                 {is3D ? (
                     <Map3DErrorBoundary message={t('map.failed3d')}>
                         <Suspense fallback={<div className="resort-map-message">{t('map.loading3d')}</div>}>
-                            {/* Remade, facing the same way, when a drag setting changes, which MapLibre only takes when a map is created */}
+                            {/* Remade, facing the same way, when a drag setting or the language changes, which MapLibre only takes when a map is created */}
                             <ResortMap3D
-                                key={`${rotation}-${tilt}`}
+                                key={`${rotation}-${tilt}-${language.id}`}
                                 initialView={view.current}
                                 onViewChange={setView3D}
                                 lat={lat}
@@ -299,7 +310,7 @@ export function ResortMap({
                                 tilt={tilt}
                                 onSkiMapStatusChange={setSkiMapStatus}
                                 customLocationOn={customLocationOn}
-                                onCustomLocationOnChange={setCustomLocationOn}
+                                onCustomLocationOnChange={setCustomLocationOnFeature}
                                 onPointerMove={tracksPointer ? pointAt : undefined}
                             />
                         </Suspense>
@@ -310,9 +321,14 @@ export function ResortMap({
                         zoom={Math.round(view.current.zoom)}
                         maxZoom={18}
                         scrollWheelZoom={true}
+                        zoomControl={false}
                         className={`h-full rounded-xl shadow-lg ${className}`}
                         style={{ zIndex: 0 }}
                     >
+                        {/* Leaflet's own, which only takes its titles when made, so it is remade in a new language */}
+                        <ZoomControl key={language.id} zoomInTitle={t('map.zoomIn')} zoomOutTitle={t('map.zoomOut')} />
+                        <PopupCloseLabel label={t('map.closePopup')} />
+
                         {/* Standard is plain OpenStreetMap. OpenSkiMap looks better, but its terms forbid other sites using its tiles;
                             OpenSnowMap's ski run and lift overlay was tried and dropped for how it looked, so the Ski map draws its own. */}
                         {onSatellite ? (
@@ -330,7 +346,7 @@ export function ResortMap({
                                 convention={convention}
                                 customLocation={customLocation}
                                 onStatusChange={setSkiMapStatus}
-                                onCustomLocationOnChange={setCustomLocationOn}
+                                onCustomLocationOnChange={setCustomLocationOnFeature}
                             />
                         )}
 
@@ -395,7 +411,7 @@ export function ResortMap({
                             type="button"
                             onClick={toggleExpanded}
                             className="resort-map-btn"
-                            title={size === 'expanded' ? 'Collapse map' : 'Expand map'}
+                            title={size === 'expanded' ? t('map.collapse') : t('map.expand')}
                         >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 {size === 'expanded' ? (
@@ -415,7 +431,7 @@ export function ResortMap({
                             type="button"
                             onClick={isFullscreen ? exitFullscreen : enterFullscreen}
                             className="resort-map-btn"
-                            title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+                            title={isFullscreen ? t('map.exitFullscreen') : t('map.fullscreen')}
                         >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 {isFullscreen ? (
@@ -435,7 +451,7 @@ export function ResortMap({
                         type="button"
                         onClick={() => setIsLayersPanelOpen(open => !open)}
                         className={`resort-map-btn ${isLayersPanelOpen ? 'active' : ''}`}
-                        title="Map layers"
+                        title={t('map.layers')}
                         aria-expanded={isLayersPanelOpen}
                     >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

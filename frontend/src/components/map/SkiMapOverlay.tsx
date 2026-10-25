@@ -6,7 +6,6 @@ import type { DifficultyConvention } from '../../utils/difficultyColours';
 import { OPENSKIDATA_ATTRIBUTION, OSM_ATTRIBUTION } from '../../utils/mapLayers';
 import {
     LIFT_COLOUR,
-    describeCustomLocationOn,
     featureAt,
     hoverName,
     runStyle,
@@ -54,7 +53,8 @@ function featureLayers(feature: SkiMapFeature, convention: DifficultyConvention,
 function hoverLayer(feature: SkiMapFeature, convention: DifficultyConvention, renderers: Renderers): L.Path {
     const options: L.PolylineOptions = { renderer: renderers.skiMapHover, weight: 10, opacity: 0, fillOpacity: 0, interactive: true };
     const layer = feature.area ? L.polygon(feature.coords, options) : L.polyline(feature.coords, options);
-    return layer.bindTooltip(hoverName(feature, convention), { sticky: true, direction: 'top', offset: [0, -8] });
+    // Named each time it opens, so it is in the language showing then
+    return layer.bindTooltip(() => hoverName(feature, convention), { sticky: true, direction: 'top', offset: [0, -8] });
 }
 
 interface SkiMapOverlayProps {
@@ -62,8 +62,8 @@ interface SkiMapOverlayProps {
     convention: DifficultyConvention;
     customLocation: { lat: number; lon: number } | null | undefined;
     onStatusChange: (status: SkiMapStatus) => void;
-    /** What the Custom location is on, e.g. "On Peak to Creek, blue run", or null */
-    onCustomLocationOnChange: (text: string | null) => void;
+    /** The Run or Lift the Custom location is on, or null */
+    onCustomLocationOnChange: (feature: SkiMapFeature | null) => void;
 }
 
 /**
@@ -140,8 +140,8 @@ export function SkiMapOverlay({ convention, customLocation, onStatusChange, onCu
     useEffect(() => {
         const toScreen = (lat: number, lon: number) => map.latLngToLayerPoint([lat, lon]);
         const feature = customLocation ? featureAt(toScreen, customLocation.lat, customLocation.lon, features.values()) : null;
-        onCustomLocationOnChangeRef.current(feature ? describeCustomLocationOn(feature, convention) : null);
-    }, [map, customLocation, features, convention]);
+        onCustomLocationOnChangeRef.current(feature);
+    }, [map, customLocation, features]);
 
     // Turned off: the Custom location is no longer said to be on anything
     useEffect(() => () => onCustomLocationOnChangeRef.current(null), []);

@@ -15,7 +15,6 @@ import {
     DASHED_DOWNHILL,
     LIFT_COLOUR,
     OTHER_RUNS,
-    describeCustomLocationOn,
     featureAt,
     hoverName,
     runStyle,
@@ -32,7 +31,8 @@ interface FeatureProperties {
     width: number;
     /** Which of DASH_PATTERNS the Run is dashed with, or '' for a solid line */
     dash: string;
-    hover: string;
+    /** The SkiMapFeature's id, which hovering names in the language showing then */
+    id: string;
 }
 
 /** Every dashed kind of Run, by its dashes in pixels and line width, as the flat map draws them */
@@ -104,7 +104,7 @@ function toGeoJson(features: Iterable<SkiMapFeature>, convention: DifficultyConv
                 colour: style?.colour ?? LIFT_COLOUR,
                 width,
                 dash: style?.dashArray ? `${style.dashArray}@${width}` : '',
-                hover: hoverName(feature, convention),
+                id: feature.id,
             },
         });
     }
@@ -130,7 +130,8 @@ interface SkiMap3DOptions {
     convention: DifficultyConvention;
     customLocation: { lat: number; lon: number } | null | undefined;
     onStatusChange: (status: SkiMapStatus) => void;
-    onCustomLocationOnChange: (text: string | null) => void;
+    /** The Run or Lift the Custom location is on, or null */
+    onCustomLocationOnChange: (feature: SkiMapFeature | null) => void;
 }
 
 /** Keeps the 3D map's Ski map drawn while it is on, once the style with SKI_MAP_SOURCES and SKI_MAP_LAYERS has loaded. */
@@ -171,11 +172,13 @@ export function useSkiMap3D(map: MapLibreMap | null, styleReady: Promise<void>, 
             const popup = new Popup({ closeButton: false, closeOnClick: false, offset: 10, className: 'resort-map-3d-hover' });
             const onMouseMove = (event: { point: { x: number; y: number }; lngLat: { lng: number; lat: number } }) => {
                 const [hit] = map.queryRenderedFeatures([event.point.x, event.point.y], { layers: [LIFT_HOVER, RUN_HOVER] });
-                if (!hit) {
+                const feature = hit && drawn.get(String(hit.properties.id));
+                if (!feature) {
                     popup.remove();
                     return;
                 }
-                popup.setLngLat(event.lngLat).setText(String(hit.properties.hover)).addTo(map);
+                // Named as the mouse moves, so in the language showing then
+                popup.setLngLat(event.lngLat).setText(hoverName(feature, convention)).addTo(map);
             };
             const canHover = window.matchMedia('(hover: hover)').matches;
             if (canHover) map.on('mousemove', onMouseMove);
@@ -203,8 +206,8 @@ export function useSkiMap3D(map: MapLibreMap | null, styleReady: Promise<void>, 
         if (!map) return;
         const toScreen = (lat: number, lon: number) => map.project([lon, lat]);
         const feature = customLocation ? featureAt(toScreen, customLocation.lat, customLocation.lon, features.values()) : null;
-        onCustomLocationOnChangeRef.current(feature ? describeCustomLocationOn(feature, convention) : null);
-    }, [map, customLocation, features, convention]);
+        onCustomLocationOnChangeRef.current(feature);
+    }, [map, customLocation, features]);
 
     // Turned off, or the 3D map closed: the Custom location is no longer said to be on anything
     useEffect(() => {

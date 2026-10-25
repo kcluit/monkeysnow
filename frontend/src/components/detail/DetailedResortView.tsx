@@ -30,7 +30,7 @@ import type { UnitSystem } from '../../types';
 import { formatElevation } from '../../utils/unitConversion';
 import type { HeightLine } from '../../utils/heightLines';
 import type { MapRotation, MapTilt } from '../../utils/mapRotation';
-import { interpolate } from '../../locales';
+import { formatDecimal, interpolate } from '../../locales';
 
 interface DetailedResortViewPropsWithUnits extends DetailedResortViewProps {
     unitSystem: UnitSystem;
@@ -97,6 +97,8 @@ export function DetailedResortView({
     setHistoryLength,
 }: DetailedResortViewPropsWithUnits): JSX.Element {
     const { t } = useLanguage();
+    // One of the heading's facts, e.g. "Lat: 50.1150"
+    const field = (label: string, value: string) => t('detail.field', { label, value });
 
     const [selectedModels, setSelectedModels] = useSelectedModels();
     const [selectedVariables, setSelectedVariables] = useShownCharts();
@@ -217,11 +219,12 @@ export function DetailedResortView({
     // e.g. "2100m (ground 1845m)" while a Custom elevation is forecast; null until the height is known
     const customLocationElevationText = customLocationElevation === null
         ? null
-        : formatElevation(customLocationElevation, unitSystem) + (
-            groundElevation !== null && groundElevation !== customLocationElevation
-                ? ` (ground ${formatElevation(groundElevation, unitSystem)})`
-                : ''
-        );
+        : groundElevation !== null && groundElevation !== customLocationElevation
+            ? t('detail.elevationWithGround', {
+                elevation: formatElevation(customLocationElevation, unitSystem),
+                ground: formatElevation(groundElevation, unitSystem),
+            })
+            : formatElevation(customLocationElevation, unitSystem);
 
     // The 3D map draws a Height line at each Elevation band of a Resort, or at the one height of a Saved location
     // or Custom location; the one the charts are for is bold
@@ -330,7 +333,7 @@ export function DetailedResortView({
             <div className="mb-6 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
                 <div className="flex items-center gap-3 flex-wrap">
                     <h1 className="text-2xl font-bold text-theme-textPrimary">
-                        {customLocation ? 'Custom Location' : resortName}
+                        {customLocation ? t('detail.customLocation') : resortName}
                     </h1>
                     {isHistory && <HistoryBadge days={historyLength} />}
                     {customLocation && (
@@ -339,7 +342,7 @@ export function DetailedResortView({
                                 onClick={() => setDialog('save')}
                                 className="px-3 py-1 text-sm rounded-lg bg-theme-secondary hover:bg-theme-cardBg transition-colors text-theme-accent"
                             >
-                                Save location
+                                {t('detail.saveLocation')}
                             </button>
                             <button
                                 onClick={handleResetCustomLocation}
@@ -348,24 +351,24 @@ export function DetailedResortView({
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                 </svg>
-                                <span>Reset to {resortName}</span>
+                                <span>{t('detail.resetTo', { name: resortName })}</span>
                             </button>
                         </>
                     )}
                     {savedLocation && !customLocation && (confirmingDelete ? (
                         <div className="flex items-center gap-2 text-sm" role="alert">
-                            <span className="text-theme-textSecondary">Delete {savedLocation.name}?</span>
+                            <span className="text-theme-textSecondary">{t('detail.confirmDelete', { name: savedLocation.name })}</span>
                             <button
                                 onClick={() => onDeleteSavedLocation?.(savedLocation.id)}
                                 className="px-3 py-1 rounded-lg bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 transition-colors text-red-500"
                             >
-                                Delete
+                                {t('detail.delete')}
                             </button>
                             <button
                                 onClick={() => setConfirmingDelete(false)}
                                 className="px-3 py-1 rounded-lg bg-theme-secondary hover:bg-theme-cardBg transition-colors text-theme-textSecondary"
                             >
-                                Cancel
+                                {t('detail.cancel')}
                             </button>
                         </div>
                     ) : (
@@ -374,24 +377,24 @@ export function DetailedResortView({
                                 onClick={() => setDialog('edit')}
                                 className="px-3 py-1 text-sm rounded-lg bg-theme-secondary hover:bg-theme-cardBg transition-colors text-theme-accent"
                             >
-                                Edit
+                                {t('detail.edit')}
                             </button>
                             <button
                                 onClick={() => setConfirmingDelete(true)}
                                 className="px-3 py-1 text-sm rounded-lg bg-theme-secondary hover:bg-theme-cardBg transition-colors text-red-500"
                             >
-                                Delete
+                                {t('detail.delete')}
                             </button>
                         </>
                     ))}
                 </div>
                 {selectionWasFull && (
                     <div className="flex items-center gap-3 mt-2 text-sm text-theme-textSecondary" role="status">
-                        <span>Saved, but not added to the main page: {MAX_SELECTED_RESORTS} resort maximum reached.</span>
+                        <span>{t('detail.selectionWasFull', { max: MAX_SELECTED_RESORTS })}</span>
                         <button
                             onClick={onDismissSelectionWasFull}
                             className="shrink-0 p-1 rounded-md hover:bg-theme-border transition-colors hover:text-theme-textPrimary"
-                            aria-label="Dismiss notice"
+                            aria-label={t('detail.dismissNotice')}
                         >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -402,31 +405,31 @@ export function DetailedResortView({
                 <div className="flex items-center gap-4 text-sm text-theme-textSecondary flex-wrap">
                     {customLocation ? (
                         <>
-                            <span>Lat: {customLocation.lat.toFixed(4)}</span>
-                            <span>Lon: {customLocation.lon.toFixed(4)}</span>
+                            <span>{field(t('detail.latitude'), formatDecimal(customLocation.lat, 4))}</span>
+                            <span>{field(t('detail.longitude'), formatDecimal(customLocation.lon, 4))}</span>
                             {customLocationElevationText === null ? (
-                                <span className="animate-pulse">Fetching elevation...</span>
+                                <span className="animate-pulse">{t('detail.fetchingElevation')}</span>
                             ) : (
-                                <span>Elevation: {customLocationElevationText}</span>
+                                <span>{field(t('detail.elevation'), customLocationElevationText)}</span>
                             )}
                         </>
                     ) : savedLocation ? (
                         <>
-                            <span>Lat: {savedLocation.lat.toFixed(4)}</span>
-                            <span>Lon: {savedLocation.lon.toFixed(4)}</span>
-                            <span>Elevation: {formatElevation(savedLocation.elevation, unitSystem)}</span>
+                            <span>{field(t('detail.latitude'), formatDecimal(savedLocation.lat, 4))}</span>
+                            <span>{field(t('detail.longitude'), formatDecimal(savedLocation.lon, 4))}</span>
+                            <span>{field(t('detail.elevation'), formatElevation(savedLocation.elevation, unitSystem))}</span>
                         </>
                     ) : (
                         <>
-                            <span>Lat: {location.lat.toFixed(4)}</span>
-                            <span>Lon: {location.lon.toFixed(4)}</span>
-                            <span>Base: {formatElevation(location.baseElevation, unitSystem)}</span>
-                            <span>Mid: {formatElevation(location.midElevation, unitSystem)}</span>
-                            <span>Top: {formatElevation(location.topElevation, unitSystem)}</span>
+                            <span>{field(t('detail.latitude'), formatDecimal(location.lat, 4))}</span>
+                            <span>{field(t('detail.longitude'), formatDecimal(location.lon, 4))}</span>
+                            <span>{field(t('band.base'), formatElevation(location.baseElevation, unitSystem))}</span>
+                            <span>{field(t('band.mid'), formatElevation(location.midElevation, unitSystem))}</span>
+                            <span>{field(t('band.top'), formatElevation(location.topElevation, unitSystem))}</span>
                         </>
                     )}
                     {timezoneInfo && (
-                        <span>Timezone: {timezoneInfo.timezoneAbbreviation} ({timezoneInfo.timezone})</span>
+                        <span>{field(t('detail.timezone'), `${timezoneInfo.timezoneAbbreviation} (${timezoneInfo.timezone})`)}</span>
                     )}
                 </div>
             </div>
@@ -509,7 +512,7 @@ export function DetailedResortView({
                         />
                     ) : comparisonModels.length > 0 && (
                         <div className="text-center py-2 text-sm text-theme-textSecondary animate-pulse">
-                            Loading additional model data...
+                            {t('detail.loadingMoreModels')}
                         </div>
                     ))}
                 </>
@@ -523,8 +526,8 @@ export function DetailedResortView({
 
             {dialog === 'save' && customLocation && (
                 <SavedLocationDialog
-                    title="Save location"
-                    submitLabel="Save"
+                    title={t('detail.saveLocation')}
+                    submitLabel={t('detail.savedLocation.save')}
                     initialName={suggestedName(customLocation.lat, customLocation.lon)}
                     // The height being forecast: the Custom elevation, or else the Ground elevation the forecast reported;
                     // empty for the visitor to fill if none arrives
@@ -540,8 +543,8 @@ export function DetailedResortView({
             )}
             {dialog === 'edit' && savedLocation && (
                 <SavedLocationDialog
-                    title="Edit location"
-                    submitLabel="Save"
+                    title={t('detail.savedLocation.editTitle')}
+                    submitLabel={t('detail.savedLocation.save')}
                     initialName={savedLocation.name}
                     initialElevation={savedLocation.elevation}
                     unitSystem={unitSystem}

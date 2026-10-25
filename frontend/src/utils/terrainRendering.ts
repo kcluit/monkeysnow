@@ -7,6 +7,7 @@
 import type { SlopeBand } from './slopeBands';
 import type { ElevationWindow } from './terrainTiles';
 import type { UnitSystem } from './unitConversion';
+import type { TranslationKey } from '../types/i18n';
 
 /** The border every renderer here needs around a tile: one sample for slopes, one more for smoothing. */
 export const TERRAIN_BORDER = 2;
@@ -222,16 +223,21 @@ export function renderFlats(canvas: HTMLCanvasElement, w: ElevationWindow): void
     });
 }
 
-/** The eight Aspects clockwise from north, each 45 degrees wide, in skimomap's colours: cold blues north, warm oranges south */
-export const ASPECT_SECTORS: readonly { name: string; colour: Rgb }[] = [
-    { name: 'N', colour: [2, 119, 255] },
-    { name: 'NE', colour: [140, 193, 255] },
-    { name: 'E', colour: [255, 255, 255] },
-    { name: 'SE', colour: [255, 182, 141] },
-    { name: 'S', colour: [255, 94, 0] },
-    { name: 'SW', colour: [115, 42, 1] },
-    { name: 'W', colour: [0, 0, 0] },
-    { name: 'NW', colour: [0, 54, 115] },
+export type AspectName = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW';
+
+/**
+ * The eight Aspects clockwise from north, each 45 degrees wide, in skimomap's colours: cold blues north, warm oranges south.
+ * `label` is how the language showing writes it: French says O for west.
+ */
+export const ASPECT_SECTORS: readonly { name: AspectName; label: TranslationKey; colour: Rgb }[] = [
+    { name: 'N', label: 'map.aspect.n', colour: [2, 119, 255] },
+    { name: 'NE', label: 'map.aspect.ne', colour: [140, 193, 255] },
+    { name: 'E', label: 'map.aspect.e', colour: [255, 255, 255] },
+    { name: 'SE', label: 'map.aspect.se', colour: [255, 182, 141] },
+    { name: 'S', label: 'map.aspect.s', colour: [255, 94, 0] },
+    { name: 'SW', label: 'map.aspect.sw', colour: [115, 42, 1] },
+    { name: 'W', label: 'map.aspect.w', colour: [0, 0, 0] },
+    { name: 'NW', label: 'map.aspect.nw', colour: [0, 54, 115] },
 ];
 
 const FLAT_GRADIENT = Math.tan((FLAT_BELOW_DEGREES * Math.PI) / 180);

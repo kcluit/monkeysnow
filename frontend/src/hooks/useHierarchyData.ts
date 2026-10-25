@@ -1,8 +1,12 @@
 import { useCallback, useMemo } from 'react';
-import { RESORT_HIERARCHY } from '../data/resortLocations';
+import { RESORT_HIERARCHY, continentName } from '../data/resortLocations';
 import type { ContinentData, ResortInfo } from '../data/resortLocations';
+import { countryName, regionName } from '../locales';
+import { useLanguage } from './useLanguage';
 import { useSavedLocations } from './useSavedLocations';
 import type { SavedLocation } from '../utils/savedLocations';
+import { countryNamesInEveryLanguage, regionNamesInEveryLanguage } from '../utils/resortSearch';
+import type { Translate } from '../types/i18n';
 
 export type { ContinentData, CountryData, ProvinceData, ResortInfo } from '../data/resortLocations';
 
@@ -18,7 +22,10 @@ export interface HierarchyNode {
   type: HierarchyNodeType;
   children?: HierarchyNode[];
   resortId?: string;
-  /** A resort's other names, often in the local script; matched by search but not shown. */
+  /**
+   * A resort's other names, often in the local script, or a country's or Region's name in
+   * every language; matched by search but not shown.
+   */
   aka?: string[];
 }
 
@@ -33,26 +40,38 @@ function toResortNode(resort: ResortInfo): HierarchyNode {
 }
 
 /**
- * Converts hierarchy data to a flat HierarchyNode tree for UI rendering.
+ * Converts hierarchy data to a flat HierarchyNode tree for UI rendering, in the language
+ * shown: continents, countries and the Regions it names are named in it, and countries
+ * and Regions sorted in its order.
  */
-function buildHierarchyTree(hierarchy: ContinentData[]): HierarchyNode[] {
+function buildHierarchyTree(hierarchy: ContinentData[], t: Translate, locale: string): HierarchyNode[] {
+  const collator = new Intl.Collator(locale);
+  const byName = (a: HierarchyNode, b: HierarchyNode) => collator.compare(a.name, b.name);
   return hierarchy.map((continent): HierarchyNode => ({
     id: continent.id,
-    name: continent.name,
+    name: continentName(continent.name),
     type: 'continent',
-    children: continent.countries.map((country): HierarchyNode => ({
-      id: country.id,
-      name: country.name,
-      type: 'country',
-      children: country.hasRegions
-        ? country.provinces.map((province): HierarchyNode => ({
-            id: province.id,
-            name: province.name,
-            type: 'province',
-            children: province.resorts.map(toResortNode),
-          }))
-        : country.provinces.flatMap((province) => province.resorts.map(toResortNode)),
-    })),
+    children: continent.countries
+      .map((country): HierarchyNode => ({
+        id: country.id,
+        name: countryName(country.code, country.name),
+        type: 'country',
+        aka: countryNamesInEveryLanguage(country.code, country.name),
+        children: country.hasRegions
+          ? country.provinces
+              .map((province): HierarchyNode => province.isOther
+                ? { id: province.id, name: t('picker.otherRegion'), type: 'province', children: province.resorts.map(toResortNode) }
+                : {
+                    id: province.id,
+                    name: regionName(country.code, province.name),
+                    type: 'province',
+                    aka: regionNamesInEveryLanguage(country.code, province.name),
+                    children: province.resorts.map(toResortNode),
+                  })
+              .sort(byName)
+          : country.provinces.flatMap((province) => province.resorts.map(toResortNode)),
+      }))
+      .sort(byName),
   }));
 }
 
@@ -108,10 +127,10 @@ function buildDisplayNames(hierarchy: ContinentData[]): Map<string, string> {
 }
 
 /** The picker's Saved locations group: Saved locations by name, straight under it with no Country or Region. */
-function buildCustomNode(savedLocations: SavedLocation[]): HierarchyNode {
+function buildCustomNode(savedLocations: SavedLocation[], t: Translate): HierarchyNode {
   return {
     id: 'custom',
-    name: 'Saved locations',
+    name: t('picker.savedLocations'),
     type: 'custom',
     children: [...savedLocations]
       .sort((a, b) => a.name.localeCompare(b.name))
@@ -124,8 +143,8 @@ function buildCustomNode(savedLocations: SavedLocation[]): HierarchyNode {
   };
 }
 
-// The hierarchy is bundled with the app, so everything derived from it is built once.
-const HIERARCHY_TREE = buildHierarchyTree(RESORT_HIERARCHY);
+// The hierarchy is bundled with the app, so everything derived from it is built once,
+// except the tree's names, which are built again in each language shown.
 const RESORT_ALIASES = buildResortAliases(RESORT_HIERARCHY);
 const SKI_RESORTS = getAllResortIds(RESORT_HIERARCHY);
 const DISPLAY_NAMES = buildDisplayNames(RESORT_HIERARCHY);
@@ -142,10 +161,15 @@ export interface UseHierarchyDataReturn {
 
 export function useHierarchyData(): UseHierarchyDataReturn {
   const savedLocations = useSavedLocations();
+  const { t, language } = useLanguage();
 
+  const continentsTree = useMemo(
+    () => buildHierarchyTree(RESORT_HIERARCHY, t, language.locale),
+    [t, language.locale]
+  );
   const hierarchyTree = useMemo(
-    () => [buildCustomNode(savedLocations), ...HIERARCHY_TREE],
-    [savedLocations]
+    () => [buildCustomNode(savedLocations, t), ...continentsTree],
+    [savedLocations, t, continentsTree]
   );
 
   const getDisplayName = useCallback(

@@ -10,6 +10,8 @@ export type UnitSystem = UnitSystemType;
 export interface Command {
     id: string;
     name: string;
+    /** Other words the palette's search finds it by */
+    keywords?: string[];
     shortcut?: string;
     icon?: IconDefinition;
     action?: () => void;
@@ -189,29 +191,43 @@ export interface AllWeatherData {
     historyLength?: number;
 }
 
+/*
+ * A processed card's words, dates and decimals are getters, worked out in the language shown each
+ * time they are read: App keeps processed cards across a change of language, so they can't be
+ * baked in. A component reading them calls useLanguage(), to be drawn again when it changes.
+ */
+
 // Snow condition type
 export interface SnowCondition {
-    text: string;
+    /** In the language shown, read as it's shown */
+    readonly text: string;
     isHighlight: boolean;
     isSecondary?: boolean;  // true for N/A display
 }
 
+/** A Period's id, which code compares; periodName() in components/cards shows it, "AM" or "Matin" */
+export type PeriodTime = 'AM' | 'PM' | 'Night';
+
 // Period data (AM/PM/Night)
 export interface Period {
-    time: string;
+    time: PeriodTime;
     temp: string;
     tempMax: number;
     tempMin: number;
     tempAvg: number;
     tempMedian: number;
-    snow: string;
-    rain: string;
+    /** e.g. "1.5 cm", with the language's decimal mark */
+    readonly snow: string;
+    readonly rain: string;
     wind: string;
     /** The same amounts in metric and unrounded, for adding up and comparing */
     snowCm: number;
     rainMm: number;
     windKmh: number;
-    condition: string;
+    /** The Card model's WMO weather code, which the words, the emoji and the short words come from */
+    weatherCode: number;
+    /** The weather in the language shown, e.g. "Partly cloudy" */
+    readonly condition: string;
     snowQuality: SnowQuality | null;
     /** The highest Freezing level in this Period, e.g. "1720 m" */
     freezingLevel: string;
@@ -219,9 +235,14 @@ export interface Period {
 
 // Day forecast data
 export interface DayForecast {
-    name: string;
-    date: string;
-    weather: string;
+    /** The forecast's own date, "2026-10-24", which the name and date are written from */
+    dateKey: string;
+    /** The weekday as a heading in the language shown, "Saturday" or "Samedi" */
+    readonly name: string;
+    /** "Oct 24" or "24 oct." */
+    readonly date: string;
+    weatherCode: number;
+    readonly weather: string;
     weatherEmoji: string;
     periods: Period[];
     freezingLevel: string;
@@ -236,7 +257,7 @@ export interface ProcessedResortData {
     days: DayForecast[];
     fetchedAt?: number; // epoch ms, from ResortData
     /** Label of the Card model it came from, e.g. "NOAA HRRR" */
-    model: string;
+    readonly model: string;
     /** Whether these are History's days, oldest first and today last, rather than the forecast's, today first */
     isHistory?: boolean;
 }

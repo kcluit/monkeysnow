@@ -7,6 +7,7 @@
 
 import type uPlot from 'uplot';
 import type { ChartConfig } from '../types';
+import { formatDecimal, translate } from '../../../locales';
 
 export interface TooltipPluginOptions {
     /** Latest chart configuration, for labels and series metadata */
@@ -58,11 +59,11 @@ export function createTooltipPlugin(options: TooltipPluginOptions): uPlot.Plugin
             const value = u.data[i][idx];
             if (value === null || value === undefined) continue;
 
-            const formattedValue = value.toFixed(2);
+            const formattedValue = formatDecimal(value, 2);
             const color = seriesConfig.color;
 
             const name = seriesConfig.bold ? `<strong>${seriesConfig.name}</strong>` : seriesConfig.name;
-            content += `<div><span style="color:${color}">●</span> ${name}: ${formattedValue}</div>`;
+            content += `<div><span style="color:${color}">●</span> ${translate('chart.tooltip.value', { name, value: formattedValue })}</div>`;
         }
 
         tooltip.innerHTML = content;

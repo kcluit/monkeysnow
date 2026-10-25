@@ -10,6 +10,8 @@ import type { ChartConfig, ChartType, SeriesConfig, ChartTheme, BoxWhiskerData, 
 import type { WeatherChartProps } from '../types/detailView';
 import type { WeatherModel, HourlyDataPoint, AggregationType } from '../types/openMeteo';
 import type { UnitSystem } from '../types';
+import type { TranslationKey } from '../types/i18n';
+import { translate, unitSymbol } from '../locales';
 import { supportsAccumulation } from '../types/chartSettings';
 import type { ChartDisplayType } from '../types/chartSettings';
 import { getModelConfig, getVariableConfig, getOverlayConfig, hasOverlays } from './chartConfigurations';
@@ -131,26 +133,21 @@ function computeStatistics(
     return result;
 }
 
+const AGGREGATION_NAMES: Record<AggregationType, TranslationKey> = {
+    median: 'chart.aggregation.median',
+    mean: 'chart.aggregation.mean',
+    min: 'chart.aggregation.min',
+    max: 'chart.aggregation.max',
+    p25: 'chart.aggregation.p25',
+    p75: 'chart.aggregation.p75',
+};
+
 /**
- * Get display name for aggregation type.
+ * Get display name for aggregation type, in the language showing.
  */
 function getAggregationDisplayName(aggType: AggregationType): string {
-    switch (aggType) {
-        case 'median':
-            return 'Median';
-        case 'mean':
-            return 'Mean';
-        case 'min':
-            return 'Min';
-        case 'max':
-            return 'Max';
-        case 'p25':
-            return '25th %ile';
-        case 'p75':
-            return '75th %ile';
-        default:
-            return aggType;
-    }
+    const key = AGGREGATION_NAMES[aggType];
+    return key ? translate(key) : aggType;
 }
 
 /**
@@ -193,7 +190,7 @@ function buildBandSeries(
         const maxData = statistics.get('max')!;
         bands.push({
             id: 'band_min_max',
-            name: 'Min-Max Range',
+            name: translate('chart.series.minMaxRange'),
             color: aggregationColor(styles, 'max'),
             type: 'band',
             data: maxData, // Use max data for y-scale calculation
@@ -207,7 +204,7 @@ function buildBandSeries(
         const p75Data = statistics.get('p75')!;
         bands.push({
             id: 'band_p25_p75',
-            name: '25th-75th Percentile',
+            name: translate('chart.series.percentileRange'),
             color: aggregationColor(styles, 'p75'),
             type: 'band',
             data: p75Data, // Use p75 data for y-scale calculation
@@ -316,7 +313,7 @@ function buildAccumulationSeries(
             id: `accumulation_${model}`,
             // Focused and held together with the model's hourly line
             line: model,
-            name: `${getModelConfig(model).name} (Accum)`,
+            name: translate('chart.series.accumulation', { name: getModelConfig(model).name }),
             color: modelColor(styles, model),
             type: 'line',
             data,
@@ -359,7 +356,7 @@ function onAccumulationAxis(series: SeriesConfig): SeriesConfig {
     return {
         ...series,
         id: `accumulation_${series.id}`,
-        name: `${series.name} (Accum)`,
+        name: translate('chart.series.accumulation', { name: series.name }),
         yAxisIndex: 1,
     };
 }
@@ -525,7 +522,7 @@ export function buildWeatherChartConfig(
         };
         boxWhiskerSeriesList.push({
             id: 'ensemble_boxwhisker',
-            name: 'Ensemble Spread',
+            name: translate('chart.series.ensembleSpread'),
             color: aggregationColor(styles, 'median'),
             type: 'boxwhisker',
             data: boxWhiskerData.median, // Use median for y-scale calculation
@@ -541,7 +538,7 @@ export function buildWeatherChartConfig(
         if (heatmapData.dates.length > 0) {
             heatmapSeriesList.push({
                 id: 'heatmap',
-                name: `${variableConfig.label} by Hour`,
+                name: translate('chart.series.byHour', { chart: variableConfig.label }),
                 color: variableConfig.color,
                 type: 'heatmap',
                 data: [], // Heatmap doesn't use standard data array
@@ -604,7 +601,7 @@ export function buildWeatherChartConfig(
         if (windArrowData.direction.some(d => d !== null)) {
             allSeries.push({
                 id: 'wind_direction_arrows',
-                name: 'Wind Direction',
+                name: translate('chart.windDirection10m.label'),
                 color: '#94a3b8', // slate-400 - subtle gray that works on most themes
                 type: 'line', // Type doesn't matter for arrow overlay, but needs a valid type
                 data: [], // No line data, just arrow overlay
@@ -615,7 +612,7 @@ export function buildWeatherChartConfig(
     }
 
     // Get unit string
-    const unit = unitSystem === 'imperial' ? variableConfig.unitImperial : variableConfig.unit;
+    const unit = unitSymbol(unitSystem === 'imperial' ? variableConfig.unitImperial : variableConfig.unit);
 
     // Use provided theme or get from CSS
     const chartTheme = theme ?? getUPlotTheme();
@@ -624,7 +621,7 @@ export function buildWeatherChartConfig(
     const yAxisSecondary = hasAccumulation
         ? {
             type: 'value' as const,
-            label: `Accumulation (${unit})`,
+            label: translate('chart.axis.accumulation', { unit }),
             formatter: (value: number) => `${Math.round(value)}`,
         }
         : undefined;
@@ -648,7 +645,7 @@ export function buildWeatherChartConfig(
         base: unitSystem === 'imperial' ? location.baseElevation * M_TO_FT : location.baseElevation,
         mid: unitSystem === 'imperial' ? location.midElevation * M_TO_FT : location.midElevation,
         top: unitSystem === 'imperial' ? location.topElevation * M_TO_FT : location.topElevation,
-        unit: unitSystem === 'imperial' ? 'ft' : 'm',
+        unit: unitSymbol(unitSystem === 'imperial' ? 'ft' : 'm'),
     } : undefined;
 
     return {
@@ -665,7 +662,7 @@ export function buildWeatherChartConfig(
         },
         yAxis: {
             type: 'value',
-            label: isHeatmap ? 'Hour of Day' : `${variableConfig.label} (${unit})`,
+            label: isHeatmap ? translate('chart.axis.hourOfDay') : `${variableConfig.label} (${unit})`,
             domain: isHeatmap ? [0, 23] : variableConfig.yAxisDomain,
             formatter: (value: number) => isHeatmap ? `${Math.round(value)}:00` : `${Math.round(value)}`,
         },

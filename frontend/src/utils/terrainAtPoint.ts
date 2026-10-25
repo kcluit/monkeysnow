@@ -5,7 +5,7 @@
  */
 
 import { loadDemTile, OVERLAY_MAX_ZOOM, TERRAIN_TILE_SIZE } from './terrainTiles';
-import { ASPECT_SECTORS, STEEPNESS_MIN_ZOOM, aspectSector } from './terrainRendering';
+import { ASPECT_SECTORS, STEEPNESS_MIN_ZOOM, aspectSector, type AspectName } from './terrainRendering';
 
 const EARTH_CIRCUMFERENCE_M = 40075016.686;
 
@@ -22,7 +22,7 @@ export interface TerrainReading {
     /** Degrees, or null where the terrain on screen is too coarse to tell steepness */
     slopeAngle: number | null;
     /** e.g. "NE", or null on a Flat or where Slope angle is unknown */
-    aspect: string | null;
+    aspect: AspectName | null;
 }
 
 /** The terrain at a point, read at the zoom the Overlays would draw it at, or null if its tiles couldn't be had. */

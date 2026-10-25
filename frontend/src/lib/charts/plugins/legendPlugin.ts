@@ -11,15 +11,17 @@
 import type uPlot from 'uplot';
 import type { ChartConfig } from '../types';
 import type { SeriesFocusPluginResult } from './seriesFocusPlugin';
+import { translate } from '../../../locales';
 
 /** How long a touch on an entry lasts before it hides or shows the line instead of holding it */
 const LONG_PRESS_MS = 500;
 /** How far a touch may drift and still be a long-press rather than a scroll */
 const LONG_PRESS_SLOP_PX = 10;
 
-const ENTRY_HINT = `Click to hold · Shift+click to hide · ${
-    /Mac/.test(navigator.platform) ? 'Option' : 'Alt'
-}+click to show only this line`;
+/** What clicking an entry does, in the language showing */
+function entryHint(): string {
+    return translate('chart.legend.entryHint', { alt: /Mac/.test(navigator.platform) ? 'Option' : 'Alt' });
+}
 
 export interface LegendPluginOptions {
     /** Latest chart configuration, for series metadata */
@@ -46,11 +48,12 @@ export function createLegendPlugin(options: LegendPluginOptions): uPlot.Plugin {
     // A long-press may still be followed by a click, which mustn't then hold the line
     let swallowClick = false;
 
-    /** Restyle the entries in place */
+    /** Restyle and rename the entries in place */
     function refreshLegend(u: uPlot) {
         const config = getConfig();
         const focusedLine = seriesFocus.getFocusedLine();
         const heldLine = seriesFocus.getHeldLine();
+        const hint = entryHint();
 
         for (const { seriesIdx, item, bullet, label } of legendItems) {
             const seriesConfig = config.series[seriesIdx - 1];
@@ -58,6 +61,7 @@ export function createLegendPlugin(options: LegendPluginOptions): uPlot.Plugin {
             const line = seriesFocus.lineOf(seriesIdx);
             const isHeld = line !== null && line === heldLine;
 
+            item.title = hint;
             item.style.opacity = u.series[seriesIdx].show ? '1' : '0.4';
             // The hover tint stays on the Held line, telling it apart from a previewed one
             item.classList.toggle('uplot-legend-item-tinted', isHeld || seriesIdx === hoveredIdx);
@@ -137,7 +141,6 @@ export function createLegendPlugin(options: LegendPluginOptions): uPlot.Plugin {
 
             item.appendChild(bullet);
             item.appendChild(label);
-            item.title = ENTRY_HINT;
 
             item.addEventListener('pointerdown', (e) => {
                 swallowClick = false;
@@ -223,6 +226,8 @@ export function createLegendPlugin(options: LegendPluginOptions): uPlot.Plugin {
                     if (opts.show !== undefined) refreshLegend(u);
                 },
             ],
+            // A new config comes with its data, and may name the lines anew (a change of language)
+            setData: [refreshLegend],
             destroy: [
                 () => {
                     if (legend && legend.parentNode) {

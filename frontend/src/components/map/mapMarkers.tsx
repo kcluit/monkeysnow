@@ -3,6 +3,9 @@
  * look and behave the same (docs/adr/0008).
  */
 
+import { useLanguage } from '../../hooks/useLanguage';
+import { formatDecimal } from '../../locales';
+
 // A double-click or double-tap zooms the map, so a click only counts once no second one follows this soon
 export const DOUBLE_CLICK_MS = 300;
 
@@ -21,10 +24,11 @@ export function ResortPopupContent({ resortName, hasCustomLocation }: {
     resortName?: string;
     hasCustomLocation: boolean;
 }): JSX.Element {
+    const { t } = useLanguage();
     return (
         <>
             {resortName}
-            {hasCustomLocation && <span className="text-xs text-gray-500"> (Original)</span>}
+            {hasCustomLocation && <span className="text-xs text-gray-500"> {t('map.popup.original')}</span>}
         </>
     );
 }
@@ -37,15 +41,16 @@ export function CustomLocationPopupContent({ lat, lon, elevationText, onText }: 
     /** e.g. "On Peak to Creek, blue run" when the flat map's Ski map shows it on a Run or Lift */
     onText?: string | null;
 }): JSX.Element {
+    const { t } = useLanguage();
     return (
         <div className="text-sm">
-            <div className="font-semibold mb-1">Custom Location</div>
-            <div className="text-gray-600">Lat: {lat.toFixed(4)}</div>
-            <div className="text-gray-600">Lon: {lon.toFixed(4)}</div>
+            <div className="font-semibold mb-1">{t('map.popup.customLocation')}</div>
+            <div className="text-gray-600">{t('map.popup.lat', { value: formatDecimal(lat, 4) })}</div>
+            <div className="text-gray-600">{t('map.popup.lon', { value: formatDecimal(lon, 4) })}</div>
             {elevationText === null || elevationText === undefined ? (
-                <div className="text-gray-500 italic mt-1">Loading elevation...</div>
+                <div className="text-gray-500 italic mt-1">{t('map.popup.loadingElevation')}</div>
             ) : (
-                <div className="text-gray-600 mt-1">Elevation: {elevationText}</div>
+                <div className="text-gray-600 mt-1">{t('map.popup.elevation', { elevation: elevationText })}</div>
             )}
             {onText && <div className="text-gray-600 mt-1">{onText}</div>}
         </div>

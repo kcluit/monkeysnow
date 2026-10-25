@@ -6,8 +6,10 @@ import { CompactDetailUtilityBar } from './CompactDetailUtilityBar';
 import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
 import { elevationFromUnits, elevationInUnits, formatElevation, maxTypedElevation } from '../../utils/unitConversion';
+import { unitSymbol } from '../../locales';
 import { FORECAST_HORIZONS, HISTORY_LENGTHS } from '../../utils/constants';
 import { HistorySwitch } from '../HistorySwitch';
+import { useLanguage } from '../../hooks/useLanguage';
 
 /** The Elevation menu's width in px (w-48) */
 const ELEVATION_MENU_WIDTH = 192;
@@ -48,6 +50,7 @@ function LargeDetailUtilityBar({
     setCustomElevation,
     onResetCustomLocation,
 }: DetailUtilityBarProps): JSX.Element {
+    const { t, tPlural } = useLanguage();
     const [showElevationDropdown, setShowElevationDropdown] = useState(false);
     const [elevationMenuOpensLeft, setElevationMenuOpensLeft] = useState(false);
     const [showForecastDropdown, setShowForecastDropdown] = useState(false);
@@ -79,24 +82,26 @@ function LargeDetailUtilityBar({
         return () => document.removeEventListener('click', handleClickOutside);
     }, []);
 
-    const elevationUnit = unitSystem === 'imperial' ? 'ft' : 'm';
+    const elevationUnit = unitSymbol(unitSystem === 'imperial' ? 'ft' : 'm');
     const maxElevationInput = maxTypedElevation(unitSystem);
 
     // The menu's presets above "Custom...": a Resort's Elevation bands, or a Custom location's Ground elevation
-    const elevationPresets: { label: string; elevation: number | null; isSelected: boolean; select: () => void }[] = customLocation
+    const elevationPresets: { id: string; label: string; elevation: number | null; isSelected: boolean; select: () => void }[] = customLocation
         ? [
-            { label: 'Ground', elevation: groundElevation, isSelected: customElevation === null, select: () => setCustomElevation(null) },
+            { id: 'ground', label: t('detail.ground'), elevation: groundElevation, isSelected: customElevation === null, select: () => setCustomElevation(null) },
         ]
         : [
-            { label: 'Base', elevation: location.baseElevation, isSelected: elevationSelection === 'base', select: () => setElevationSelection('base') },
-            { label: 'Mid', elevation: location.midElevation, isSelected: elevationSelection === 'mid', select: () => setElevationSelection('mid') },
-            { label: 'Top', elevation: location.topElevation, isSelected: elevationSelection === 'top', select: () => setElevationSelection('top') },
+            { id: 'base', label: t('band.base'), elevation: location.baseElevation, isSelected: elevationSelection === 'base', select: () => setElevationSelection('base') },
+            { id: 'mid', label: t('band.mid'), elevation: location.midElevation, isSelected: elevationSelection === 'mid', select: () => setElevationSelection('mid') },
+            { id: 'top', label: t('band.top'), elevation: location.topElevation, isSelected: elevationSelection === 'top', select: () => setElevationSelection('top') },
         ];
     // The Custom elevation in effect, if one was typed
     const typedElevation = customLocation
         ? customElevation
         : typeof elevationSelection === 'number' ? elevationSelection : null;
-    const groundText = groundElevation === null ? 'Ground' : `Ground ${formatElevation(groundElevation, unitSystem)}`;
+    const groundText = groundElevation === null
+        ? t('detail.ground')
+        : t('detail.groundAt', { elevation: formatElevation(groundElevation, unitSystem) });
     const elevationButtonText = typedElevation !== null
         ? formatElevation(typedElevation, unitSystem)
         : customLocation ? groundText : elevationPresets.find((preset) => preset.isSelected)?.label;
@@ -127,11 +132,11 @@ function LargeDetailUtilityBar({
 
     // Get model button text: Comparison models shown here / Selected models
     const getModelButtonText = (): string => {
-        const modelCount = `${shownModelCount}/${selectedModelCount}`;
+        const counts = { shown: shownModelCount, selected: selectedModelCount };
         if (aggregationCount > 0) {
-            return `Models (${modelCount} + ${aggregationCount})`;
+            return t('detail.modelsButtonWithAggregations', { ...counts, aggregations: aggregationCount });
         }
-        return `Models (${modelCount})`;
+        return t('detail.modelsButton', counts);
     };
 
     return (
@@ -142,7 +147,7 @@ function LargeDetailUtilityBar({
                 className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-background border border-theme-border hover:bg-theme-secondary transition-colors"
             >
                 <Icon icon={icons.chevronLeft} className="text-theme-textSecondary" />
-                <span className="text-sm text-theme-textPrimary">Back</span>
+                <span className="text-sm text-theme-textPrimary">{t('detail.back')}</span>
             </button>
 
             {/* Model Selection Button - Opens Modal */}
@@ -159,7 +164,7 @@ function LargeDetailUtilityBar({
             {/* Elevation Dropdown - a Saved location has one elevation; a Custom location offers its Ground elevation */}
             {!customLocation && fixedElevation !== undefined ? (
                 <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-secondary border border-theme-border">
-                    <span className="text-sm text-theme-textSecondary">Elevation:</span>
+                    <span className="text-sm text-theme-textSecondary">{t('detail.elevationLabel')}</span>
                     <span className="text-sm text-theme-textPrimary font-medium">{formatElevation(fixedElevation, unitSystem)}</span>
                 </div>
             ) : (
@@ -175,7 +180,7 @@ function LargeDetailUtilityBar({
                             }}
                             className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-background border border-theme-border hover:bg-theme-secondary transition-colors"
                         >
-                            <span className="text-sm text-theme-textSecondary">Elevation:</span>
+                            <span className="text-sm text-theme-textSecondary">{t('detail.elevationLabel')}</span>
                             <span className="text-sm text-theme-textPrimary font-medium">{elevationButtonText}</span>
                             <svg className="w-4 h-4 text-theme-textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -185,7 +190,7 @@ function LargeDetailUtilityBar({
                             <div className={`absolute ${elevationMenuOpensLeft ? 'right-0' : 'left-0'} z-20 mt-1 w-48 bg-theme-background rounded-lg shadow-lg border border-theme-border p-1`}>
                                 {elevationPresets.map((option) => (
                                     <button
-                                        key={option.label}
+                                        key={option.id}
                                         onClick={() => {
                                             option.select();
                                             setShowElevationDropdown(false);
@@ -218,7 +223,7 @@ function LargeDetailUtilityBar({
                                                     : 'text-theme-textSecondary hover:bg-theme-secondary hover:text-theme-textPrimary'
                                                 }`}
                                         >
-                                            <span>Custom...</span>
+                                            <span>{t('detail.customElevation')}</span>
                                             {typedElevation !== null && (
                                                 <span className="text-xs text-theme-textSecondary opacity-70">{formatElevation(typedElevation, unitSystem)}</span>
                                             )}
@@ -231,7 +236,7 @@ function LargeDetailUtilityBar({
                                                     value={customElevationValue}
                                                     onChange={(e) => setCustomElevationValue(e.target.value)}
                                                     onKeyDown={handleCustomElevationKeyDown}
-                                                    placeholder="Elevation"
+                                                    placeholder={t('detail.elevation')}
                                                     min="0"
                                                     max={maxElevationInput.toString()}
                                                     autoFocus
@@ -244,7 +249,7 @@ function LargeDetailUtilityBar({
                                                     onClick={handleCustomElevationSubmit}
                                                     className="flex-1 px-2 py-1 text-xs rounded bg-theme-accent text-theme-background hover:opacity-90"
                                                 >
-                                                    Apply
+                                                    {t('detail.apply')}
                                                 </button>
                                                 <button
                                                     onClick={() => {
@@ -253,7 +258,7 @@ function LargeDetailUtilityBar({
                                                     }}
                                                     className="flex-1 px-2 py-1 text-xs rounded bg-theme-secondary text-theme-textSecondary hover:bg-theme-cardBg"
                                                 >
-                                                    Cancel
+                                                    {t('detail.cancel')}
                                                 </button>
                                             </div>
                                         </div>
@@ -267,7 +272,7 @@ function LargeDetailUtilityBar({
                     {customLocation && customElevation !== null && (
                         <button
                             onClick={() => setCustomElevation(null)}
-                            title="Forecast at the ground elevation again"
+                            title={t('detail.forecastAtGround')}
                             className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-background border border-theme-border hover:bg-theme-secondary transition-colors"
                         >
                             <Icon icon={icons.reset} className="text-theme-textSecondary" />
@@ -283,7 +288,7 @@ function LargeDetailUtilityBar({
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
-                            <span className="text-sm font-medium">Reset Location</span>
+                            <span className="text-sm font-medium">{t('detail.resetLocation')}</span>
                         </button>
                     )}
                 </>
@@ -303,9 +308,9 @@ function LargeDetailUtilityBar({
                         }}
                         className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-background border border-theme-border hover:bg-theme-secondary transition-colors"
                     >
-                        <span className="text-sm text-theme-textSecondary">{isHistory ? 'History:' : 'Forecast:'}</span>
+                        <span className="text-sm text-theme-textSecondary">{isHistory ? t('detail.historyLabel') : t('detail.forecastLabel')}</span>
                         <span className="text-sm text-theme-textPrimary font-medium">
-                            {days} Days
+                            {tPlural('detail.days', days)}
                         </span>
                         <svg className="w-4 h-4 text-theme-textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -325,7 +330,7 @@ function LargeDetailUtilityBar({
                                             : 'text-theme-textSecondary hover:bg-theme-secondary hover:text-theme-textPrimary'
                                         }`}
                                 >
-                                    {choice} Days
+                                    {tPlural('detail.days', choice)}
                                 </button>
                             ))}
                         </div>
@@ -341,7 +346,7 @@ function LargeDetailUtilityBar({
                 className="flex items-center gap-2 px-3 py-2 rounded-lg bg-theme-background border border-theme-border hover:bg-theme-secondary transition-colors"
             >
                 <span className="text-sm text-theme-textPrimary">
-                    Charts ({selectedVariables.length})
+                    {t('detail.charts', { count: selectedVariables.length })}
                 </span>
                 <svg className="w-4 h-4 text-theme-textSecondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -354,7 +359,7 @@ function LargeDetailUtilityBar({
             <button
                 onClick={() => setIsChartLocked(!isChartLocked)}
                 className="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors bg-theme-background border border-theme-border hover:bg-theme-secondary text-theme-textPrimary"
-                title={isChartLocked ? 'Unlock charts (enable zoom and slider)' : 'Lock charts (disable zoom and hide slider)'}
+                title={isChartLocked ? t('detail.unlockCharts') : t('detail.lockCharts')}
             >
                 <span className="text-lg">{isChartLocked ? '🔒' : '🔓'}</span>
             </button>

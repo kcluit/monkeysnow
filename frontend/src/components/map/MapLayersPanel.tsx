@@ -10,6 +10,7 @@ import {
     type OverlayId,
     type TerrainColouringId,
 } from '../../utils/mapLayers';
+import { useLanguage } from '../../hooks/useLanguage';
 import { SlopeBandsEditor } from './SlopeBandsEditor';
 
 interface MapLayersPanelProps {
@@ -32,14 +33,15 @@ export const MapLayersPanel = forwardRef<HTMLDivElement, MapLayersPanelProps>(fu
     { layers, onChange, hints, is3D, cursorReadout, onCursorReadoutChange },
     ref,
 ) {
+    const { t } = useLanguage();
     const [isEditingBands, setIsEditingBands] = useState(false);
     const toggle = (id: OverlayId) => onChange(withOverlay(layers, id, !layers.overlays.includes(id)));
     const colouring = terrainColouring(layers);
-    const colourings: { id: TerrainColouringId | null; label: string }[] = [{ id: null, label: 'None' }, ...TERRAIN_COLOURINGS];
+    const colourings: { id: TerrainColouringId | null; label: string }[] = [{ id: null, label: t('map.layers.none') }, ...TERRAIN_COLOURINGS];
 
     return (
-        <div ref={ref} className="resort-map-layers" role="group" aria-label="Map layers">
-            <div className="resort-map-layers-bases" role="radiogroup" aria-label="Base map">
+        <div ref={ref} className="resort-map-layers" role="group" aria-label={t('map.layers')}>
+            <div className="resort-map-layers-bases" role="radiogroup" aria-label={t('map.layers.baseMap')}>
                 {BASE_MAPS.map(base => (
                     <button
                         key={base.id}
@@ -56,7 +58,7 @@ export const MapLayersPanel = forwardRef<HTMLDivElement, MapLayersPanelProps>(fu
             {OVERLAYS.map(overlay => {
                 const alwaysOn = is3D && overlay.id === 'hillshade';
                 const on = alwaysOn || layers.overlays.includes(overlay.id);
-                const hint = alwaysOn ? 'Always on in 3D' : on ? hints[overlay.id] : undefined;
+                const hint = alwaysOn ? t('map.layers.alwaysOn3d') : on ? hints[overlay.id] : undefined;
                 return (
                     <label key={overlay.id} className={`resort-map-layers-overlay ${alwaysOn ? 'disabled' : ''}`}>
                         <input type="checkbox" checked={on} disabled={alwaysOn} onChange={() => toggle(overlay.id)} />
@@ -65,7 +67,7 @@ export const MapLayersPanel = forwardRef<HTMLDivElement, MapLayersPanelProps>(fu
                     </label>
                 );
             })}
-            <div className="resort-map-layers-heading" id="resort-map-colour-terrain">Colour terrain by</div>
+            <div className="resort-map-layers-heading" id="resort-map-colour-terrain">{t('map.layers.colourTerrainBy')}</div>
             <div role="radiogroup" aria-labelledby="resort-map-colour-terrain">
                 {colourings.map(option => {
                     const on = colouring === option.id;
@@ -93,7 +95,7 @@ export const MapLayersPanel = forwardRef<HTMLDivElement, MapLayersPanelProps>(fu
                                         <svg className={`w-3 h-3 ${isEditingBands ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                                         </svg>
-                                        Edit bands
+                                        {t('map.layers.editBands')}
                                     </button>
                                     {isEditingBands && <SlopeBandsEditor />}
                                 </>
@@ -104,10 +106,10 @@ export const MapLayersPanel = forwardRef<HTMLDivElement, MapLayersPanelProps>(fu
             </div>
             {cursorReadout !== undefined && (
                 <>
-                    <div className="resort-map-layers-heading">Under the mouse</div>
+                    <div className="resort-map-layers-heading">{t('map.layers.underMouse')}</div>
                     <label className="resort-map-layers-overlay">
                         <input type="checkbox" checked={cursorReadout} onChange={() => onCursorReadoutChange(!cursorReadout)} />
-                        <span>Height, slope angle and aspect</span>
+                        <span>{t('map.layers.cursorReadout')}</span>
                     </label>
                 </>
             )}

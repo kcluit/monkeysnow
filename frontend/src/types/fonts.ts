@@ -7,6 +7,8 @@ export const FontSchema = z.object({
   family: z.string(),           // CSS font-family value
   googleFontsUrl: z.string().optional(), // Google Fonts URL (if applicable)
   isMonospace: z.boolean(),
+  // The alphabets it has letters for; a language written in another draws them in the fallback font
+  scripts: z.array(z.enum(['latin', 'cyrillic', 'han'])),
 });
 
 export type Font = z.infer<typeof FontSchema>;
@@ -19,6 +21,7 @@ export const fonts: Font[] = [
     family: "'SF Pro Display', system-ui, sans-serif",
     googleFontsUrl: 'https://fonts.cdnfonts.com/css/sf-pro-display',
     isMonospace: false,
+    scripts: ['latin', 'cyrillic'],
   },
   {
     id: 'inter',
@@ -26,6 +29,7 @@ export const fonts: Font[] = [
     family: "'Inter', system-ui, sans-serif",
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap',
     isMonospace: false,
+    scripts: ['latin', 'cyrillic'],
   },
   {
     id: 'roboto',
@@ -33,6 +37,7 @@ export const fonts: Font[] = [
     family: "'Roboto', system-ui, sans-serif",
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700;800&display=swap',
     isMonospace: false,
+    scripts: ['latin', 'cyrillic'],
   },
   {
     id: 'lexend',
@@ -40,6 +45,7 @@ export const fonts: Font[] = [
     family: "'Lexend Deca', system-ui, sans-serif",
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;600;700;800&display=swap',
     isMonospace: false,
+    scripts: ['latin'],
   },
   {
     id: 'jetbrains',
@@ -47,6 +53,7 @@ export const fonts: Font[] = [
     family: "'JetBrains Mono', monospace",
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap',
     isMonospace: true,
+    scripts: ['latin', 'cyrillic'],
   },
   {
     id: 'fira-code',
@@ -54,6 +61,7 @@ export const fonts: Font[] = [
     family: "'Fira Code', monospace",
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&display=swap',
     isMonospace: true,
+    scripts: ['latin', 'cyrillic'],
   },
   {
     id: 'ibm-plex',
@@ -61,6 +69,7 @@ export const fonts: Font[] = [
     family: "'IBM Plex Mono', monospace",
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap',
     isMonospace: true,
+    scripts: ['latin', 'cyrillic'],
   },
   {
     id: 'roboto-mono',
@@ -68,6 +77,7 @@ export const fonts: Font[] = [
     family: "'Roboto Mono', monospace",
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&display=swap',
     isMonospace: true,
+    scripts: ['latin', 'cyrillic'],
   },
   // --- Sans-serif additions ---
   {
@@ -76,6 +86,7 @@ export const fonts: Font[] = [
     family: "'Geist', system-ui, sans-serif",
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap',
     isMonospace: false,
+    scripts: ['latin', 'cyrillic'],
   },
   {
     id: 'plus-jakarta',
@@ -83,6 +94,7 @@ export const fonts: Font[] = [
     family: "'Plus Jakarta Sans', system-ui, sans-serif",
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap',
     isMonospace: false,
+    scripts: ['latin'],
   },
   {
     id: 'dm-sans',
@@ -90,6 +102,7 @@ export const fonts: Font[] = [
     family: "'DM Sans', system-ui, sans-serif",
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap',
     isMonospace: false,
+    scripts: ['latin'],
   },
   {
     id: 'outfit',
@@ -97,6 +110,7 @@ export const fonts: Font[] = [
     family: "'Outfit', system-ui, sans-serif",
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap',
     isMonospace: false,
+    scripts: ['latin'],
   },
   {
     id: 'nunito',
@@ -104,6 +118,7 @@ export const fonts: Font[] = [
     family: "'Nunito', system-ui, sans-serif",
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap',
     isMonospace: false,
+    scripts: ['latin', 'cyrillic'],
   },
   {
     id: 'space-grotesk',
@@ -111,6 +126,7 @@ export const fonts: Font[] = [
     family: "'Space Grotesk', system-ui, sans-serif",
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap',
     isMonospace: false,
+    scripts: ['latin'],
   },
   {
     id: 'poppins',
@@ -118,6 +134,7 @@ export const fonts: Font[] = [
     family: "'Poppins', system-ui, sans-serif",
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap',
     isMonospace: false,
+    scripts: ['latin'],
   },
   {
     id: 'comfortaa',
@@ -125,12 +142,14 @@ export const fonts: Font[] = [
     family: "'Comfortaa', system-ui, sans-serif",
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap',
     isMonospace: false,
+    scripts: ['latin', 'cyrillic'],
   },
   {
     id: 'comic-sans',
     name: 'Comic Sans MS',
     family: "'Comic Sans MS', 'Comic Sans', cursive, sans-serif",
     isMonospace: false,
+    scripts: ['latin', 'cyrillic'],
   },
   // --- Monospace additions ---
   {
@@ -139,6 +158,7 @@ export const fonts: Font[] = [
     family: "'Geist Mono', monospace",
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700;800&display=swap',
     isMonospace: true,
+    scripts: ['latin', 'cyrillic'],
   },
   {
     id: 'space-mono',
@@ -146,6 +166,7 @@ export const fonts: Font[] = [
     family: "'Space Mono', monospace",
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap',
     isMonospace: true,
+    scripts: ['latin'],
   },
   {
     id: 'source-code-pro',
@@ -153,6 +174,7 @@ export const fonts: Font[] = [
     family: "'Source Code Pro', monospace",
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500;600;700;800&display=swap',
     isMonospace: true,
+    scripts: ['latin', 'cyrillic'],
   },
   {
     id: 'inconsolata',
@@ -160,6 +182,7 @@ export const fonts: Font[] = [
     family: "'Inconsolata', monospace",
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700;800&display=swap',
     isMonospace: true,
+    scripts: ['latin'],
   },
   // --- Serif additions ---
   {
@@ -168,6 +191,7 @@ export const fonts: Font[] = [
     family: "'Playfair Display', Georgia, serif",
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap',
     isMonospace: false,
+    scripts: ['latin', 'cyrillic'],
   },
   {
     id: 'lora',
@@ -175,6 +199,7 @@ export const fonts: Font[] = [
     family: "'Lora', Georgia, serif",
     googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap',
     isMonospace: false,
+    scripts: ['latin', 'cyrillic'],
   },
   // --- Accessibility ---
   {
@@ -183,8 +208,32 @@ export const fonts: Font[] = [
     family: "'Open-Dyslexic', 'OpenDyslexic', sans-serif", // cdnfonts names the family 'Open-Dyslexic'
     googleFontsUrl: 'https://fonts.cdnfonts.com/css/open-dyslexic',
     isMonospace: false,
+    scripts: ['latin'],
   },
 ];
+
+// None of the fonts above has Chinese characters. Named before a stack's generic family,
+// these draw them in a sans-serif face on every platform (Mac and iPhone, older Macs,
+// Windows, Android and Linux), where the generic monospace would give Windows' serif
+// NSimSun. A serif stack keeps its generic, whose Chinese face is a serif one too.
+const CHINESE_SANS_SERIF = "'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC'";
+
+/** The CSS font-family to apply for a font: its own, with a Chinese face before its generic family */
+export function fontFamilyWithChinese(font: Font): string {
+  const families = font.family.split(',').map(family => family.trim());
+  const generic = families[families.length - 1];
+  if (generic === 'serif') return font.family;
+  return [...families.slice(0, -1), CHINESE_SANS_SERIF, generic].join(', ');
+}
+
+/**
+ * Whether the font pickers mark a font as having no letters for a language's script: only
+ * where another font has them, so picking it would change the language's text. No font
+ * here has Chinese characters, so in Chinese none is marked.
+ */
+export function lacksLettersFor(font: Font, script: Font['scripts'][number]): boolean {
+  return !font.scripts.includes(script) && fonts.some(other => other.scripts.includes(script));
+}
 
 export function getFontById(id: string): Font | undefined {
   return fonts.find(font => font.id === id);

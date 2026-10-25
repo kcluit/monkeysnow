@@ -1,180 +1,45 @@
-import { z } from 'zod';
+import type { en } from '../locales/en';
 
 /**
- * All translatable UI strings in the application.
- * Keys use namespaced prefixes for organization.
- *
- * When adding new strings, add them here first - TypeScript will
- * then require them in all language files.
+ * Every translatable UI string, keyed by a namespaced id. The English file
+ * (`locales/en`) is the source: a key added there is required in every other language.
  */
-export interface Translations {
-    // Common
-    'common.loading': string;
-    'common.error': string;
-    'common.on': string;
-    'common.off': string;
-    'common.show': string;
-    'common.hide': string;
-
-    // Utility Bar
-    'utilityBar.selectResorts': string;
-    'utilityBar.baseForecast': string;
-    'utilityBar.midForecast': string;
-    'utilityBar.topForecast': string;
-    'utilityBar.sortByTemperature': string;
-    'utilityBar.sortBySnowfall': string;
-    'utilityBar.sortByWind': string;
-    'utilityBar.reverseOrder': string;
-    'utilityBar.normalOrder': string;
-    'utilityBar.default': string;
-    'utilityBar.fullView': string;
-    'utilityBar.compact': string;
-
-    // Cards
-    'card.webcams': string;
-    'card.freezing': string;
-    'card.snow': string;
-    'card.wind': string;
-    'card.totals': string;
-    'card.next3Days': string;
-    'card.next7Days': string;
-
-    // Commands
-    'command.theme': string;
-    'command.font': string;
-    'command.rainbowText': string;
-    'command.boldText': string;
-    'command.fullscreen': string;
-    'command.fpsCounter': string;
-    'command.showBorders': string;
-    'command.showDate': string;
-    'command.elevation': string;
-    'command.sortBy': string;
-    'command.sortDay': string;
-    'command.sortOrder': string;
-    'command.chooseView': string;
-    'command.temperatureDisplay': string;
-    'command.snowfallEstimate': string;
-    'command.snowCaution': string;
-    'command.utilityBar': string;
-    'command.utilityBarStyle': string;
-    'command.units': string;
-    'command.language': string;
-    'command.resorts': string;
-
-    // Elevation options
-    'elevation.base': string;
-    'elevation.mid': string;
-    'elevation.top': string;
-
-    // Sort options
-    'sort.temperature': string;
-    'sort.snowfall': string;
-    'sort.wind': string;
-
-    // Sort Day
-    'sortDay.next3Days': string;
-    'sortDay.next7Days': string;
-    'sortDay.today': string;
-
-    // Sort Order
-    'sortOrder.normal': string;
-    'sortOrder.reverse': string;
-
-    // View modes
-    'view.default': string;
-    'view.full': string;
-    'view.compact': string;
-    'view.graph': string;
-
-    // Graph view
-    'graph.loadingHours': string;
-    'graph.precipitationMetric': string;
-    'graph.precipitationInches': string;
-    'graph.temperature': string;
-    'graph.freezingLevel': string;
-    'graph.elevationBands': string;
-    'graph.night': string;
-    'graph.now': string;
-
-    // Temperature metrics
-    'temperature.max': string;
-    'temperature.min': string;
-    'temperature.avg': string;
-    'temperature.median': string;
-
-    // Snowfall estimate
-    'snowfall.model': string;
-    'snowfall.totalPrecip': string;
-
-    // Snow caution
-    'snowCaution.extraCautious': string;
-    'snowCaution.cautious': string;
-    'snowCaution.realistic': string;
-
-    // Utility bar style
-    'utilityBarStyle.compact': string;
-    'utilityBarStyle.large': string;
-
-    // Units
-    'units.metric': string;
-    'units.imperial': string;
-
-    // Loading and Error states
-    'loading.weatherData': string;
-    'error.loadingWeatherData': string;
-    'error.tryRefreshing': string;
-
-    // Empty states
-    'empty.selectResorts': string;
-
-    // Fetch status ({count}, {things}, {eta} and {n} are filled in at runtime)
-    'fetchStatus.queued': string;
-    'fetchStatus.limitReached': string;
-    'fetchStatus.limitReachedTomorrow': string;
-    'fetchStatus.etaMinutes': string;
-    'fetchStatus.etaHours': string;
-    'fetchStatus.resort': string;
-    'fetchStatus.resorts': string;
-    'fetchStatus.model': string;
-    'fetchStatus.models': string;
-
-    // Detail View
-    'detail.loadingForecast': string;
-    'detail.errorLoadingForecast': string;
-    'detail.back': string;
-    'detail.noModelCovers': string;
-    'detail.noModelHasData': string;
-    'detail.chooseModels': string;
-
-    // Detail view map
-    'map.show3d': string;
-    'map.showFlat': string;
-    'map.loading3d': string;
-    'map.failed3d': string;
-    'map.exaggeration': string;
-    'map.heightLineBase': string;
-    'map.heightLineMid': string;
-    'map.heightLineTop': string;
-
-    // Main page models
-    'cardModels.search': string;
-    'cardModels.everywhere': string;
-    'cardModels.yourSelection': string;
-    'cardModels.auto': string;
-    'cardModels.covers': string;
-    'cardModels.noCountries': string;
-    'cardModels.resetAll': string;
-    'cardModels.allAuto': string;
-    'cardModels.changedOne': string;
-    'cardModels.changedMany': string;
-}
+export type Translations = { [K in keyof typeof en]: string };
 
 /**
  * Type-safe translation key.
  * Using this type ensures only valid keys can be passed to t().
  */
 export type TranslationKey = keyof Translations;
+
+/** A key whose plural forms are `<key>.one` and `<key>.other`, for tPlural() */
+export type PluralKey = {
+    [K in TranslationKey]: K extends `${infer Base}.other` ? (`${Base}.one` extends TranslationKey ? Base : never) : never
+}[TranslationKey];
+
+/** The plural forms a language's rule picks from (Intl.PluralRules), beyond English's one and other */
+export type ExtraPluralForm = 'zero' | 'two' | 'few' | 'many';
+
+/**
+ * One area's strings in another language: the same keys as the English area, every one
+ * translated, plus each plural key's `Extra` forms where its rule has more than English's
+ * (Russian's few and many: 2 курорта, 5 курортов)
+ */
+export type Translated<T, Extra extends ExtraPluralForm = never> = { [K in keyof T]: string } & {
+    [K in keyof T as K extends `${infer Base}.other` ? `${Base}.${Extra}` : never]: string
+};
+
+/** The scripts monkeysnow's languages are written in, which a font may or may not have letters for */
+export type Script = 'latin' | 'cyrillic' | 'han';
+
+/** Values for a string's `{placeholders}` */
+export type TranslationValues = Record<string, string | number>;
+
+/** Look up a string in the current language, filling its `{placeholders}` */
+export type Translate = (key: TranslationKey, values?: TranslationValues) => string;
+
+/** Look up `<key>.one`, `<key>.other` or another form the language has, by its plural rule for `count`; `{count}` is filled in */
+export type TranslatePlural = (key: PluralKey, count: number, values?: TranslationValues) => string;
 
 /**
  * Language definition with metadata and translations.
@@ -184,186 +49,25 @@ export interface Language {
     id: string;
     /** English name (e.g., 'French') */
     name: string;
-    /** Native name (e.g., 'Français') */
+    /** Native name (e.g., 'Français'), what the language pickers show */
     nativeName: string;
+    /** BCP 47 tag that dates, times and numbers are formatted in (e.g., 'en-US', 'fr') */
+    locale: string;
+    /**
+     * The page's lang attribute, where it isn't the id: 'zh-Hans', so that a browser
+     * with no Chinese font named draws the Simplified Chinese forms, not Japanese ones
+     */
+    htmlLang?: string;
+    /** The alphabet it is written in, which the font pickers check each font for */
+    script: Script;
     /** All translated strings */
     translations: Translations;
+    /**
+     * Regions named in this language, by country code and then by resorts.json's name;
+     * every other Region keeps resorts.json's name
+     */
+    regionNames?: Record<string, Record<string, string>>;
 }
-
-/**
- * Zod schema for validating translations.
- * Ensures all required keys are present.
- */
-export const TranslationsSchema = z.object({
-    // Common
-    'common.loading': z.string(),
-    'common.error': z.string(),
-    'common.on': z.string(),
-    'common.off': z.string(),
-    'common.show': z.string(),
-    'common.hide': z.string(),
-
-    // Utility Bar
-    'utilityBar.selectResorts': z.string(),
-    'utilityBar.baseForecast': z.string(),
-    'utilityBar.midForecast': z.string(),
-    'utilityBar.topForecast': z.string(),
-    'utilityBar.sortByTemperature': z.string(),
-    'utilityBar.sortBySnowfall': z.string(),
-    'utilityBar.sortByWind': z.string(),
-    'utilityBar.reverseOrder': z.string(),
-    'utilityBar.normalOrder': z.string(),
-    'utilityBar.default': z.string(),
-    'utilityBar.fullView': z.string(),
-    'utilityBar.compact': z.string(),
-
-    // Cards
-    'card.webcams': z.string(),
-    'card.freezing': z.string(),
-    'card.snow': z.string(),
-    'card.wind': z.string(),
-    'card.totals': z.string(),
-    'card.next3Days': z.string(),
-    'card.next7Days': z.string(),
-
-    // Commands
-    'command.theme': z.string(),
-    'command.font': z.string(),
-    'command.rainbowText': z.string(),
-    'command.boldText': z.string(),
-    'command.fullscreen': z.string(),
-    'command.fpsCounter': z.string(),
-    'command.showBorders': z.string(),
-    'command.showDate': z.string(),
-    'command.elevation': z.string(),
-    'command.sortBy': z.string(),
-    'command.sortDay': z.string(),
-    'command.sortOrder': z.string(),
-    'command.chooseView': z.string(),
-    'command.temperatureDisplay': z.string(),
-    'command.snowfallEstimate': z.string(),
-    'command.snowCaution': z.string(),
-    'command.utilityBar': z.string(),
-    'command.utilityBarStyle': z.string(),
-    'command.units': z.string(),
-    'command.language': z.string(),
-    'command.resorts': z.string(),
-
-    // Elevation options
-    'elevation.base': z.string(),
-    'elevation.mid': z.string(),
-    'elevation.top': z.string(),
-
-    // Sort options
-    'sort.temperature': z.string(),
-    'sort.snowfall': z.string(),
-    'sort.wind': z.string(),
-
-    // Sort Day
-    'sortDay.next3Days': z.string(),
-    'sortDay.next7Days': z.string(),
-    'sortDay.today': z.string(),
-
-    // Sort Order
-    'sortOrder.normal': z.string(),
-    'sortOrder.reverse': z.string(),
-
-    // View modes
-    'view.default': z.string(),
-    'view.full': z.string(),
-    'view.compact': z.string(),
-    'view.graph': z.string(),
-
-    // Graph view
-    'graph.loadingHours': z.string(),
-    'graph.precipitationMetric': z.string(),
-    'graph.precipitationInches': z.string(),
-    'graph.temperature': z.string(),
-    'graph.freezingLevel': z.string(),
-    'graph.elevationBands': z.string(),
-    'graph.night': z.string(),
-    'graph.now': z.string(),
-
-    // Temperature metrics
-    'temperature.max': z.string(),
-    'temperature.min': z.string(),
-    'temperature.avg': z.string(),
-    'temperature.median': z.string(),
-
-    // Snowfall estimate
-    'snowfall.model': z.string(),
-    'snowfall.totalPrecip': z.string(),
-
-    // Snow caution
-    'snowCaution.extraCautious': z.string(),
-    'snowCaution.cautious': z.string(),
-    'snowCaution.realistic': z.string(),
-
-    // Utility bar style
-    'utilityBarStyle.compact': z.string(),
-    'utilityBarStyle.large': z.string(),
-
-    // Units
-    'units.metric': z.string(),
-    'units.imperial': z.string(),
-
-    // Loading and Error states
-    'loading.weatherData': z.string(),
-    'error.loadingWeatherData': z.string(),
-    'error.tryRefreshing': z.string(),
-
-    // Empty states
-    'empty.selectResorts': z.string(),
-
-    // Fetch status
-    'fetchStatus.queued': z.string(),
-    'fetchStatus.limitReached': z.string(),
-    'fetchStatus.limitReachedTomorrow': z.string(),
-    'fetchStatus.etaMinutes': z.string(),
-    'fetchStatus.etaHours': z.string(),
-    'fetchStatus.resort': z.string(),
-    'fetchStatus.resorts': z.string(),
-    'fetchStatus.model': z.string(),
-    'fetchStatus.models': z.string(),
-
-    // Detail View
-    'detail.loadingForecast': z.string(),
-    'detail.errorLoadingForecast': z.string(),
-    'detail.back': z.string(),
-    'detail.noModelCovers': z.string(),
-    'detail.noModelHasData': z.string(),
-    'detail.chooseModels': z.string(),
-    'map.show3d': z.string(),
-    'map.showFlat': z.string(),
-    'map.loading3d': z.string(),
-    'map.failed3d': z.string(),
-    'map.exaggeration': z.string(),
-    'map.heightLineBase': z.string(),
-    'map.heightLineMid': z.string(),
-    'map.heightLineTop': z.string(),
-
-    // Main page models
-    'cardModels.search': z.string(),
-    'cardModels.everywhere': z.string(),
-    'cardModels.yourSelection': z.string(),
-    'cardModels.auto': z.string(),
-    'cardModels.covers': z.string(),
-    'cardModels.noCountries': z.string(),
-    'cardModels.resetAll': z.string(),
-    'cardModels.allAuto': z.string(),
-    'cardModels.changedOne': z.string(),
-    'cardModels.changedMany': z.string(),
-}) satisfies z.ZodType<Translations>;
-
-/**
- * Zod schema for validating a complete language definition.
- */
-export const LanguageSchema = z.object({
-    id: z.string(),
-    name: z.string(),
-    nativeName: z.string(),
-    translations: TranslationsSchema,
-});
 
 /**
  * Return type for the useLanguage hook.
@@ -371,10 +75,12 @@ export const LanguageSchema = z.object({
 export interface UseLanguageReturn {
     /** Current language */
     language: Language;
-    /** Set language by ID */
+    /** Pick a language by ID, remembered in this browser */
     setLanguage: (languageId: string) => void;
     /** Translation function - returns translated string for key */
-    t: (key: TranslationKey) => string;
+    t: Translate;
+    /** Plural-aware translation function */
+    tPlural: TranslatePlural;
     /** All available languages */
     availableLanguages: Language[];
 }

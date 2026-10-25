@@ -1,3 +1,5 @@
+import { useLanguage } from '../../hooks/useLanguage';
+import { ASPECT_SECTORS } from '../../utils/terrainRendering';
 import type { TerrainReading } from '../../utils/terrainAtPoint';
 import { formatElevation, type UnitSystem } from '../../utils/unitConversion';
 
@@ -10,11 +12,13 @@ interface CursorReadoutProps {
 
 /** The height, Slope angle and Aspect of the terrain under the mouse, in the top-right corner of either map. */
 export function CursorReadout({ reading, unitSystem, is3D }: CursorReadoutProps): JSX.Element {
+    const { t } = useLanguage();
+    const aspect = ASPECT_SECTORS.find(sector => sector.name === reading.aspect);
     return (
         <div className={`resort-map-readout ${is3D ? 'resort-map-readout-3d' : ''}`} aria-hidden="true">
-            <span>Height <strong>{formatElevation(reading.height, unitSystem)}</strong></span>
-            {reading.slopeAngle !== null && <span>Slope angle <strong>{Math.round(reading.slopeAngle)}°</strong></span>}
-            {reading.aspect && <span>Aspect <strong>{reading.aspect}</strong></span>}
+            <span>{t('map.readout.height')} <strong>{formatElevation(reading.height, unitSystem)}</strong></span>
+            {reading.slopeAngle !== null && <span>{t('map.readout.slopeAngle')} <strong>{Math.round(reading.slopeAngle)}°</strong></span>}
+            {aspect && <span>{t('map.readout.aspect')} <strong>{t(aspect.label)}</strong></span>}
         </div>
     );
 }

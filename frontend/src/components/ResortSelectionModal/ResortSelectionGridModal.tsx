@@ -14,13 +14,14 @@ import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
 import { matchesSearchWords, normalizeForSearch, toSearchWords } from '../../utils/resortSearch';
 import { useOverlay } from '../../hooks/useOverlay';
+import { useLanguage } from '../../hooks/useLanguage';
 import { shouldAutoFocusSearch } from '../../utils/autoFocus';
 
 interface ResortSelectionGridModalProps {
   hierarchy: UseResortHierarchyReturn;
 }
 
-// The text search compares each resort with: its names, its Region and its country, but not its continent
+// The text search compares each resort with: its names, its Region and its country (in every language), but not its continent
 function buildSearchTexts(tree: HierarchyNode[]): Map<string, string> {
   const texts = new Map<string, string>();
 
@@ -29,7 +30,7 @@ function buildSearchTexts(tree: HierarchyNode[]): Map<string, string> {
       texts.set(node.id, normalizeForSearch([node.name, ...(node.aka ?? []), ...places].join(' ')));
       return;
     }
-    const childPlaces = node.type === 'country' || node.type === 'province' ? [...places, node.name] : places;
+    const childPlaces = node.type === 'country' || node.type === 'province' ? [...places, node.name, ...(node.aka ?? [])] : places;
     node.children?.forEach((child) => visit(child, childPlaces));
   }
 
@@ -161,6 +162,7 @@ interface GroupNodeProps {
 // One group at any level: Saved locations, a continent, a country or a Region
 const GroupNode = memo(function GroupNode(props: GroupNodeProps) {
   const { node, isGroupOpen, onToggleOpen, groupResorts, selected, onToggleGroup, onToggleResort, highlightedId } = props;
+  const { t } = useLanguage();
   const level = isTopLevel(node) ? 'continent' : node.type === 'country' ? 'country' : 'province';
   const icon = node.type === 'custom' ? icons.custom : icons[level];
   const isOpen = isGroupOpen(node);
@@ -188,7 +190,7 @@ const GroupNode = memo(function GroupNode(props: GroupNodeProps) {
           type="button"
           className={`resort-grid-toggle ${isOpen ? 'expanded' : ''}`}
           aria-expanded={isOpen}
-          aria-label={`${isOpen ? 'Collapse' : 'Expand'} ${node.name}`}
+          aria-label={t(isOpen ? 'picker.collapse' : 'picker.expand', { name: node.name })}
         >
           <Icon icon={isOpen ? icons.caretDown : icons.caretRight} />
         </button>
@@ -201,7 +203,7 @@ const GroupNode = memo(function GroupNode(props: GroupNodeProps) {
       </div>
       {isOpen && node.type === 'custom' && children.length === 0 && (
         <div className="resort-grid-custom-hint">
-          Click any resort's map in its forecast view to save a location here.
+          {t('picker.savedLocationsHint')}
         </div>
       )}
       {isOpen && children.length > 0 && (
@@ -246,6 +248,7 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
     capNotice,
   } = hierarchy;
 
+  const { t, tPlural } = useLanguage();
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Get hierarchy tree from context
@@ -337,7 +340,7 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={handleSearchKeyDown}
-              placeholder="Search resorts, regions or countries..."
+              placeholder={t('picker.search')}
               autoComplete="off"
               spellCheck={false}
             />
@@ -345,7 +348,7 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
           <button
             className="resort-grid-close-btn"
             onClick={closeModal}
-            aria-label="Close"
+            aria-label={t('picker.close')}
           >
             <Icon icon={icons.close} />
           </button>
@@ -355,7 +358,7 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
         <div className="resort-grid-content">
           {shownTree.length === 0 ? (
             <div className="resort-grid-empty">
-              {isSearching ? 'No resorts found' : 'No resorts available'}
+              {t(isSearching ? 'picker.noResortsFound' : 'picker.noResorts')}
             </div>
           ) : (
             <div className="resort-grid-columns">
@@ -380,24 +383,24 @@ export const ResortSelectionGridModal = memo(function ResortSelectionGridModal({
         <div className="command-palette-footer">
           {onlyResort?.resortId && (
             <span className="command-hint">
-              <kbd>↵</kbd> {selected.has(onlyResort.resortId) ? 'remove' : 'add'}
+              <kbd>↵</kbd> {t(selected.has(onlyResort.resortId) ? 'picker.remove' : 'picker.add')}
             </span>
           )}
           <span className="command-hint">
-            <kbd>esc</kbd> close
+            <kbd>{t('key.esc')}</kbd> {t('picker.closeHint')}
           </span>
           <CapNotice notice={capNotice} />
           {selectedResorts.length > 0 && (
             <button
               className="resort-grid-clear-btn"
               onClick={clearAllResorts}
-              aria-label="Clear selection"
+              aria-label={t('picker.clearSelection')}
             >
-              Clear
+              {t('picker.clear')}
             </button>
           )}
           <span className="resort-selection-count">
-            {selectedResorts.length} / {MAX_SELECTED_RESORTS} selected
+            {tPlural('picker.selected', selectedResorts.length, { max: MAX_SELECTED_RESORTS })}
           </span>
         </div>
       </div>

@@ -18,6 +18,7 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { VariableDraggableItem } from './VariableDraggableItem';
 import { VariableCategorySectionDraggable } from './VariableCategorySectionDraggable';
 import { useOverlay } from '../../hooks/useOverlay';
+import { useLanguage } from '../../hooks/useLanguage';
 import { shouldAutoFocusSearch } from '../../utils/autoFocus';
 import type { UseVariableSelectionReturn } from '../../hooks/useVariableSelection';
 
@@ -28,6 +29,7 @@ interface VariableSelectionModalProps {
 export function VariableSelectionModal({
   selection,
 }: VariableSelectionModalProps): JSX.Element | null {
+  const { t, language } = useLanguage();
   const {
     isOpen,
     closeModal,
@@ -118,14 +120,15 @@ export function VariableSelectionModal({
     setExpandedCategories(new Set());
   }, []);
 
-  // Filter categories to only show those with matching variables
+  // Filter categories to only show those with matching variables; the copies take each name
+  // in the language showing, so they're made again when it changes
   const filteredCategories = useMemo(() => {
     const filteredSet = new Set(filteredVariables);
     return orderedCategories.map(category => ({
       ...category,
       variables: category.variables.filter(v => filteredSet.has(v)),
     })).filter(cat => cat.variables.length > 0);
-  }, [filteredVariables, orderedCategories]);
+  }, [filteredVariables, orderedCategories, language]);
 
   // Lock page scroll while open, and close on Esc
   useOverlay(isOpen, closeModal);
@@ -149,9 +152,9 @@ export function VariableSelectionModal({
       <div className="command-palette variable-selection-modal">
         {/* Header */}
         <div className="variable-selection-header">
-          <h2 className="variable-selection-title">Select charts</h2>
+          <h2 className="variable-selection-title">{t('chart.picker.title')}</h2>
           <p className="variable-selection-subtitle">
-            Choose which charts to show, and drag them into order.
+            {t('chart.picker.subtitle')}
           </p>
         </div>
 
@@ -160,7 +163,7 @@ export function VariableSelectionModal({
           <input
             type="text"
             className="command-input"
-            placeholder="Search charts..."
+            placeholder={t('chart.picker.search')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             autoFocus={shouldAutoFocusSearch()}
@@ -174,14 +177,14 @@ export function VariableSelectionModal({
             onClick={selectAll}
             className="variable-action-button"
           >
-            Select All
+            {t('chart.picker.selectAll')}
           </button>
           <button
             type="button"
             onClick={deselectAll}
             className="variable-action-button"
           >
-            Deselect All
+            {t('chart.picker.deselectAll')}
           </button>
           {!isSearching && (
             <button
@@ -189,11 +192,11 @@ export function VariableSelectionModal({
               onClick={allExpanded ? collapseAllCategories : expandAllCategories}
               className="variable-action-button"
             >
-              {allExpanded ? 'Collapse All' : 'Expand All'}
+              {allExpanded ? t('chart.picker.collapseAll') : t('chart.picker.expandAll')}
             </button>
           )}
           <span className="variable-selection-count">
-            {selectedInFilteredCount} of {filteredVariables.length}
+            {t('chart.picker.count', { selected: selectedInFilteredCount, total: filteredVariables.length })}
           </span>
         </div>
 
@@ -254,10 +257,10 @@ export function VariableSelectionModal({
         {/* Footer */}
         <div className="command-palette-footer">
           <span className="command-hint">
-            <kbd>↕</kbd> drag to reorder
+            <kbd>↕</kbd> {t('chart.picker.dragHint')}
           </span>
           <span className="command-hint">
-            <kbd>esc</kbd> close
+            <kbd>{t('key.esc')}</kbd> {t('chart.picker.close')}
           </span>
         </div>
       </div>

@@ -5,6 +5,7 @@ import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import type { VariableCategory } from '../../data/variableCategories';
 import type { WeatherVariable } from '../../types/openMeteo';
 import { VARIABLE_CONFIGS } from '../../utils/chartConfigurations';
+import { useLanguage } from '../../hooks/useLanguage';
 import { VariableCardDraggable } from './VariableCardDraggable';
 
 interface VariableCategorySectionDraggableProps {
@@ -24,6 +25,7 @@ function VariableCategorySectionDraggableInner({
   isExpanded,
   onToggleExpand,
 }: VariableCategorySectionDraggableProps): JSX.Element {
+  const { t } = useLanguage();
   const selectedCount = variables.filter(v => isSelected(v)).length;
 
   const {
@@ -59,7 +61,7 @@ function VariableCategorySectionDraggableInner({
           className="category-drag-handle"
           {...attributes}
           {...listeners}
-          aria-label={`Drag to reorder ${category.name} category`}
+          aria-label={t('chart.picker.dragCategory', { category: category.name })}
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
             <circle cx="5" cy="4" r="1.5" />

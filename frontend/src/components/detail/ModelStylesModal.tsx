@@ -7,11 +7,13 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useOverlay } from '../../hooks/useOverlay';
+import { useLanguage } from '../../hooks/useLanguage';
 import { useSelectedModels, useSelectedAggregations } from '../../hooks/useSelectedModels';
 import { getModelStyles, setModelStyles } from '../../utils/modelStyles';
 import { ModelStylesTab, ResetModelStyles } from './ModelStylesTab';
 
 export function ModelStylesModal({ onClose }: { onClose: () => void }): JSX.Element {
+    const { t } = useLanguage();
     const [selectedModels] = useSelectedModels();
     const [selectedAggregations] = useSelectedAggregations();
     const [localModelStyles, setLocalModelStyles] = useState(getModelStyles);
@@ -35,7 +37,7 @@ export function ModelStylesModal({ onClose }: { onClose: () => void }): JSX.Elem
         >
             <div className="command-palette chart-settings-modal model-styles-wide">
                 <div className="chart-settings-header">
-                    <h2 className="chart-settings-title">Model styles</h2>
+                    <h2 className="chart-settings-title">{t('detail.modelStyles.title')}</h2>
                 </div>
 
                 <div className="chart-settings-content">
@@ -50,7 +52,7 @@ export function ModelStylesModal({ onClose }: { onClose: () => void }): JSX.Elem
                 <div className="chart-settings-footer">
                     <ResetModelStyles onChange={setLocalModelStyles} />
                     <button type="button" className="chart-settings-btn apply" onClick={saveAndClose}>
-                        Done
+                        {t('detail.done')}
                     </button>
                 </div>
             </div>

@@ -1,5 +1,6 @@
 import { memo, useEffect, useRef } from 'react';
 import { CommandItem } from './CommandItem';
+import { useLanguage } from '../../hooks/useLanguage';
 import type { Command } from '../../types';
 
 interface CommandListProps {
@@ -15,6 +16,7 @@ export const CommandList = memo(function CommandList({
   onSelect,
   onHover,
 }: CommandListProps): JSX.Element {
+  const { t } = useLanguage();
   const selectedRef = useRef<HTMLDivElement>(null);
 
   // Scroll selected item into view
@@ -25,7 +27,7 @@ export const CommandList = memo(function CommandList({
   if (commands.length === 0) {
     return (
       <div className="command-list-empty">
-        No commands found
+        {t('command.noneFound')}
       </div>
     );
   }

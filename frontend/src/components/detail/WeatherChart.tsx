@@ -9,6 +9,8 @@ import { useState, useMemo, useEffect, type ReactNode } from 'react';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useChartTheme } from '../../hooks/useChartTheme';
 import { useFullscreenView } from '../../hooks/useFullscreenView';
+import { useLanguage } from '../../hooks/useLanguage';
+import { unitSymbol } from '../../locales';
 import { useModelStyles } from '../../hooks/useModelStyles';
 import { UPlotChart } from '../../lib/charts';
 import { setChartZoomSyncExclusion } from '../../lib/charts/chartRegistry';
@@ -60,6 +62,7 @@ export function WeatherChart({
     onCloseSettings,
     dragHandle,
 }: WeatherChartComponentProps): JSX.Element {
+    const { t, tPlural, language } = useLanguage();
     const variableConfig = getVariableConfig(variable);
 
     // Many variables come from only a few models; draw just the ones that provide this one
@@ -130,7 +133,7 @@ export function WeatherChart({
     // The same on every chart
     const modelStyles = useModelStyles();
 
-    // Build chart config (memoized for performance)
+    // Build chart config (memoized for performance); built again in a new language, for its words
     const chartConfig = useMemo(() => {
         return buildWeatherChartConfig(
             {
@@ -167,6 +170,7 @@ export function WeatherChart({
         showAccumulation,
         showOverlays,
         displayHeight,
+        language,
     ]);
 
     // Also on an empty chart, which the model picker and command palette can open it on
@@ -195,11 +199,11 @@ export function WeatherChart({
 
     // Handle no data
     if (!chartConfig || providingModels.length === 0) {
-        let emptyMessage = 'No data available';
+        let emptyMessage = t('chart.noData');
         if (isLoading) {
-            emptyMessage = 'Waiting for models...';
+            emptyMessage = t('chart.waitingForModels');
         } else if (loadedModelCount > 0) {
-            emptyMessage = `None of the models here provide ${variableConfig.label}`;
+            emptyMessage = t('chart.noModelProvides', { chart: variableConfig.label });
         }
         return (
             <div className="weather-chart weather-chart-empty">
@@ -214,7 +218,7 @@ export function WeatherChart({
                             {variableConfig.label}
                             {(unitSystem === 'metric' ? variableConfig.unit : variableConfig.unitImperial) && (
                                 <span className="weather-chart-unit">
-                                    {' '}({unitSystem === 'metric' ? variableConfig.unit : variableConfig.unitImperial})
+                                    {' '}({unitSymbol(unitSystem === 'metric' ? variableConfig.unit : variableConfig.unitImperial)})
                                 </span>
                             )}
                         </span>
@@ -255,7 +259,7 @@ export function WeatherChart({
                         {variableConfig.label}
                         {(unitSystem === 'metric' ? variableConfig.unit : variableConfig.unitImperial) && (
                             <span className="weather-chart-unit">
-                                {' '}({unitSystem === 'metric' ? variableConfig.unit : variableConfig.unitImperial})
+                                {' '}({unitSymbol(unitSystem === 'metric' ? variableConfig.unit : variableConfig.unitImperial)})
                             </span>
                         )}
                     </span>
@@ -266,7 +270,7 @@ export function WeatherChart({
                     )}
                     {providingModels.length < loadedModelCount && (
                         <span className="weather-chart-description">
-                            {providingModels.length} of {loadedModelCount} models provide this
+                            {tPlural('chart.modelsProvide', providingModels.length, { total: loadedModelCount })}
                         </span>
                     )}
                 </div>
@@ -276,7 +280,7 @@ export function WeatherChart({
                         type="button"
                         className="weather-chart-btn"
                         onClick={isFullscreen ? exitFullscreen : enterFullscreen}
-                        title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+                        title={isFullscreen ? t('chart.exitFullscreen') : t('chart.fullscreen')}
                     >
                         <svg
                             className="w-4 h-4"
@@ -307,7 +311,7 @@ export function WeatherChart({
                         type="button"
                         className="weather-chart-btn"
                         onClick={onOpenSettings}
-                        title="Chart settings"
+                        title={t('chart.settings')}
                     >
                         <svg
                             className="w-4 h-4"
@@ -334,7 +338,7 @@ export function WeatherChart({
                             type="button"
                             className="weather-chart-btn"
                             onClick={onToggleVisibility}
-                            title="Hide chart"
+                            title={t('chart.hide')}
                         >
                             <svg
                                 className="w-4 h-4"

@@ -46,6 +46,9 @@ import type { DifficultyConvention } from '../../utils/difficultyColours';
 import type { UnitSystem } from '../../utils/unitConversion';
 import { SKI_MAP_LAYERS, SKI_MAP_SOURCES, useSkiMap3D } from './SkiMap3D';
 import type { SkiMapStatus } from './skiMapFeatures';
+import type { SkiMapFeature } from '../../utils/skiMapData';
+import { formatDecimal } from '../../locales';
+import type { Translate } from '../../types/i18n';
 import {
     CUSTOM_LOCATION_DOT_HTML,
     CUSTOM_LOCATION_DOT_SIZE,
@@ -293,6 +296,18 @@ function zoomOutOverTerrain(map: MapLibreMap): void {
     }
 }
 
+/** MapLibre's words on the controls the 3D map has, which it only takes when a map is created; the parent remakes the map in a new language */
+function controlWords(t: Translate): Record<string, string> {
+    return {
+        'NavigationControl.ZoomIn': t('map.zoomIn'),
+        'NavigationControl.ZoomOut': t('map.zoomOut'),
+        'NavigationControl.ResetBearing': t('map.resetBearing'),
+        'AttributionControl.ToggleAttribution': t('map.toggleAttribution'),
+        'Popup.Close': t('map.closePopup'),
+        'Map.Title': t('map.mapTitle'),
+    };
+}
+
 export interface ResortMap3DProps {
     /** Where the camera starts, carried over from the flat map */
     initialView: MapView;
@@ -317,9 +332,9 @@ export interface ResortMap3DProps {
     rotation: MapRotation;
     tilt: MapTilt;
     onSkiMapStatusChange: (status: SkiMapStatus) => void;
-    /** What the Custom location is on, e.g. "On Peak to Creek, blue run", reported to and shown back from the parent */
+    /** What the Custom location is on, e.g. "On Peak to Creek, blue run", shown back from the parent, which is told the Run or Lift */
     customLocationOn: string | null;
-    onCustomLocationOnChange: (text: string | null) => void;
+    onCustomLocationOnChange: (feature: SkiMapFeature | null) => void;
     /** Where on the ground the mouse is, for the cursor readout, or null off the map or over the sky */
     onPointerMove?: (point: TerrainPoint | null) => void;
 }
@@ -371,7 +386,7 @@ export default function ResortMap3D({
     const onSatelliteRef = useRef(onSatellite);
     onSatelliteRef.current = onSatellite;
 
-    // Create the map once; the parent keys this component by Resort and by the drag settings
+    // Create the map once; the parent keys this component by Resort, by the drag settings and by the language
     useEffect(() => {
         const container = containerRef.current;
         if (!container) return;
@@ -386,6 +401,7 @@ export default function ResortMap3D({
             maxPitch: MAX_PITCH,
             ...mapDragOptions(rotation, tilt),
             attributionControl: { compact: true },
+            locale: controlWords(t),
         });
         setStyleReady(new Promise((resolve) => created.once('style.load', () => resolve())));
         created.addControl(new NavigationControl({ visualizePitch: true }), 'top-left');
@@ -586,7 +602,7 @@ export default function ResortMap3D({
                     value={exaggeration}
                     onChange={(event) => setExaggeration(Number(event.target.value))}
                 />
-                <span className="resort-map-exaggeration-value">{exaggeration}×</span>
+                <span className="resort-map-exaggeration-value">{Number.isInteger(exaggeration) ? exaggeration : formatDecimal(exaggeration)}×</span>
             </label>
 
             {createPortal(

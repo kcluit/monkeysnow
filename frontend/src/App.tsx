@@ -29,6 +29,7 @@ import { useLocalStorage } from './hooks/useLocalStorage';
 import { useResortFiltering } from './hooks/useResortFiltering';
 import { useTheme } from './hooks/useTheme';
 import { useFont } from './hooks/useFont';
+import { lacksLettersFor } from './types/fonts';
 import { useFullscreen, isFullscreenSupported } from './hooks/useFullscreen';
 import { useFPSCounter } from './hooks/useFPSCounter';
 import { useCommandPalette } from './hooks/useCommandPalette';
@@ -134,6 +135,7 @@ function ResortDetailRoute({
 }): JSX.Element | null {
     const { resortId: requestedId } = useParams<{ resortId: string }>();
     const navigate = useNavigate();
+    const { t } = useLanguage();
 
     // Earlier slugs and pre-OpenSkiData IDs (e.g. /resort/Big-White) redirect to the current slug
     const resortId = requestedId ? resolveResortId(requestedId) : null;
@@ -152,10 +154,10 @@ function ResortDetailRoute({
     const handleBack = useCallback(() => navigate('/'), [navigate]);
 
     usePageMeta({
-        title: displayName ? `${displayName} Snow Forecast — monkeysnow` : 'monkeysnow — ski resort snow forecasts',
+        title: displayName ? t('app.meta.resortTitle', { name: displayName }) : t('app.meta.homeTitle'),
         description: displayName
-            ? `Detailed snow forecast for ${displayName}. Multi-model weather charts, hourly snowfall estimates, temperature and wind data.`
-            : 'Real-time snow forecasts for ski resorts worldwide.',
+            ? t('app.meta.resortDescription', { name: displayName })
+            : t('app.meta.shortDescription'),
         canonical: resortId
             ? `https://monkeysnow.com/resort/${encodeURIComponent(resortId)}`
             : 'https://monkeysnow.com/',
@@ -169,7 +171,7 @@ function ResortDetailRoute({
     }
 
     return (
-        <Suspense fallback={<div className="text-center py-12 text-theme-textSecondary">Loading charts...</div>}>
+        <Suspense fallback={<div className="text-center py-12 text-theme-textSecondary">{t('app.loadingCharts')}</div>}>
             <DetailedResortView
                 resortId={resortId}
                 resortName={displayName}
@@ -209,6 +211,7 @@ function SavedLocationRoute({
     const { locationKey } = useParams<{ locationKey: string }>();
     const navigate = useNavigate();
     const { pathname, state } = useLocation();
+    const { t } = useLanguage();
     const savedLocations = useSavedLocations();
     const savedLocation = locationKey
         ? savedLocations.find((location) => location.id === savedLocationIdFromKey(locationKey))
@@ -227,8 +230,8 @@ function SavedLocationRoute({
     const handleBack = useCallback(() => navigate('/'), [navigate]);
 
     usePageMeta({
-        title: savedLocation ? `${savedLocation.name} Snow Forecast — monkeysnow` : 'monkeysnow — ski resort snow forecasts',
-        description: 'Real-time snow forecasts for ski resorts worldwide.',
+        title: savedLocation ? t('app.meta.resortTitle', { name: savedLocation.name }) : t('app.meta.homeTitle'),
+        description: t('app.meta.shortDescription'),
         canonical: 'https://monkeysnow.com/',
     });
 
@@ -238,7 +241,7 @@ function SavedLocationRoute({
     }
 
     return (
-        <Suspense fallback={<div className="text-center py-12 text-theme-textSecondary">Loading charts...</div>}>
+        <Suspense fallback={<div className="text-center py-12 text-theme-textSecondary">{t('app.loadingCharts')}</div>}>
             <DetailedResortView
                 key={savedLocation.id}
                 resortId={savedLocation.id}
@@ -276,7 +279,7 @@ function App(): JSX.Element {
     const { isRainbowEnabled, setRainbowEnabled } = useRainbowText();
     const { isHideBordersEnabled, setHideBordersEnabled } = useHideBorders();
     const { isShowDateEnabled, setShowDateEnabled } = useShowDate();
-    const { t, language, setLanguage, availableLanguages } = useLanguage();
+    const { t, tPlural, language, setLanguage, availableLanguages } = useLanguage();
     const isMobile = useIsMobile();
 
     // Hierarchy data bundled with the app (resort list, display names)
@@ -409,10 +412,10 @@ function App(): JSX.Element {
     // Resort filtering hook
     const { searchTerm, setSearchTerm, filteredResorts, sortResorts } = useResortFiltering(skiResorts, allWeatherData);
 
-    // Sort day options for the utility bars, settings and command palette
+    // Sort day options for the utility bars, settings and command palette, named in the language showing
     const sortDayData = useMemo(
         () => getSortDayData(selectedResorts, allWeatherData, processResortData, selectedElevation, isShowDateEnabled, isHistory ? historyLength : undefined),
-        [selectedResorts, allWeatherData, selectedElevation, isShowDateEnabled, isHistory, historyLength]
+        [selectedResorts, allWeatherData, selectedElevation, isShowDateEnabled, isHistory, historyLength, language]
     );
 
     // Dependencies for command palette lazy generation
@@ -451,7 +454,8 @@ function App(): JSX.Element {
         unitSystem, setUnitSystem,
         resortDisplayLimit, setResortDisplayLimit,
         openResortModalAndDismissBanner,
-        language.id, setLanguage, availableLanguages,
+        // Every command's name is in the language showing
+        language.id, t, setLanguage, availableLanguages,
     ];
 
     // Command factory for lazy generation - commands only built when palette opens
@@ -475,7 +479,7 @@ function App(): JSX.Element {
         const baseCommands: Command[] = [
             {
                 id: 'theme',
-                name: 'Theme',
+                name: t('command.theme'),
                 icon: icons.theme,
                 subCommands: availableThemes.map((t) => ({
                     id: `theme-${t.id}`,
@@ -486,29 +490,29 @@ function App(): JSX.Element {
             },
             {
                 id: 'font',
-                name: 'Font',
+                name: t('command.font'),
                 icon: icons.font,
                 subCommands: availableFonts.map((f) => ({
                     id: `font-${f.id}`,
-                    name: f.name,
+                    name: lacksLettersFor(f, language.script) ? `${f.name} · ${t('font.missingLetters')}` : f.name,
                     icon: f.isMonospace ? icons.monospace : icons.regular,
                     action: () => setFont(f.id),
                 })),
             },
             {
                 id: 'rainbow',
-                name: 'Rainbow text',
+                name: t('command.rainbowText'),
                 icon: icons.rainbow,
                 subCommands: [
                     {
                         id: 'rainbow-on',
-                        name: 'On',
+                        name: t('common.on'),
                         icon: isRainbowEnabled ? icons.check : undefined,
                         action: () => setRainbowEnabled(true),
                     },
                     {
                         id: 'rainbow-off',
-                        name: 'Off',
+                        name: t('common.off'),
                         icon: !isRainbowEnabled ? icons.check : undefined,
                         action: () => setRainbowEnabled(false),
                     },
@@ -516,18 +520,18 @@ function App(): JSX.Element {
             },
             {
                 id: 'bold-text',
-                name: 'Bold text',
+                name: t('command.boldText'),
                 icon: icons.bold,
                 subCommands: [
                     {
                         id: 'bold-text-on',
-                        name: 'On',
+                        name: t('common.on'),
                         icon: isBoldTextEnabled ? icons.check : undefined,
                         action: () => setBoldTextEnabled(true),
                     },
                     {
                         id: 'bold-text-off',
-                        name: 'Off',
+                        name: t('common.off'),
                         icon: !isBoldTextEnabled ? icons.check : undefined,
                         action: () => setBoldTextEnabled(false),
                     },
@@ -535,19 +539,19 @@ function App(): JSX.Element {
             },
             {
                 id: 'fullscreen',
-                name: 'Fullscreen',
+                name: t('command.fullscreen'),
                 icon: icons.fullscreen,
                 shortcut: 'F11',
                 subCommands: [
                     {
                         id: 'fullscreen-on',
-                        name: 'On',
+                        name: t('common.on'),
                         icon: isFullscreen ? icons.check : undefined,
                         action: enterFullscreen,
                     },
                     {
                         id: 'fullscreen-off',
-                        name: 'Off',
+                        name: t('common.off'),
                         icon: !isFullscreen ? icons.check : undefined,
                         action: exitFullscreen,
                     },
@@ -555,18 +559,18 @@ function App(): JSX.Element {
             },
             {
                 id: 'fps',
-                name: 'FPS counter',
+                name: t('command.fpsCounter'),
                 icon: icons.fps,
                 subCommands: [
                     {
                         id: 'fps-on',
-                        name: 'On',
+                        name: t('common.on'),
                         icon: isFPSEnabled ? icons.check : undefined,
                         action: () => setFPSEnabled(true),
                     },
                     {
                         id: 'fps-off',
-                        name: 'Off',
+                        name: t('common.off'),
                         icon: !isFPSEnabled ? icons.check : undefined,
                         action: () => setFPSEnabled(false),
                     },
@@ -574,18 +578,18 @@ function App(): JSX.Element {
             },
             {
                 id: 'show-borders',
-                name: 'Show borders',
+                name: t('command.showBorders'),
                 icon: icons.borders,
                 subCommands: [
                     {
                         id: 'show-borders-on',
-                        name: 'On',
+                        name: t('common.on'),
                         icon: !isHideBordersEnabled ? icons.check : undefined,
                         action: () => setHideBordersEnabled(false),
                     },
                     {
                         id: 'show-borders-off',
-                        name: 'Off',
+                        name: t('common.off'),
                         icon: isHideBordersEnabled ? icons.check : undefined,
                         action: () => setHideBordersEnabled(true),
                     },
@@ -593,18 +597,18 @@ function App(): JSX.Element {
             },
             {
                 id: 'show-date',
-                name: 'Show date',
+                name: t('command.showDate'),
                 icon: icons.date,
                 subCommands: [
                     {
                         id: 'show-date-on',
-                        name: 'On',
+                        name: t('common.on'),
                         icon: isShowDateEnabled ? icons.check : undefined,
                         action: () => setShowDateEnabled(true),
                     },
                     {
                         id: 'show-date-off',
-                        name: 'Off',
+                        name: t('common.off'),
                         icon: !isShowDateEnabled ? icons.check : undefined,
                         action: () => setShowDateEnabled(false),
                     },
@@ -612,18 +616,18 @@ function App(): JSX.Element {
             },
             {
                 id: 'chart-zoom-sync',
-                name: 'Sync charts',
+                name: t('command.syncCharts'),
                 icon: icons.link,
                 subCommands: [
                     {
                         id: 'chart-zoom-sync-on',
-                        name: 'On',
+                        name: t('common.on'),
                         icon: chartZoomSyncEnabled ? icons.check : undefined,
                         action: () => setChartZoomSyncEnabled(true),
                     },
                     {
                         id: 'chart-zoom-sync-off',
-                        name: 'Off',
+                        name: t('common.off'),
                         icon: !chartZoomSyncEnabled ? icons.check : undefined,
                         action: () => setChartZoomSyncEnabled(false),
                     },
@@ -631,24 +635,24 @@ function App(): JSX.Element {
             },
             {
                 id: 'map-rotation',
-                name: '3D map rotation',
+                name: t('command.mapRotation'),
                 icon: icons.rotate,
                 subCommands: [
                     {
                         id: 'map-rotation-linear',
-                        name: 'Linear',
+                        name: t('command.mapRotation.linear'),
                         icon: mapRotation === 'linear' ? icons.check : undefined,
                         action: () => setMapRotation('linear'),
                     },
                     {
                         id: 'map-rotation-linear-reversed',
-                        name: 'Linear reversed',
+                        name: t('command.mapRotation.linearReversed'),
                         icon: mapRotation === 'linearReversed' ? icons.check : undefined,
                         action: () => setMapRotation('linearReversed'),
                     },
                     {
                         id: 'map-rotation-orbital',
-                        name: 'Orbital',
+                        name: t('command.mapRotation.orbital'),
                         icon: mapRotation === 'orbital' ? icons.check : undefined,
                         action: () => setMapRotation('orbital'),
                     },
@@ -656,18 +660,18 @@ function App(): JSX.Element {
             },
             {
                 id: 'map-tilt',
-                name: '3D map tilt',
+                name: t('command.mapTilt'),
                 icon: icons.tilt,
                 subCommands: [
                     {
                         id: 'map-tilt-drag-up',
-                        name: 'Drag up',
+                        name: t('command.mapTilt.dragUp'),
                         icon: mapTilt === 'dragUp' ? icons.check : undefined,
                         action: () => setMapTilt('dragUp'),
                     },
                     {
                         id: 'map-tilt-drag-down',
-                        name: 'Drag down',
+                        name: t('command.mapTilt.dragDown'),
                         icon: mapTilt === 'dragDown' ? icons.check : undefined,
                         action: () => setMapTilt('dragDown'),
                     },
@@ -676,24 +680,24 @@ function App(): JSX.Element {
             ...detailedViewCommands,
             {
                 id: 'slope-bands',
-                name: 'Slope bands',
+                name: t('command.slopeBands'),
                 icon: icons.slopeBands,
                 action: openSlopeBands,
             },
             {
                 id: 'cursor-readout',
-                name: 'Cursor readout',
+                name: t('command.cursorReadout'),
                 icon: icons.cursor,
                 subCommands: [
                     {
                         id: 'cursor-readout-on',
-                        name: 'On',
+                        name: t('common.on'),
                         icon: cursorReadoutShown ? icons.check : undefined,
                         action: () => setCursorReadoutShown(true),
                     },
                     {
                         id: 'cursor-readout-off',
-                        name: 'Off',
+                        name: t('common.off'),
                         icon: !cursorReadoutShown ? icons.check : undefined,
                         action: () => setCursorReadoutShown(false),
                     },
@@ -748,7 +752,7 @@ function App(): JSX.Element {
     // Command palette hook with lazy generation
     const commandPalette = useCommandPalette(commandFactory, commandDeps);
 
-    // Load resort data
+    // Load resort data, its days and weather named in the language showing
     const loadResort = useCallback(async (resortName: string): Promise<boolean> => {
         if (!allWeatherData) return false;
 
@@ -764,7 +768,7 @@ function App(): JSX.Element {
             console.warn(`Failed to load ${resortName}:`, err);
             return false;
         }
-    }, [allWeatherData, selectedElevation, selectedTemperatureMetric, snowfallEstimateMode, unitSystem, snowCaution, getDisplayName]);
+    }, [allWeatherData, selectedElevation, selectedTemperatureMetric, snowfallEstimateMode, unitSystem, snowCaution, getDisplayName, language]);
 
     // Preview theme when selecting in command palette
     useEffect(() => {
@@ -993,6 +997,9 @@ function App(): JSX.Element {
         );
     }
 
+    // The first-visit banner's sentence, around its Select Resorts button wherever the language puts it
+    const [bannerBefore, bannerAfter = ''] = tPlural('app.banner', selectedResorts.length, { total: skiResorts.length }).split('{button}');
+
     // Home page content (resort list)
     const homeContent = (
         <>
@@ -1051,12 +1058,12 @@ function App(): JSX.Element {
             {!bannerDismissed && skiResorts.length > 0 && selectedResorts.length > 0 && (
                 <div className="flex items-center justify-between gap-3 px-4 py-2.5 mb-6 rounded-xl bg-theme-secondary border border-theme-border text-sm text-theme-textSecondary">
                     <span>
-                        Showing {selectedResorts.length} of {skiResorts.length} resorts — click <button onClick={openResortModalAndDismissBanner} className="underline text-theme-textPrimary hover:text-theme-accent transition-colors">Select Resorts</button> to add more
+                        {bannerBefore}<button onClick={openResortModalAndDismissBanner} className="underline text-theme-textPrimary hover:text-theme-accent transition-colors">{t('app.banner.selectResorts')}</button>{bannerAfter}
                     </span>
                     <button
                         onClick={() => setBannerDismissed(true)}
                         className="shrink-0 p-1 rounded-md hover:bg-theme-border transition-colors text-theme-textSecondary hover:text-theme-textPrimary"
-                        aria-label="Dismiss banner"
+                        aria-label={t('app.banner.dismiss')}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                     </button>
@@ -1064,7 +1071,7 @@ function App(): JSX.Element {
             )}
 
             <div className={viewMode === 'compact' ? "compact-grid" : "space-y-8"}>
-                <Suspense fallback={<div className="text-center py-4 text-theme-textSecondary">Loading...</div>}>
+                <Suspense fallback={<div className="text-center py-4 text-theme-textSecondary">{t('common.loading')}</div>}>
                     {viewMode === 'graph' && allWeatherData ? (
                         <GraphView
                             // Switching History opens the Graphs on their 5 days again
@@ -1099,7 +1106,7 @@ function App(): JSX.Element {
 
                 {isTruncated && (
                     <div className="text-center py-3 text-sm text-theme-textSecondary">
-                        Showing {effectiveDisplayLimit} of {selectedResorts.length} selected resorts
+                        {t('app.truncated', { shown: effectiveDisplayLimit, total: selectedResorts.length })}
                     </div>
                 )}
 
@@ -1110,7 +1117,7 @@ function App(): JSX.Element {
                         className={`w-full border-2 border-dashed border-theme-border rounded-${viewMode === 'compact' ? 'xl' : '2xl'} ${viewMode === 'compact' ? 'p-6' : 'p-8'} flex flex-col items-center justify-center gap-2 text-theme-textSecondary hover:text-theme-textPrimary hover:border-theme-textSecondary hover:bg-theme-secondary transition-all duration-200 cursor-pointer group`}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width={viewMode === 'compact' ? 24 : 32} height={viewMode === 'compact' ? 24 : 32} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-50 group-hover:opacity-100 transition-opacity"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        <span className={`${viewMode === 'compact' ? 'text-sm' : 'text-base'} font-medium`}>Add more resorts</span>
+                        <span className={`${viewMode === 'compact' ? 'text-sm' : 'text-base'} font-medium`}>{t('app.addMoreResorts')}</span>
                     </button>
                 )}
 
@@ -1213,7 +1220,7 @@ function App(): JSX.Element {
                 rel="noopener noreferrer"
                 className="absolute md:fixed top-2 right-2 text-xs text-theme-textSecondary hover:text-theme-textPrimary underline transition-colors z-10"
             >
-                Weather data by Open-Meteo.com
+                {t('app.attribution')}
             </a>
 
             {/* Command Palette */}
@@ -1252,8 +1259,8 @@ function App(): JSX.Element {
                 <Route path="/" element={
                     <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
                         <PageMeta
-                            title="monkeysnow — ski resort snow forecasts"
-                            description="Real-time snow forecasts for ski resorts worldwide. Compare powder, dry snow, wet snow and rain estimates across multiple weather models."
+                            title={t('app.meta.homeTitle')}
+                            description={t('app.meta.homeDescription')}
                             canonical="https://monkeysnow.com/"
                         />
                         <Header font={font} />
@@ -1309,8 +1316,8 @@ function App(): JSX.Element {
                 <Route path="/about" element={
                     <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
                         <PageMeta
-                            title="About — monkeysnow"
-                            description="monkeysnow is a minimalistic ski resort snow forecast app using wet-bulb snow estimation at each elevation and multi-model weather data from Open-Meteo."
+                            title={t('app.meta.aboutTitle')}
+                            description={t('app.meta.aboutDescription')}
                             canonical="https://monkeysnow.com/about"
                         />
                         <Header font={font} />
@@ -1322,8 +1329,8 @@ function App(): JSX.Element {
                 <Route path="/settings" element={
                     <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
                         <PageMeta
-                            title="Settings — monkeysnow"
-                            description="Customize monkeysnow: themes, fonts, view modes, elevation display, temperature units, and weather model preferences."
+                            title={t('app.meta.settingsTitle')}
+                            description={t('app.meta.settingsDescription')}
                             canonical="https://monkeysnow.com/settings"
                         />
                         <Header font={font} />
@@ -1335,8 +1342,8 @@ function App(): JSX.Element {
                 <Route path="/terms" element={
                     <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
                         <PageMeta
-                            title="Terms of Use — monkeysnow"
-                            description="Terms of use for monkeysnow, a free ski resort snow forecast application."
+                            title={t('app.meta.termsTitle')}
+                            description={t('app.meta.termsDescription')}
                             canonical="https://monkeysnow.com/terms"
                         />
                         <Header font={font} />
@@ -1348,8 +1355,8 @@ function App(): JSX.Element {
                 <Route path="/privacy" element={
                     <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
                         <PageMeta
-                            title="Privacy Policy — monkeysnow"
-                            description="Privacy policy for monkeysnow. We do not collect personal data."
+                            title={t('app.meta.privacyTitle')}
+                            description={t('app.meta.privacyDescription')}
                             canonical="https://monkeysnow.com/privacy"
                         />
                         <Header font={font} />
@@ -1372,13 +1379,18 @@ function App(): JSX.Element {
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
                     github
                 </a>
-                <Link to="/terms" className="flex items-center gap-1.5 opacity-40 hover:opacity-100 hover:text-theme-textPrimary transition-all">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                    terms
-                </Link>
+                {/* Named in itself, so a visitor who can't read the page still finds their language */}
+                <button
+                    onClick={() => commandPalette.openToCommand('language')}
+                    title={t('footer.language')}
+                    className="flex items-center gap-1.5 opacity-40 hover:opacity-100 hover:text-theme-textPrimary transition-all cursor-pointer"
+                >
+                    <FontAwesomeIcon icon={icons.language} style={{ width: 14, height: 14 }} />
+                    {language.nativeName.toLowerCase()}
+                </button>
                 <Link to="/privacy" className="flex items-center gap-1.5 opacity-40 hover:opacity-100 hover:text-theme-textPrimary transition-all">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    privacy
+                    {t('footer.privacy')}
                 </Link>
                 <a
                     href="https://ko-fi.com/kcluit"
@@ -1387,7 +1399,7 @@ function App(): JSX.Element {
                     className="flex items-center gap-1.5 opacity-40 hover:opacity-100 hover:text-theme-textPrimary transition-all"
                 >
                     <FontAwesomeIcon icon={icons.donate} style={{ width: 14, height: 14 }} />
-                    donate
+                    {t('footer.donate')}
                 </a>
                 <button
                     onClick={() => commandPalette.openToCommand('theme')}

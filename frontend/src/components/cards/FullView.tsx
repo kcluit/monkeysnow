@@ -1,9 +1,11 @@
 import { useRef, useState, useEffect, useLayoutEffect, useCallback, type ReactNode } from 'react';
-import { calculateSnowTotals, getSnowConditionFromQuality } from '../../utils/weather';
-import { formatSnow } from '../../utils/unitConversion';
-import { getTemperatureStyle, getWindClass, shortWeatherText, showsAmount } from './cardUtils';
+import { getSnowConditionFromQuality } from '../../utils/weather';
+import { showsRain, showsSnow } from '../../utils/unitConversion';
+import { getTemperatureStyle, getWindClass, periodName, shortWeatherText, totalsText } from './cardUtils';
 import { HistoryBadge } from './HistoryBadge';
 import { isSavedLocationId } from '../../utils/savedLocations';
+import { useLanguage } from '../../hooks/useLanguage';
+import { formatLocale } from '../../locales';
 import type { CardProps, DayForecast, Period } from '../../types';
 
 const PERIODS = ['AM', 'PM', 'Night'] as const;
@@ -48,6 +50,7 @@ function periodColumns(day: DayForecast): { period: Period; span: number }[] {
 }
 
 export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max', showDate = false, unitSystem = 'metric', onResortClick, selectedElevation = 'bot' }: CardProps): JSX.Element {
+    const { t } = useLanguage();
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
     const [canScrollRight, setCanScrollRight] = useState(false);
@@ -84,10 +87,9 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
         scrollContainerRef.current?.scrollBy({ left: direction * 204, behavior: 'smooth' });
     };
 
-    const totals = calculateSnowTotals(resort);
     // A Saved location has one elevation, whichever band is selected
     const elevationLabel = isSavedLocationId(resort.id) ? ''
-        : selectedElevation === 'bot' ? 'Base ' : selectedElevation === 'mid' ? 'Mid ' : 'Top ';
+        : `${t(selectedElevation === 'bot' ? 'band.base' : selectedElevation === 'mid' ? 'band.mid' : 'band.top')} `;
 
     const rows: Row[] = [
         {
@@ -98,9 +100,9 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
             },
         },
         {
-            label: 'Snow',
+            label: t('card.row.snow'),
             cell: period => {
-                if (!showsAmount(period.snow)) return zero;
+                if (!showsSnow(period.snowCm, unitSystem)) return zero;
                 const snowStyle = period.snowCm >= 5 ? {
                     background: 'var(--specialColor)',
                     WebkitBackgroundClip: 'text' as const,
@@ -113,37 +115,38 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
             },
         },
         {
-            label: 'Rain',
-            cell: period => showsAmount(period.rain)
+            label: t('card.row.rain'),
+            cell: period => showsRain(period.rainMm, unitSystem)
                 ? <span className="font-semibold text-theme-textSecondary">{withUnit(period.rain)}</span>
                 : zero,
         },
         {
-            label: 'Wind',
+            label: t('card.row.wind'),
             cell: period => <span className={`font-semibold ${getWindClass(period.windKmh)}`}>{withUnit(period.wind)}</span>,
         },
         {
-            label: 'Weather',
+            label: t('card.row.weather'),
             tall: true,
             cell: period => (
                 <span className="block mx-auto w-12 sm:w-16 text-[11px] sm:text-[13px] leading-tight font-medium text-theme-textSecondary line-clamp-2" title={period.condition}>
-                    {shortWeatherText(period.condition)}
+                    {shortWeatherText(period.weatherCode)}
                 </span>
             ),
         },
         {
-            label: 'Freezing level',
+            label: t('term.freezingLevel'),
             // formatFreezingLevel gives "- m" when the model has none
             cell: period => period.freezingLevel.startsWith('-')
                 ? null
                 : <span className="font-medium text-theme-textSecondary">{withUnit(period.freezingLevel)}</span>,
         },
         {
-            label: 'Snow quality',
+            label: t('term.snowQuality'),
             cell: period => {
-                if (!period.snowQuality || (!showsAmount(period.snow) && !showsAmount(period.rain))) return zero;
+                if (!period.snowQuality || (!showsSnow(period.snowCm, unitSystem) && !showsRain(period.rainMm, unitSystem))) return zero;
                 const quality = getSnowConditionFromQuality(period.snowQuality);
-                return <span className={`text-[11px] sm:text-xs font-semibold whitespace-nowrap ${quality.isHighlight ? 'special-color-text' : 'text-theme-accent'}`}>{quality.text}</span>;
+                // Wraps where it's longer than its column, as "Nieve húmeda" and "Neige humide" are
+                return <span className={`inline-block text-[11px] sm:text-xs leading-tight font-semibold ${quality.isHighlight ? 'special-color-text' : 'text-theme-accent'}`}>{quality.text}</span>;
             },
         },
     ];
@@ -165,13 +168,13 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
                         <span className="text-theme-accent font-medium">{elevationLabel}{resort.elevation}</span>
                         {' · '}{resort.model}
                         {resort.fetchedAt !== undefined && (
-                            <span title="Last updated"> · {new Date(resort.fetchedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span>
+                            <span title={t('card.lastUpdated')}> · {new Date(resort.fetchedAt).toLocaleTimeString(formatLocale(), { hour: 'numeric', minute: '2-digit' })}</span>
                         )}
                     </span>
                 </div>
                 <div className="text-xs sm:text-sm font-medium">
-                    <span className="text-theme-accent">Totals:</span>
-                    <span className="text-theme-textPrimary"> {resort.isHistory ? 'Past' : 'Next'} 3 Days: {formatSnow(totals.threeDays, unitSystem)} | {resort.isHistory ? 'Past' : 'Next'} 7 Days: {formatSnow(totals.sevenDays, unitSystem)}</span>
+                    <span className="text-theme-accent">{t('card.totals')}</span>
+                    <span className="text-theme-textPrimary"> {totalsText(resort, unitSystem)}</span>
                 </div>
             </div>
 
@@ -207,7 +210,7 @@ export function FullView({ resort, temperatureMetric: _temperatureMetric = 'max'
                             <tr>
                                 <th className={labelCell} />
                                 {resort.days.flatMap((day, dayIndex) => periodColumns(day).map(({ period, span }, index) => (
-                                    <th key={`${dayIndex}-${period.time}`} colSpan={span} style={dividerColor} className={`${PERIOD_WIDTH[span]} ${dayStart(index)} pb-1 text-[11px] sm:text-xs font-semibold text-theme-textSecondary`}>{period.time}</th>
+                                    <th key={`${dayIndex}-${period.time}`} colSpan={span} style={dividerColor} className={`${PERIOD_WIDTH[span]} ${dayStart(index)} pb-1 text-[11px] sm:text-xs font-semibold text-theme-textSecondary`}>{periodName(period.time)}</th>
                                 )))}
                             </tr>
                         </thead>

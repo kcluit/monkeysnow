@@ -6,6 +6,7 @@ import {
     faHandshake,
 } from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface SectionProps {
     title: string;
@@ -28,8 +29,13 @@ function Section({ title, icon, children }: SectionProps): JSX.Element {
 }
 
 export function TermsPage(): JSX.Element {
+    const { t, language } = useLanguage();
+    // The terms stay in English, the binding version; another language only says so, above them
     return (
-        <div className="about-page">
+        <div className="about-page" lang="en">
+            {language.id !== 'en' && (
+                <p className="about-note" lang={language.id} style={{ marginTop: 0 }}>{t('legal.termsEnglishOnly')}</p>
+            )}
             <Section title="terms of use" icon={faFileContract}>
                 <p>
                     By accessing and using monkeysnow, you agree to be bound by these terms of use.

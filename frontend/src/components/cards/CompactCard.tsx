@@ -1,11 +1,14 @@
 import { useRef, useState, useEffect, useLayoutEffect, useCallback, MouseEvent } from 'react';
 import { webcamUrls } from '../../utils/constants';
-import { calculateDayStats, formatWeatherText, getTemperatureStyle, getSnowClass, getWindClass, showsAmount } from './cardUtils';
+import { calculateDayStats, dayWeatherTexts, getTemperatureStyle, getSnowClass, getWindClass } from './cardUtils';
 import { HistoryBadge } from './HistoryBadge';
-import { formatSnow, formatWind } from '../../utils/unitConversion';
+import { formatSnow, formatWind, showsSnow } from '../../utils/unitConversion';
+import { useLanguage } from '../../hooks/useLanguage';
 import type { CardProps } from '../../types';
 
 export function CompactCard({ resort, temperatureMetric = 'max', showDate = false, unitSystem = 'metric', onResortClick }: CardProps): JSX.Element {
+    // Its days' names and weather are read in the language shown, so it is drawn again when that changes
+    useLanguage();
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [seymourClicks, setSeymourClicks] = useState(0);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -116,8 +119,7 @@ export function CompactCard({ resort, temperatureMetric = 'max', showDate = fals
                     <div className="flex gap-1.5" style={{ width: 'max-content' }}>
                         {resort.days.map((day, dayIndex) => {
                             const dayStats = calculateDayStats(day, temperatureMetric, unitSystem);
-                            const weatherText = formatWeatherText(day.periods);
-                            const snowText = formatSnow(dayStats.snow, unitSystem);
+                            const weatherTexts = dayWeatherTexts(day.periods);
                             return (
                                 <div key={dayIndex} className="w-[130px]">
                                     {/* Day Header - More compact */}
@@ -143,9 +145,9 @@ export function CompactCard({ resort, temperatureMetric = 'max', showDate = fals
                                                     </span>
                                                 );
                                             })()}
-                                            {showsAmount(snowText) ? (
+                                            {showsSnow(dayStats.snow, unitSystem) ? (
                                                 <span className={`text-xs font-bold ${getSnowClass(dayStats.snow)}`}>
-                                                    {snowText}
+                                                    {formatSnow(dayStats.snow, unitSystem)}
                                                 </span>
                                             ) : (
                                                 <span className="text-xs text-theme-textSecondary">--</span>
@@ -154,8 +156,8 @@ export function CompactCard({ resort, temperatureMetric = 'max', showDate = fals
 
                                         {/* Weather + Wind compact row */}
                                         <div className="flex items-center justify-between mt-1">
-                                            <span className="text-xs text-theme-textPrimary truncate max-w-[70px]" title={weatherText}>
-                                                {weatherText.split('/')[0].trim()}
+                                            <span className="text-xs text-theme-textPrimary truncate max-w-[70px]" title={weatherTexts.join(' / ')}>
+                                                {weatherTexts[0]}
                                             </span>
                                             <span className={`text-xs font-medium ${getWindClass(dayStats.wind)}`}>
                                                 {formatWind(dayStats.wind, unitSystem)}

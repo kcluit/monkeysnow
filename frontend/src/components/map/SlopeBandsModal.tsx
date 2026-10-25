@@ -5,10 +5,12 @@
  */
 
 import { createPortal } from 'react-dom';
+import { useLanguage } from '../../hooks/useLanguage';
 import { useOverlay } from '../../hooks/useOverlay';
 import { SlopeBandsEditor } from './SlopeBandsEditor';
 
 export function SlopeBandsModal({ onClose }: { onClose: () => void }): JSX.Element {
+    const { t } = useLanguage();
     // Lock page scroll while open; Esc closes
     useOverlay(true, onClose);
 
@@ -21,17 +23,17 @@ export function SlopeBandsModal({ onClose }: { onClose: () => void }): JSX.Eleme
         >
             <div className="command-palette chart-settings-modal">
                 <div className="chart-settings-header">
-                    <h2 className="chart-settings-title">Slope bands</h2>
+                    <h2 className="chart-settings-title">{t('map.slopeBands.title')}</h2>
                 </div>
 
                 <div className="chart-settings-content">
-                    <p className="slope-bands-intro">The ranges of steepness the Slope angle map colouring paints, and their colours, on both maps.</p>
+                    <p className="slope-bands-intro">{t('map.slopeBands.intro')}</p>
                     <SlopeBandsEditor />
                 </div>
 
                 <div className="chart-settings-footer">
                     <button type="button" className="chart-settings-btn apply" onClick={onClose}>
-                        Done
+                        {t('map.slopeBands.done')}
                     </button>
                 </div>
             </div>

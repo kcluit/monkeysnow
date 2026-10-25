@@ -7,6 +7,7 @@ import { FORECAST_HORIZONS, HISTORY_LENGTHS } from '../../utils/constants';
 import { CompactHistorySwitch } from '../HistorySwitch';
 import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
+import { useLanguage } from '../../hooks/useLanguage';
 
 export function CompactDetailUtilityBar({
     onBack,
@@ -34,6 +35,8 @@ export function CompactDetailUtilityBar({
     setCustomElevation,
     onResetCustomLocation,
 }: DetailUtilityBarProps): JSX.Element {
+    const { t } = useLanguage();
+
     // Variable selection hook for modal
     const variableSelection = useVariableSelection({
         selectedVariables,
@@ -53,9 +56,9 @@ export function CompactDetailUtilityBar({
     };
 
     const getElevationText = (): string => {
-        if (elevationSelection === 'base') return 'Base';
-        if (elevationSelection === 'mid') return 'Mid';
-        if (elevationSelection === 'top') return 'Top';
+        if (elevationSelection === 'base') return t('band.base');
+        if (elevationSelection === 'mid') return t('band.mid');
+        if (elevationSelection === 'top') return t('band.top');
         return formatElevation(elevationSelection, unitSystem);
     };
 
@@ -71,9 +74,9 @@ export function CompactDetailUtilityBar({
 
     // Model button text: Comparison models shown here / Selected models
     const getModelButtonText = (): string => {
-        const modelCount = `${shownModelCount}/${selectedModelCount}`;
-        if (aggregationCount > 0) return `Models (${modelCount}+${aggregationCount})`;
-        return `Models (${modelCount})`;
+        const counts = { shown: shownModelCount, selected: selectedModelCount };
+        if (aggregationCount > 0) return t('detail.modelsButtonWithAggregationsCompact', { ...counts, aggregations: aggregationCount });
+        return t('detail.modelsButton', counts);
     };
 
     return (
@@ -86,7 +89,7 @@ export function CompactDetailUtilityBar({
                         onClick={onBack}
                         className="compact-bar-text text-theme-textSecondary hover:text-theme-textPrimary hover:font-bold transition-colors"
                     >
-                        Back
+                        {t('detail.back')}
                     </button>
 
                     <span className="compact-bar-separator hidden sm:inline">|</span>
@@ -117,7 +120,7 @@ export function CompactDetailUtilityBar({
                         // A Custom elevation can only be typed in the large bar; here a click goes back to Ground
                         <button
                             onClick={() => setCustomElevation(null)}
-                            title="Forecast at the ground elevation again"
+                            title={t('detail.forecastAtGround')}
                             className="compact-bar-text text-theme-accent hover:text-theme-textPrimary transition-colors"
                         >
                             {formatElevation(customElevation, unitSystem)}
@@ -140,10 +143,10 @@ export function CompactDetailUtilityBar({
                     {/* Days shown - cycle */}
                     <button
                         onClick={cycleDays}
-                        title={isHistory ? 'History length' : 'Forecast horizon'}
+                        title={isHistory ? t('detail.historyLength') : t('detail.forecastHorizon')}
                         className="compact-bar-text text-theme-textSecondary hover:text-theme-accent transition-colors"
                     >
-                        {days}d
+                        {t('detail.daysShort', { count: days })}
                     </button>
 
                     <span className="compact-bar-separator hidden sm:inline">|</span>
@@ -153,7 +156,7 @@ export function CompactDetailUtilityBar({
                         onClick={variableSelection.openModal}
                         className="compact-bar-text text-theme-textSecondary hover:text-theme-textPrimary hover:font-bold transition-colors"
                     >
-                        Charts ({selectedVariables.length})
+                        {t('detail.charts', { count: selectedVariables.length })}
                     </button>
 
                     <span className="compact-bar-separator hidden sm:inline">|</span>
@@ -174,7 +177,7 @@ export function CompactDetailUtilityBar({
                                 onClick={onResetCustomLocation}
                                 className="compact-bar-text text-red-500 hover:text-red-400 transition-colors"
                             >
-                                Reset Location
+                                {t('detail.resetLocation')}
                             </button>
                         </>
                     )}

@@ -2,6 +2,8 @@ import { memo, useCallback } from 'react';
 import type { VariableCategory } from '../../data/variableCategories';
 import type { WeatherVariable } from '../../types/openMeteo';
 import { VARIABLE_CONFIGS } from '../../utils/chartConfigurations';
+import { useLanguage } from '../../hooks/useLanguage';
+import { unitSymbol } from '../../locales';
 
 interface VariableCategorySectionProps {
   category: VariableCategory;
@@ -20,6 +22,8 @@ function VariableCategorySectionInner({
   isExpanded,
   onToggleExpand,
 }: VariableCategorySectionProps): JSX.Element {
+  // Redraws this memoized section in a new language, as its names are read here
+  useLanguage();
   const selectedCount = variables.filter(v => isSelected(v)).length;
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
@@ -71,7 +75,7 @@ function VariableCategorySectionInner({
                   {config?.label || variable}
                 </span>
                 {config?.unit && (
-                  <span className="variable-card-unit">{config.unit}</span>
+                  <span className="variable-card-unit">{unitSymbol(config.unit)}</span>
                 )}
               </label>
             );

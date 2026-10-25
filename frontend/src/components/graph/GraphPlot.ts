@@ -3,7 +3,8 @@
  * axis, the temperature on the right, and the Freezing level, which has no axis of its
  * own, read against dashed lines at the heights being forecast. Night is shaded, local
  * midnights and the current hour are marked, and it zooms, pans and is pointed at
- * together with every other Graph on the page through a GraphSync.
+ * together with every other Graph on the page through a GraphSync. Its words are in the
+ * language of its `t`, so a change of language builds it again.
  */
 
 import uPlot from 'uplot';
@@ -12,12 +13,15 @@ import { createTouchPlugin, createZoomPlugin, type XRange } from '../../lib/char
 import { chartTextFill } from '../../lib/charts/theme';
 import { colorWithOpacity } from '../../lib/charts/utils/colorUtils';
 import type { ChartTheme } from '../../lib/charts';
+import { formatDecimal, unitSymbol, withUnit } from '../../locales';
 import { SNOW_QUALITIES } from '../../utils/snowQuality';
 import { SNOW_QUALITY_COLOURS, SNOW_QUALITY_NAMES } from '../../utils/snowQualityColours';
-import { precipitationFloor, type GraphData } from './graphData';
+import { getWeatherDescription, getWeatherEmoji } from '../../utils/weather';
+import { precipitationFloor, type CompassPoint, type GraphData } from './graphData';
 import type { GraphTimeAxis } from './graphTimeAxis';
 import type { GraphSync, SyncedGraph } from './graphSync';
-import type { UnitSystem } from '../../types';
+import type { ElevationLevel, UnitSystem } from '../../types';
+import type { Translate, TranslationKey } from '../../types/i18n';
 
 export const TEMPERATURE_COLOUR = '#f2643a';
 /** Of the theme's secondary text colour, which night is shaded in */
@@ -40,7 +44,16 @@ export interface GraphPlotOptions {
     /** Of the plot alone, without the time axis */
     plotHeight: number;
     sync: GraphSync;
+    /** The language shown's t(), which the labels and the tooltip are written with */
+    t: Translate;
 }
+
+const BAND_NAMES: Record<ElevationLevel, TranslationKey> = { bot: 'band.base', mid: 'band.mid', top: 'band.top' };
+
+const WIND_FROM: Record<CompassPoint, TranslationKey> = {
+    n: 'graph.windFrom.n', ne: 'graph.windFrom.ne', e: 'graph.windFrom.e', se: 'graph.windFrom.se',
+    s: 'graph.windFrom.s', sw: 'graph.windFrom.sw', w: 'graph.windFrom.w', nw: 'graph.windFrom.nw',
+};
 
 const escapeHtml = (text: string) => text.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
@@ -84,7 +97,7 @@ export class GraphPlot implements SyncedGraph {
     }
 
     private buildOptions(width: number, plotHeight: number): uPlot.Options {
-        const { data, axis, theme, units } = this.options;
+        const { data, axis, theme, units, t } = this.options;
         const labelFill: uPlot.Axis.Stroke = (u) => chartTextFill(u.ctx, theme, theme.textSecondary);
         const floor = precipitationFloor(units);
         const heights = data.heightLines.map((line) => line.height);
@@ -101,8 +114,8 @@ export class GraphPlot implements SyncedGraph {
                 paths: bars,
                 points: { show: false },
             })),
-            { label: 'Temperature', scale: 'temperature', stroke: TEMPERATURE_COLOUR, width: 2, points: { show: false } },
-            { label: 'Freezing level', scale: 'freezingLevel', stroke: theme.textSecondary, width: 1.25, points: { show: false } },
+            { label: t('graph.temperature'), scale: 'temperature', stroke: TEMPERATURE_COLOUR, width: 2, points: { show: false } },
+            { label: t('graph.freezingLevel'), scale: 'freezingLevel', stroke: theme.textSecondary, width: 1.25, points: { show: false } },
         ];
 
         return {
@@ -150,7 +163,7 @@ export class GraphPlot implements SyncedGraph {
                     gap: 4,
                     grid: { show: true, stroke: theme.gridColor, width: 1 },
                     ticks: { show: false },
-                    values: (_u, values) => values.map((v) => (Number.isInteger(v) ? String(v) : v.toFixed(1))),
+                    values: (_u, values) => values.map((v) => (Number.isInteger(v) ? String(v) : formatDecimal(v, 1))),
                 },
                 {
                     scale: 'temperature',
@@ -194,9 +207,15 @@ export class GraphPlot implements SyncedGraph {
 
     /** Night, midnights, the heights being forecast, 0 °C, the current hour, the tooltip and the hairline */
     private marksPlugin(): uPlot.Plugin {
-        const { data, axis, nights, theme } = this.options;
+        const { data, axis, nights, theme, units, t } = this.options;
         // Darker on light themes and lighter on dark ones, so it shows on every theme
         const nightFill = colorWithOpacity(theme.textSecondary, NIGHT_OPACITY);
+        // "Base 1500 m", or a Saved location's height alone
+        const unit = units === 'imperial' ? 'ft' : 'm';
+        const heightLines = data.heightLines.map((line) => ({
+            ...line,
+            label: `${line.band ? `${t(BAND_NAMES[line.band])} ` : ''}${withUnit(line.height, unit)}`,
+        }));
 
         const verticalLine = (u: uPlot, t: number, stroke: string, width: number) => {
             const x = Math.round(u.valToPos(t, 'x', true)) + 0.5;
@@ -298,7 +317,7 @@ export class GraphPlot implements SyncedGraph {
                         ctx.lineWidth = 3 * px;
                         ctx.strokeStyle = theme.tooltipBg;
                         let previous: { y: number; right: number } | null = null;
-                        const fromBottom = [...data.heightLines].sort((a, b) => a.height - b.height);
+                        const fromBottom = [...heightLines].sort((a, b) => a.height - b.height);
                         for (const line of fromBottom) {
                             const y = heightLineY(u, line.height) - 2 * px;
                             ctx.font = `${line.picked ? 'bold ' : ''}${LABEL_SIZE * px}px system-ui, -apple-system, sans-serif`;
@@ -338,16 +357,17 @@ export class GraphPlot implements SyncedGraph {
     }
 
     private showTooltip(idx: number, left: number, top: number): void {
-        const { data, axis, units } = this.options;
+        const { data, axis, units, t } = this.options;
         const imperial = units === 'imperial';
         const quality = data.qualities[idx];
         const amount = data.amounts[idx];
 
-        let precipitation = 'No precipitation';
+        let precipitation = escapeHtml(t('graph.noPrecipitation'));
         if (quality) {
-            const unit = data.isSnow[idx] ? (imperial ? 'in' : 'cm') : imperial ? 'in' : 'mm';
+            const unit = unitSymbol(data.isSnow[idx] ? (imperial ? 'in' : 'cm') : imperial ? 'in' : 'mm');
             const digits = imperial && !data.isSnow[idx] ? 2 : 1;
-            precipitation = `<span style="color:${SNOW_QUALITY_COLOURS[quality]}">■</span> ${amount.toFixed(digits)} ${unit} ${SNOW_QUALITY_NAMES[quality]}`;
+            const words = t('graph.precipitationAmount', { amount: formatDecimal(amount, digits), unit, quality: SNOW_QUALITY_NAMES[quality] });
+            precipitation = `<span style="color:${SNOW_QUALITY_COLOURS[quality]}">■</span> ${escapeHtml(words)}`;
         }
         const temperature = data.temperature[idx];
         const freezing = data.freezingLevel[idx];
@@ -356,11 +376,11 @@ export class GraphPlot implements SyncedGraph {
         const windFrom = data.windFrom[idx];
         const rows = [
             `<strong>${escapeHtml(axis.hourBefore(data.times[idx]))}</strong>`,
-            weather ? `${weather.emoji} ${escapeHtml(weather.text)}` : '',
+            weather === null ? '' : `${getWeatherEmoji(weather)} ${escapeHtml(getWeatherDescription(weather))}`,
             precipitation,
-            temperature === null ? '' : `<span style="color:${TEMPERATURE_COLOUR}">●</span> Temperature ${Math.round(temperature)} °${imperial ? 'F' : 'C'}`,
-            windSpeed === null ? '' : `Wind ${Math.round(windSpeed)} ${imperial ? 'mph' : 'km/h'}${windFrom ? ` ${windFrom}` : ''}`,
-            freezing === null ? '' : `Freezing level ${Math.round(freezing)} ${imperial ? 'ft' : 'm'}`,
+            temperature === null ? '' : `<span style="color:${TEMPERATURE_COLOUR}">●</span> ${escapeHtml(t('graph.temperature'))} ${Math.round(temperature)} °${imperial ? 'F' : 'C'}`,
+            windSpeed === null ? '' : `${escapeHtml(t('graph.wind'))} ${withUnit(Math.round(windSpeed), imperial ? 'mph' : 'km/h')}${windFrom ? ` ${t(WIND_FROM[windFrom])}` : ''}`,
+            freezing === null ? '' : `${escapeHtml(t('graph.freezingLevel'))} ${withUnit(Math.round(freezing), imperial ? 'ft' : 'm')}`,
         ];
         this.tooltip.innerHTML = rows.filter(Boolean).map((row) => `<div>${row}</div>`).join('');
         this.tooltip.style.display = 'block';

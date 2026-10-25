@@ -11,6 +11,8 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useOverlay } from '../../hooks/useOverlay';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { useLanguage } from '../../hooks/useLanguage';
+import type { TranslationKey } from '../../types/i18n';
 import type { AggregationType, WeatherModel, WeatherVariable } from '../../types/openMeteo';
 import type { ChartDisplayType, ChartSettingsTab } from '../../types/chartSettings';
 import type { ModelAvailabilityContext } from '../../types/detailView';
@@ -50,12 +52,12 @@ interface ChartSettingsModalProps {
     onChartWidthChange: (width: number) => void;
 }
 
-const CHART_TYPES: { type: ChartDisplayType; label: string; icon: IconDefinition; requiresMultipleModels?: boolean }[] = [
-    { type: 'line', label: 'Line', icon: icons.lineChart },
-    { type: 'bar', label: 'Bar', icon: icons.barChart },
-    { type: 'area', label: 'Area', icon: icons.areaChart },
-    { type: 'boxwhisker', label: 'Box & Whisker', icon: icons.boxChart, requiresMultipleModels: true },
-    { type: 'heatmap', label: 'Heatmap', icon: icons.heatmap, requiresMultipleModels: true },
+const CHART_TYPES: { type: ChartDisplayType; label: TranslationKey; icon: IconDefinition; requiresMultipleModels?: boolean }[] = [
+    { type: 'line', label: 'detail.chartSettings.line', icon: icons.lineChart },
+    { type: 'bar', label: 'detail.chartSettings.bar', icon: icons.barChart },
+    { type: 'area', label: 'detail.chartSettings.area', icon: icons.areaChart },
+    { type: 'boxwhisker', label: 'detail.chartSettings.boxWhisker', icon: icons.boxChart, requiresMultipleModels: true },
+    { type: 'heatmap', label: 'detail.chartSettings.heatmap', icon: icons.heatmap, requiresMultipleModels: true },
 ];
 
 // Dimension constraints
@@ -84,6 +86,7 @@ export function ChartSettingsModal({
     chartWidth,
     onChartWidthChange,
 }: ChartSettingsModalProps): JSX.Element {
+    const { t } = useLanguage();
     // The tab last chosen, on every chart's gear
     const [lastTab, setLastTab] = useLocalStorage<ChartSettingsTab>('chartSettingsTab', 'chart');
     const [tab, setTab] = useState<ChartSettingsTab>(initialTab ?? lastTab);
@@ -155,8 +158,8 @@ export function ChartSettingsModal({
                             className={`chart-settings-tab ${tab === 'models' ? 'selected' : ''}`}
                             onClick={() => selectTab('models')}
                         >
-                            <span className="chart-settings-tab-label">Model styles</span>
-                            <span className="chart-settings-tab-hint">all charts</span>
+                            <span className="chart-settings-tab-label">{t('detail.modelStyles.title')}</span>
+                            <span className="chart-settings-tab-hint">{t('detail.chartSettings.modelStylesHint')}</span>
                         </button>
                     </div>
                 </div>
@@ -175,7 +178,7 @@ export function ChartSettingsModal({
                         <>
                             {/* Chart Type Section */}
                             <div className="chart-settings-section">
-                                <h3 className="chart-settings-section-title">Chart Type</h3>
+                                <h3 className="chart-settings-section-title">{t('detail.chartSettings.chartType')}</h3>
                                 <div className="chart-type-options">
                                     {CHART_TYPES.map(({ type, label, icon }) => (
                                         <button
@@ -185,7 +188,7 @@ export function ChartSettingsModal({
                                             onClick={() => setLocalChartType(type)}
                                         >
                                             <span className="chart-type-icon"><Icon icon={icon} /></span>
-                                            <span className="chart-type-label">{label}</span>
+                                            <span className="chart-type-label">{t(label)}</span>
                                         </button>
                                     ))}
                                 </div>
@@ -194,7 +197,7 @@ export function ChartSettingsModal({
                             {/* Accumulation Option (for precip variables) */}
                             {hasAccumulation && (
                                 <div className="chart-settings-section">
-                                    <h3 className="chart-settings-section-title">Accumulation Overlay</h3>
+                                    <h3 className="chart-settings-section-title">{t('detail.chartSettings.accumulation')}</h3>
                                     <label className="chart-settings-toggle">
                                         <input
                                             type="checkbox"
@@ -202,10 +205,10 @@ export function ChartSettingsModal({
                                             onChange={(e) => setLocalShowAccumulation(e.target.checked)}
                                         />
                                         <span className="chart-settings-toggle-label">
-                                            Show accumulation graph overlay
+                                            {t('detail.chartSettings.showAccumulation')}
                                         </span>
                                         <span className="chart-settings-toggle-desc">
-                                            Each model's running total on the right axis, with any Aggregations you've ticked
+                                            {t('detail.chartSettings.accumulationDescription')}
                                         </span>
                                     </label>
                                 </div>
@@ -214,7 +217,7 @@ export function ChartSettingsModal({
                             {/* Multi-Level Overlay Option (for wind/soil variables) */}
                             {hasOverlayLevels && overlayConfig && (
                                 <div className="chart-settings-section">
-                                    <h3 className="chart-settings-section-title">Multi-Level Overlay</h3>
+                                    <h3 className="chart-settings-section-title">{t('detail.chartSettings.overlays')}</h3>
                                     <label className="chart-settings-toggle">
                                         <input
                                             type="checkbox"
@@ -222,10 +225,13 @@ export function ChartSettingsModal({
                                             onChange={(e) => setLocalShowOverlays(e.target.checked)}
                                         />
                                         <span className="chart-settings-toggle-label">
-                                            Show {overlayConfig.description}
+                                            {t('detail.chartSettings.showOverlays', { levels: overlayConfig.description })}
                                         </span>
                                         <span className="chart-settings-toggle-desc">
-                                            Displays {overlayConfig.overlays.length} additional {overlayConfig.description} on the chart
+                                            {t('detail.chartSettings.overlaysDescription', {
+                                                count: overlayConfig.overlays.length,
+                                                levels: overlayConfig.description,
+                                            })}
                                         </span>
                                     </label>
                                     {localShowOverlays && (
@@ -246,7 +252,7 @@ export function ChartSettingsModal({
 
                             {/* Sync Option */}
                             <div className="chart-settings-section">
-                                <h3 className="chart-settings-section-title">Sync</h3>
+                                <h3 className="chart-settings-section-title">{t('detail.chartSettings.sync')}</h3>
                                 <label className="chart-settings-toggle">
                                     <input
                                         type="checkbox"
@@ -254,23 +260,25 @@ export function ChartSettingsModal({
                                         onChange={(e) => setLocalZoomSyncExcluded(!e.target.checked)}
                                     />
                                     <span className="chart-settings-toggle-label">
-                                        Sync zoom and held line with other charts
+                                        {t('detail.chartSettings.syncZoom')}
                                     </span>
                                     <span className="chart-settings-toggle-desc">
-                                        When enabled, zooming this chart or holding a line on it does the same on other charts
+                                        {t('detail.chartSettings.syncDescription')}
                                     </span>
                                 </label>
                             </div>
 
                             {/* Dimensions Section */}
                             <div className="chart-settings-section">
-                                <h3 className="chart-settings-section-title">Dimensions</h3>
+                                <h3 className="chart-settings-section-title">{t('detail.chartSettings.dimensions')}</h3>
 
                                 {/* Height Slider */}
                                 <div className="chart-settings-slider">
                                     <label className="chart-settings-slider-label">
-                                        <span>Height</span>
-                                        <span className="chart-settings-slider-value">{localChartHeight}px</span>
+                                        <span>{t('detail.chartSettings.height')}</span>
+                                        <span className="chart-settings-slider-value">
+                                            {t('detail.chartSettings.pixels', { value: localChartHeight })}
+                                        </span>
                                     </label>
                                     <input
                                         type="range"
@@ -286,8 +294,8 @@ export function ChartSettingsModal({
                                 {/* Width Slider */}
                                 <div className="chart-settings-slider">
                                     <label className="chart-settings-slider-label">
-                                        <span>Width (fullscreen)</span>
-                                        <span className="chart-settings-slider-value">{localChartWidth}%</span>
+                                        <span>{t('detail.chartSettings.width')}</span>
+                                        <span className="chart-settings-slider-value">{t('detail.percent', { value: localChartWidth })}</span>
                                     </label>
                                     <input
                                         type="range"
@@ -299,7 +307,7 @@ export function ChartSettingsModal({
                                         className="chart-settings-range"
                                     />
                                     <span className="chart-settings-slider-desc">
-                                        Width only applies when chart is in fullscreen mode
+                                        {t('detail.chartSettings.widthDescription')}
                                     </span>
                                 </div>
                             </div>
@@ -315,7 +323,7 @@ export function ChartSettingsModal({
                         className="chart-settings-btn apply"
                         onClick={saveAndClose}
                     >
-                        Done
+                        {t('detail.done')}
                     </button>
                 </div>
             </div>
