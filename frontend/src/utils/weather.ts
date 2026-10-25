@@ -10,7 +10,9 @@ import type {
     DayData,
     TemperatureMetric,
     SnowfallEstimateMode,
+    SnowCaution,
     SnowQuality,
+    PeriodEstimate,
     UnitSystem
 } from '../types';
 import {
@@ -22,16 +24,20 @@ import {
     formatFreezingLevel
 } from './unitConversion';
 import { forecastModelOf } from './resortForecast';
-import { addPrecipitation, dominantQuality, noPrecipitationByQuality, sumPrecipitationByQuality } from './snowQuality';
+import { DEFAULT_SNOW_CAUTION, addPrecipitation, dominantQuality, noPrecipitationByQuality, sumPrecipitationByQuality } from './snowQuality';
 import { getModelInfo } from '../data/modelHierarchy';
+
+/** The Snowfall estimate a visitor starts with: the monkeysnow estimate */
+export const DEFAULT_SNOWFALL_ESTIMATE_MODE: SnowfallEstimateMode = 'totalPrecip';
 
 export function processResortData(
     allData: AllWeatherData,
     resortName: string,
     elevation: ElevationLevel = 'bot',
     temperatureMetric: TemperatureMetric = 'max',
-    snowfallEstimateMode: SnowfallEstimateMode = 'model',
-    unitSystem: UnitSystem = 'metric'
+    snowfallEstimateMode: SnowfallEstimateMode = DEFAULT_SNOWFALL_ESTIMATE_MODE,
+    unitSystem: UnitSystem = 'metric',
+    snowCaution: SnowCaution = DEFAULT_SNOW_CAUTION
 ): ProcessedResortData | null {
     try {
         if (!allData || !allData.data) {
@@ -68,12 +74,12 @@ export function processResortData(
             const dateDisplay = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
 
             // Create periods from AM/PM/NIGHT data
-            const periods = createPeriodsFromDayData(dayData, temperatureMetric, snowfallEstimateMode, unitSystem);
+            const periods = createPeriodsFromDayData(dayData, temperatureMetric, snowfallEstimateMode, unitSystem, snowCaution);
 
             // Skip days with no meaningful forecast data (API returned zeros beyond model range)
             if (periods.length === 0 || periods.every(p => p.tempMax === 0 && p.tempMin === 0 && p.tempAvg === 0 && p.tempMedian === 0)) continue;
 
-            const snowCondition = getSnowConditionFromQuality(dayQualityOf(dayData, periods, snowfallEstimateMode));
+            const snowCondition = getSnowConditionFromQuality(dayQualityOf(dayData, periods, snowfallEstimateMode, snowCaution));
 
             // Get the highest freezing level from all periods
             const freezingLevels = [
@@ -119,7 +125,7 @@ export function processResortData(
     }
 }
 
-function createPeriodsFromDayData(dayData: DayData, temperatureMetric: TemperatureMetric, snowfallEstimateMode: SnowfallEstimateMode, unitSystem: UnitSystem): Period[] {
+function createPeriodsFromDayData(dayData: DayData, temperatureMetric: TemperatureMetric, snowfallEstimateMode: SnowfallEstimateMode, unitSystem: UnitSystem, snowCaution: SnowCaution): Period[] {
     const periods: Period[] = [];
 
     const periodOrder: Array<{ key: keyof DayData; label: string }> = [
@@ -131,7 +137,7 @@ function createPeriodsFromDayData(dayData: DayData, temperatureMetric: Temperatu
     for (const { key, label } of periodOrder) {
         const periodData = dayData[key];
         if (periodData) {
-            periods.push(createPeriodFromData(periodData, label, temperatureMetric, snowfallEstimateMode, unitSystem));
+            periods.push(createPeriodFromData(periodData, label, temperatureMetric, snowfallEstimateMode, unitSystem, snowCaution));
         }
     }
 
@@ -153,7 +159,7 @@ function getTemperatureByMetric(data: PeriodData, metric: TemperatureMetric): nu
     }
 }
 
-function createPeriodFromData(data: PeriodData, label: string, temperatureMetric: TemperatureMetric, snowfallEstimateMode: SnowfallEstimateMode, unitSystem: UnitSystem): Period {
+function createPeriodFromData(data: PeriodData, label: string, temperatureMetric: TemperatureMetric, snowfallEstimateMode: SnowfallEstimateMode, unitSystem: UnitSystem, snowCaution: SnowCaution): Period {
     const displayTemp = getTemperatureByMetric(data, temperatureMetric);
     // Determine rounding mode based on metric
     const roundingMode = temperatureMetric === 'max' ? 'ceil' as const
@@ -161,7 +167,8 @@ function createPeriodFromData(data: PeriodData, label: string, temperatureMetric
             : 'round' as const;
 
     // A Period with no precipitation has no Snow quality and shows zeros for both
-    const snowQuality = data.snow_quality ?? null;
+    const estimate = periodEstimateOf(data, snowCaution);
+    const snowQuality = estimate.snow_quality;
     let snowValue = 0;
     let rainValue = 0;
     if (snowQuality !== null) {
@@ -172,8 +179,8 @@ function createPeriodFromData(data: PeriodData, label: string, temperatureMetric
             else rainValue = data.precipitation_total ?? 0;
         } else {
             // The monkeysnow estimate: the Period's precipitation split by each hour's wet bulb, so a Sleet/Mix Period shows both
-            snowValue = data.snowfall_estimate ?? 0;
-            rainValue = data.rain_estimate ?? 0;
+            snowValue = estimate.snowfall_estimate;
+            rainValue = estimate.rain_estimate;
         }
     }
 
@@ -272,12 +279,23 @@ export function getSnowConditionFromQuality(quality: SnowQuality | null): SnowCo
     }
 }
 
-/** A Period's precipitation by Snow quality; one cached before it was kept counts all of its precipitation under its label. */
-function precipitationByQualityOf(data: PeriodData): number[] {
-    if (data.precipitation_by_quality) return data.precipitation_by_quality;
-    const byQuality = noPrecipitationByQuality();
-    if (data.snow_quality) addPrecipitation(byQuality, data.snow_quality, data.precipitation_total ?? 0);
-    return byQuality;
+/**
+ * A Period's estimate under a Snow caution. One cached under an earlier SNOW_ESTIMATE_VERSION has
+ * only Cautious's, shown under every caution until it is refetched; one cached before the tally by
+ * Snow quality was kept counts all of its precipitation under its label.
+ */
+function periodEstimateOf(data: PeriodData, snowCaution: SnowCaution): PeriodEstimate {
+    const estimate = data.estimates?.[snowCaution];
+    if (estimate) return estimate;
+    const snowQuality = data.snow_quality ?? null;
+    const byQuality = data.precipitation_by_quality ?? noPrecipitationByQuality();
+    if (!data.precipitation_by_quality && snowQuality) addPrecipitation(byQuality, snowQuality, data.precipitation_total ?? 0);
+    return {
+        snowfall_estimate: data.snowfall_estimate ?? 0,
+        rain_estimate: data.rain_estimate ?? 0,
+        precipitation_by_quality: byQuality,
+        snow_quality: snowQuality,
+    };
 }
 
 /**
@@ -286,10 +304,10 @@ function precipitationByQualityOf(data: PeriodData): number[] {
  * Periods all show nothing has none, and in Model mode a Rain day the model gives snow for
  * is a mix, as a Period is.
  */
-function dayQualityOf(dayData: DayData, periods: Period[], snowfallEstimateMode: SnowfallEstimateMode): SnowQuality | null {
+function dayQualityOf(dayData: DayData, periods: Period[], snowfallEstimateMode: SnowfallEstimateMode, snowCaution: SnowCaution): SnowQuality | null {
     if (!periods.some(p => parseFloat(p.snow) > 0 || parseFloat(p.rain) > 0)) return null;
     const byQuality = sumPrecipitationByQuality(
-        [dayData.AM, dayData.PM, dayData.NIGHT].map(data => data ? precipitationByQualityOf(data) : undefined)
+        [dayData.AM, dayData.PM, dayData.NIGHT].map(data => data ? periodEstimateOf(data, snowCaution).precipitation_by_quality : undefined)
     );
     const quality = dominantQuality(byQuality);
     if (snowfallEstimateMode === 'model' && quality === 'rain' && periods.some(p => p.snowCm > 0)) return 'sleet/mix';

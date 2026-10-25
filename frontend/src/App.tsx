@@ -55,7 +55,8 @@ import { SlopeBandsModal } from './components/map/SlopeBandsModal';
 import { useIsMobile } from './hooks/useIsMobile';
 import { useLanguage } from './hooks/useLanguage';
 import { useHierarchy } from './contexts/HierarchyContext';
-import { processResortData } from './utils/weather';
+import { DEFAULT_SNOWFALL_ESTIMATE_MODE, processResortData } from './utils/weather';
+import { DEFAULT_SNOW_CAUTION } from './utils/snowQuality';
 import { generateControlCommands, generateDetailedViewCommands } from './utils/commandGenerators';
 import { icons } from './constants/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -93,6 +94,7 @@ import type {
     ViewMode,
     TemperatureMetric,
     SnowfallEstimateMode,
+    SnowCaution,
     UtilityBarStyle,
     ResortDisplayLimit,
 } from './types';
@@ -343,7 +345,8 @@ function App(): JSX.Element {
 
     // Local component state
     const [selectedTemperatureMetric, setSelectedTemperatureMetric] = useLocalStorage<TemperatureMetric>('temperatureMetric', defaultTemperatureMetric);
-    const [snowfallEstimateMode, setSnowfallEstimateMode] = useLocalStorage<SnowfallEstimateMode>('snowfallEstimateMode', 'model');
+    const [snowfallEstimateMode, setSnowfallEstimateMode] = useLocalStorage<SnowfallEstimateMode>('snowfallEstimateMode', DEFAULT_SNOWFALL_ESTIMATE_MODE);
+    const [snowCaution, setSnowCaution] = useLocalStorage<SnowCaution>('snowCaution', DEFAULT_SNOW_CAUTION);
     const [chartZoomSyncEnabled, setChartZoomSyncEnabled] = useLocalStorage<boolean>('chartZoomSync', true);
     const [mapRotation, setMapRotation] = useLocalStorage<MapRotation>(MAP_ROTATION_STORAGE_KEY, DEFAULT_MAP_ROTATION);
     const [mapTilt, setMapTilt] = useLocalStorage<MapTilt>(MAP_TILT_STORAGE_KEY, DEFAULT_MAP_TILT);
@@ -441,6 +444,7 @@ function App(): JSX.Element {
         isHistory, historyLength, setHistoryLength,
         selectedTemperatureMetric, setSelectedTemperatureMetric,
         snowfallEstimateMode, setSnowfallEstimateMode,
+        snowCaution, setSnowCaution,
         openCardModels,
         showUtilityBar, setShowUtilityBar,
         utilityBarStyle, setUtilityBarStyle,
@@ -718,6 +722,8 @@ function App(): JSX.Element {
             setSelectedTemperatureMetric,
             snowfallEstimateMode,
             setSnowfallEstimateMode,
+            snowCaution,
+            setSnowCaution,
             openCardModels,
             showUtilityBar,
             setShowUtilityBar,
@@ -747,7 +753,7 @@ function App(): JSX.Element {
         if (!allWeatherData) return false;
 
         try {
-            const data = processResortData(allWeatherData, resortName, selectedElevation, selectedTemperatureMetric, snowfallEstimateMode, unitSystem);
+            const data = processResortData(allWeatherData, resortName, selectedElevation, selectedTemperatureMetric, snowfallEstimateMode, unitSystem, snowCaution);
 
             if (data) {
                 data.name = getDisplayName(resortName);
@@ -758,7 +764,7 @@ function App(): JSX.Element {
             console.warn(`Failed to load ${resortName}:`, err);
             return false;
         }
-    }, [allWeatherData, selectedElevation, selectedTemperatureMetric, snowfallEstimateMode, unitSystem, getDisplayName]);
+    }, [allWeatherData, selectedElevation, selectedTemperatureMetric, snowfallEstimateMode, unitSystem, snowCaution, getDisplayName]);
 
     // Preview theme when selecting in command palette
     useEffect(() => {
@@ -832,7 +838,8 @@ function App(): JSX.Element {
                 isReversed,
                 selectedTemperatureMetric,
                 snowfallEstimateMode,
-                unitSystem
+                unitSystem,
+                snowCaution
             );
 
             // Clear existing data
@@ -860,6 +867,7 @@ function App(): JSX.Element {
         selectedTemperatureMetric,
         snowfallEstimateMode,
         unitSystem,
+        snowCaution,
         sortResorts,
         loadResort,
         createLoadingController
@@ -931,7 +939,8 @@ function App(): JSX.Element {
             isReversed,
             selectedTemperatureMetric,
             snowfallEstimateMode,
-            unitSystem
+            unitSystem,
+            snowCaution
         );
 
         const processed = sortedResorts
@@ -952,6 +961,7 @@ function App(): JSX.Element {
         selectedTemperatureMetric,
         snowfallEstimateMode,
         unitSystem,
+        snowCaution,
         resortData,
         sortResorts,
         effectiveDisplayLimit
@@ -1063,6 +1073,7 @@ function App(): JSX.Element {
                             allWeatherData={allWeatherData}
                             elevation={selectedElevation}
                             snowfallMode={snowfallEstimateMode}
+                            snowCaution={snowCaution}
                             units={unitSystem}
                             onResortClick={handleResortClick}
                         />
@@ -1175,6 +1186,8 @@ function App(): JSX.Element {
         setSelectedTemperatureMetric,
         snowfallEstimateMode,
         setSnowfallEstimateMode,
+        snowCaution,
+        setSnowCaution,
         openCardModels,
         showUtilityBar,
         setShowUtilityBar,

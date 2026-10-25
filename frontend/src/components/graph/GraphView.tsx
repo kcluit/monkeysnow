@@ -8,13 +8,14 @@ import { GraphCard } from './GraphCard';
 import { GraphSync } from './graphSync';
 import { NIGHT_OPACITY, TEMPERATURE_COLOUR } from './GraphPlot';
 import type { XRange } from '../../lib/charts/plugins';
-import type { AllWeatherData, ElevationLevel, ProcessedResortData, SnowfallEstimateMode, UnitSystem } from '../../types';
+import type { AllWeatherData, ElevationLevel, ProcessedResortData, SnowCaution, SnowfallEstimateMode, UnitSystem } from '../../types';
 
 interface GraphViewProps {
     resorts: ProcessedResortData[];
     allWeatherData: AllWeatherData;
     elevation: ElevationLevel;
     snowfallMode: SnowfallEstimateMode;
+    snowCaution: SnowCaution;
     units: UnitSystem;
     onResortClick?: (resortId: string) => void;
 }
@@ -36,7 +37,7 @@ function boundsOf(resorts: ProcessedResortData[], allWeatherData: AllWeatherData
  * Graph view: the Main page with a Graph for each card, all showing the same stretch
  * of time, under one key that explains them.
  */
-export function GraphView({ resorts, allWeatherData, elevation, snowfallMode, units, onResortClick }: GraphViewProps): JSX.Element {
+export function GraphView({ resorts, allWeatherData, elevation, snowfallMode, snowCaution, units, onResortClick }: GraphViewProps): JSX.Element {
     const theme = useChartTheme();
     const isMobile = useIsMobile();
     // One per visit to the page, so coming back opens on the next 5 days again
@@ -62,6 +63,7 @@ export function GraphView({ resorts, allWeatherData, elevation, snowfallMode, un
                         data={allWeatherData.data[resort.id]}
                         elevation={elevation}
                         snowfallMode={snowfallMode}
+                        snowCaution={snowCaution}
                         units={units}
                         theme={theme}
                         sync={sync}

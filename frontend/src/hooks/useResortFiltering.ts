@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
-import { daysFromToday, processResortData } from '../utils/weather';
+import { DEFAULT_SNOWFALL_ESTIMATE_MODE, daysFromToday, processResortData } from '../utils/weather';
+import { DEFAULT_SNOW_CAUTION } from '../utils/snowQuality';
 import { RESORT_LOCATIONS } from '../data/resortLocations';
 import type {
   AllWeatherData,
@@ -11,6 +12,7 @@ import type {
   Period,
   TemperatureMetric,
   SnowfallEstimateMode,
+  SnowCaution,
   UnitSystem
 } from '../types';
 
@@ -43,8 +45,9 @@ export function useResortFiltering(
     selectedSortDay: SortDay,
     isReversed: boolean,
     temperatureMetric: TemperatureMetric = 'max',
-    snowfallEstimateMode: SnowfallEstimateMode = 'model',
-    unitSystem: UnitSystem = 'metric'
+    snowfallEstimateMode: SnowfallEstimateMode = DEFAULT_SNOWFALL_ESTIMATE_MODE,
+    unitSystem: UnitSystem = 'metric',
+    snowCaution: SnowCaution = DEFAULT_SNOW_CAUTION
   ): string[] => {
     if (!allWeatherData) return resorts;
 
@@ -117,7 +120,7 @@ export function useResortFiltering(
     // Each resort's days nearest today first, as the sort day counts them
     const resortDaysMap = new Map<string, DayForecast[]>();
     for (const resort of resorts) {
-      const resortData = processResortData(allWeatherData, resort, selectedElevation, temperatureMetric, snowfallEstimateMode, unitSystem);
+      const resortData = processResortData(allWeatherData, resort, selectedElevation, temperatureMetric, snowfallEstimateMode, unitSystem, snowCaution);
       if (resortData) resortDaysMap.set(resort, daysFromToday(resortData));
     }
 

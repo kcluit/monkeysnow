@@ -19,7 +19,7 @@ import {
 } from './openMeteoBudget';
 import { cardModelAt, markGap, recommendedCardModel } from './cardModels';
 import { getSavedLocation, isSavedLocationId } from './savedLocations';
-import { SNOW_ESTIMATE_VERSION, SNOW_QUALITIES, addPrecipitation, dominantQuality, estimateHour, noPrecipitationByQuality, surfacePressureOr } from './snowQuality';
+import { SNOW_CAUTIONS, SNOW_ESTIMATE_VERSION, addPrecipitation, byCaution, dominantQuality, noPrecipitationByQuality, splitHour, surfacePressureOr, wetBulbOf } from './snowQuality';
 import type { DayData, ElevationForecast, HourlyForecast, HourlySeries, PeriodData, ResortData } from '../types';
 import type { WeatherModel } from '../types/openMeteo';
 
@@ -216,9 +216,10 @@ function hoursFrom(hours: HourlyForecast, from: number): HourlyForecast {
         start: hours.start + skip * hours.interval,
         temperature: hours.temperature.subarray(skip),
         snowfall: hours.snowfall.subarray(skip),
-        snowEstimate: hours.snowEstimate.subarray(skip),
+        wetBulb: hours.wetBulb?.subarray(skip),
+        snowEstimate: hours.snowEstimate?.subarray(skip),
         precipitation: hours.precipitation.subarray(skip),
-        quality: hours.quality.subarray(skip),
+        quality: hours.quality?.subarray(skip),
         windSpeed: hours.windSpeed?.subarray(skip),
         windDirection: hours.windDirection?.subarray(skip),
         weatherCode: hours.weatherCode?.subarray(skip),
@@ -310,30 +311,22 @@ function hourlyForecastOf(response: ApiResponse, until: number): HourlyForecast 
     let length = Math.min(temperature.length, hoursUntil(start, interval, until));
     while (length > 0 && !Number.isFinite(temperature[length - 1])) length--;
 
-    const hours: HourlyForecast = {
+    // The Graph splits each hour by the visitor's Snow caution as it draws, so switching it needs no refetch
+    const wetBulb = Float32Array.from({ length }, (_, i) => Number.isFinite(temperature[i])
+        ? wetBulbOf(temperature[i], humidity[i], surfacePressureOr(pressure[i], elevation))
+        : NaN);
+    return {
         start,
         interval,
         temperature: temperature.slice(0, length),
         snowfall: snowfall.slice(0, length),
-        snowEstimate: new Float32Array(length),
+        wetBulb,
         precipitation: precipitation.slice(0, length),
-        quality: new Int8Array(length).fill(-1),
         windSpeed: windSpeed.slice(0, length),
         windDirection: windDirection.slice(0, length),
         // WMO codes run to 99, so 255 can stand for an hour without one
         weatherCode: Uint8Array.from(weatherCode.subarray(0, length), (code) => (Number.isFinite(code) ? code : 255)),
     };
-    for (let i = 0; i < length; i++) {
-        if (!Number.isFinite(temperature[i])) {
-            hours.snowEstimate[i] = NaN;
-            continue;
-        }
-        const estimate = estimateHour(temperature[i], humidity[i], precipitation[i], surfacePressureOr(pressure[i], elevation));
-        hours.snowEstimate[i] = estimate.snowCm;
-        // As for a Period, only an hour with precipitation has a Snow quality
-        if (precipitation[i] > 0) hours.quality[i] = SNOW_QUALITIES.indexOf(estimate.quality);
-    }
-    return hours;
 }
 
 type Period = 'AM' | 'PM' | 'NIGHT';
@@ -480,16 +473,18 @@ function processLocation(mainResp: ApiResponse | undefined, freezing: FreezingSe
                 continue;
             }
 
-            // The monkeysnow estimate: each hour's precipitation split by this band's wet bulb,
-            // and what fell under each Snow quality, which decides the Period's
-            let snowEstimateCm = 0;
-            let rainEstimateMm = 0;
-            const byQuality = noPrecipitationByQuality();
+            // The monkeysnow estimate under each Snow caution: each hour's precipitation split by this
+            // band's wet bulb, and what fell under each Snow quality, which decides the Period's
+            const totals = byCaution(() => ({ snowCm: 0, rainMm: 0, byQuality: noPrecipitationByQuality() }));
             for (const hourData of hData) {
-                const estimate = estimateHour(hourData.temperature, hourData.humidity, hourData.precipitation, surfacePressureOr(hourData.surface_pressure, elevation));
-                snowEstimateCm += estimate.snowCm;
-                rainEstimateMm += estimate.rainMm;
-                addPrecipitation(byQuality, estimate.quality, hourData.precipitation);
+                const wetBulb = wetBulbOf(hourData.temperature, hourData.humidity, surfacePressureOr(hourData.surface_pressure, elevation));
+                for (const caution of SNOW_CAUTIONS) {
+                    const hour = splitHour(wetBulb, hourData.precipitation, caution);
+                    const total = totals[caution];
+                    total.snowCm += hour.snowCm;
+                    total.rainMm += hour.rainMm;
+                    addPrecipitation(total.byQuality, hour.quality, hourData.precipitation);
+                }
             }
 
             const period: PeriodData = {
@@ -506,10 +501,12 @@ function processLocation(mainResp: ApiResponse | undefined, freezing: FreezingSe
                 weather_code: fixed(getMode(hData.map(d => d.weather_code)), 0),
                 surface_pressure: fixed(getAverage(hData.map(d => d.surface_pressure)), 2),
                 freezing_level: fData.length > 0 ? fixed(getMax(fData), 2) : null,
-                snowfall_estimate: fixed(snowEstimateCm, 4),
-                rain_estimate: fixed(rainEstimateMm, 4),
-                precipitation_by_quality: byQuality.map(mm => fixed(mm, 4)),
-                snow_quality: dominantQuality(byQuality),
+                estimates: byCaution((caution) => ({
+                    snowfall_estimate: fixed(totals[caution].snowCm, 4),
+                    rain_estimate: fixed(totals[caution].rainMm, 4),
+                    precipitation_by_quality: totals[caution].byQuality.map(mm => fixed(mm, 4)),
+                    snow_quality: dominantQuality(totals[caution].byQuality),
+                })),
             };
             day[chunkName] = period;
         }

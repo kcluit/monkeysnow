@@ -84,9 +84,10 @@ export function AboutPage(): JSX.Element {
                     monkeysnow estimates what falls from each hour's temperature and humidity at the height
                     being forecast, through the wet-bulb temperature: how cold the air would get if its moisture
                     evaporated into it, which tells rain from snow better than the air temperature alone.
-                    The estimate is cautious: when an hour is close, it leans toward the worse label.
+                    How far it leans toward the worse label when an hour is close is your snow caution,
+                    set on the settings page: cautious unless you pick another.
                 </p>
-                <Subsection title="snow quality" icon={faListOl}>
+                <Subsection title="snow quality, when cautious" icon={faListOl}>
                     <dl className="about-stats-list">
                         <dt>powder</dt>
                         <dd>
@@ -118,12 +119,33 @@ export function AboutPage(): JSX.Element {
                         </dd>
                     </dl>
                 </Subsection>
+                <Subsection title="snow caution" icon={faShieldAlt}>
+                    <dl className="about-stats-list">
+                        <dt>extra cautious</dt>
+                        <dd>
+                            - rain from a wet bulb of −0.3 °C and sleet/mix from −1.5 °C, so rain wherever there's
+                            even a 1 in 10 chance of it. Its snow is denser too, as LaChapelle measured it at Alta,
+                            so down to a wet bulb of about −6 °C the same water makes 10 to 15% less of it.
+                        </dd>
+
+                        <dt>cautious</dt>
+                        <dd>
+                            - the labels above: rain from +0.5 °C, where snow is still about 2 in 3 likely.
+                        </dd>
+
+                        <dt>realistic</dt>
+                        <dd>
+                            - rain from +1.35 °C and sleet/mix from +0.25 °C, so half snow at +0.8 °C,
+                            where the rain–snow studies put it in the mountains.
+                        </dd>
+                    </dl>
+                </Subsection>
                 <p>
-                    The "monkeysnow estimate" on a card splits each hour's total precipitation into snow and rain
-                    this way, for each elevation on its own, and turns the snow's water into centimetres with a
-                    snow-to-liquid ratio that rises from 8 near freezing to 17 at −14 °C and falls again in the
-                    bitter cold. The "Model estimate" shows the weather model's own snowfall and rain instead,
-                    which it works out for its grid cell rather than for each elevation.
+                    The "monkeysnow estimate" on a card, shown unless you pick the "Model estimate", splits each
+                    hour's total precipitation into snow and rain this way, for each elevation on its own, and turns
+                    the snow's water into centimetres with a snow-to-liquid ratio that rises from 8 near freezing to
+                    17 at −14 °C and falls again in the bitter cold. The "Model estimate" shows the weather model's
+                    own snowfall and rain instead, which it works out for its grid cell rather than for each elevation.
                 </p>
                 <p>
                     A period's or a day's snow quality is the one under which most of its precipitation fell;
