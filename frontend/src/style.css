@@ -243,6 +243,16 @@ h1.title-color-text,
     font-size: 0.75rem;
 }
 
+.settings-option-label {
+    text-align: left;
+}
+
+.settings-option-note {
+    display: block;
+    font-size: 0.75rem;
+    opacity: 0.75;
+}
+
 .settings-check-icon {
     margin-left: auto;
     font-size: 0.75rem;

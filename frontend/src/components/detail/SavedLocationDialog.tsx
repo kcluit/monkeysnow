@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useOverlay } from '../../hooks/useOverlay';
 import { useLanguage } from '../../hooks/useLanguage';
+import { unitSymbol } from '../../locales';
 import {
     MAX_SAVED_ELEVATION,
     MAX_SAVED_NAME_LENGTH,
@@ -71,7 +72,7 @@ export function SavedLocationDialog({
         if (canSubmit) onSubmit({ name: trimmedName, elevation: elevationMetres! });
     };
 
-    const unit = isImperial ? 'ft' : 'm';
+    const unit = unitSymbol(isImperial ? 'ft' : 'm');
     const inputClass = 'w-full px-2 py-1.5 text-sm rounded border border-theme-border bg-theme-cardBg text-theme-textPrimary placeholder-theme-textSecondary focus:outline-none focus:border-theme-accent';
 
     return createPortal(

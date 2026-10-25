@@ -11,7 +11,7 @@ import type { WeatherChartProps } from '../types/detailView';
 import type { WeatherModel, HourlyDataPoint, AggregationType } from '../types/openMeteo';
 import type { UnitSystem } from '../types';
 import type { TranslationKey } from '../types/i18n';
-import { translate } from '../locales';
+import { translate, unitSymbol } from '../locales';
 import { supportsAccumulation } from '../types/chartSettings';
 import type { ChartDisplayType } from '../types/chartSettings';
 import { getModelConfig, getVariableConfig, getOverlayConfig, hasOverlays } from './chartConfigurations';
@@ -612,7 +612,7 @@ export function buildWeatherChartConfig(
     }
 
     // Get unit string
-    const unit = unitSystem === 'imperial' ? variableConfig.unitImperial : variableConfig.unit;
+    const unit = unitSymbol(unitSystem === 'imperial' ? variableConfig.unitImperial : variableConfig.unit);
 
     // Use provided theme or get from CSS
     const chartTheme = theme ?? getUPlotTheme();
@@ -645,7 +645,7 @@ export function buildWeatherChartConfig(
         base: unitSystem === 'imperial' ? location.baseElevation * M_TO_FT : location.baseElevation,
         mid: unitSystem === 'imperial' ? location.midElevation * M_TO_FT : location.midElevation,
         top: unitSystem === 'imperial' ? location.topElevation * M_TO_FT : location.topElevation,
-        unit: unitSystem === 'imperial' ? 'ft' : 'm',
+        unit: unitSymbol(unitSystem === 'imperial' ? 'ft' : 'm'),
     } : undefined;
 
     return {

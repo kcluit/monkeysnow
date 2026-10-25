@@ -493,7 +493,7 @@ function App(): JSX.Element {
                 icon: icons.font,
                 subCommands: availableFonts.map((f) => ({
                     id: `font-${f.id}`,
-                    name: f.name,
+                    name: f.scripts.includes(language.script) ? f.name : `${f.name} · ${t('font.missingLetters')}`,
                     icon: f.isMonospace ? icons.monospace : icons.regular,
                     action: () => setFont(f.id),
                 })),

@@ -10,6 +10,7 @@ import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useChartTheme } from '../../hooks/useChartTheme';
 import { useFullscreenView } from '../../hooks/useFullscreenView';
 import { useLanguage } from '../../hooks/useLanguage';
+import { unitSymbol } from '../../locales';
 import { useModelStyles } from '../../hooks/useModelStyles';
 import { UPlotChart } from '../../lib/charts';
 import { setChartZoomSyncExclusion } from '../../lib/charts/chartRegistry';
@@ -217,7 +218,7 @@ export function WeatherChart({
                             {variableConfig.label}
                             {(unitSystem === 'metric' ? variableConfig.unit : variableConfig.unitImperial) && (
                                 <span className="weather-chart-unit">
-                                    {' '}({unitSystem === 'metric' ? variableConfig.unit : variableConfig.unitImperial})
+                                    {' '}({unitSymbol(unitSystem === 'metric' ? variableConfig.unit : variableConfig.unitImperial)})
                                 </span>
                             )}
                         </span>
@@ -258,7 +259,7 @@ export function WeatherChart({
                         {variableConfig.label}
                         {(unitSystem === 'metric' ? variableConfig.unit : variableConfig.unitImperial) && (
                             <span className="weather-chart-unit">
-                                {' '}({unitSystem === 'metric' ? variableConfig.unit : variableConfig.unitImperial})
+                                {' '}({unitSymbol(unitSystem === 'metric' ? variableConfig.unit : variableConfig.unitImperial)})
                             </span>
                         )}
                     </span>

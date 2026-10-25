@@ -18,4 +18,15 @@ describe('the resort picker\'s search', () => {
         const spain = normalizeForSearch(countryNamesInEveryLanguage('ES', 'Spain').join(' '));
         expect(matchesSearchWords(spain, toSearchWords('espana'))).toBe(true);
     });
+
+    it('finds a Resort and its country in Cyrillic, by its Russian name in resorts.json', () => {
+        const arhyz = normalizeForSearch(['Arhyz', 'Архыз', ...countryNamesInEveryLanguage('RU', 'Russia')].join(' '));
+        expect(matchesSearchWords(arhyz, toSearchWords('Архыз'))).toBe(true);
+        expect(matchesSearchWords(arhyz, toSearchWords('россия архыз'))).toBe(true);
+        expect(matchesSearchWords(verbier, toSearchWords('Швейцария'))).toBe(true);
+    });
+
+    it('finds ё by е, as Russians often type it', () => {
+        expect(matchesSearchWords(normalizeForSearch('Озёрный'), toSearchWords('озерный'))).toBe(true);
+    });
 });

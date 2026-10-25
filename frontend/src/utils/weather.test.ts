@@ -90,6 +90,9 @@ describe('a card when the language changes', () => {
             expect([day.name, day.date, am.snow, am.condition, day.snowCondition.text]).toEqual(['Samedi', '24 oct.', '1,6 cm', 'Neige modérée', 'Pluie et neige']);
             setLanguage('es');
             expect([day.name, day.date, am.snow, am.condition, day.snowCondition.text]).toEqual(['Sábado', '24 oct', '1,6 cm', 'Nevada moderada', 'Aguanieve']);
+            // Russian writes its units in Cyrillic too
+            setLanguage('ru');
+            expect([day.name, day.date, am.snow, am.condition, day.snowCondition.text]).toEqual(['Суббота', '24 окт.', '1,6 см', 'Умеренный снег', 'Снег с дождём']);
         } finally {
             setLanguage('en');
             warn.mockRestore();

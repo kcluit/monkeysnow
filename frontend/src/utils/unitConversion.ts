@@ -3,7 +3,7 @@
  * All conversions are from metric (Open-Meteo default) to imperial.
  */
 
-import { formatDecimal } from '../locales';
+import { formatDecimal, withUnit } from '../locales';
 
 export type UnitSystem = 'metric' | 'imperial';
 
@@ -42,14 +42,14 @@ export function formatTempWithRounding(
 }
 
 /**
- * Convert snow amount from cm and format with unit, written the language's way ("1.5 cm", "1,5 cm").
+ * Convert snow amount from cm and format with unit, written the language's way ("1.5 cm", "1,5 cm", "1,5 см").
  */
 export function formatSnow(cm: number, system: UnitSystem): string {
   if (system === 'imperial') {
     const inches = cm * CM_TO_INCHES;
-    return `${formatDecimal(inches, 1)} in`;
+    return withUnit(formatDecimal(inches, 1), 'in');
   }
-  return `${formatDecimal(cm, 1)} cm`;
+  return withUnit(formatDecimal(cm, 1), 'cm');
 }
 
 /**
@@ -58,9 +58,9 @@ export function formatSnow(cm: number, system: UnitSystem): string {
 export function formatRain(mm: number, system: UnitSystem): string {
   if (system === 'imperial') {
     const inches = mm * MM_TO_INCHES;
-    return `${formatDecimal(inches, 1)} in`;
+    return withUnit(formatDecimal(inches, 1), 'in');
   }
-  return `${formatDecimal(mm, 1)} mm`;
+  return withUnit(formatDecimal(mm, 1), 'mm');
 }
 
 /** Whether formatSnow shows any snow, rather than "0.0 cm" */
@@ -79,20 +79,20 @@ export function showsRain(mm: number, system: UnitSystem): boolean {
 export function formatWind(kmh: number, system: UnitSystem): string {
   if (system === 'imperial') {
     const mph = Math.round(kmh * KMH_TO_MPH);
-    return `${mph} mph`;
+    return withUnit(mph, 'mph');
   }
-  return `${Math.round(kmh)} km/h`;
+  return withUnit(Math.round(kmh), 'km/h');
 }
 
 /**
- * Convert elevation/height from meters and format with unit.
+ * Convert elevation/height from meters and format with unit ("1500m", "1500 м").
  */
 export function formatElevation(meters: number, system: UnitSystem): string {
   if (system === 'imperial') {
     const feet = Math.round(meters * M_TO_FT);
-    return `${feet}ft`;
+    return withUnit(feet, 'ft', true);
   }
-  return `${Math.round(meters)}m`;
+  return withUnit(Math.round(meters), 'm', true);
 }
 
 /** A height in metres as a whole number in the visitor's units, for typing over */
@@ -115,13 +115,13 @@ export function maxTypedElevation(system: UnitSystem): number {
  */
 export function formatFreezingLevel(meters: number | null, system: UnitSystem): string {
   if (meters === null || isNaN(meters)) {
-    return system === 'imperial' ? '- ft' : '- m';
+    return withUnit('-', system === 'imperial' ? 'ft' : 'm');
   }
   if (system === 'imperial') {
     const feet = Math.round(meters * M_TO_FT);
-    return `${feet} ft`;
+    return withUnit(feet, 'ft');
   }
-  return `${Math.round(meters)} m`;
+  return withUnit(Math.round(meters), 'm');
 }
 
 /**

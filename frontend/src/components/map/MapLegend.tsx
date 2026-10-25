@@ -1,4 +1,5 @@
 import { useLanguage } from '../../hooks/useLanguage';
+import { withUnit } from '../../locales';
 import { TERRAIN_COLOURINGS, type TerrainColouringId } from '../../utils/mapLayers';
 import { slopeBandLabel, type SlopeBand } from '../../utils/slopeBands';
 import {
@@ -56,9 +57,9 @@ function AspectRose(): JSX.Element {
 
 function heightTicks(unitSystem: UnitSystem): { value: number; label: string }[] {
     if (unitSystem === 'imperial') {
-        return [0, 10000, 20000].map(feet => ({ value: feet * FEET_TO_METRES, label: feet === 0 ? '0' : `${feet}ft` }));
+        return [0, 10000, 20000].map(feet => ({ value: feet * FEET_TO_METRES, label: feet === 0 ? '0' : withUnit(feet, 'ft', true) }));
     }
-    return [0, 2000, 4000, 6000, 8000].map(metres => ({ value: metres, label: metres === 0 ? '0' : `${metres}m` }));
+    return [0, 2000, 4000, 6000, 8000].map(metres => ({ value: metres, label: metres === 0 ? '0' : withUnit(metres, 'm', true) }));
 }
 
 interface MapLegendProps {

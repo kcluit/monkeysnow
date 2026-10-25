@@ -1,6 +1,7 @@
 import { en } from './en';
 import { fr } from './fr';
 import { es } from './es';
+import { ru } from './ru';
 import type {
     Language,
     PluralKey,
@@ -15,6 +16,7 @@ const englishLanguage: Language = {
     name: 'English',
     nativeName: 'English',
     locale: 'en-US',
+    script: 'latin',
     translations: en,
 };
 
@@ -23,6 +25,7 @@ const frenchLanguage: Language = {
     name: 'French',
     nativeName: 'Français',
     locale: 'fr',
+    script: 'latin',
     translations: fr,
 };
 
@@ -32,7 +35,17 @@ const spanishLanguage: Language = {
     nativeName: 'Español',
     // Spain's conventions (1,5 and a 24-hour clock), which Chile and Argentina share
     locale: 'es',
+    script: 'latin',
     translations: es,
+};
+
+const russianLanguage: Language = {
+    id: 'ru',
+    name: 'Russian',
+    nativeName: 'Русский',
+    locale: 'ru',
+    script: 'cyrillic',
+    translations: ru,
 };
 
 /**
@@ -42,6 +55,7 @@ export const languages: Language[] = [
     englishLanguage,
     frenchLanguage,
     spanishLanguage,
+    russianLanguage,
 ];
 
 /**
@@ -65,14 +79,15 @@ export function interpolate(template: string, values: TranslationValues): string
 
 // French sets a space before : ; ! ? and », after «, and between a number and °: a
 // no-break one, so a line never starts with the mark. Spanish sets one only between a
-// number and ° or %. Done here rather than in the strings, so they stay readable with
-// ordinary spaces.
+// number and ° or %, Russian before a dash and °. Done here rather than in the strings,
+// so they stay readable with ordinary spaces.
 const NO_BREAK_SPACE = '\u{00A0}';
 const typesetters: Record<string, (text: string) => string> = {
     fr: text => text
         .replace(/ ([:;!?»°])/g, `${NO_BREAK_SPACE}$1`)
         .replace(/« /g, `«${NO_BREAK_SPACE}`),
     es: text => text.replace(/ ([°%])/g, `${NO_BREAK_SPACE}$1`),
+    ru: text => text.replace(/ ([—°])/g, `${NO_BREAK_SPACE}$1`),
 };
 
 /** Where a visitor's pick is kept. Only a pick is: until there is one, the browser's language decides. */
@@ -207,16 +222,19 @@ export function formatLocale(): string {
 /** A formatter's one method, which hourFormat() keeps */
 export type DateFormat = Pick<Intl.DateTimeFormat, 'format'>;
 
-// Intl writes a French hour "14 h" by itself, but a Spanish one as a bare "14", which
-// reads like a stray number after a date: Spanish gets the hour symbol ("14 h", as the
-// RAE writes it) added, after a no-break space so the two never part.
+// Intl writes a French hour "14 h" by itself, but a Spanish or Russian one as a bare "14",
+// which reads like a stray number after a date: Spanish gets the hour symbol ("14 h", as
+// the RAE writes it) added, after a no-break space so the two never part, and Russian the
+// minutes a clock shows ("14:00", as Russian forecasts write an hour).
 const hourSymbols: Record<string, string> = {
     es: `${NO_BREAK_SPACE}h`,
+    ru: ':00',
 };
 
 /**
  * An Intl.DateTimeFormat with `options` that show an hour, alone or ending a date, writing
- * the hour the locale's language does: "5 PM", "17 h" in French, and "17 h" in Spanish too.
+ * the hour the locale's language does: "5 PM", "17 h" in French, "17 h" in Spanish too, and
+ * "17:00" in Russian.
  */
 export function hourFormat(locale: string, options: Intl.DateTimeFormatOptions): DateFormat {
     const formatter = new Intl.DateTimeFormat(locale, options);
@@ -245,6 +263,33 @@ export function formatDecimal(value: number, digits = 1): string {
     }
     const fixed = value.toFixed(digits);
     return mark === '.' ? fixed : fixed.replace('.', mark);
+}
+
+// The unit symbols code writes, each with the key its symbol in the language showing is under
+const UNIT_KEYS: Record<string, TranslationKey> = {
+    cm: 'unit.cm', mm: 'unit.mm', m: 'unit.m', ft: 'unit.ft', in: 'unit.in',
+    'km/h': 'unit.kmh', mph: 'unit.mph', 'm/s': 'unit.ms',
+    hPa: 'unit.hPa', kPa: 'unit.kPa', inHg: 'unit.inHg', psi: 'unit.psi', min: 'unit.min',
+    'J/kg': 'unit.Jkg', 'W/m²': 'unit.Wm2', 'kg/m²': 'unit.kgm2', 'kg/m³': 'unit.kgm3', 'm³/m³': 'unit.m3m3',
+};
+
+/**
+ * A unit symbol as the language showing writes it: Russian's are Cyrillic (см, км/ч). Any
+ * other, such as °C, % or one already translated, comes back as it is.
+ */
+export function unitSymbol(symbol: string): string {
+    const key = UNIT_KEYS[symbol];
+    return key ? translate(key) : symbol;
+}
+
+/**
+ * A number and its unit, as the language showing writes them: "1.5 cm", "1,5 см". `tight`
+ * keeps English's "1500m" in a language that writes the symbol as English does; one with a
+ * symbol of its own, such as Russian's м, always sets the space ("1500 м").
+ */
+export function withUnit(value: string | number, symbol: string, tight = false): string {
+    const local = unitSymbol(symbol);
+    return tight && local === symbol ? `${value}${local}` : `${value} ${local}`;
 }
 
 const regionNames = new Map<string, Intl.DisplayNames | null>();

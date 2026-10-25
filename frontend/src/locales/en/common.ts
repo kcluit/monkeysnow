@@ -43,11 +43,33 @@ export const common = {
     'period.pm': 'PM',
     'period.night': 'Night',
 
+    // Unit symbols beside a number, by the symbol code writes (°C, °F and % are the same in every language)
+    'unit.cm': 'cm',
+    'unit.mm': 'mm',
+    'unit.m': 'm',
+    'unit.ft': 'ft',
+    'unit.in': 'in',
+    'unit.kmh': 'km/h',
+    'unit.mph': 'mph',
+    'unit.ms': 'm/s',
+    'unit.hPa': 'hPa',
+    'unit.kPa': 'kPa',
+    'unit.inHg': 'inHg',
+    'unit.psi': 'psi',
+    'unit.min': 'min',
+    'unit.Jkg': 'J/kg',
+    'unit.Wm2': 'W/m²',
+    'unit.kgm2': 'kg/m²',
+    'unit.kgm3': 'kg/m³',
+    'unit.m3m3': 'm³/m³',
+
     // The Escape key, as the footer hints of the palette and pickers show it
     'key.esc': 'esc',
 
     // Language (the command palette finds it by every language's word for it)
     'language.title': 'Language',
+    // Beside a font with no letters for the language showing (never English's), on the Settings page and in the command palette
+    'font.missingLetters': 'no letters for this language',
 
     // Footer
     'footer.privacy': 'privacy',

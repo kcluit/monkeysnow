@@ -22,6 +22,7 @@ import {
 } from '../utils/mapLayers';
 import { FORECAST_HORIZONS, HISTORY_LENGTHS } from '../utils/constants';
 import { elevationFromUnits, elevationInUnits, formatElevation, maxTypedElevation } from '../utils/unitConversion';
+import { unitSymbol } from '../locales';
 import type {
     ElevationLevel,
     SortOption,
@@ -198,9 +199,11 @@ interface OptionButtonProps {
     icon?: typeof icons[keyof typeof icons];
     onHover?: () => void;
     onHoverEnd?: () => void;
+    /** A caveat in smaller type under the label */
+    note?: string;
 }
 
-function OptionButton({ label, isSelected, onClick, icon, onHover, onHoverEnd }: OptionButtonProps): JSX.Element {
+function OptionButton({ label, isSelected, onClick, icon, onHover, onHoverEnd, note }: OptionButtonProps): JSX.Element {
     return (
         <button
             onClick={onClick}
@@ -209,7 +212,14 @@ function OptionButton({ label, isSelected, onClick, icon, onHover, onHoverEnd }:
             className={`settings-option-btn ${isSelected ? 'selected' : ''}`}
         >
             {icon && <Icon icon={icon} className="settings-option-icon" />}
-            <span>{label}</span>
+            {note ? (
+                <span className="settings-option-label">
+                    {label}
+                    <span className="settings-option-note">{note}</span>
+                </span>
+            ) : (
+                <span>{label}</span>
+            )}
             {isSelected && <Icon icon={icons.check} className="settings-check-icon" />}
         </button>
     );
@@ -340,7 +350,7 @@ function DetailElevationPicker({ selection, setSelection, unitSystem }: DetailEl
     const [isTyping, setIsTyping] = useState(false);
     const [typed, setTyped] = useState('');
     const customElevation = typeof selection === 'number' ? selection : null;
-    const unit = unitSystem === 'imperial' ? 'ft' : 'm';
+    const unit = unitSymbol(unitSystem === 'imperial' ? 'ft' : 'm');
 
     const startTyping = () => {
         setTyped(customElevation === null ? '' : String(elevationInUnits(customElevation, unitSystem)));
@@ -807,6 +817,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                                     icon={f.isMonospace ? icons.monospace : icons.regular}
                                     onHover={() => applyFont(f)}
                                     onHoverEnd={resetFontPreview}
+                                    note={f.scripts.includes(language.script) ? undefined : t('font.missingLetters')}
                                 />
                             ))}
                         </div>

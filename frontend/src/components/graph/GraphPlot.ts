@@ -13,7 +13,7 @@ import { createTouchPlugin, createZoomPlugin, type XRange } from '../../lib/char
 import { chartTextFill } from '../../lib/charts/theme';
 import { colorWithOpacity } from '../../lib/charts/utils/colorUtils';
 import type { ChartTheme } from '../../lib/charts';
-import { formatDecimal } from '../../locales';
+import { formatDecimal, unitSymbol, withUnit } from '../../locales';
 import { SNOW_QUALITIES } from '../../utils/snowQuality';
 import { SNOW_QUALITY_COLOURS, SNOW_QUALITY_NAMES } from '../../utils/snowQualityColours';
 import { getWeatherDescription, getWeatherEmoji } from '../../utils/weather';
@@ -214,7 +214,7 @@ export class GraphPlot implements SyncedGraph {
         const unit = units === 'imperial' ? 'ft' : 'm';
         const heightLines = data.heightLines.map((line) => ({
             ...line,
-            label: `${line.band ? `${t(BAND_NAMES[line.band])} ` : ''}${line.height} ${unit}`,
+            label: `${line.band ? `${t(BAND_NAMES[line.band])} ` : ''}${withUnit(line.height, unit)}`,
         }));
 
         const verticalLine = (u: uPlot, t: number, stroke: string, width: number) => {
@@ -364,7 +364,7 @@ export class GraphPlot implements SyncedGraph {
 
         let precipitation = escapeHtml(t('graph.noPrecipitation'));
         if (quality) {
-            const unit = data.isSnow[idx] ? (imperial ? 'in' : 'cm') : imperial ? 'in' : 'mm';
+            const unit = unitSymbol(data.isSnow[idx] ? (imperial ? 'in' : 'cm') : imperial ? 'in' : 'mm');
             const digits = imperial && !data.isSnow[idx] ? 2 : 1;
             const words = t('graph.precipitationAmount', { amount: formatDecimal(amount, digits), unit, quality: SNOW_QUALITY_NAMES[quality] });
             precipitation = `<span style="color:${SNOW_QUALITY_COLOURS[quality]}">■</span> ${escapeHtml(words)}`;
@@ -379,8 +379,8 @@ export class GraphPlot implements SyncedGraph {
             weather === null ? '' : `${getWeatherEmoji(weather)} ${escapeHtml(getWeatherDescription(weather))}`,
             precipitation,
             temperature === null ? '' : `<span style="color:${TEMPERATURE_COLOUR}">●</span> ${escapeHtml(t('graph.temperature'))} ${Math.round(temperature)} °${imperial ? 'F' : 'C'}`,
-            windSpeed === null ? '' : `${escapeHtml(t('graph.wind'))} ${Math.round(windSpeed)} ${imperial ? 'mph' : 'km/h'}${windFrom ? ` ${t(WIND_FROM[windFrom])}` : ''}`,
-            freezing === null ? '' : `${escapeHtml(t('graph.freezingLevel'))} ${Math.round(freezing)} ${imperial ? 'ft' : 'm'}`,
+            windSpeed === null ? '' : `${escapeHtml(t('graph.wind'))} ${withUnit(Math.round(windSpeed), imperial ? 'mph' : 'km/h')}${windFrom ? ` ${t(WIND_FROM[windFrom])}` : ''}`,
+            freezing === null ? '' : `${escapeHtml(t('graph.freezingLevel'))} ${withUnit(Math.round(freezing), imperial ? 'ft' : 'm')}`,
         ];
         this.tooltip.innerHTML = rows.filter(Boolean).map((row) => `<div>${row}</div>`).join('');
         this.tooltip.style.display = 'block';

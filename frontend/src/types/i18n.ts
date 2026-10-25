@@ -17,8 +17,20 @@ export type PluralKey = {
     [K in TranslationKey]: K extends `${infer Base}.other` ? (`${Base}.one` extends TranslationKey ? Base : never) : never
 }[TranslationKey];
 
-/** One area's strings in another language: the same keys as the English area, every one translated */
-export type Translated<T> = { [K in keyof T]: string };
+/** The plural forms a language's rule picks from (Intl.PluralRules), beyond English's one and other */
+export type ExtraPluralForm = 'zero' | 'two' | 'few' | 'many';
+
+/**
+ * One area's strings in another language: the same keys as the English area, every one
+ * translated, plus each plural key's `Extra` forms where its rule has more than English's
+ * (Russian's few and many: 2 курорта, 5 курортов)
+ */
+export type Translated<T, Extra extends ExtraPluralForm = never> = { [K in keyof T]: string } & {
+    [K in keyof T as K extends `${infer Base}.other` ? `${Base}.${Extra}` : never]: string
+};
+
+/** The alphabets monkeysnow's languages are written in, which a font may or may not have letters for */
+export type Script = 'latin' | 'cyrillic';
 
 /** Values for a string's `{placeholders}` */
 export type TranslationValues = Record<string, string | number>;
@@ -26,7 +38,7 @@ export type TranslationValues = Record<string, string | number>;
 /** Look up a string in the current language, filling its `{placeholders}` */
 export type Translate = (key: TranslationKey, values?: TranslationValues) => string;
 
-/** Look up `<key>.one` or `<key>.other` by the language's plural rule for `count`; `{count}` is filled in */
+/** Look up `<key>.one`, `<key>.other` or another form the language has, by its plural rule for `count`; `{count}` is filled in */
 export type TranslatePlural = (key: PluralKey, count: number, values?: TranslationValues) => string;
 
 /**
@@ -41,6 +53,8 @@ export interface Language {
     nativeName: string;
     /** BCP 47 tag that dates, times and numbers are formatted in (e.g., 'en-US', 'fr') */
     locale: string;
+    /** The alphabet it is written in, which the font pickers check each font for */
+    script: Script;
     /** All translated strings */
     translations: Translations;
 }

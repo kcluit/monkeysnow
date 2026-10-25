@@ -6,6 +6,7 @@ import { CompactDetailUtilityBar } from './CompactDetailUtilityBar';
 import { Icon } from '../Icon';
 import { icons } from '../../constants/icons';
 import { elevationFromUnits, elevationInUnits, formatElevation, maxTypedElevation } from '../../utils/unitConversion';
+import { unitSymbol } from '../../locales';
 import { FORECAST_HORIZONS, HISTORY_LENGTHS } from '../../utils/constants';
 import { HistorySwitch } from '../HistorySwitch';
 import { useLanguage } from '../../hooks/useLanguage';
@@ -81,7 +82,7 @@ function LargeDetailUtilityBar({
         return () => document.removeEventListener('click', handleClickOutside);
     }, []);
 
-    const elevationUnit = unitSystem === 'imperial' ? 'ft' : 'm';
+    const elevationUnit = unitSymbol(unitSystem === 'imperial' ? 'ft' : 'm');
     const maxElevationInput = maxTypedElevation(unitSystem);
 
     // The menu's presets above "Custom...": a Resort's Elevation bands, or a Custom location's Ground elevation

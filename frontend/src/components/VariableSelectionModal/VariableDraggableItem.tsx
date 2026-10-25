@@ -4,6 +4,7 @@ import { CSS } from '@dnd-kit/utilities';
 import type { WeatherVariable } from '../../types/openMeteo';
 import { VARIABLE_CONFIGS } from '../../utils/chartConfigurations';
 import { useLanguage } from '../../hooks/useLanguage';
+import { unitSymbol } from '../../locales';
 
 interface VariableDraggableItemProps {
   variable: WeatherVariable;
@@ -90,7 +91,7 @@ function VariableDraggableItemInner({
       <div className="variable-info">
         <span className="variable-info-label">{config?.label || variable}</span>
         {config?.unit && (
-          <span className="variable-info-unit">{config.unit}</span>
+          <span className="variable-info-unit">{unitSymbol(config.unit)}</span>
         )}
       </div>
     </div>
