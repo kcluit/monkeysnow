@@ -3,7 +3,7 @@
  * Generates commands with checkmarks based on current state.
  */
 
-import type { Command, ElevationLevel, SortOption, SortDay, SortDayData, ViewMode, TemperatureMetric, SnowfallEstimateMode, UtilityBarStyle, UnitSystem, ResortDisplayLimit } from '../types';
+import type { Command, ElevationLevel, SortOption, SortDay, SortDayData, ViewMode, TemperatureMetric, SnowfallEstimateMode, SnowCaution, UtilityBarStyle, UnitSystem, ResortDisplayLimit } from '../types';
 import type { Language } from '../types/i18n';
 import type { ElevationSelection } from '../types/detailView';
 import { icons } from '../constants/icons';
@@ -47,6 +47,9 @@ export interface ControlCommandParams {
   // Snowfall Estimate Mode
   snowfallEstimateMode: SnowfallEstimateMode;
   setSnowfallEstimateMode: (m: SnowfallEstimateMode) => void;
+  // Snow caution
+  snowCaution: SnowCaution;
+  setSnowCaution: (c: SnowCaution) => void;
   // Weather Model
   openCardModels: () => void;
   // Utility Bar visibility
@@ -368,6 +371,35 @@ export function generateSnowfallEstimateCommands(
 }
 
 /**
+ * Generate Snow caution submenu commands with checkmarks.
+ */
+export function generateSnowCautionCommands(
+  selectedCaution: SnowCaution,
+  setSelectedCaution: (c: SnowCaution) => void
+): Command[] {
+  return [
+    {
+      id: 'snow-caution-extra-cautious',
+      name: 'Extra cautious',
+      icon: selectedCaution === 'extraCautious' ? icons.check : undefined,
+      action: () => setSelectedCaution('extraCautious'),
+    },
+    {
+      id: 'snow-caution-cautious',
+      name: 'Cautious',
+      icon: selectedCaution === 'cautious' ? icons.check : undefined,
+      action: () => setSelectedCaution('cautious'),
+    },
+    {
+      id: 'snow-caution-realistic',
+      name: 'Realistic',
+      icon: selectedCaution === 'realistic' ? icons.check : undefined,
+      action: () => setSelectedCaution('realistic'),
+    },
+  ];
+}
+
+/**
  * Generate unit system submenu commands with checkmarks.
  */
 export function generateUnitSystemCommands(
@@ -637,6 +669,15 @@ export function generateControlCommands(params: ControlCommandParams): Command[]
       subCommands: generateSnowfallEstimateCommands(
         params.snowfallEstimateMode,
         params.setSnowfallEstimateMode
+      ),
+    },
+    {
+      id: 'snow-caution',
+      name: 'Snow caution',
+      icon: icons.caution,
+      subCommands: generateSnowCautionCommands(
+        params.snowCaution,
+        params.setSnowCaution
       ),
     },
     {

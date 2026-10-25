@@ -5,9 +5,9 @@
  * the Card model's weather.
  */
 
-import { SNOW_QUALITIES } from '../../utils/snowQuality';
+import { SNOW_QUALITIES, splitHour } from '../../utils/snowQuality';
 import { getWeatherDescription, getWeatherEmoji } from '../../utils/weather';
-import type { ElevationLevel, ResortData, SnowfallEstimateMode, SnowQuality, UnitSystem } from '../../types';
+import type { ElevationLevel, HourlyForecast, ResortData, SnowCaution, SnowfallEstimateMode, SnowQuality, UnitSystem } from '../../types';
 
 const CM_TO_INCHES = 0.393701;
 const MM_TO_INCHES = 0.0393701;
@@ -64,11 +64,27 @@ export function precipitationFloor(units: UnitSystem): number {
 
 const BAND_NAMES: Record<ElevationLevel, string> = { bot: 'Base', mid: 'Mid', top: 'Top' };
 
+/**
+ * An hour's Snow quality, null when nothing falls, and the monkeysnow estimate's snow under a Snow
+ * caution. A forecast cached under an earlier SNOW_ESTIMATE_VERSION has only Cautious's, shown
+ * under every caution until it is refetched.
+ */
+function hourEstimateOf(hours: HourlyForecast, i: number, caution: SnowCaution): { quality: SnowQuality | null; snowCm: number } {
+    if (!hours.wetBulb) {
+        const index = hours.quality?.[i] ?? -1;
+        return { quality: index >= 0 ? SNOW_QUALITIES[index] : null, snowCm: hours.snowEstimate?.[i] ?? 0 };
+    }
+    const wetBulb = hours.wetBulb[i];
+    if (!Number.isFinite(wetBulb) || !(hours.precipitation[i] > 0)) return { quality: null, snowCm: 0 };
+    return splitHour(wetBulb, hours.precipitation[i], caution);
+}
+
 /** A Graph's data, or null for a forecast cached before hours were kept. */
 export function graphDataOf(
     data: ResortData,
     elevation: ElevationLevel,
     snowfallMode: SnowfallEstimateMode,
+    snowCaution: SnowCaution,
     units: UnitSystem
 ): GraphData | null {
     const band = data[elevation];
@@ -115,7 +131,8 @@ export function graphDataOf(
         result.weather.push(text ? { text, emoji: getWeatherEmoji(text) } : null);
 
         // Snow or rain, decided as the cards decide a Period's
-        let quality: SnowQuality | null = hours.quality[i] >= 0 ? SNOW_QUALITIES[hours.quality[i]] : null;
+        const estimate = hourEstimateOf(hours, i, snowCaution);
+        let quality = estimate.quality;
         let snowCm = 0;
         let rainMm = 0;
         if (quality !== null) {
@@ -126,7 +143,7 @@ export function graphDataOf(
                 // A Sleet/Mix hour is drawn as all the water that fell, since one bar can't be part cm and part mm
                 rainMm = hours.precipitation[i];
             } else {
-                snowCm = hours.snowEstimate[i];
+                snowCm = estimate.snowCm;
             }
             // The model's snow in an hour monkeysnow reckons is rain is a mix
             if (snowfallMode === 'model' && quality === 'rain' && snowCm > 0) quality = 'sleet/mix';

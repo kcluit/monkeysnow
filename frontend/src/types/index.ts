@@ -67,6 +67,20 @@ export type TemperatureMetric = 'max' | 'min' | 'avg' | 'median';
 export type SnowfallEstimateMode = 'model' | 'totalPrecip';
 export type ResortDisplayLimit = 'auto' | number;
 export type SnowQuality = 'rain' | 'sleet/mix' | 'wet_snow' | 'powder' | 'dry_snow';
+/** How readily Snow quality calls an hour snow, and how much snow the monkeysnow estimate makes of it (docs/adr/0013) */
+export type SnowCaution = 'extraCautious' | 'cautious' | 'realistic';
+
+/** A Period's monkeysnow estimate and Snow quality under one Snow caution */
+export interface PeriodEstimate {
+    /** The monkeysnow estimate's snow, cm (utils/snowQuality.ts) */
+    snowfall_estimate: number;
+    /** The monkeysnow estimate's rain, mm */
+    rain_estimate: number;
+    /** mm of precipitation that fell under each Snow quality, in SNOW_QUALITIES order, which the day's label is summed from */
+    precipitation_by_quality: number[];
+    /** The one under which most of the Period's precipitation fell, the worst of the tied on a tie; null when nothing fell */
+    snow_quality: SnowQuality | null;
+}
 
 // Weather data structures from new API format
 export interface PeriodData {
@@ -83,14 +97,16 @@ export interface PeriodData {
     weather_code: number;
     surface_pressure: number;
     freezing_level: number | null;
-    /** The monkeysnow estimate's snow, cm (utils/snowQuality.ts) */
-    snowfall_estimate: number;
-    /** The monkeysnow estimate's rain, mm; these two are missing on forecasts cached under an earlier SNOW_ESTIMATE_VERSION, which are refetched */
+    /** The Period under each Snow caution; missing on forecasts cached under an earlier SNOW_ESTIMATE_VERSION, which are refetched */
+    estimates?: Record<SnowCaution, PeriodEstimate>;
+    /**
+     * Only on forecasts cached under an earlier SNOW_ESTIMATE_VERSION, which show these, Cautious's,
+     * until they are refetched; rain_estimate and precipitation_by_quality are missing on older ones
+     */
+    snowfall_estimate?: number;
     rain_estimate?: number;
-    /** mm of precipitation that fell under each Snow quality, in SNOW_QUALITIES order, which the day's label is summed from */
     precipitation_by_quality?: number[];
-    /** The one under which most of the Period's precipitation fell, the worst of the tied on a tie; null when nothing fell */
-    snow_quality: SnowQuality | null;
+    snow_quality?: SnowQuality | null;
 }
 
 export interface DayData {
@@ -122,12 +138,18 @@ export interface HourlyForecast {
     temperature: Float32Array;
     /** The Card model's own snowfall in the hour before each one, cm */
     snowfall: Float32Array;
-    /** The monkeysnow estimate's snow in the hour before each one, cm, from its precipitation and this band's wet bulb (utils/snowQuality.ts) */
-    snowEstimate: Float32Array;
+    /**
+     * This band's wet bulb at each hour, °C, which splits its precipitation into the monkeysnow
+     * estimate's snow and rain under the visitor's Snow caution (utils/snowQuality.ts); missing on
+     * forecasts cached under an earlier SNOW_ESTIMATE_VERSION, which have snowEstimate and quality instead
+     */
+    wetBulb?: Float32Array;
+    /** Only on forecasts cached under an earlier SNOW_ESTIMATE_VERSION: Cautious's snow in the hour before each one, cm */
+    snowEstimate?: Float32Array;
     /** Everything that fell in the hour before each one, mm of water, including the showers Open-Meteo's rain leaves out */
     precipitation: Float32Array;
-    /** Each hour's Snow quality, as its index in SNOW_QUALITIES, or -1 when nothing falls */
-    quality: Int8Array;
+    /** Only on forecasts cached under an earlier SNOW_ESTIMATE_VERSION: Cautious's Snow quality of each hour, its index in SNOW_QUALITIES, or -1 when nothing falls */
+    quality?: Int8Array;
     /** km/h at 10 m above the ground; these three are missing on forecasts cached before they were kept */
     windSpeed?: Float32Array;
     /** Degrees the wind blows from, 0 = north */
@@ -314,7 +336,8 @@ export interface UseResortFilteringReturn {
         isReversed: boolean,
         temperatureMetric?: TemperatureMetric,
         snowfallEstimateMode?: SnowfallEstimateMode,
-        unitSystem?: UnitSystem
+        unitSystem?: UnitSystem,
+        snowCaution?: SnowCaution
     ) => string[];
 }
 

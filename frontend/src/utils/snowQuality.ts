@@ -4,24 +4,46 @@
  * Each Elevation band's wet bulb decides, never the model's own snowfall, which is its grid
  * cell's and the same for every band on it (docs/adr/0011).
  *
- * Snow quality is cautious: when an hour is close, it leans toward the worse label.
+ * How far Snow quality leans toward the worse label when an hour is close is the visitor's
+ * Snow caution (docs/adr/0013): Realistic follows the rain-snow studies, Cautious and Extra
+ * cautious call Rain sooner, and Extra cautious makes denser snow too.
  */
 
-import type { SnowQuality } from '../types';
+import type { SnowCaution, SnowQuality } from '../types';
 
 /** Every Snow quality from worst to best; an HourlyForecast stores each hour's as its index here */
 export const SNOW_QUALITIES: readonly SnowQuality[] = ['rain', 'sleet/mix', 'wet_snow', 'dry_snow', 'powder'];
+
+/** Every Snow caution, the most cautious first */
+export const SNOW_CAUTIONS: readonly SnowCaution[] = ['extraCautious', 'cautious', 'realistic'];
+
+/** The Snow caution a visitor starts with */
+export const DEFAULT_SNOW_CAUTION: SnowCaution = 'cautious';
+
+/** One value for each Snow caution */
+export function byCaution<T>(valueOf: (caution: SnowCaution) => T): Record<SnowCaution, T> {
+    return { extraCautious: valueOf('extraCautious'), cautious: valueOf('cautious'), realistic: valueOf('realistic') };
+}
 
 /**
  * Bumped whenever the estimate changes, so a forecast cached under an earlier one counts as
  * stale and is refetched, instead of showing labels and amounts these rules would not give.
  */
-export const SNOW_ESTIMATE_VERSION = 3;
+export const SNOW_ESTIMATE_VERSION = 4;
 
-/** Rain from this wet bulb (°C) up, where snow is less likely than 3 in 4 */
-export const RAIN_FROM = 0.5;
-/** Sleet/Mix from this wet bulb (°C) up to RAIN_FROM; below it snow is likelier than 19 in 20 */
-export const MIX_FROM = -0.5;
+/**
+ * A Snow caution's two lines, wet bulbs in °C: Sleet/Mix from `mixFrom` up, Rain from `rainFrom`
+ * up. Each comment gives how likely snow is at the two lines on Wang et al.'s (2019) curve,
+ * 1 / (1 + 6.99e-5 * e^(2 (Tw + 3.97))), which is half snow at +0.8 °C.
+ */
+export const CAUTION_LINES: Record<SnowCaution, { mixFrom: number; rainFrom: number }> = {
+    // 99% and 90%: Rain wherever there's even a 1 in 10 chance of it
+    extraCautious: { mixFrom: -1.5, rainFrom: -0.3 },
+    // 93% and 65%
+    cautious: { mixFrom: -0.5, rainFrom: 0.5 },
+    // 75% and 25%, so half snow at +0.8 °C, where the rain-snow studies put it in the mountains
+    realistic: { mixFrom: 0.25, rainFrom: 1.35 },
+};
 
 /** Wet snow has a snow-to-liquid ratio under this, Dry snow from it up */
 export const DRY_SNOW_FROM_RATIO = 10;
@@ -66,24 +88,38 @@ export function wetBulbOf(tempC: number, humidity: number, pressureHpa: number):
 }
 
 /**
- * The share of an hour's precipitation that falls as snow: all of it below MIX_FROM, none
- * from RAIN_FROM up, and a straight line between, so the label and the amount can't disagree.
+ * The share of an hour's precipitation that falls as snow: all of it below the Snow caution's
+ * Sleet/Mix line, none from its Rain line up, and a straight line between, so the label and the
+ * amount can't disagree.
  */
-export function snowFractionOf(wetBulbC: number): number {
-    if (wetBulbC <= MIX_FROM) return 1;
-    if (wetBulbC >= RAIN_FROM) return 0;
-    return (RAIN_FROM - wetBulbC) / (RAIN_FROM - MIX_FROM);
+export function snowFractionOf(wetBulbC: number, caution: SnowCaution): number {
+    const { mixFrom, rainFrom } = CAUTION_LINES[caution];
+    if (wetBulbC <= mixFrom) return 1;
+    if (wetBulbC >= rainFrom) return 0;
+    return (rainFrom - wetBulbC) / (rainFrom - mixFrom);
 }
 
 /** The ratio line's corners, [wet bulb °C, ratio], coldest first; flat beyond each end */
 const RATIO_LINE: readonly (readonly [number, number])[] = [[-25, 12], [-18, 17], [-14, 17], [-0.5, 8]];
 
 /**
- * Snow-to-liquid ratio, cm of snow per cm of water, at a wet bulb: 8 at -0.5 °C and warmer,
- * rising straight to 17 at -14, flat to -18, falling straight to 12 at -25 and colder, where
- * crystals go small. One line, kept on the low side of fresh-snow climatologies.
+ * Snow-to-liquid ratio, cm of snow per cm of water, at a wet bulb under a Snow caution. Extra
+ * cautious takes the lower of the ratio line and LaChapelle's (1962) new-snow density at Alta,
+ * 50 + 1.7 (T + 15)^1.5 kg/m³, which is denser near freezing (9.6 against the line's 11 at -5 °C);
+ * from about -10 °C down the line is the lower, so cold snow can still be Powder.
  */
-export function snowToLiquidRatioOf(wetBulbC: number): number {
+export function snowToLiquidRatioOf(wetBulbC: number, caution: SnowCaution): number {
+    const ratio = ratioLineAt(wetBulbC);
+    if (caution !== 'extraCautious') return ratio;
+    return Math.min(ratio, 1000 / (50 + 1.7 * Math.pow(Math.max(0, wetBulbC + 15), 1.5)));
+}
+
+/**
+ * The ratio line: 8 at -0.5 °C and warmer, rising straight to 17 at -14, flat to -18, falling
+ * straight to 12 at -25 and colder, where crystals go small. From 0 to -14 °C it is within 0.5 of
+ * the average of Hedstrom & Pomeroy's (1998) and LaChapelle's (1962) new-snow curves.
+ */
+function ratioLineAt(wetBulbC: number): number {
     const coldest = RATIO_LINE[0];
     const warmest = RATIO_LINE[RATIO_LINE.length - 1];
     if (wetBulbC <= coldest[0]) return coldest[1];
@@ -97,15 +133,17 @@ export function snowToLiquidRatioOf(wetBulbC: number): number {
 }
 
 /**
- * An hour's Snow quality from its wet bulb: Rain and Sleet/Mix by the two lines above, and
- * the snow labels by how fluffy the snow is, Wet snow under a ratio of 10, Dry snow from
- * 10 to 15, Powder at 15 and up. On the ratio line that is Wet snow from -0.5 °C to about
- * -3.5, Dry snow to -11, Powder to about -21, and Dry snow again in the bitter cold.
+ * An hour's Snow quality from its wet bulb under a Snow caution: Rain and Sleet/Mix by its two
+ * lines, and the snow labels by how fluffy the snow is, Wet snow under a ratio of 10, Dry snow
+ * from 10 to 15, Powder at 15 and up. On the ratio line that is Wet snow down to about -3.5 °C,
+ * Dry snow to -11, Powder to about -21, and Dry snow again in the bitter cold; Extra cautious's
+ * Wet snow runs down to about -5.5 °C.
  */
-export function snowQualityOf(wetBulbC: number): SnowQuality {
-    if (wetBulbC >= RAIN_FROM) return 'rain';
-    if (wetBulbC >= MIX_FROM) return 'sleet/mix';
-    const ratio = snowToLiquidRatioOf(wetBulbC);
+export function snowQualityOf(wetBulbC: number, caution: SnowCaution): SnowQuality {
+    const { mixFrom, rainFrom } = CAUTION_LINES[caution];
+    if (wetBulbC >= rainFrom) return 'rain';
+    if (wetBulbC >= mixFrom) return 'sleet/mix';
+    const ratio = snowToLiquidRatioOf(wetBulbC, caution);
     if (ratio >= POWDER_FROM_RATIO) return 'powder';
     if (ratio >= DRY_SNOW_FROM_RATIO) return 'dry_snow';
     return 'wet_snow';
@@ -113,7 +151,6 @@ export function snowQualityOf(wetBulbC: number): SnowQuality {
 
 /** monkeysnow's estimate for one hour */
 export interface HourlySnowEstimate {
-    wetBulb: number;
     quality: SnowQuality;
     /** cm of snow made by the hour's precipitation */
     snowCm: number;
@@ -121,15 +158,13 @@ export interface HourlySnowEstimate {
     rainMm: number;
 }
 
-/** Splits an hour's total precipitation (mm of water) into snow and rain by its wet bulb at the hour's surface pressure. */
-export function estimateHour(tempC: number, humidity: number, precipitationMm: number, pressureHpa: number): HourlySnowEstimate {
-    const wetBulb = wetBulbOf(tempC, humidity, pressureHpa);
+/** Splits an hour's total precipitation (mm of water) into snow and rain by its wet bulb, under a Snow caution. */
+export function splitHour(wetBulbC: number, precipitationMm: number, caution: SnowCaution): HourlySnowEstimate {
     const fell = Number.isFinite(precipitationMm) && precipitationMm > 0 ? precipitationMm : 0;
-    const snowWaterMm = fell * snowFractionOf(wetBulb);
+    const snowWaterMm = fell * snowFractionOf(wetBulbC, caution);
     return {
-        wetBulb,
-        quality: snowQualityOf(wetBulb),
-        snowCm: snowWaterMm * snowToLiquidRatioOf(wetBulb) / 10,
+        quality: snowQualityOf(wetBulbC, caution),
+        snowCm: snowWaterMm * snowToLiquidRatioOf(wetBulbC, caution) / 10,
         rainMm: fell - snowWaterMm,
     };
 }

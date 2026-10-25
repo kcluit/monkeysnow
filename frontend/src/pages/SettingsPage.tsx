@@ -29,6 +29,7 @@ import type {
     ViewMode,
     TemperatureMetric,
     SnowfallEstimateMode,
+    SnowCaution,
     UtilityBarStyle,
     UnitSystem,
     ResortDisplayLimit,
@@ -107,6 +108,8 @@ export interface SettingsPageProps {
     setSelectedTemperatureMetric: (m: TemperatureMetric) => void;
     snowfallEstimateMode: SnowfallEstimateMode;
     setSnowfallEstimateMode: (m: SnowfallEstimateMode) => void;
+    snowCaution: SnowCaution;
+    setSnowCaution: (c: SnowCaution) => void;
     openCardModels: () => void;
     // Utility bar
     showUtilityBar: boolean;
@@ -419,6 +422,7 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
         isHistory, setIsHistory, historyLength, setHistoryLength,
         selectedTemperatureMetric, setSelectedTemperatureMetric,
         snowfallEstimateMode, setSnowfallEstimateMode,
+        snowCaution, setSnowCaution,
         openCardModels,
         showUtilityBar, setShowUtilityBar,
         utilityBarStyle, setUtilityBarStyle,
@@ -575,6 +579,14 @@ export function SettingsPage(props: SettingsPageProps): JSX.Element {
                             <div className="settings-options-row">
                                 <OptionButton label="Model estimate" isSelected={snowfallEstimateMode === 'model'} onClick={() => setSnowfallEstimateMode('model')} />
                                 <OptionButton label="monkeysnow estimate" isSelected={snowfallEstimateMode === 'totalPrecip'} onClick={() => setSnowfallEstimateMode('totalPrecip')} />
+                            </div>
+                        </div>
+                        <div className="settings-subsection">
+                            <span className="settings-subsection-label">Snow caution</span>
+                            <div className="settings-options-row">
+                                <OptionButton label="Extra cautious" isSelected={snowCaution === 'extraCautious'} onClick={() => setSnowCaution('extraCautious')} />
+                                <OptionButton label="Cautious" isSelected={snowCaution === 'cautious'} onClick={() => setSnowCaution('cautious')} />
+                                <OptionButton label="Realistic" isSelected={snowCaution === 'realistic'} onClick={() => setSnowCaution('realistic')} />
                             </div>
                         </div>
                         <div className="settings-subsection">

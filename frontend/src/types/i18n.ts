@@ -55,6 +55,7 @@ export interface Translations {
     'command.chooseView': string;
     'command.temperatureDisplay': string;
     'command.snowfallEstimate': string;
+    'command.snowCaution': string;
     'command.utilityBar': string;
     'command.utilityBarStyle': string;
     'command.units': string;
@@ -105,6 +106,11 @@ export interface Translations {
     // Snowfall estimate
     'snowfall.model': string;
     'snowfall.totalPrecip': string;
+
+    // Snow caution
+    'snowCaution.extraCautious': string;
+    'snowCaution.cautious': string;
+    'snowCaution.realistic': string;
 
     // Utility bar style
     'utilityBarStyle.compact': string;
@@ -236,6 +242,7 @@ export const TranslationsSchema = z.object({
     'command.chooseView': z.string(),
     'command.temperatureDisplay': z.string(),
     'command.snowfallEstimate': z.string(),
+    'command.snowCaution': z.string(),
     'command.utilityBar': z.string(),
     'command.utilityBarStyle': z.string(),
     'command.units': z.string(),
@@ -286,6 +293,11 @@ export const TranslationsSchema = z.object({
     // Snowfall estimate
     'snowfall.model': z.string(),
     'snowfall.totalPrecip': z.string(),
+
+    // Snow caution
+    'snowCaution.extraCautious': z.string(),
+    'snowCaution.cautious': z.string(),
+    'snowCaution.realistic': z.string(),
 
     // Utility bar style
     'utilityBarStyle.compact': z.string(),

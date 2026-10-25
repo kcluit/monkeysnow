@@ -56,6 +56,7 @@ export const en: Translations = {
     'command.chooseView': 'Choose view',
     'command.temperatureDisplay': 'Temperature display',
     'command.snowfallEstimate': 'Snowfall estimate',
+    'command.snowCaution': 'Snow caution',
     'command.utilityBar': 'Utility bar',
     'command.utilityBarStyle': 'Utility bar style',
     'command.units': 'Units',
@@ -106,6 +107,11 @@ export const en: Translations = {
     // Snowfall estimate
     'snowfall.model': 'Model estimate',
     'snowfall.totalPrecip': 'monkeysnow estimate',
+
+    // Snow caution
+    'snowCaution.extraCautious': 'Extra cautious',
+    'snowCaution.cautious': 'Cautious',
+    'snowCaution.realistic': 'Realistic',
 
     // Utility bar style
     'utilityBarStyle.compact': 'Compact',

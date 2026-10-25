@@ -12,7 +12,7 @@ import { GraphPlot } from './GraphPlot';
 import type { GraphSync } from './graphSync';
 import type { XRange } from '../../lib/charts/plugins';
 import type { ChartTheme } from '../../lib/charts';
-import type { ElevationLevel, ProcessedResortData, ResortData, SnowfallEstimateMode, UnitSystem } from '../../types';
+import type { ElevationLevel, ProcessedResortData, ResortData, SnowCaution, SnowfallEstimateMode, UnitSystem } from '../../types';
 
 /** The time axis under the plot, and the space above it */
 const AXIS_HEIGHT = 34;
@@ -22,6 +22,7 @@ interface GraphCardProps {
     data: ResortData;
     elevation: ElevationLevel;
     snowfallMode: SnowfallEstimateMode;
+    snowCaution: SnowCaution;
     units: UnitSystem;
     theme: ChartTheme;
     sync: GraphSync;
@@ -36,14 +37,17 @@ interface GraphCardProps {
  * is only drawn while the card is on or near the screen, since hundreds of chart
  * canvases at once would use too much memory.
  */
-export function GraphCard({ resort, data, elevation, snowfallMode, units, theme, sync, bounds, plotHeight, onResortClick }: GraphCardProps): JSX.Element {
+export function GraphCard({ resort, data, elevation, snowfallMode, snowCaution, units, theme, sync, bounds, plotHeight, onResortClick }: GraphCardProps): JSX.Element {
     const { t } = useLanguage();
     const [cardRef, isNearScreen] = useInViewport<HTMLDivElement>({ rootMargin: '600px 0px' });
     const plotRef = useRef<HTMLDivElement>(null);
     const totals = calculateSnowTotals(resort);
     const webcamUrl = webcamUrls[resort.id];
 
-    const graphData = useMemo(() => graphDataOf(data, elevation, snowfallMode, units), [data, elevation, snowfallMode, units]);
+    const graphData = useMemo(
+        () => graphDataOf(data, elevation, snowfallMode, snowCaution, units),
+        [data, elevation, snowfallMode, snowCaution, units]
+    );
     const axis = useMemo(
         () => graphData && graphData.times.length > 0
             ? new GraphTimeAxis(bounds.min, bounds.max, graphData.times[0], graphData.timeZone)
